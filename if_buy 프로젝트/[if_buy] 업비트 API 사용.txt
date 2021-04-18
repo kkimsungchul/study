@@ -1,0 +1,8 @@
+[ If_buy 프로젝트 - 업비트 API 사용 ]
+	
+	참고링크 : https://docs.upbit.com/reference#%EB%B6%84minute-%EC%BA%94%EB%93%A4-1
+
+
+
+
+
