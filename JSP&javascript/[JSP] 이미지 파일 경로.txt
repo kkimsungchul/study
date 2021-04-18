@@ -1,0 +1,20 @@
+# 접근이유
+	모든 페이지의 상단에 로고바, 네이버에 들어가면 페이지 상단에 NAVER 이 써잇듯 네이트가면 네이트가 써있든 이런 로고를 넣어주려고함
+	jsp:include 를 사용하여 이미지를 넣을려고 했으나 제대로 매핑안되어서 이미지가 안뜨거나 jsp:include 가 안돼었음
+	
+
+
+# 경로접근 
+	해당경로에서 다른 파일들에 접근을 할때 ../폴더명/파일명.확장자  이런식으로 접근이 잘안됨
+	<resources mapping="/resources/**" location="/resources/" />
+	위와같이 작성되어있는 리소스 맵핑을 이용하려고 webapp 밑에 있는 resources 를 사용하여 해봤지만 매핑이 잘 되지않음
+
+	마지막에 사용하였던 방법은 
+ 	<img src="${pageContext.request.contextPath}/resources/saverLogo.png" align="center"/>	
+	이런식으로 접근하는 방법을 사용하여 접근. 
+ 	절대 경로를 사용히므로 사용하는곳이 바뀌어도 문제가 없을듯 함
+	
+	
+
+
+

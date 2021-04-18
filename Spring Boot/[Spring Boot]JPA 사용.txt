@@ -1,0 +1,106 @@
+[ 스프링 부트 - JPA 사용하기 ] 
+	
+
+	참고 URL : https://victorydntmd.tistory.com/323?category=764331
+		NO SQL 일때 편함
+
+# 라이브러리 추가
+
+	build.gradle 파일을 열어서 dependencies에 아래의 내용을 추가
+
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+	※ 추가한 내용
+	=====================================================================================================================================================
+	dependencies {
+		implementation 'org.springframework.boot:spring-boot-starter-web'
+		implementation 'org.springframework.boot:spring-boot-starter-web-services'
+		testImplementation 'org.springframework.boot:spring-boot-starter-test'
+		
+		// lombok을 위해 추가
+		compileOnly 'org.projectlombok:lombok:1.18.20'
+		annotationProcessor 'org.projectlombok:lombok:1.18.20'
+
+		testCompileOnly 'org.projectlombok:lombok:1.18.20'
+		testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
+
+		//mysql 사용을 위해 추가
+		runtimeOnly 'mysql:mysql-connector-java'
+		
+		//jap 사용을 위해 추가
+		implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	}
+
+	=====================================================================================================================================================
+
+
+# apllication.yml 설정
+
+
+	=====================================================================================================================================================
+
+	spring:
+	  datasource:
+		driver-class-name: com.mysql.cj.jdbc.Driver
+		url: jdbc:mysql://localhost:3306/if_buy?serverTimezone=UTC&characterEncoding=UTF-8
+		username: securus
+		password: securus1234
+
+	  jpa:
+		database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+		open-in-view: false
+		show-sql: true
+		hibernate:
+		  format_sql: true
+		  ddl-auto: create
+
+	logging:
+	  level:
+		org:
+		  hibernate:
+			SQL: DEBUG
+			type:
+			  descriptor:
+				sql:
+				  BasicBinder: TRACE
+
+
+	=====================================================================================================================================================
+
+
+	* spring.datasource
+		datasouce는 MySQL 설정과 관련된 것이므로 여기를 참고해주세요.
+			참고링크 : https://victorydntmd.tistory.com/321
+
+	* spring.jpa.database-platform
+		JPA 데이터베이스 플랫폼을 지정합니다.
+	* 예제에서는 MySQL InnoDB를 사용하도록 설정했습니다.
+		spring.jpa.open-in-view
+	* OSIV(Open Session In View)는 웹 요청이 완료될 때까지 동일한 EntityManager를 갖도록 해줍니다.
+		스프링부트에서 OSIV가 기본값으로 true인데, 성능과 확장상 면에서 안좋다고 해서 false로 설정을 껏습니다. ( 참고 )
+			참고링크 : https://stackoverflow.com/questions/30549489/what-is-this-spring-jpa-open-in-view-true-property-in-spring-boot
+	* spring.jpa.show-sql
+		콘솔에 JPA 실행 쿼리를 출력합니다.
+	* spring.jpa.hibernate.format_sql
+		콘솔에 출력되는 JPA 실행 쿼리를 가독성있게 표현합니다.
+	* spring.jpa.hibernate.ddl_auto
+		데이터베이스 초기화 전략을 설정합니다.
+		none
+			아무것도 실행하지 않습니다.
+		create
+			SessionFactory가 시작될 때 기존테이블을 삭제 후 다시 생성합니다.
+		create-drop
+			create와 같으나 SessionFactory가 종료될 때 drop을 실행합니다.
+		update
+			변경된 스키마만 반영합니다.
+		validate
+			엔티티와 테이블이 정상적으로 매핑되었는지만 확인합니다.
+		logging.level.org.hibernate.type.descriptor.sql
+			SQL에서 물음표로 표기된 부분( bind parameter )을 로그로 출력해서 확인할 수 있습니다.
+
+
+- 현재 적용은 하지 않음
+	spring.jpa.hibernate.naming
+		엔티티와 테이블에 대한 네이밍 전략
+	spring.jpa.hibernate.use-new-id-generator-mappings
+		auto increment에 대한 설정

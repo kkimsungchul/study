@@ -1,0 +1,26 @@
+
+보다 강력한 암호화 운용방식을 지원하기 위해서 '자바 암호화 확장'을 다운받아 설치해야 하는데, 
+이전까지는 local_policy.jar, US_export_policy.jar 두 개의 파일을 <java-home>/lib/security 폴더에 저장해두는 방식이었다.
+
+
+
+그러나, 자바 8 151 버전 이후부터는 폴더 구조가 변경되어 <java-home>/lib/security/policy 폴더가 생겼으며 
+그 안에 limited와 unlimited 폴더가 있고 각각 local_policy.jar, US_export_policy.jar 두 파일이 존재하므로 오라클 사이트에서 다운로드 받을 필요가 없어졌다.
+
+그리하여, 새로운 활성화 방법은
+<java-home>/lib/security/java.security 파일을 열어 826번째 줄에서
+ crypto.policy=unlimited
+의 주석 처리 부분을 제거한다.
+또는, 자바 소스 코드에서
+
+Security.setProperty("crypto.policy", "unlimited");
+
+라고 지정해 줄 수도 있다.
+
+추가하여, 자바 9부터는 기본적으로 unlimited strength가 활성화되어 있다고 한다. 
+
+
+# 참고 소스 파일
+
+	경로 : C:\Users\SECURUS-GRAM\Desktop\Spring-스프링프로젝트 시작\암호화\java_crypto
+

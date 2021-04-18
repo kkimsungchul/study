@@ -1,0 +1,69 @@
+# 자바 파일 이동
+
+	JDK 1.7 버전 이상부터는 Files , Path , Paths 클래스를 사용하여 파일을 이동할 수 있음
+	
+	
+
+	
+	ex) 예제
+	=====================================================================================================================================================
+
+		try {
+			Path filePath = Paths.get("/home/mjs/test/myfile");
+			Path filePathToMove = Paths.get("/home/mjs/test/myfile_moved");
+			Files.move(filePath, filePathToMove);
+		} catch (IOException e) {
+			e.printStackTrace();
+}
+
+
+	=====================================================================================================================================================
+
+
+
+	실제 적용
+	readFilePath : 기존파일 경로
+	moveDirPath : 이동할 파일 경로
+	=====================================================================================================================================================
+
+
+        System.out.println("### readFilePath : " + readFilePath);
+        System.out.println("### moveDirPath : " + moveDirPath);
+        try {
+            Path filePath = Paths.get(readFilePath);
+            Path filePathToMove = Paths.get(moveDirPath);
+            Files.move(filePath, filePathToMove);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+	=====================================================================================================================================================
+
+
+
+# 자바 디렉토리 생성
+
+※ 경로에 대해서는 마지막 하위 디렉토리까지 있어야함
+	=====================================================================================================================================================
+
+	//로그저장 폴더 생성 (월별로 생성)
+		public void mkDir(String filePath){
+			File Folder = new File(filePath);
+			System.out.println("### filePath : " + filePath);
+			// 해당 디렉토리가 없을경우 디렉토리를 생성합니다.
+			if (!Folder.exists()) {
+				try{
+					Folder.mkdir(); //폴더 생성합니다.
+					System.out.println(filePath + " 폴더가 생성되었습니다.");
+				}
+				catch(Exception e){
+					e.getStackTrace();
+				}
+			}else {
+				System.out.println(filePath + "이미 폴더가 있습니다.");
+			}
+		}
+
+	=====================================================================================================================================================

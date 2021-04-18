@@ -1,0 +1,48 @@
+https://blog.outsider.ne.kr/675
+
+
+# key값 동적 할당 하기
+
+ex1) 기본 제이슨 타입
+=================================================================================================================
+	var something = { 
+		name: 'Outsider',
+		blog: 'http://blog.outsider.ne.kr'
+	}
+
+	* 제이슨은 위와같이 key : value 로 값을 줄수가 있음
+
+
+
+ex2) 동적으로 키값 할당 시도
+=================================================================================================================
+	var keyName = "age";
+
+	var something = { 
+		name: 'Outsider',
+		blog: 'http://blog.outsider.ne.kr',
+		keyName : '18'
+	}
+
+	* 변수로 keyName 을 선언하고서 age란 값으로 키값을 동적으로 할당하고싶어도 할당이 안됨.. 해당 데이터를 보면
+	name: 'Outsider', blog: 'http://blog.outsider.ne.kr',keyName : '18' 
+	이런식으로 keyName 이 들어가버림 그 안에 값이 들어가는게 아니라
+
+
+
+
+ex3) 해결방안
+=================================================================================================================
+
+	var keyName = "age";
+
+	var something = { 
+		name: 'Outsider',
+		blog: 'http://blog.outsider.ne.kr',
+	}
+
+	something[keyName] = '18';
+
+	* 위와같이 선언하게되면 키값을 동적으로 할당이 됨
+
+	name: 'Outsider', blog: 'http://blog.outsider.ne.kr', age : '18' 

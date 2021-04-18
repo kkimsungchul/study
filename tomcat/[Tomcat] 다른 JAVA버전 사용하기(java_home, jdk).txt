@@ -1,0 +1,30 @@
+[ 톰캣에서 사용할 자바 버전 변경 ] 
+
+	환경변수에 JAVA_HOME 으로 설정한 자바는  1.8.0.192 버전
+	사용할 버전은 jdk1.8.0_121
+	
+
+
+# JAVA 버전 변경
+
+	1. 톰캣 설치 디렉토리에서 하단의 파일을 염
+	  "톰캣루트디렉토리"\bin\setclasspath.bat
+	  ex) C:\apache-tomcat-7.0.53\bin\setclasspath.bat
+
+
+	2. 해당 파일의 77, 78 번 라인을 수정
+
+	set _RUNJAVA="%JRE_HOME%\bin\java"
+	set _RUNJDB="%JAVA_HOME%\bin\jdb"
+
+	이부분을 아래와 같이 수정
+
+	set _RUNJAVA="C:\Program Files\Java\jdk1.8.0_121\bin\java"
+	set _RUNJDB="C:\Program Files\Java\jdk1.8.0_121\bin\jdb"
+
+
+	* 위와같이 수정하면 콘솔창에서 실행할때 실행된 자바버전은 기존의 자바_홈의 버전이 나오지만
+		실제로 실행되는 버전은 강제로 기재한 버전으로 실행됨
+
+	* catalina.bat , service.bat 두개의 파일에 수정을 해보았는데 적용이 안되었음 그래서 위에서 작성한 파일을 수정함
+

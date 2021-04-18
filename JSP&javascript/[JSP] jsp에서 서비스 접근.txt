@@ -1,0 +1,24 @@
+
+<%@ page import="util.UserService" %>
+<%@ page import="org.springframework.web.context.WebApplicationContext" %>
+<%@ page import="org.springframework.web.context.support.WebApplicationContextUtils" %>
+
+
+
+
+ WebApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(request.getSession().getServletContext());
+	 
+
+   UserService userService = (UserService)context.getBean("userService");
+
+
+
+
+@Service 로 생성한 인스턴스에 접근하려고 할때
+new 를 사용하여 새로운 인스턴스 생성시 널값이 나오게되어서,
+기존에 생성되어있는 서비스를 가져와서 사용해야함.
+위에 첫번째 줄에 있는 코드를 입력하면 이미 만들어져있는 서블릿컨텍스트를 가져와서 사용함
+
+두번째줄은 사용자가 생성한 서비스를 가져오는 코드,
+UserService 라는 서비스생성 후 그 안에 context.getBean을 사용해서 넣어줌
+

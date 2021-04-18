@@ -1,0 +1,343 @@
+# 참고 
+	참고 URL : https://springsource.tistory.com/4
+	참고 URL : https://okky.kr/article/238672
+
+# 인터셉터 설정
+	
+	* 모든 요청의 처리전, 처리후에 대한 데이터를 가공 하기위헤 설정
+	* 스프링 버전이 3.2 미만 버전은 경로에 대한 예외처리(<mvc:exclude-mapping path=""/>)는 지원해 주지 않아서, preHandle 또는 postHandle 에서 직접 진행하여야 함
+	
+
+# interceptor-context.xml 파일 생성
+	
+	인터셉터를 설정하기 위해서 스프링 xml 설정 파일들을 모아놓은 폴더에 interceptor-context.xml 생성
+
+
+
+# interceptor-context.xml 내용 작성
+	* <mvc:mapping path="/" />  인터셉터설정을 적용할 URI 를 매핑,
+		ex) <mvc:mapping path="/board/"/> 식으로 해당 board가 포함된 URI에 대해서는 모두 실행
+
+	* <mvc:exclude-mapping path="/test/"/> 인터셉터를 적용하지 않을 예외 URI 설정
+		ex) xxx.com/test/test.do 의경우에는 예외 URI 가 포함되어 있으므로 인터셉터가 작동하지 않음
+
+	* <bean class="securus.common.interceptor.CommonInterceptor"/> 생성한 인터셉터 클래스의 경로,
+		인터셉터를 처리할 코드를 작성한 클래스의 위치를 설정
+	
+
+================================================================================================================================================
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd  http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+
+    <!--인터셉터 처리. nocache 설정 및 모든페이지에 대해서 인터셉터 호출-->
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/"/>
+            <mvc:exclude-mapping path="/test/"/>
+            <bean class="securus.common.interceptor.CommonInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
+<!--
+    여러개의 인터셉터 등록도 가능하며, 각각의 인터셉터 클래스를 만들어서 적용도 가능함
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/"/>
+            <mvc:exclude-mapping path="/test/"/>
+            <bean class="securus.common.interceptor.CommonInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+-->
+
+</beans>
+
+
+================================================================================================================================================
+
+
+
+# CommonInterceptor.java 파일 생성 및 설정
+
+	상단의 interceptor-context.xml 파일에서 <bean class="securus.common.interceptor.CommonInterceptor"/> 로 기재한 경로에 파일 생성
+
+	* postHandle 메소드는 후처리 메소드로, 컨트롤러에 갔다 온 후에 가공할 내용을 기재
+
+	* preHandle 메소드는 전처리 메소드로, 컨트롤러에 들어가기 전에 가공할 메소드를 기재, 
+		해당 메소드의 리턴값은 boolean 으로 false 일 경우 그뒤에 실행되는 컨트롤러, postHandle 의 메소드는 실행되지 않음,
+		리턴값이 true 의경우 그 뒤에 실행해야 할 컨트롤러 postHandle 등의 메소드들이 실행됨.
+	* perHandle 에서 리턴값을 false 로 줄 경우엔 그뒤에 실행되야 할 메소드들이 전부다 실행되지 않고 멈춰버리므로, 이동할 페이지에 대해 명시해야함
+		하단의 예제는 false일 경우 main.do 페이지로 돌아가도록 설정
+		ex)
+		response.sendRedirect("/main.do");
+		return false;
+		
+================================================================================================================================================
+package securus.common.interceptor;
+
+
+import org.slf4j.LoggerFactory;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+/**
+ * Created by kimsc on 2019-01-22.
+ */
+
+
+public class CommonInterceptor extends HandlerInterceptorAdapter {
+
+    private static final org.slf4j.Logger Logger = LoggerFactory.getLogger(CommonInterceptor.class);
+    //후처리
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView mav)throws Exception{
+        Logger.info("후처리 ");
+        System.out.println("후처리");
+
+    }
+
+    //전처리
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler){
+        Logger.info("전처리~");
+        System.out.println("전처리");
+        boolean returnBoolean =true;
+        
+        if(returnBoolean==false){
+
+            try{
+                response.sendRedirect("/main.do");
+            }catch (Exception e){
+
+            }finally {
+
+            }
+
+        }
+
+        return returnBoolean;
+    }
+
+}
+
+
+
+
+
+================================================================================================================================================
+
+
+
+
+#################################################################################################################
+#################################################################################################################
+
+
+
+# 1. HandlerInterceptorAdapter 클래스를 상속받아서 인터셉터 클래스를 생성
+	ex)
+
+	import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+
+	public class SampleInterceptor extends HandlerInterceptorAdapter{
+	
+	}
+	
+
+# 2. HandlerInterceptorAdapter 클래스에 있는 메소드들을 오버라이딩 하여 작성
+	* preHandle 메소드
+		컨트롤러가 실행 되기 전에 호출, 컨트롤러 실행 이전에 처리해야할 정보들이 있을때 사용
+		리턴타입이 boolean 이며, false 를 리턴할 경우 남은 컨트롤러의 작동과 postHandle 메소드를 실행하지 않음.
+
+
+	* postHandle 메소드
+		컨트롤러 실행 후에 호출, 해당 메소드는 컨트롤러에서 전달하는 ModelAndView 타입의 객체 정보가 전달되서 로그를 남기거나 수정할수 있음.
+
+	* afterCompletion 메소드
+		모든 뷰에서 최종 결과를 생성하는 일을 포함한 모든 작업이 모두 완료된 후에 실행됨
+	
+	* 핸들러인터셉터는 하나이상 등록하여 사용 할 수 있으며, 인터셉터가 등록된 순서대로 실행됨,
+	  postHandle , afterCompletion 메소드는 preHandle 의 실생순서와 반대로 실행됨
+
+
+
+	//전처리
+	@Override
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler){
+
+	}
+
+	//후처리
+	@Override
+	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView mav)throws Exception{
+
+	}
+
+
+
+
+# 3. servlet-context.xml (이클립스) , applicationContext.xml (인텔리J) 에 인터셉터 등록
+	* 하단의 방법으로 사용, 상황에 맞게 사용하면 됨
+
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/mng_home/community/**"/>
+			<mvc:exclude-mapping path="/login/**"/>
+			<bean class="interceptorTest.SampleInterceptor"/>
+		</mvc:interceptor>
+	</mvc:interceptors>
+
+
+	또는
+
+
+	<interceptors>
+		<interceptor>
+			<mapping path="/**"/>
+			<exclude-mapping path="/login/**"/>
+
+
+			<beans:bean class="interceptorTest.InterceptorTest"/>
+		</interceptor>
+	</interceptors>
+
+
+	* <mvc:interceptors> </mvc:interceptors> , <interceptors> </interceptors>
+	   생성한 인터셉터들을 선언하는곳,
+
+	* <mvc:interceptor> </mvc:interceptor> , <interceptor> </interceptor>
+	   인터셉터들의 설정 및 경로를 선언
+
+	* <mvc:mapping path=""> , <mapping path="/**"/>
+	   인터셉터할 URL 맵핑 /login/login.do 등으로 URL 을 전부 적어도 되고, /board/** 등으로 하위경로에 대해 전부 선언해도 됨
+
+	*<bean class=""> , <beans:bean class="">
+	   2번 항목에서 생성한 인터셉터 클래스의 경로를 기재
+
+!!!!!중요!!!!!!!
+	*<exclude-mapping path="/login/**"/> , <mvc:exclude-mapping path="/login/**"/>
+	   해당 경로는 제외(인터셉터 작동하지않는 예외URL)
+	   !! 다만 해당 설정은 스프링 3.2버전부터 적용 가능. 그 이하 버전은 지원하지 않음
+	   이와 같은 경우는 후처리(postHandle 메소드) 에서 IF문으로 분기하여 예외사항을 기록
+
+
+# 4. 인터셉터설정을 단독xml파일로 설정할 경우
+	1. web.xml 파일에서  contextConfigLocation 의 value 경로를 확인,
+
+	2. 해당 경로 설정을 변경 
+		* 기본적으로는 <param-value>/WEB-INF/spring/applicationContext.xml</param-value> 이런식으로 하나만 되어있음
+		* 위 내용을  <param-value>/WEB-INF/spring/**</param-value> 로 변경 (해당 경로에 있는 xml파일들을 다 불러옴)
+	
+	    <context-param>
+	        <param-name>contextConfigLocation</param-name>
+	        <param-value>/WEB-INF/spring/**</param-value>
+	    </context-param>
+
+	3. <param-value>/WEB-INF/spring/**</param-value> 에 해당하는 경로에 interceptor.xml 등으로 파일 생성 
+		-파일명은 알아볼수 있게 작성, 다른 스프링 설정파일들과 규칙이 비슷하게 작성
+
+	4. interceptor 설정에 필요한 정보들을 등록
+		* 파일 상단 부분에 xmlns:mvc="http://www.springframework.org/schema/mvc" 추가
+		* xsi:schemaLocation=" 부분에 하단의 두줄을 추가
+			http://www.springframework.org/schema/mvc 
+			http://www.springframework.org/schema/mvc/spring-mvc.xsd
+
+		* 파일내용에 하단의 내용 추가
+				
+				 <!--인터셉터 등록하는 곳 선언-->
+			    <mvc:interceptors>
+			     <!--인터셉터 등록-->
+			        <mvc:interceptor>
+			            <!--인터셉터 할 URL 경로 설정-->
+				    <mvc:mapping path="/mng_home/**"/>
+				    <!--인터셉터 클래스의 경로 설정-->
+			            <bean class="com.securus.kr.SecureInterceptor"/>
+			        </mvc:interceptor>
+			    </mvc:interceptors>
+
+
+
+
+
+
+# 인터셉터.xml 파일 전체 소스	
+
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd  http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+
+    <!-- SecureCoding 2019-01-22 (김성철) :: 프로세스 검증 누락 취약점에 대한 보안코딩.-->
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/mng_home/**"/>
+            <bean class="com.securus.kr.SecureInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
+</beans>
+
+	
+
+
+
+
+
+# 인터셉터 클래스 전체 소스
+
+
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+//로그찍기
+import org.slf4j.LoggerFactory;
+
+
+
+/**
+ * Created by kimsc on 2019-01-22.
+ */
+
+
+public class SampleInterceptor extends HandlerInterceptorAdapter{
+
+    private static final org.slf4j.Logger Logger = LoggerFactory.getLogger(SampleInterceptor.class);
+    //후처리
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView mav)throws Exception{
+        Logger.info("인터셉터 후처리 ");
+        System.out.println("인터셉터 후처리");
+
+    }
+    //전처리
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler){
+        Logger.info("인터셉터 전처리~");
+        System.out.println("인터셉터 전처리");
+
+        return true;
+    }
+
+}
+
+
+
+
+

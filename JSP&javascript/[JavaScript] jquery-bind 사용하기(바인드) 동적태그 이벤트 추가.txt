@@ -1,0 +1,114 @@
+참고 링크 : https://minkdak.tistory.com/5
+
+[bind 사용하기]
+
+	회원가입 버튼을 눌렀을때 페이지 이동이 없이
+	<div name="insertPopup"><div> 의 공간에 
+	append 함수를 사용하여서 <input name = "idp_user_name">을 추가한 경우
+	새로 생긴 input 에 대해서 이벤트를 추가해야 할 경우가 있다.
+
+	미리 스크립트 파일에 아래와 같이 선언을 해두면 될거같지만.. 안된다..
+	페이지가 호출될때 스크립트들도 다 로드되므로, 뒤늦게 생긴 input에는 포커스 아웃 이벤트가 적용되지 않는다.
+	 $('#idp_user_name').focusout();
+
+
+	그럴경우 bind를 사용하여서 이벤트를 연결시켜주면 된다.
+	
+	아래의 예시
+
+<html>
+	<body>
+		<button value="회원가입" onclick="loadInsertForm">
+	<body>
+<html>
+
+
+function loadInsertForm(){
+	$("#insertPopup").append('<input name = "idp_user_name">');
+	testBind();
+}
+
+
+
+function testBind(){
+	$('#idp_user_name').bind({
+        focusout : idcheck
+    });
+}
+
+
+
+
+[ 동적으로 생성된 태그에 이벤트 추가 ]
+
+	참고 URL : https://roqkffhwk.tistory.com/45
+
+	위와같이 바인드로 되는애들이 있는반면.. 안먹히는 애들이 있다.
+
+
+	버튼을 동적으로 가져왔는데... 이벤트가 먹지 않는다.
+		<input id="${ssoUserList.entityCode}"type="button" value="통제" class="buttonClass" >
+	
+	해당 버튼을 클릭했을때 이벤트는 미리 적어놨었는데...안됨..
+
+
+
+	$(".buttonClass").click(function(){
+		어쩌고 저쩌고
+	})
+	
+
+
+$(".buttonClass").click(function(){ 
+이부분을
+ $(document).on("click",".buttonClass",function(){
+
+이렇게 변경해주자
+
+
+그런애들은 아래와같이 수정해주자
+
+
+
+기존소스 
+=================================================================================================================
+		$(".buttonClass").click(function(){
+            console.log("gggggggg")
+            var stateCircle = $(this).prop("id");
+            if($(this).val()=='통제'){
+                $(this).prop("value","해제");
+                $("."+stateCircle).css("color","red");
+            }else if($(this).val()=='해제'){
+                $(this).prop("value","통제");
+                $("."+stateCircle).css("color","green");
+            }
+        })
+
+=================================================================================================================
+
+
+수정된 소스
+=================================================================================================================
+       $(document).on("click",".buttonClass",function(){
+
+            console.log("gggggggg")
+            var stateCircle = $(this).prop("id");
+            if($(this).val()=='통제'){
+                $(this).prop("value","해제");
+                $("."+stateCircle).css("color","red");
+
+
+            }else if($(this).val()=='해제'){
+                $(this).prop("value","통제");
+                $("."+stateCircle).css("color","green");
+
+
+            }
+        });
+
+=================================================================================================================
+
+
+
+
+

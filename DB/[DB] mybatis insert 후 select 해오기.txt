@@ -1,0 +1,58 @@
+[ mybatis insert 후 select 해오기 ]
+
+	데이터베이스에 값을 넣은 후, 해당 테이블의 키값을 가져와야 할때가 있음
+	참고 URL : https://taetaetae.github.io/2017/04/04/mybatis-useGeneratedKeys/
+				https://choija.tistory.com/33
+		
+=================================================================================================================
+	ex)
+		테이블에 값을 넣을때 'schedule_seq' 칼럼은 자동생성되는 키값임
+			아래와 같이 schedule_seq 값은 insert 할때 넣지 않음
+			schedule_seq
+			entity_code
+			schedule_time
+			.....
+
+			insert entity_code , schedule_time ......
+
+=================================================================================================================
+
+	위와같이 insert 를 하고 난뒤에 키값을 가져오고 싶은데 쿼리문을 두번사용하기에는 낭비같아 보여서 찾은 방법
+
+	ex ) 두번 실행 예시
+	# INSERT 문 실행
+
+	INSERT INTO 테이블 entity_code , schedule_time ......
+
+	# SELECT 문 실행
+	SELECT  schedule_seq FROM
+
+
+이럴때 mybatis 에서 인설트한 키값을 바로 가져올 수 있음
+
+	
+	기존에는 아래와 같이 인설트 문을 실행함
+	<insert id="insertSystemSchedule" parameterType="hashMap">
+
+
+	아래와 같이 수정하면 인설트 후 키값을 바로 가져 올 수 있음
+	<insert id="insertSystemSchedule" useGeneratedKeys="true" keyProperty="schedule_seq" parameterType="hashMap">
+		
+		* keyProperty : 키값의 필드명
+		* 
+		
+
+	해당 키값은 파라메터로 보냈던 hashMap에 바인딩됨
+
+	처음에 hashMap에 아래의 두개의 칼럼뿐이 없었다면,
+		"entity_code" , "schedule_time"
+
+	인설트 문을 실행 한 후에는 hashMap에 아래와 같이 키값이 추가되어있음
+		"entity_code" , "schedule_time" , "schedule_seq" 
+
+
+	VO를 사용하는 경우에는 VO에다가 키값에 대한 필드를 만들어주면 거기에 자동으로 바인딩됨
+
+
+
+

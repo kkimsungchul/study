@@ -1,0 +1,28 @@
+[ ajax 사용하기 ]
+	
+	* 참고 URL : https://ooz.co.kr/58
+
+
+
+	
+	/*
+    * url : 데이터를 전송할 곳
+    * type : 데이터를 보낼 방법 - post , get 생략가능
+    * contentType : 인코딩- 글자깨질경우만 기재
+    * data : 보낼값, { 키값 : "벨류값" , 키값 : "벨류값"}
+    * success : 보낸 요청에 대한 응답이 성공했을 경우
+    * error : 보낸 요청에서 에러가 발생했을 경우
+	* async: true 또는 false 동기 비동기여부 체크, 모든처리결과과 완료된 후에 실행될 때 true 체크
+    * */
+    $.ajax({
+        url: "/user/getUserList.do",
+        type: "POST",
+        dataType: "JSON",
+        contentType: "application/x-www-form-urlencoded; charset=UTF-8", // 인코딩 설정
+        data: {
+            pageNum: pageNum,
+            deptId: deptId,
+            userStatus: userStatus,
+            displayQuantity: $displayQuantity
+        },
+        success: function (data) {

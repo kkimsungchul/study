@@ -1,0 +1,18 @@
+# MY SQL 함수 생성시 생성이 안되는 에러 (1418 에러코드 )
+
+	에러내용 : 
+		mysql error 1418 this function has none of deterministic no sql or reads sql data in its declaration
+	
+	참고 URL : 
+		http://www.mysqlkorea.com/gnuboard4/bbs/board.php?bo_table=community_03&wr_id=1965
+		https://dzzienki.tistory.com/34
+		https://godlvkhj.tistory.com/98
+
+
+# 해결 
+	아래의 쿼리문 실행 후 함수 생성 쿼리문을 입력하면 됨
+
+	SET GLOBAL log_bin_trust_function_creators = 1;
+
+
+

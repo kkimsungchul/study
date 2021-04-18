@@ -1,0 +1,63 @@
+[JQUERY 버전 두개 사용하기]
+	ex ) 개발에 사용한 Jquery버전은 3.3.1 버전
+		 달력 컴포넌트에서 필요로 하는 Jquery버전은 1.7 버전일 경우
+		 동시에 두개의 Jquery를 선언하면 에러가 발생함
+
+
+# 참고URL 
+	https://ooz.co.kr/202
+	https://www.codingfactory.net/10795
+	https://sdsupport.cafe24.com/board/tip/read_begin.html?no=624&board_no=1002
+
+
+
+# 스크립트 선언
+	
+	<script src="/common/bootstrap/vendor/jquery/jquery.min.js"></script>
+
+	<script src="/common/js/jquery.min.js"></script>
+	
+
+# 사용방법 및 사용 소스
+	$ 표시는 Jquery에서 Jquery를 구분하기위한 Alias(별칭) 일 뿐이여서 변경이 가능함,
+	공통적으로 사용할 Jquery (3.3.1버전으로 제일 상단에 선언) 는 $를 그대로 사용
+	특정 위치에서만 사용할 Jquery(1.7 버전으로 달력 컴포넌트에서만 사용) 는 dp라는 별칭을 주어서 사용
+	noConflict(); 함수를 사용할때 뒤에 인자값으로 true, false 를 줄 수 있는데
+	true 를 주면 다른버전의 전역변수를 전부 삭제한다고 함
+
+
+
+<script>
+    //1.7버전의 Jquery는 dp라는 별칭으로 사용하기위해 선언
+    var dp = jQuery.noConflict();
+
+    dp(function() {
+        dp("#startLogCalendar").datepicker({
+		.....
+
+		});
+
+        dp("#endLogCalendar").datepicker({
+		.....
+        });
+    });
+
+
+    function test(){
+        console.log(dp("#startLogCalendar").val());
+        console.log(dp("#endLogCalendar").val());
+        console.log(dp("#searchColumn").val());
+        console.log(dp("#searchValue").val());
+
+    }
+</script>
+
+
+<script>
+
+    $(function () {
+        getsmaccessLogList();
+    });
+</script>
+
+

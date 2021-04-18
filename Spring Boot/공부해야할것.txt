@@ -1,0 +1,36 @@
+JWT 인증토큰
+
+https://docs.upbit.com/reference#%EC%9B%90%ED%99%94-%EC%9E%85%EA%B8%88%ED%95%98%EA%B8%B0
+
+
+JWT / MQ / SPRING MSA
+
+
+GRADLE / MAVEN 차이점
+
+GIT / JENKINS 사용법
+
+
+JIRA / REDMINE
+
+JWT : 인증방식
+MQ : 메시지큐 / 메시지 전달방식
+MSA : 구조
+GRADLE / MAVEN : 라이브러리 다운 및 적용 방식
+GIT : 소스 형상관리
+JENKINS : 배포 툴
+JIRA / REDMINE : 업무 협의 툴
+
+MSA -> Docker(Container) -> K8S(Kubernetes)
+
+CI /CD
+
+NoSQL / Elasticsearch
+
+ELK => Elasticsearch / Logstash / Kibana
+
+MongoDB
+
+AWS / GCP / AZURE
+
+aaS / PaaS / SaaS / FaaS / BaaS

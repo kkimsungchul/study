@@ -1,0 +1,43 @@
+[ 스프링부트 - thymeleaf 사용 ]
+	참고 URL :https://qiita.com/rubytomato@github/items/ac65c2203d16d1a1bbd7
+
+
+# HTML 페이지 생성
+	
+	- xmlns:th="http://www.w3.org/1999/xhtml"
+		XHTML 문서를 위한 XML 네임스페이스를 명시하는 것으로, 생략해도 정상동작합니다.
+		IntelliJ에서 thymeleaf 문법 사용 시, 문법 에러가 발생하여 추가하였습니다.
+		참고 URL : http://tcpschool.com/html-tag-attrs/html-xmlns
+
+	- th:insert
+		헤더와 푸터처럼 다른 페이지를 현재 페이지에 삽입하는 역할을 합니다. 
+		JSP의 include와 같습니다.
+		참고 URL : https://www.thymeleaf.org/doc/articles/layouts.html
+
+	- th:href
+		thymeleaf에서 html 속성은 대부분 이처럼 th: 으로 바꿔서 사용할 수 있습니다.
+		@{ } 의 의미는 애플리케이션이 설치된 경로를 기준으로 하는 상대경로 입니다. 
+		예제에서 @{/post}는 URL이 http://localhost:8080/post 가 되겠네요.
+		참고 URL : https://www.thymeleaf.org/doc/articles/standardurlsyntax.html#context-relative-urls
+
+	* 예시
+	=================================================================================================================
+
+		<!DOCTYPE html>
+		<html lang="ko" xmlns:th="http://www.w3.org/1999/xhtml">
+		<head>
+			<meta charset="UTF-8">
+			<title>If Buy...껄껄껄</title>
+		</head>
+		<body>
+		<!--HEADER-->
+		<div th:insert ="common/header.html" id="header"></div>
+
+		<a th:href="@{/post}">글작성</a>
+
+		<!--FOOTER-->
+		<div th:insert="common/footer.html" id="footer"></div>
+		</body>
+		</html>
+
+	=================================================================================================================

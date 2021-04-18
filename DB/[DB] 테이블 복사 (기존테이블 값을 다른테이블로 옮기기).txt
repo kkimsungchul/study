@@ -1,0 +1,100 @@
+[ 데이터베이스 테이블 복제  - MYSQL]
+
+# 테이블 복사하기 스키마 + 데이터
+
+CREATE TABLE 새로만들테이블명 AS
+
+SELECT * FROM 복사할테이블명 [WHERE 절]
+
+ 
+
+# 테이블 구조만 복사하기
+
+CREATE TABLE 새로만들테이블명 AS
+
+SELECT * FROM 복사할테이블명 WHERE 1=2 [where에다가 참이 아닌 조건을 넣어줌]
+
+ 
+
+# 테이블은 이미 생성되어 있고 데이터만 복사
+
+INSERT INTO 복사할테이블명 SELECT * FROM 복사할테이블명 [WHERE 절]
+
+
+
+
+[ 데이터베이스 테이블 복제  - MSSQL]
+
+
+
+1. 테이블을 생성하면서 테이블의 데이타 복사
+
+
+select * into 생성될테이블명 from 원본테이블명
+
+
+테이블 구조만 복사하겠다면
+
+select * into 생성될테이블명 from 원본테이블명 where 1=2
+
+
+2. 테이블이 이미 생성되어 있는경우 데이타만 복사
+
+
+insert into 카피될테이블명 select * from 원본테이블명
+
+
+특정 데이타만 복사 하겠다면
+
+insert into 카피될테이블명 select * from 원본테이블명 where 검색조건
+
+
+
+
+
+
+[ 데이터베이스 테이블의 값 복사하기 ]
+
+
+	* 기존테이블 A 에서 신규테이블 B로 모두 이동
+	* 기존테이블 A 에서 신규테이블 B로 특정칼럼만, 또는 특정 조건에 맞는 값만 이동
+
+	* 기존테이블 A 에서 기존테이블 B로 특정 칼럼의 값만 이동
+	* 기존테이블 A 에서 기존테이블 B로 특정 칼럼만, 또는 특정 조건에 맞는 값만 이동
+
+
+
+# 1. 기존테이블 A 에서 신규테이블 B로 모두 이동
+
+	쿼리문
+
+
+
+# 2. 기존테이블 A 에서 신규테이블 B로 특정칼럼만, 또는 특정 조건에 맞는 값만 이동
+
+	쿼리문
+
+
+# 3. 기존테이블 A 에서 기존테이블 B로 특정 칼럼의 값만 이동
+
+	쿼리문
+
+	
+# 4. 기존테이블 A 에서 기존테이블 B로 특정 칼럼만, 또는 특정 조건에 맞는 값만 이동
+
+	
+	쿼리문
+	INSERT INTO B (칼럼명, 칼럼명, 칼럼명)
+	SELECT  칼럼명, 칼럼명, 칼럼명 
+	FROM A
+
+
+	ex)
+	INSERT INTO securus_sp_user (idp_user_id,sp_user_id,sp_dept_id,sp_entity_code,register_date,sp_id_regist_date) 
+	SELECT idp_user_id, idp_user_id,idp_user_deptid,idp_user_ppss_dutyid02,idp_user_regist_date,idp_user_regist_date
+	FROM securus_idp_user WHERE idp_user_regist_date<20200601
+
+
+
+
+

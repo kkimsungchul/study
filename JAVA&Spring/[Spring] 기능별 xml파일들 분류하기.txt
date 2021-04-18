@@ -1,0 +1,72 @@
+# xml파일들 분류하기.
+
+	스프링 프로젝트의 기본 구성을 다 생성한 뒤에 보면
+	contextapplication.xml 또는 applicationContext.xml 또는 root-context.xml 등으로 생성되는것이 보임
+		* 이클립스의 경우 servlet-context.xml , root-context.xml 으로 생성
+		* 인텔리J 의 경우 dispatcher-servlet.xml , applicationContext.xml 으로 생성
+
+	* root-context.xml 또는 applicationContext.xml 파일에 해당 스프링에서 사용할 설정들을 전부다 넣어줘도 되긴 하나.. 프로젝트가 커질수록 해당 xml파일 내에 기재해야 하는 내용들이 많아짐
+	그에따라서 기능별로 xml 파일을 생성하여 관리함
+	
+	* 기능별로 분류하여서 생성한 xml파일들은 web.xml파일에 등록해줘야 하므로 네이밍 규칙을 맞춰서 작성하는게 편힘
+
+	... 뭐 굳이 분리 는안해도되나.. 보기좋자네...
+
+
+* 하단의 내용들은 CIIM-manager 프로젝트를 진행하면서 xml파일들을 분류한 내용임
+
+
+
+# web.xml에 등록
+
+	* 네이밍 규칙을 맞춰서 작성하였다면 아래의 두줄의 코드로 모든 xml 파일들이 등록가능
+	* context- xxxxxxx .xml 로 된 파일들은 전부다 등록되는 코드
+	* " * " 를 사용하면 별표자리에는 어떠한 단어가 와도 된다라는 뜻이고, " ** " 로 작성하면 해당경로에 있는 모든 파일을 의미함
+	
+================================================================================================================================================
+
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>/WEB-INF/spring/context-*.xml</param-value>
+    </context-param>
+================================================================================================================================================
+
+	
+
+
+
+	
+
+	
+	
+# context-application.xml
+	기본적인 설정 내용을 기재
+================================================================================================================================================
+    <context:component-scan base-package="securus.**"/>
+    <mvc:annotation-driven/>
+
+    <!--viewResolver 설정-->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/views/"/>
+        <property name="suffix" value=""/>
+    </bean>
+
+================================================================================================================================================
+
+# context-datasource.xml
+	데이터베이스 설정 및 연결과 관련된 내용을 기재
+
+# context-interceptor.xml
+	인터셉터와 관련된 내용을 기재
+
+# context-properties.xml
+	외부 설정 파일과 관련된 내용을 기재
+	
+# context-transaction.xml
+	트랜잭션고 관련된 내용을 기재
+
+
+
+
+
+

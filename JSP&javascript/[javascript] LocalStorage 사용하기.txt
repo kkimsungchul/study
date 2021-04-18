@@ -1,0 +1,44 @@
+[ 로컬스토리지 사용하기 ]
+		
+		참고 URL : https://velog.io/@kler/TIL4-%EB%A1%9C%EC%BB%AC%EC%8A%A4%ED%86%A0%EB%A6%AC%EC%A7%80-%EC%84%B8%EC%85%98%EC%8A%A4%ED%86%A0%EB%A6%AC%EC%A7%80-%EC%BF%A0%ED%82%A4-%EC%A0%95%EB%A6%AC
+
+		
+
+# 형태
+	key ,value 값으로 구현되어있으며, 자바의 hashmap 과 비슷함
+	
+
+# 값 꺼내오기 
+
+	localStorage.getItem("ipCheck")
+	
+# 값 저장하기
+
+	localStorage.setItem("ipCheck","192.168.0.1")
+
+
+
+# 예시
+
+		<script>
+			var userIP = localStorage.getItem("ipCheck")
+			var userAgent = localStorage.getItem("securus_user_agent")
+			var NowDate = localStorage.getItem("NowDate")
+			
+			
+			if (userIP =='<%=ipCheck%>'){
+				if (userAgent =='<%=securusUserAgent%>'){
+
+					var timeCheck = '<%=NowDate%>' -  NowDate
+					if (timeCheck<10){
+						alert("빠른시간내에 반복적으로 로그인을 시도 할 수 없습니다.")
+						history.back();
+					}					
+				}
+			}
+			
+			localStorage.setItem("securus_user_agent",'<%=securusUserAgent%>')
+			localStorage.setItem("NowDate",'<%=NowDate%>')
+			localStorage.setItem("ipCheck",'<%=ipCheck%>')
+			
+		</script>

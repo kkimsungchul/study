@@ -1,0 +1,80 @@
+[JQUERY 달력 사용]
+
+※ Jquery버전을 1.7버전을 사용해야 함, 개발에 사용한 Jquery버전은 3.3.1버전이므로 
+	동시에 두개의Jquery를 사용하게되면 에러가 발생함,
+	이와관련하여서는 현재 문서가 있는 폴더 내에서 "jquery_다른버전 두개 동시에 사용하기.txt" 파일을 참고하여 설정 적용
+
+
+# 참고 
+	http://www.nextree.co.kr/p9887/
+	https://offbyone.tistory.com/230
+	https://zetawiki.com/wiki/JQuery_UI_%EB%82%A0%EC%A7%9C%EC%84%A0%ED%83%9D%EA%B8%B0_datepicker
+	http://blog.naver.com/PostView.nhn?blogId=psy10604&logNo=70127458663
+
+
+
+
+# jquery 라이브러리 다운로드
+	※ jquery 3.3.1.min.js 버전을 사용하면 정상적인 작동이 안됨.
+
+	http://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css
+	http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js
+	http://code.jquery.com/ui/1.8.18/jquery-ui.min.js
+
+
+
+# 스크립트 추가
+    * 직접다운받아서 사용해도되며, 사용할 경우에 jquery-ui.css 파일에 필요한 이미지들도 다운받아서 경로상에 넣어준다.
+
+	
+	<link rel="stylesheet" href="http://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css" />
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="http://code.jquery.com/ui/1.8.18/jquery-ui.min.js"></script>
+
+
+
+# 스크립트 작성
+
+	
+$(function() {
+        $("#startLogCalendar").datepicker({
+            showMonthAfterYear:true,
+            monthNamesShort: ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'],
+            dayNamesMin: ['일','월','화','수','목','금','토'],
+            showAnimation: 'slider',
+            dateFormat: 'yymmdd',
+            nextText: '다음 달',
+            prevText: '이전 달',
+            showOtherMonths: true,
+            selectOtherMonths: true,
+            changeMonth: true,
+            changeYear: true
+        });
+
+        $("#endLogCalendar").datepicker({
+            showMonthAfterYear:true,
+            monthNamesShort: ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'],
+            dayNamesMin: ['일','월','화','수','목','금','토'],
+            showAnimation: 'slider',
+            dateFormat: 'yymmdd',
+            nextText: '다음 달',
+            prevText: '이전 달',
+            showOtherMonths: true,
+            selectOtherMonths: true,
+            changeMonth: true,
+            changeYear: true
+        });
+    });
+
+
+# HTML 작성
+	* 인풋 태그를 클릭시에 달력컴포넌트가 하단에 출력되며, 날짜 클릭시에 달력컴포넌트 창이 사라짐
+
+	 <input type="text" id="startLogCalendar" name="logCalendar"> - <input type="text" id="endLogCalendar" name="logCalendar">
+
+
+
+
+
+
+

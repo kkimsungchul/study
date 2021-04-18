@@ -1,0 +1,42 @@
+[ 스프링 부트 - devtools 설정]
+	
+	참고 url : 
+		https://haviyj.tistory.com/11
+
+# 설정
+
+	1. build.gradle파일에 devtools dependency를 추가
+	
+	=================================================================================================================
+	
+		dependencies {
+			...중략...
+
+			compile('org.springframework.boot:spring-boot-devtools')
+
+
+		}
+	=================================================================================================================
+
+	2. intellij에서 Action을 찾는 단축키인 ctrl+shift+A로 registry를 검색
+
+	3.compiler.automake.allow.when.app.running을 체크
+
+	4.Settings -> Build -> Compiler에서 Build project automatically를 체크
+
+
+	5. application.yml 파일에 내용 추가
+		※ 디폴트로 사용할 경우 추가하지 않아도 됨
+		=================================================================================================================
+		spring:
+		  devtools:
+			livereload:
+			  enabled : true
+		  freemarker:
+			cache: false
+
+		=================================================================================================================
+
+
+	6. 크롬에서 LiveReload 확장모듈 추가
+	https://chrome.google.com/webstore/detail/livereload/jnihajbhpnppcggbcgedagnkighmdlei?hl=ko

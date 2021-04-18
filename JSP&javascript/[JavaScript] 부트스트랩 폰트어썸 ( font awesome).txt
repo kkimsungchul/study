@@ -1,0 +1,51 @@
+
+# 부트스트랩 폰트어썸 ( font awesome)
+
+	부트스트랩 쓰다보면 아이콘들이 있는데, 이미지 경로나,,뭐 그런게 없고 그냥 <i class="fas fa-laugh-wink"></i> 되어 있는 경우가 있음.
+
+	해당 css의 class 는 폰트어썸의 아이콘을 사용하는 것이므로, 이미정의 되어있는 클래스를 가져오는것뿐임, 그래서 파일 경로나 그런게 없음.
+
+	폰트어썸을 사용하려면
+	문서의 상단에 
+	<link href="/common/bootstrap/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+
+	를 정의해주고,
+
+	쓰고싶은 아이콘을 
+	https://fontawesome.com/icons?from=io
+	에서 찾은뒤 적용하면 된다.
+	
+	ex)
+		<i class="fas fa-arrow-right"></i>
+
+
+
+# 크기 조절
+
+	i 태그 class 뒤에 fa-5x, fa-2x 등을 추가하여서  크기를 조절
+	fa-lg
+	fa-2x
+	fa-3x
+	fa-4x
+	fa-5x	
+
+
+	ex)
+		<i class="fas fa-arrow-right fa-5x"></i>
+
+
+# 색상 변경
+	CSS 스타일 속성을 추가하여서 색상을 지정해 주면 된다
+
+	ex)
+		<i class="fas fa-arrow-right fa-5x" style="color:blue></i>
+		"
+
+
+
+
+
+참고 URL : https://zzznara2.tistory.com/543
+	
+
+크기조절 : https://nuknukhan.tistory.com/38

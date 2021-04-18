@@ -1,0 +1,63 @@
+http://www.devkuma.com/books/pages/740
+
+resultType에는 검색 결과를 Java의 어떤 형태로 변환할 것인지를 설정한다.
+
+일반적으로 java.util.Map과 같이 변환 되는 클래스의 FQCN(Fully Qualified Class Name)를 지정한다.
+
+그러나, 일부 자주 이용하는 형태에 대해서는 미리 별칭(alias)이 정의되어 짧은 이름으로 지정할 수 있다.
+
+이하는, org.apache.ibatis.type.TypeAliasRegistry에서 추출하였다.
+
+별칭(alias)	데이터 형태(data type)
+
+string	String
+date	Date
+map	Map
+hashmap	HashMap
+list	List
+arraylist	ArrayList
+decimal	BigDecimal
+bigdecimal	BigDecimal
+biginteger	BigInteger
+_byte	byte
+_long	long
+_short	short
+_int	int
+_integer	int
+_double	double
+_float	float
+_boolean	boolean
+_byte[]	byte[]
+_long[]	long[]
+_short[]	short[]
+_int[]	int[]
+_integer[]	int[]
+_double[]	double[]
+_float[]	float[]
+_boolean[]	boolean[]
+byte	Byte
+long	Long
+short	Short
+int	Integer
+integer	Integer
+double	Double
+float	Float
+boolean	Boolean
+byte[]	Byte[]
+long[]	Long[]
+short[]	Short[]
+int[]	Integer[]
+integer[]	Integer[]
+double[]	Double[]
+float[]	Float[]
+boolean[]	Boolean[]
+object	Object
+date[]	Date[]
+decimal[]	BigDecimal[]
+bigdecimal[]	BigDecimal[]
+biginteger[]	BigInteger[]
+object[]	Object[]
+collection	Collection
+iterator	Iterator
+ResultSet	ResultSet
+원시형의 경우는 언더스코어(_)를 앞에 붙인다. 붙이지 않는 경우는 래퍼 클래스가 되므로 주의하자.

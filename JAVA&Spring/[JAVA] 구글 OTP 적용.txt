@@ -1,0 +1,27 @@
+
+[구글 OTP 구현 예제 블로그]
+ 
+https://zero-gravity.tistory.com/221
+https://enterkey.tistory.com/221
+https://miniweb4u.tistory.com/18
+
+
+#1 라이브러리 다운로드
+	라이브러리 명 : commons-codec-1.9.jar
+	http://zero-gravity.tistory.com/attachment/cfile21.uf@257BEF4353A24A3A3738AA.jar
+
+	* 자바 버전에 1.6 이하일 경우 security.jar 라이브러리를 추가로 다운로드
+
+
+
+
+
+
+#2 적용 방법
+	* 소스를 긁어와서 사용하되 필요한 부분만 수정하였음
+
+
+
+
+OTP 키 발급 또는 URL 생성 메소드
+

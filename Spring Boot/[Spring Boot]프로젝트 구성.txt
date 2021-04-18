@@ -1,0 +1,32 @@
+[ 스프링부트 - 프로젝트 구성 ]
+	참고 url : https://victorydntmd.tistory.com/325?category=764331
+
+# JAVA 디렉토리
+	- controller
+		URL과 실행 함수를 매핑
+		비즈니스 로직이 있는 service를 호출하여 비즈니스 로직 처리
+		반환할 템플릿을 정의 및 JSON 등으로 응답
+	- service
+		비즈니스 로직을 구현
+		데이터 처리(모델)를 담당하는 repository에서 데이터를 가져와서 controller에 넘겨주거나, 비즈니스 로직을 처리
+	- domain > entity
+		DB 테이블과 매핑되는 객체(Entity)를 정의
+		JPA에서는 Entity를 통해 데이터를 조작함
+	- domain > repository
+		데이터를 가져오거나 조작하는 함수를 정의
+		Interface를 implements하여 미리 만들어진 함수를 사용할 수 있으며, 또한 직접 구현이 가능
+	- dto
+		controller와 service 간에 주고 받을 객체를 정의하며, 최종적으로는 view에 뿌려줄 객체
+		Entity와 속성이 같을 수 있으나, 여러 service를 거쳐야 하는 경우 dto의 몸집은 더 커짐
+		ex) AEntity에 a 속성, BEntity에 b속성이 있을 때, ZDto에 a,b 속성으로 정의될 수 있음
+		entity와 dto를 분리한 이유는 Entity는 DB 테이블이 정의되어 있으므로, 데이터 전달 목적을 갖는 객체인 dto를 정의하는 것이 좋다고 합니다. 
+		※ 참고 : https://jojoldu.tistory.com/251#2-3-controller--dto-%EA%B5%AC%ED%98%84
+
+
+# resources 디렉토리
+
+	- static
+		css, js, img 등의 정적 자원들을 모아놓은 디렉토리입니다.
+	- templates
+		템플릿을 모아놓은 디렉터리입니다.
+		Thymeleaf는 HTML을 사용합니다.

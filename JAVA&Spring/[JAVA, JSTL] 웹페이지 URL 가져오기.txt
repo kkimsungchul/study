@@ -1,0 +1,67 @@
+[ 사이트 URL 가져오기 ]
+
+
+	
+
+# JSTL을 사용하여 URL 가져오기
+	ex : http://localhost:80/test/index.jsp?query=1
+	
+	위 URL 을 JSTL 로 표편하면 아래의 구조와 같음
+
+	[scheme]://[serverName]:[serverPort]/[servletPath]?[queryString]
+
+
+
+	${pageContext.request.requestURL} : 
+		http://localhost:80/test/index.jsp
+
+	${pageContext.request.scheme} : 
+		http
+	
+	${pageContext.request.serverName} : 
+		localhost
+		
+	${pageContext.request.serverPort} : 
+		80
+
+	${pageContext.request.requestURI} : 
+		/test/index.jsp
+
+	${pageContext.request.servletPath} : 
+		/index.jsp
+
+	${pageContext.request.queryString} : 
+		query=1
+
+
+# JAVA 에서 가져오기
+	URL : http://localhost:9080/xssInput.do?seq=1
+
+	 request.getRequestURL() : 
+		http://localhost:9080/xssInput.do
+	 
+	 request.getScheme() : 
+		http
+	 
+	 request.getServerName() : 
+		localhost
+	 
+	 request.getServerPort() : 
+		9080
+	 
+	 request.getRequestURI() : 
+		/xssInput.do
+	 
+	 request.getServletPath() : 
+		/xssInput.do
+	 
+	 request.getQueryString() : 
+		seq=1
+
+
+
+		
+
+
+
+

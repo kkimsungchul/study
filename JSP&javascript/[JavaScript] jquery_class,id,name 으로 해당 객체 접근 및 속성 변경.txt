@@ -1,0 +1,91 @@
+# ID 로 접근시
+	$('#아이디')
+
+	ex)  $("#idp_user_id").show();
+
+
+# class로 접근시
+
+	$('.클래스명')
+	
+	ex) $('.trClass').empty();
+
+# name 으로 접근시
+	$('tag_name[name=name]')
+	
+	ex) $("input[name=userId]")
+	ex) $("input[name=사용자가 지정한 아이디 입력 ]")
+	
+
+# 값 가져오기
+	$('#아이디').val();	
+	
+	ex)
+		$("#idp_user_id").val();
+
+
+# 속성 가져오기
+	
+	$('#아이디').attr("속성명");
+
+	ex)
+	$("#idp_user_id").attr("disabled")
+
+
+# 속성 변경하기
+
+	$('#아이디').attr("속성명",속성값);
+	
+	ex)
+	$("#idp_user_id").attr("disabled",true);
+
+
+# 속성 제거하기
+
+	$('#아이디').removeAttr("속성명");
+
+	ex)
+	$("#idp_user_id").removeAttr("disabled");
+	
+
+
+# 사용 예시, 하단참고
+
+	
+ex) 
+1. 하단과 같이인풋이 있고 벨류가 있으며, onclick 이벤트를 넣은후 매게변수로 this 를 넣어줌
+	<input id="timeDay" type="checkbox" class="" value="timeDayValue" onclick="schduleCValueCheck(this)">
+
+
+2. 그렇게 하고 해당 함수에서 받을때
+
+
+    function schduleCValueCheck(clickInput){
+
+	//this로 가져온 해당 객체의html을 표시
+        console.log(clickInput);
+	
+
+	//해당객체의 value 값만 표시
+        console.log($(clickInput).val());
+
+
+	//해당객체에서 attr("disabled") 의 속성값을 표시
+        console.log($("#"+$(clickInput).val()).attr("disabled"));
+
+
+
+        var disabledCheck=$("#"+$(clickInput).val()).attr("disabled");
+
+        if(disabledCheck=='disabled'){
+            $("#"+$(clickInput).val()).removeAttr("disabled");
+        }else{
+            $("#"+$(clickInput).val()).attr("disabled",true);
+        }
+
+
+    }
+
+
+
+

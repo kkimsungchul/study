@@ -1,0 +1,159 @@
+[ 스프링부트 - 어노테이션(Annotation) 및 클래스 설정 ]
+	참고 URL : https://victorydntmd.tistory.com/333?category=764331
+
+
+# 공통
+	@Slf4j
+		logger 클래스랑 같다고 보면댐
+		클래스명 위에 선언해주면됨
+
+		log.info("### resList : {}" ,resList);
+		
+		{}는 받는 인자의 수만큼 생성해주면됨
+		log.info("### resList : {} , {}" ,resList,aaa);
+
+
+# 컨트롤러 클래스
+
+	@Controller
+		컨트롤러임을 명시하는 어노테이션입니다.
+		MVC에서 컨트롤러로 명시된 클래스의 메서드들은 반환 값으로 템플릿 경로를 작성하거나, redirect를 해줘야 합니다.
+		템플릿 경로는 templates 패키지를 기준으로한 상대경로입니다.
+	
+	@RestController도 존재하는데, 이는 @Controller, @ResponseBody가 합쳐진 어노테이션입니다.
+		view 페이지가 필요없는 API 응답에 어울리는 어노테이션입니다.
+	
+	@AllArgsConstructor
+		Bean 주입 방식과 관련이 있으며, 생성자로 Bean 객체를 받는 방식을 해결해주는 어노테이션입니다. 그래서 BoardService 객체를 주입 받을 때 @Autowired 같은 특별한 어노테이션을 부여하지 않았습니다. 
+		그 밖에, @NoArgsConstructor @RequiredArgsConstructor 어노테이션이 있습니다. 
+		
+		참고 URL : https://jojoldu.tistory.com/251#2-3-controller--dto-%EA%B5%AC%ED%98%84
+					https://projectlombok.org/features/constructor
+
+	@GetMapping / @PostMapping
+		URL을 매핑해주는 어노테이션이며, HTTP Method에 맞는 어노테이션을 작성하면 됩니다. 
+
+		참고 URL : https://docs.spring.io/spring-framework/docs/current/reference/html/web-reactive.html#webflux-ann-requestmapping
+
+
+# 서비스 클래스
+
+	@AllArgsConstructor
+		Controller에서 봤던 어노테이션 입니다.
+		마찬가지로 Repository를 주입하기 위해 사용합니다.
+	
+	@Service
+		서비스 계층임을 명시해주는 어노테이션입니다.
+	
+	@Transactional
+		선언적 트랜잭션이라 부르며, 트랜잭션을 적용하는 어노테이션입니다.
+	
+	save()
+		JpaRepository에 정의된 메서드로, DB에 INSERT, UPDATE를 담당합니다.
+		매개변수로는 Entity를 전달합니다.
+
+
+# 레파지토리 클래스
+
+	Repository는 인터페이스로 정의하고, JpaRepository 인터페이스를 상속받으면 됩니다.
+		JpaRepository의 제네릭 타입에는 Entity 클래스와 PK의 타입을 명시해주면 됩니다.
+		JpaRepository에는 일반적으로 많이 사용하는 데이터 조작을 다루는 함수가 정의되어 있기 때문에, CRUD 작업이 편해집니다.
+
+
+
+
+# 엔티티 클래스
+
+	@NoArgsConstructor(access = AccessLevel.PROTECTED)
+		파라미터가 없는 기본 생성자를 추가하는 어노테이션입니다. ( JPA 사용을위해 기본 생성자 생성은 필수 )
+		access는 생성자의 접근 권한을 설정하는 속성이며, 최종적으로 protected BoardEntity() { }와 동일합니다.
+		protected인 이유는 Entity 생성을 외부에서 할 필요가 없기 때문입니다.
+
+	@Getter
+		모든 필드에 getter를 자동생성 해주는 어노테이션입니다.
+	
+	@Setter 어노테이션은 setter를 자동생성 해주지만, 무분별한 setter 사용은 안정성을 보장받기 어려우므로 Builder 패턴을 사용합니다. 
+		참고로 @Getter와 @Setter를 모두 해결해주는 @Data 어노테이션도 있습니다.
+		참고 URL : https://www.popit.kr/%EC%8B%A4%EB%AC%B4%EC%97%90%EC%84%9C-lombok-%EC%82%AC%EC%9A%A9%EB%B2%95/
+	
+
+	@Entity
+		객체를 테이블과 매핑 할 엔티티라고 JPA에게 알려주는 역할을 하는 어노테이션 입니다. ( 엔티티 매핑 )
+		@Entity가 붙은 클래스는 JPA가 관리하며, 이를 엔티티 클래스라 합니다.
+
+	@Table(name = "board")
+		엔티티 클래스와 매핑되는 테이블 정보를 명시하는 어노테이션입니다.
+		name 속성으로 테이블명을 작성할 수 있으며, 생략 시 엔티티 이름이 테이블명으로 자동 매핑됩니다.
+	
+	@Id
+		테이블의 기본 키임을 명시하는 어노테이션 입니다.
+		저는 일반적으로 Id를 대체키로 사용하는 것이 좋다는 관점이며, Long 타입을 사용합니다.
+	
+	@GeneratedValue(strategy= GenerationType.IDENTITY)
+		기본키로 대체키를 사용할 때, 기본키 값 생성 전략을 명시합니다. 
+		참고 URL : https://victorydntmd.tistory.com/203#PK
+	
+	@Column
+		컬럼을 매핑하는 어노테이션입니다.
+	
+	@Builder
+		빌더패턴 클래스를 생성해주는 어노테이션입니다.
+		@Setter 사용 대신 빌더패턴을 사용해야 안정성을 보장할 수 있습니다.
+
+
+	Entity 클래스는 테이블과 관련이 있는 것을 알 수 있습니다.
+	비즈니스 로직은 Entity를 기준으로 돌아가기 때문에 Entity를 Request, Response 용도로 사용하는 것은 적절하지 못합니다.
+	그래서 데이터 전달목적을 갖는 dto 클래스를 정의하여 사용합니다.
+	이와 관련하여 이 글과 이 글을 참고해보시면 좋을 것 같네요.
+	
+		참고 URL : https://jojoldu.tistory.com/251#2-3-controller--dto-%EA%B5%AC%ED%98%84
+		참고 URL : https://gmlwjd9405.github.io/2018/12/25/difference-dao-dto-entity.html
+
+
+	@MappedSuperclass
+		테이블로 매핑하지 않고, 자식 클래스(엔티티)에게 매핑정보를 상속하기 위한 어노테이션입니다.
+	
+	@EntityListeners(AuditingEntityListener.class)
+		JPA에게 해당 Entity는 Auditing기능을 사용한다는 것을 알리는 어노테이션입니다.
+	
+	@CreatedDate
+		Entity가 처음 저장될때 생성일을 주입하는 어노테이션입니다.
+		이때 생성일은 update할 필요가 없으므로, updatable = false 속성을 추가합니다.
+		속성을 추가하지 않으면 수정 시, 해당 값은 null이 되어버립니다.
+		참고 URL : https://stackoverflow.com/questions/19090258/spring-jpa-auditing-empty-createdby/47643242#47643242
+	
+	@LastModifiedDate
+		Entity가 수정될때 수정일자를 주입하는 어노테이션입니다.
+
+	
+
+# 메인 클래스
+	@EnableJpaAuditing
+		JPA Auditing 활성화를 위해 Application에서 @EnableJpaAuditing 어노테이션을 추가
+	
+	=================================================================================================================
+
+	@EnableJpaAuditing
+	@SpringBootApplication
+	public class IfbuyApplication {
+
+		public static void main(String[] args) {
+			SpringApplication.run(IfbuyApplication.class, args);
+		}
+
+	}
+
+	=================================================================================================================
+
+
+
+# DTO 클래스
+
+	toEntity()
+		dto에서 필요한 부분을 빌더패턴을 통해 entity로 만듭니다.
+		필요한 Entity는 이런식으로 추가하면 됩니다.
+
+	dto는 Controller <-> Service <-> Repository 간에 필요한 데이터를 캡슐화한 데이터 전달 객체입니다.
+		그런데 예제에서 Service에서 Repository 메서드를 호출할 때, 
+		Entity를 전달한 이유는 JpaRepository에 정의된 함수들은 미리 정의되어 있기 때문입니다. 
+		그래서 Entity를 전달할 수 밖에 없었는데, 요점은 각 계층에서 필요한 객체전달은 Entity 객체가 아닌 dto 객체를 통해 주고받는 것이 좋다는 것입니다.

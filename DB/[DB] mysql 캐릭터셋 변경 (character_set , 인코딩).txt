@@ -1,0 +1,71 @@
+[ mysql 캐릭터셋 변경 ]
+
+
+# 증상
+	mysql 캐릭터셋이 제대로 적용이 안되있어서 웹에서 utf8로 전송을 하여도
+	??? 로 데이터베이스에 들어가는 현상이 발생함
+	해당 내용은 mysql 5.5버전이상부터 가능한 방법
+
+
+# 캐릭터셋 확인하기
+	
+	1. 데이터베이스에서 아래의 쿼리문을 실행
+		SHOW VARIABLES LIKE 'c%'
+
+	2. 실행 후 나오는 값들을 확인
+
+		
+	character_set_client		utf8mb4
+	character_set_connection	utf8mb4
+	character_set_database		binary
+	character_set_filesystem	binary
+	character_set_results		utf8mb4
+	character_set_server		latin1
+	character_set_system		utf8
+
+	......
+
+	collation_database			utf8_general_ci
+	collation_server			utf8_general_ci
+
+
+
+
+	3. character_set_server		latin1 이부분을 UTF8로 수정 해야 정상적으로 값이 들어감
+
+	4. 윈도우면 4-1번으로, 리눅스면 4-2번으로
+
+	4-1. mysql 설치 디렉토리에서 my.ini 파일을 찾아서 연다
+		경로 : C:\ProgramData\MySQL\MySQL Server 5.7
+		파일명 : my.ini
+
+	4-2. /etc/my.cnf 파일을 연다
+
+
+	5. character-set-server 를 찾아서 주석을 지우고 해당 내용뒤에 utf8을 쓰고 저장한다
+
+		character-set-server = utf8
+
+	6. 서비스 재시작
+		윈도우의 경우에는 실행 창에서 아래의 단어를 실행
+			services.msc
+		
+		mysql 서비스를 재시작
+
+		
+
+
+	7. 1번 항목에서 쳤던 쿼리문을 치면 아래와 같이 변경되어있고 정상적으로 저장되는것을 확인할수 있음
+
+		character_set_server		utf8
+
+
+
+
+
+
+
+
+
+
+

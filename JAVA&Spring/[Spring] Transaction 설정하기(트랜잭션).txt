@@ -1,0 +1,78 @@
+
+# 트랜잭션 처리란
+	데이터베이스에 두개이상의 쿼리를 실행할때 하나이상 실패 하였다면 rollback, 모든 쿼리가 정상적으로 처리되었다면 commit 을 하게 해준다
+		* 참고URL : https://preamtree.tistory.com/154
+	* 예시 1 
+		국민은행계좌(a) 에 있는는 돈을 우리은행계좌(b) 로 송금 하려고 함 두개의 과정이 한번에 순차적으로 일어난다고 생각해야함
+		1. 국민은행 계좌에서 돈을 출금
+		2. 우리은행 계좌에 돈을 입금
+
+		이 두개의 과정이 연속적으로 일어나야 하는데 중간에 에러가 발생함
+		1번 항목은 성공하였는데 2번 항목이 실패하였다면 "국민은행에서는 돈이 빠져나갔고, 우리은행에는 입금되지 않음" 즉 돈이 날라감 
+		
+		1번항목은 실패하였는데, 2번 항목이 성곰함 "국민은행에서는 돈이 빠져나가지 않았고, 우리은행에는 입금됨" 즉 돈이 증가됨
+
+		이러한 상황을 막기 위해서, 1번 2번 항목이 둘다 성공했을 경우에만 commit 을 하고, 둘중 하나라도 실패한 경우에는 둘다 rollback를 함
+	
+	* AOP 와 TX를 설정하여 트랜잭션 처리를 하는 방법도 있지만, 어노테이션으로 처리하는것이 간단함
+
+	
+
+
+# xml 파일에 트랜잭션 설정
+
+	application-context.xml 파일에 트랜잭션 설정에 관한 내용 기재
+	* 문서 상단에 xmlns:tx="http://www.springframework.org/schema/tx" 추가 
+	* xsi:schemaLocation=" 부분에 http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd 추가
+	* <property name="dataSource" ref="dataSource" /> 는 데이터베이스를 사용하려고 위에서 선언한 내용의 이름과 동일해야함
+
+================================================================================================================================================
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+
+	........................중략...........................
+
+
+    <!-- Transaction Manager -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+    <tx:annotation-driven transaction-manager="transactionManager" />
+================================================================================================================================================
+
+
+
+
+# 트랜잭션을 적용할 컨트롤러 파일 설정
+
+	CIIM_manager\src\main\java\securus\main\controller\MainController.java
+	MainController 컨트롤러파일의 제일 상단에 @Transactional 어노테이션 추가
+	* 해당 어노테이션을 추가하면 트랜잭션 처리가 됨
+	!! 중요
+		클래스에 선언을 한다면 해당 클래스 내에 있는 모든 메소드 들에도 트랜잭션이 적용됨,
+		메소드에 선언한다면 해당 메소드에만 적용이 되며, 해당 메소드 내에서 다른 메소드를 호출한다면 그 메소드도 적용이 됨
+		* 참고 URL : https://crosstheline.tistory.com/96  , http://egloos.zum.com/springmvc/v/499291
+
+
+================================================================================================================================================
+@Transactional
+@Controller
+public class MainController {
+
+    @Autowired
+    MainServiceImpl mainService;
+
+
+
+================================================================================================================================================
+
+
+
+

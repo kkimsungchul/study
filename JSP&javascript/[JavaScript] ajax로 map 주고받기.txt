@@ -1,0 +1,47 @@
+[ ajax 로 map 타입 주고받기 ] 
+
+
+
+[ 컨트롤러 -> 화면단 ]
+	
+# 화면에서 보내준 데이터를 가공하고 map타입으로 리턴할 때
+
+	리턴타입은 HashMap<String,Object> 로 한다.
+	* HashMap<String,String> 등 변수타입이 오브젝트가 아닌경우에는 화면단에서 500에러가 발생함
+
+=================================================================================================================
+    /*스케쥴 리스트 추가*/
+    @ResponseBody
+    @RequestMapping(value="connection/insertSystemSchedule.do",method = RequestMethod.POST, produces = "application/json; charset=utf8")
+    public HashMap<String,Object> insertSystemSchedule(HttpServletRequest request){
+
+=================================================================================================================
+
+
+# 보내준 map을 화면에서 받을때
+	밑에부분인 success: function (data) { 이부분에서
+	data에는 리턴받은 데이터가 들어있으므로
+	자바에서는 map.get("키값") 이렇게 맵에서 꺼내썻다면 ajax에서 리턴받은것을 꺼내쓰려면
+	data.키값 으로 꺼내쓰면 된다
+
+	ex) 
+		scheduleMap.put("schedule_time",scheduleTime); 으로 자바에서 넣어줬으면
+		ajax에서는 data.schedule_time 으로 꺼내서 쓰면됨
+
+
+=================================================================================================================
+        $.ajax({
+            url: "connection/insertSystemSchedule.do",
+            type: "POST",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded; charset=UTF-8", // 인코딩 설정
+            data: {
+                entity_code: selectEntityCode,
+                schedule_time: timeValue,
+                select_schedule : selectSchedule,
+            },
+            success: function (data) {
+				data.키값
+			}
+=================================================================================================================
+

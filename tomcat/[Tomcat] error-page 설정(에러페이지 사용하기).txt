@@ -1,0 +1,46 @@
+1. web.xml 사용하여 에러페이지 지정
+
+# 에러 페이지 설정
+
+	web.xml 파일의 제일 하단에  하단의 내용을 기재
+	* 하단의 에러코드 외에 추가할 코드들도 추가하면 됨.
+	<error-code>400</error-code> 는 웹페이지에 표시된느 에러코드를 의미함, 404는 페이지를 찾을수 없음, 500은 메소드 에러등
+	<location>/WEB-INF/views/error/error.jsp</location> 는 에러페이지의 경로를 뜻하며, WEB-INF안에 폴더를 생성하여 작성하여도 됨
+================================================================================================================================================
+
+
+    <!--error page setting-->
+    <error-page>
+        <error-code>400</error-code>
+        <location>/WEB-INF/views/error/error.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>403</error-code>
+        <location>/WEB-INF/views/error/error.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>404</error-code>
+        <location>/WEB-INF/views/error/error.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>500</error-code>
+        <location>/WEB-INF/views/error/error.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>503</error-code>
+        <location>/WEB-INF/views/error/error.jsp</location>
+    </error-page>
+
+================================================================================================================================================
+
+	
+# 에러페이지 생성
+
+	error.jsp 파일을 생성하여 에러에 대한 내용과 리다이렉트 또는 되돌아가기 버튼등을 생성
+
+	경로 : webapp\WEB-INF\views\error\error.jsp
+
+
+
+
+

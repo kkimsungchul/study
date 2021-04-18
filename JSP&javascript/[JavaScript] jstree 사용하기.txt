@@ -1,0 +1,559 @@
+[ jsTree 사용하기 ]
+	https://mkil.tistory.com/436
+	
+	참고링크 : https://urajilator.tistory.com/1575
+			   https://webinformation.tistory.com/112
+
+
+# 스크립트와 CSS 파일 추가
+	https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.2/themes/default/style.min.css
+	https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.2/jstree.min.js
+
+# 이미지 파일 추가
+	* css 파일을 직접 다운받아 사용할 때 적용
+	경로 : css파일과 같은 위치
+	
+
+# JSON 트리구조로 데이터 처리하기
+	"[JavaScript] JSON 트리구조 변환 (Json tree, jqtree).txt" 파일 참고
+
+# 트리 생성
+
+	plugins 부분에 필요한 플러그인 추가
+	
+	"plugins" : [ "wholerow", "changed" , "dnd", "search" , "contextmenu" ,"cookie","hotkeys","ui" ,"crm" , ,"cookies"],
+
+	* 스크립트
+
+	=================================================================================================================
+			$('#deptTree').jstree({
+				"plugins" : [ "wholerow", "checkbox", "changed" ],
+				'core' : { 'data' : sampleData }
+			});
+
+	=================================================================================================================
+
+
+	* HTML
+
+	=================================================================================================================
+		<div id="deptTree"></div>
+	=================================================================================================================
+
+# 트리전체 삭제
+
+	$('#deptTree').jstree("destroy");
+
+
+# 트리에 노드 추가 
+
+	* 노드 추가시 직접 선택된 값을 가져오려고 하였는데 안됨. 객체에 접근까지는 되는데 노드의 값을 가져오지 못하고 있음
+	* 부서 생성을 클릭하였을때 javascript 의 전역번수로 선택된 노드의 값을 셋팅하여서 사용함
+
+	* JSTree 생성시에 선언을 하고, 부서 추가 클릭시에 부서 생성 팝업창을 띄우기로 함
+	insertDeptParNode 변수에 선택된 노드의 정보를 담음
+	=====================================================================================================================================================
+			"contextmenu" : {
+                "items": function($node){
+
+                    var tree = $('#deptTree').jstree(true);
+
+					return{
+
+                    "create": {
+                        "separator_before": false,
+                        "separator_after": true,
+                        "label": "부서 추가",
+                        "action": function (data) {
+                            if(deptPopupFlag==0){
+                                pop_open(21);
+                                deptPopupFlag=1;
+                                insertDeptParNode=$node;
+                            }else{
+                                pop_close();
+                                deptPopupFlag=0;
+                            }
+                        }
+                    },
+
+	=====================================================================================================================================================
+
+
+	
+	* 부서 팝업창에서 변수들 셋팅 
+	* 부서 코드 중복 확인
+	=====================================================================================================================================================
+
+
+
+	var parent_node_id =insertDeptParNode.id
+    var parent_node_text =insertDeptParNode.text
+    var parent_node_dept_id =insertDeptParNode.original.dept_id
+    var parent_node_dept_level =insertDeptParNode.original.dept_level
+
+    var dept_level=parent_node_dept_level+1;
+    var dept_id_check=false;
+
+    /*페이지가 열릴 시에 자동으로 상위부서와 상위부서코드를 입력해 주기 위해 사용*/
+    $(function () {
+        $("#insert_dept_parent_name").val(parent_node_text);
+        $("#insert_dept_parent_id").val(parent_node_dept_id);
+    });
+
+    /*해당 부서코드가 사용중인지 확인*/
+    $(document).on("keyup","#insert_dept_id",function () {
+
+        var dept_id = $("#insert_dept_id").val();
+        console.log(dept_id);
+        $.ajax({
+            url: "dept/deptIdCheck.do",
+            type: "post",
+            dataType: "text",
+            contentType: "application/x-www-form-urlencoded; charset=UTF-8", // 인코딩 설정
+
+            data: {
+                dept_id: dept_id,
+            },
+            success: function (data) {
+                if(data==0){
+                    $("#dept_code_check").text("사용가능한 부서코드 입니다.");
+                    dept_id_check=true;
+                }else{
+                    $("#dept_code_check").text("사용 불가능한 부서코드 입니다.");
+                    dept_id_check=false;
+                }
+
+            }
+        });
+    });
+
+	
+
+	=====================================================================================================================================================
+
+
+
+	* 부서 등록
+	* success 에서 jstree에 노드를 추가함, 
+
+	* $('#deptTree').jstree().create_node() 에 들어갈 값들은 아래와 같음
+		// 부모노드, 새노드의 데이터, 노드의 색인(위치), 노트생성시 호출할 함수, is_loaded (부모노드가 성공적으로 로드되었는지 확인)
+	=====================================================================================================================================================
+
+    function deptInsert(){
+       
+        var insert_dept_id=$("#insert_dept_id").val();
+        var insert_dept_name=$("#insert_dept_name").val();
+        if(dept_id_check==false){
+            alert("사용할 수 없는 부서코드 입니다.");
+            return;
+        }
+        $.ajax({
+            url: "dept/deptInsert.do",
+            type: "post",
+            dataType: "text",
+            contentType: "application/x-www-form-urlencoded; charset=UTF-8", // 인코딩 설정
+            data: {
+                dept_id: insert_dept_id,
+                dept_name : insert_dept_name,
+                dept_level : dept_level,
+                dept_par_id : parent_node_dept_id
+            },
+            success: function (data) {
+                console.log(data);
+                if(data==1){
+                    $('#deptTree').jstree().create_node(parent_node_id, {
+                        "id": insert_dept_id,
+                        "text": insert_dept_name
+                    }, "last", function() {
+                        alert("부서가 등록되었습니다.")
+                        pop_close();
+                    });
+                }else{
+                    alert("부서등록이 실패하였습니다.")
+
+                }
+
+            }
+        });
+    }
+
+
+	=====================================================================================================================================================
+
+
+
+
+# 클릭 이벤트
+
+	https://www.jstree.com/docs/events/
+	https://seizetop.tistory.com/5
+
+	=================================================================================================================
+
+	.bind('select_node.jstree', function(event, data){
+		var id = data.instance.get_node(data.selected).id;        //id 가져오기
+		var type = data.instance.get_node(data.selected).type;    //type 가져오기
+		var path = data.instance.get_node(data.selected).path;    //paht 가져오기
+		var a = data.instance.get_node(data.selected).data.a;    //data 에서 a 가져오기
+	})
+
+	=================================================================================================================
+
+# 드래그 앤 드롭 이벤트
+	https://qmffjem09.tistory.com/entry/jstree-drag-dnd?category=474907?category=474907
+
+
+	=================================================================================================================
+
+        }).on('move_node.jstree', function (evt, data) {
+            //console.log(arguments)
+            var parent = data.instance.get_node(data.parent);
+
+
+/*            dept_id : 선택한 부서 코드
+            dept_name : 선택한 부서명
+            dept_level : 선택한 부서의 이동 후 레벨
+            parent_dept_id : 이동할 부서의 코드
+            parent_dept_name : 이동할 부서의 이름
+            parent_dept_level : 이동할 부서의 레벨*/
+
+            var dept_id = data.node.original.dept_id;
+            var dept_name = data.node.text;
+            var dept_level = parent.original.dept_level +1;
+            var parent_dept_id = parent.original.dept_id;
+            var parent_dept_name = parent.text;
+            var parent_dept_level = parent.original.dept_level
+            /*수정 확인 팝업*/
+            if(!alertPopup("move",parent_dept_name)){
+                return;
+            }
+
+            $.ajax({
+                url :"dept/deptMove.do" ,
+                type: "post",
+                dataType: "text",
+                contentType: "application/x-www-form-urlencoded; charset=UTF-8", // 인코딩 설정
+                data: {
+                    dept_id : dept_id,
+                    dept_level : dept_level,
+                    dept_name : dept_name,
+                    parent_dept_id : parent_dept_id,
+                    parent_dept_name : parent_dept_name,
+
+                },
+                success: function (data) {
+                    alert(data + "("+ dept_name +"부서를 " + parent_dept_name + "부서의 하위 부서로 이동하였습니다.");
+                }
+
+            })
+
+        });
+
+
+	=================================================================================================================
+
+
+# jstree 노드의 이름 변경
+
+	참고 url : https://old.jstree.com/documentation/crrm
+			   https://stackoverflow.com/questions/6254735/how-can-i-rename-a-jstree-node
+
+
+
+	부서명 수정을 위한 컨텍스트 메뉴 설정
+	아래의 두개의 변수는, 이름 변경 팝업과 이름변경을 취소하였을 때 사용하려고 저장
+		rename_dept = $node.text;
+		rename_node = $node;
+	=================================================================================================================
+            
+			"contextmenu" : {
+                "items": function($node){
+
+                    var tree = $('#deptTree').jstree(true);
+
+
+                    return{
+
+                    "rename": {
+                        "separator_before": false,
+                        "separator_after": true,
+                        "label": "부서명 변경",
+                        "action": function (obj) {
+                            tree.edit($node);
+                            rename_dept = $node.text;
+                            rename_node = $node;
+                        }
+                    },
+
+
+
+	=================================================================================================================
+
+
+
+
+
+	부서명을 새로 쓰고 엔터를 누를경우 호출되는 이벤트
+	이름변경을 취소했을 경우 기존의 이름으로 되돌림
+	=================================================================================================================
+			// 노드의 이름이 변경되고 나면 호출됨
+			}).on('rename_node.jstree', function (evt, data) {
+
+				var dept_id = data.node.original.dept_id;
+				var dept_name = data.node.text;
+
+				/*수정 확인 팝업*/
+				if(!alertPopup("rename",rename_dept , dept_name)){
+					//취소를 누를경우 기존의 이름으로 되돌림
+					$('#deptTree').jstree("set_text",rename_node,rename_dept);
+					return;
+				}
+
+				$.ajax({
+					url :"dept/deptNameUpdate.do" ,
+					type: "post",
+					dataType: "text",
+					contentType: "application/x-www-form-urlencoded; charset=UTF-8", // 인코딩 설정
+					data: {
+						dept_id : dept_id,
+						dept_name : dept_name,
+					},
+					success: function (data) {
+						alert(data);
+					}
+
+				})
+
+	=================================================================================================================
+
+		
+# jstree의 클릭 이벤트에서 해당 node의 데이터 가져오는 방법
+
+
+                /*노드 클릭시 실행 되는 이벤트 */
+            }).on('select_node.jstree', function(e,data){
+                console.log(data.instance.get_node(data.selected).id);  //노드ID값
+                console.log(data.instance.get_node(data.selected).original.dept_id); //노드 생성시 데이터베이스에서 가져온 dept_id값
+                console.log(data.instance.get_node(data.selected).text);    //화면에 표시되는 텍스트 값
+                console.log(data.instance.get_node(data.selected).original.dept_par_id); //노드 생성시 데이터베이스에서 가져온 dept_par_id 값
+
+
+# jstree의 트리 변경 이벤트
+
+                /*트리가 변경되면 실행됨, 클릭상태라던지 구조라던지*/
+            }).on("changed.jstree", function (e, data) {
+                /*선택된 노드 값*/
+                console.log("### data.changed.selected : " + data.changed.selected); // newly selected
+                /*선택 해제된 노드 값*/
+                console.log("### data.changed.deselected : " + data.changed.deselected); // newly deselected
+
+            });
+
+
+
+
+
+
+# 
+
+
+
+
+
+
+
+
+
+
+
+다른 개발자들이 구현한 소스들
+예제 - 실행안됨 어떻게 사용하는지에 대해서만 작성
+=================================================================================================================
+
+
+$tree1 = $('#jstree1');
+$tree1.jstree({
+    "json_data": {},
+    "plugins": ["json_data"],
+    "core": {"themes": {"icons": false, "dots": false}, "check_callback": true, "multiple": false, "data": resData},
+}).bind('select_node.jstree', function (evt, data, x) {
+    $(data.event.target).closest('[id=jstree1]').find('li').removeClass('on');
+    $(data.event.target).closest('li').addClass("on");
+    data.instance.toggle_node(data.node);
+    var obj = data.node.data;
+    if (obj) {
+        // jstree 노드 선택시 로직처리 }
+    }).bind('loaded.jstree', function (evt, data) {
+}).bind('create_node.jstree', function (evt, data) {
+}).bind('delete_node.jstree', function (evt, data) {
+}).bind('rename_node.jstree', function (evt, data) {
+}).bind('edit_node.jstree', function (evt, data) {
+}).bind('move_node.jstree', function (evt, data) {
+}).bind('open_node.jstree', function (evt, data) {
+})
+$(document).bind('dnd_stop.vakata', function (evt, data) {
+}).bind('dnd_start.vakata', function (evt, data) {
+})
+}
+})
+} ,
+openAll : function () {
+    $tree1.jstree("open_all");
+    //tree 모두 열기
+}
+,
+closeAll : function () {
+    $tree1.jstree("close_all"); //tree 모두 닫기
+} ,add : function(){ }
+
+
+=================================================================================================================
+
+
+https://arcsit.tistory.com/entry/JsTree-Context-Menu%EC%99%80-Jstree?category=567058
+=================================================================================================================
+
+$("#ddipTree").jstree({
+    "xml_data" : {
+        "ajax" : {
+
+//XML 데이터 수령 <item id="" attr1><content><name>노드명</name></content></item> 형식
+            "url" : "<c:url value='/dsgnClfy/getDdipTree_lvl1.do'/>",
+            "type" : "POST",
+            "data" : function (node) {
+
+//처음 open 되었을씨 root가 되는 node를 가져옴 query 형식이 달라서
+                ddipCnt++;
+                if(ddipCnt > 1) {
+
+                    return {
+                        "ddipCnt" : ddipCnt,
+                        "clfyId" : node.attr ? node.attr("id") : ''
+                    };
+
+//두번째부터 부모키를 가지고 하위 노드를 가져옴
+                } else {
+                    return {
+                        "ddipCnt" : ddipCnt,
+                        "obsSeq" : obsSeq,
+                        "bisnId" : bisnId,
+                        "ddipKind" : ddipKind,
+                        "phaseCd" : phaseCd,
+                        "fieldId" : fieldId,
+                    };
+                }
+            }
+        },
+        "xsl" : "nest"
+    },
+
+//jstree에서 사용하는 각종 플러그인
+
+//테마, 데이터형식, ui, contexmenu, cookies
+
+    "plugins" : [ "themes", "xml_data", "ui","crrm","hotkeys","contextmenu", "cookies"],
+
+//가끔 이전에 눌렀던 node가 자동선택 되는 경우가 있는데 쿠키때문에 그렇다. 쿠키를 제거하면
+
+//사용하지 않을 수도 있지만 유용하게 쓰일 수 있기 떄문에 자동선택은 아래와 같이 해제가능하다.
+    "cookies" : {
+        "save_selected" : false
+    },
+
+//contextMenu를 사용하려면 plugin을 사용해야하며 아래와 같이 기술한다.
+    "contextmenu" : {
+        "items" : {
+            "create" : {
+                "separator_before" : false, //api 참고
+                "separator_after" : true, //api 참고
+                "label" : "등록", //node에서 마우스 오른쪽 클릭 시 text
+                "action" : function (obj) {
+
+//action에 맞는 jstree 이벤트가 존재하지만 contextmenu는 사용하되
+
+//처리는 팝업창으로 처리하기 위해서 이와같이 한다.
+                    if($(obj).attr("flag") != "B"){
+                        var clfyId = $(obj).attr("id");
+                        gf_openWindow("<c:url value='/dsgnClfy/editTree.do?
+
+                        mode=inst&knd=ddip&clfyId="+clfyId+"'/>",500, 280);
+                    }else{
+                        alert("납품정보는 수행할 수 없습니다.");
+                        return;
+                    }
+                }
+            },
+            "rename" : {
+                "separator_before" : false,
+                "separator_after" : true,
+                "label" : "수정",
+                "action" : function (obj) {
+                    if($(obj).attr("flag") != "B"){
+                        var clfyId = $(obj).attr("id");
+                        var hrnkClfyCd = "";
+                        if($(obj).attr("hrnkClfyId")) {
+
+//선택된 노드의 부모의 ID에 해당하는 clfyCd 가지고 오기
+                            hrnkClfyCd = $.jstree._reference('#ddipTree')._get_parent("#"+clfyId).attr("clfyCd");
+                            hrnkPath =
+
+                                $.jstree._reference('#ddipTree')._get_parent("#"+clfyId).attr("path");
+
+                        }
+                        gf_openWindow("<c:url value='/dsgnClfy/editTree.do?
+
+                        mode=updt&knd=ddip&hrnkClfyCd="+hrnkClfyCd+"&clfyId="+clfyId+"'/>",500, 280);
+                    }else {
+                        alert("납품정보는 수행할 수 없습니다.");
+                        return;
+                    }
+                }
+            },
+            "remove" : {
+                "separator_before" : false,
+                "separator_after" : true,
+                "label" : "삭제",
+                "action" : function (obj) {
+                    if(!confirm("선택하신 분류를 삭제하시겠습니까 ?"))
+                        return;
+
+                    if($(obj).attr("flag") != "B"){
+                        var clfyId = $(obj).attr("id");
+                        var flag = $(obj).attr("flag");
+                        if(!$(obj).attr("hrnkClfyId"))
+                            flag = 'C';
+
+                        execDeleteClfy(clfyId, flag);
+
+                    } else {
+                        alert("납품정보는 수행할 수 없습니다.");
+                        return;
+                    }
+                }
+            },
+            "ccp" : null
+        }
+    }
+});
+
+
+//node 선택 시 이벤트 발생 부분
+$("#ddipTree").bind("select_node.jstree",(function(event, data) {
+    var flag = data.inst.get_selected().attr("flag");
+    var bisnId = data.inst.get_selected().attr("bisnId");
+    var phaseCd = data.inst.get_selected().attr("phaseCd");
+    var stepId = parent.$("input[name='cnstKind']:checked").val();
+    if(flag == "B"){ //사업 정보인 경우
+        var param = "?stepId="+stepId+"&fieldId="+fieldId+"&obsSeq=" + obsSeq + "&bisnId=" + bisnId+"&phaseCd="+phaseCd;
+        var url = "<c:url value='/dsgnClfy/bisnInfoPop.do"+param+"'/>";
+        gf_openWindow(url, 800, 600);
+    }else{
+        var id = data.inst.get_selected().attr("id");
+        parent.dsgnDocFileView.uf_SearchRequestMap(stepKind,id,'');
+    }
+}));
+}
+
+
+=================================================================================================================

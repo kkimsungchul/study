@@ -1,0 +1,41 @@
+
+[ JAVA 아이피주소 확인 ]
+
+
+
+#원격지 주소 확인 
+	접속한 사용자의 IP 주소를 확인
+
+	HttpServletRequest 클래스 사용
+	request.getRemoteAddr();
+	
+
+
+
+#서버 주소 확인 
+	현재 서버의 IP주소를 확인
+
+	InetAddress 클래스 사용
+	InetAddress.getLocalHost().getHostAddress();
+
+
+
+#서버 호스트네임 확인 
+	현재 서버의 Host네임을 확인
+
+	InetAddress 클래스 사용
+	InetAddress.getLocalHost().getHostName();
+	
+
+
+
+
+# 아래와 같은 주소가 있을 경우
+http://localhost:8080/test/index.jsp
+ 
+request.getRequestURI();   //프로젝트경로부터 파일까지의 경로값을 얻어옴 (/test/index.jsp)
+request.getContextPath();  //프로젝트의 경로값만 가져옴(/test)
+request.getRequestURL();   //전체 경로를 가져옴 (http://localhost:8080/test/index.jsp)
+request.getServletPath();  //파일명 (/index.jsp)
+
+

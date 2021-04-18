@@ -1,0 +1,54 @@
+[한글깨짐 현상]
+
+	https://despacito-pasito.tistory.com/8
+	https://marobiana.tistory.com/112
+# 증상 
+
+	1. 화면단에서 ajax 를 이용하여 서버단으로  보낼경우 서버단에서 ' ???? ' 이런식으로 표시됨
+
+
+# 해결 방법
+
+
+	1. ajax 요청을 보낼때 type 을 'POST' 로 전송
+	2. ajax 요청을 보낼때 인코딩 타입을 설정  contentType: "application/x-www-form-urlencoded; charset=UTF-8", // 인코딩 설정
+
+
+# 증상
+	1. 서버단에서 다시 화면단으로 값을 넘길때 화면단에서 값이깨질경우 사용 ' ????? ' 이렇게 표시됨
+
+# 해결 방법
+
+	1. 컨트롤러에서 다시 보낼때 인코딩 설정
+		1-1 제이슨의 경우 : produces = "application/json; charset=utf8",
+		1-2 제이슨이 아닐 경우 : produces = "application/text; charset=utf8",
+
+
+
+# 해결방법 예시
+
+* ajax 
+
+    $.ajax({
+        url: "/user/searchUser.do",
+        type : "POST",
+        dataType: "JSON",
+        contentType: "application/x-www-form-urlencoded; charset=UTF-8", // 인코딩 설정
+        data: {
+            searchValue: searchValue,
+            searchColumn : searchColumn
+        },success function(data){
+		alert(data)
+	}
+
+
+* 컨트롤러
+	@RequestMapping(value={"user/getUserList.do","user/searchUser.do"},produces = "application/json; charset=utf8",method=RequestMethod.POST)
+
+
+
+
+
+
+
+

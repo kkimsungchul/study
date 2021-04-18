@@ -1,0 +1,53 @@
+[ JSTREE 부서이동 시 팝업창 먼저 생성 ]
+	수정 사유 : 
+		트리이동 이벤트 함수를 콜 하는 부분에 이동할지 말지 물어보는 팝업창을 넣어놓으면,
+		화면단의 jstree에서는 이미트리가 이동된 후에 물어보게 출력이 됨
+
+
+# JSTREE 시 플러그인에 dnd 옵션을 추가
+	* 하단의 옵션을 줘야 이동이 가능
+	
+	"plugins" : [ "wholerow", "changed" , "dnd", "search" , "contextmenu" ,"state"],
+
+
+
+# 트리 이동 이벤트 부분 추가
+
+	
+	}).on('move_node.jstree', function (evt, data) {
+
+	})
+
+
+
+# jstree.js 파일 수정
+
+
+	아래의 부분을 찾아서, 수정할 내용들을 추가
+	* 대략적으로 4070 라인쯤임
+	move_node : function (obj, par, pos, callback, is_loaded, skip_redraw, origin) {
+			var t1, t2, old_par, old_pos, new_par, old_ins, is_multi, dpc, tmp, i, j, k, l, p;
+
+
+
+	* 수정에 추가된 내용
+	=====================================================================================================================================================
+
+		move_node : function (obj, par, pos, callback, is_loaded, skip_redraw, origin) {
+			var t1, t2, old_par, old_pos, new_par, old_ins, is_multi, dpc, tmp, i, j, k, l, p;
+
+			par = this.get_node(par);
+
+			//부서이동 커스터마이징 추가
+			let mapping_chack = obj[0].original.dept_mapping;
+			let temp_par_name = par.original.text;
+			if(mapping_chack=='Y'){
+				alert("통합사용자 부서만 이동 할 수 있습니다.");
+				return false;
+			}
+			/*수정 확인 팝업*/
+			if(!alertPopup("move",temp_par_name)){
+				return false;
+			}
+
+	=====================================================================================================================================================

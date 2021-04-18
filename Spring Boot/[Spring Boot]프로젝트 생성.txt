@@ -1,0 +1,65 @@
+[ 참고 링크 ] 
+	메이븐 : 
+		https://goddaehee.tistory.com/238
+
+	그래들 : 
+		https://vmpo.tistory.com/7
+		https://victorydntmd.tistory.com/320	
+
+	스프링 이니셜라이즈 :
+		https://start.spring.io/
+
+
+	
+
+[ 스프링 부트 프로젝트  생성]
+
+1. 인텔리J에서 좌측 상단의 FILE -> New -> Project 클릭
+
+2. Spring Initalizr 클릭
+
+3. Choose Initalizr Service URL 을 Default 선택하고 넥스트
+
+4. Group ,  Artifact , JAVA 버전 , Type 등을 설정 하고 넥스트
+
+5. 다음화면에서 좌측에서 "web" 선택
+	우측에서 "Srping Web" , "Spring Web Services" 선택 후 넥스트
+
+6. Project Name 과 Project location 경로 지정 후 피니쉬
+
+
+
+
+[ Hello World 출력 ]
+
+1. src/main/java/패키지명/ 경로에다가 새로운 패키지 및 클래스 생성
+	패키지명 : hello
+	클래스명 : Hello
+	ex) 아래의 경로에다가 생성
+		sungchul1\src\main\java\com\example\sungchul1\
+		
+		생성 후
+		sungchul1\src\main\java\com\example\sungchul1\hello\Hello.java
+
+2. 생성한 클래스명 위에 @RestController 어노테이션 추가
+	* 임포트는 import org.springframework.web.bind.annotation.RestController;
+	ex)
+		@RestController
+		public class Hello {
+
+
+3. 메소드 생성하여 내용 및 맵핑 추가
+	* 임포트는 import org.springframework.web.bind.annotation.GetMapping;
+	ex)
+		@GetMapping("test")
+		public String hello(){
+			return "HelloSuper Coding World";
+		}
+	
+
+4. 해당 프로젝트를 실행 후 접속
+	localhost:8080/test
+
+	
+
+

@@ -1,0 +1,102 @@
+[ AJAX 로 LIST 받기 ]
+
+	Ajax 로 요청을 보내서 서버단에서 List 리턴 받기
+
+
+
+
+# 화면단에서 Ajax 로 요청보내기
+	아래와 같이 
+	URL : 요청 보낼 서버URL 
+	type : 포스트, 겟 방식
+	컨텐츠 타입 : 인코딩 설정을 위해 추가
+	data : 보낼데이터, {키 : 벨류 , 키:벨류} 로 보내면됨
+	success 요청응답시 사용할 데이터 로 작성
+
+	=================================================================================================================
+        $.ajax({
+            url: "/connection/getSystemSchedule.do",
+            type: "POST",
+            contentType: "application/x-www-form-urlencoded; charset=UTF-8", // 인코딩 설정
+            data: {
+                entityCode: entityCode
+            },success: function (data) {
+	=================================================================================================================
+
+
+# 서버단에서 값 받아서 리턴해주기
+
+	ajax 에서 보낸값은 리퀘스트 객체에서 꺼내서 사용하면됨
+
+	혹여나 RequestMapping 이부분에  {  produces = "application/text; charset=utf8"  } 이걸 추가하게되면 작동하지않고 406 에러가 발생함
+	produces 는 미디어 타입 목록을 지정해주는 내용이므로 자세한내용은 구글링 ㄱㄱ
+
+	리턴타입은 List, ArrayList 상관없음 
+	
+
+	=================================================================================================================
+    /*사용자 추가시 부서 검색*/
+    @ResponseBody
+    @RequestMapping(value = "user/insertSearchDeptList.do", method = RequestMethod.POST)
+    public ArrayList<String> insertSearchDeptList (HttpServletRequest request){
+        logger.info("user/insertSearchDeptList.do");
+
+        String searchValue = request.getParameter("searchValue");
+        System.out.println("#### searchValue : " + searchValue);
+
+        ArrayList<String> searchList = new ArrayList<>();
+
+        String testDeptName="테스트";
+        for(int i=0;i<20;i++){
+            searchList.add(testDeptName + i);
+        }
+
+        return searchList;
+    }
+
+	=================================================================================================================
+
+
+# ajax 에서 리턴받은 값 사용하기
+	
+	리스트같은경우에는 each 문을 사용하여서 꺼내 쓰면됨
+	아래에서 success 는 ajax통신 성공하였을때 실행할 애임
+	data 는 리턴받은 값
+
+
+	},success: function (data) {
+		$.each(data, function (key, value) {
+
+
+	each 문은 for 문과 똑같다고 생각하면됨
+	data 는 java에서 리턴받은 리스트
+	key 는 인덱스
+	value는 리스트에 들어있는 값들
+
+	리스트에 아래와 같이 있다고하면 each문이 돌면서 순차적으로 찍어줌
+
+	list[0] = 1
+	list[1] = 22
+	list[2] = 333
+	list[3] = 4444
+	list[4] = 55555
+
+	$.each(data, function (key, value) {
+		console.log(value)
+	}
+	
+
+	자바에서 리턴해준 리스트가
+	List<HashMap<String,String>> 이거나 ArrayList<HashMap<String,String>> 이면 
+	value.키값 으로 접근하면됨
+	hashMap.put("이름","김성철");
+	hashMap.put("성별","남자");
+	
+
+	$.each(data, function (key, value) {
+		console.log(value.이름)
+		console.log(value.성별)
+	}
+	
+
+

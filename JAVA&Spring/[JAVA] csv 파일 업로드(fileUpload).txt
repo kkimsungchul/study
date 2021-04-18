@@ -1,0 +1,184 @@
+
+
+[파일 업로드]
+
+
+# 참고 URL
+	https://addio3305.tistory.com/83
+	https://meaownworld.tistory.com/30
+
+
+# 라이브러리 추가
+
+	commons-fileupload-1.3.1.jar
+	commons-io-2.2.jar
+
+
+# 스프링 설정 추가
+	context-application.xml 파일
+	* value 는 파일 크기를 의미함, 100000000 는 10메가바이트
+=================================================================================================================
+
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="100000000" />
+    </bean>
+
+=================================================================================================================	
+
+
+
+# 웹 페이지에서 보내는 내용 추가
+
+*form
+onsubmit='return false;' 옵션을 주어야 새로고침 없이 전송이 됨,
+enctype='multipart/form-data' 옵션을 주어야 파일 전송이 가능
+
+=================================================================================================================
+        <form method='post' name='csvForm' id='csvForm'   onsubmit='return false;' enctype='multipart/form-data'>
+		<input type='file' name='csvFileName' id='csvFileName' value=''>
+        <!--<input type='submit' value='전송'>-->
+        <button value='파일 업로드' onclick='csvUpLoad()'></button></form>
+
+
+=================================================================================================================
+
+*function
+파일전송의 경우 
+processData : false 
+contentType : false 
+를 줘야함
+
+=================================================================================================================
+
+function csvUpLoad() {
+
+
+    var form = $('#csvForm')[0];
+    alert(form);
+    // FormData 객체 생성
+    var formData = new FormData(form);
+
+    /*코드로 동적으로 데이터 추가 가능.*/
+    /*formData.append("userId", "testUser!");*/
+
+
+    $.ajax({
+        type: 'POST',
+        url: '/user/csvUpload.do',
+        enctype: 'multipart/form-data',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (data) {
+            alert("총 " + data + "명의 사용자 등록 성공");
+        },error: function () {
+            alert("사용자 등록 실패");
+        }
+    });
+}
+
+=================================================================================================================
+
+
+
+
+
+
+# 컨트롤러단에서 파일 받는 내용 추가
+
+
+=================================================================================================================
+
+    @ResponseBody
+    @RequestMapping(value="user/csvUpload.do",method=RequestMethod.POST)
+    public int csvUpload(HttpServletRequest request){
+        logger.info("user/csvUpload.do");
+
+        MultipartHttpServletRequest multi = (MultipartHttpServletRequest) request;
+        MultipartFile file = multi.getFile("csvFileName");
+
+        /*파일이름 앞에 날짜와 시간을 붙여서 저장*/
+        SimpleDateFormat format1 = new SimpleDateFormat( "yyyyMMddHHmmss");
+        Calendar calendar = Calendar.getInstance();
+
+        String fileName = format1.format(calendar.getTime())+"_"+file.getOriginalFilename();
+
+        File saveFile = new File(fileFath,fileName);
+
+        try{
+            /*파일 저장*/
+            file.transferTo(saveFile);
+        }catch (IOException e){
+            System.out.println(fileError);
+        }
+
+
+        int insertCount =   userService.csvFileInsert(fileFath,fileName);
+        System.out.println("insertCount : " + insertCount);
+
+        return insertCount;
+    }
+
+=================================================================================================================
+
+
+	
+# 서비스단에서 받은 파일에 대한 유저 등록 로직 추가
+* BufferedReader 를 사용하여 문서를 읽어 들인 후에 split 를 사용하여서 칼럼을 구분하였음
+* 리턴값 i는 몇개의 사용자가 등록이 되었는지를 기록
+
+=================================================================================================================
+
+    public int csvFileInsert(String fileFath,String fileName){
+
+
+
+        BufferedReader bufferedReader=null;
+        String line = null;
+        int i=0;
+        File locationFile = new File(fileFath+fileName);
+        try {
+            bufferedReader = new BufferedReader(new FileReader(locationFile));
+            while( (line = bufferedReader.readLine()) != null) {
+                //CSV 1행을 저장하는 리스트
+                if(i==0){
+                    i++;
+                    continue;
+                }
+                i++;
+
+                String array[] = line.split(",");
+                UserVO uvo = new UserVO();
+                uvo.setIdp_user_id(array[0]);
+                uvo.setIdp_user_pw(array[1]);
+                uvo.setIdp_user_name(array[2]);
+                uvo.setIdp_emp_code(array[3]);
+                uvo.setIdp_user_deptid(array[4]);
+                uvo.setIdp_user_mobile(array[5]);
+                uvo.setIdp_user_spotid(array[6]);
+                uvo.setIdp_user_posid(array[7]);
+                uvo.setIdp_user_dutyid(array[8]);
+                uvo.setIdp_user_description(array[9]);
+                uvo.setIdp_user_email(array[10]);
+                System.out.println("uvo : " + uvo);
+                sqlSession.insert(namespace+".userInsert",uvo);
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            try{
+                if(bufferedReader!=null){
+                    bufferedReader.close();
+                }
+            }catch (IOException e){
+
+            }
+        }
+
+
+        return i-1;
+    }
+
+
+=================================================================================================================
+
