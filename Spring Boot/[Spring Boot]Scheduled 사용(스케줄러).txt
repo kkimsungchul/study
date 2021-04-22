@@ -1,0 +1,102 @@
+[ 스프링부트 - 스케쥴러 사용 ]
+	
+	참고 URL : https://api.qwer.pw/request/hangang_temp
+
+# 스케줄러 종류
+
+	1. @Scheduled 
+	2. Quatrz
+
+
+# @Scheduled 사용법
+
+	1. IfbuyApplication 메인파일의 클래스명 상단에 "@EnableScheduling" 추가
+
+	=================================================================================================================
+	@EnableScheduling   //스케쥴러
+	@EnableJpaAuditing  //JPA
+	@SpringBootApplication
+	public class IfbuyApplication {
+
+		public static void main(String[] args) {
+
+			SpringApplication.run(IfbuyApplication.class, args);
+		}
+
+	}
+
+	=================================================================================================================
+	
+
+
+	2. 스케줄 작업을 진행할 클래스 파일 생성
+
+	클래스명 위에 "@Component" 추가
+	메소드 위에 "@Scheduled(fixedDelay = 30000)" 추가,
+	fixedDelay 는 밀리세컨드로, 실행할 주기를 입력함
+	=================================================================================================================
+
+		@Slf4j
+		@Component
+		public class CoinInfoJob {
+
+			@Scheduled(fixedDelay = 30000)
+			public void getUpbitCoinInfo(){
+				log.info("# Scheduled Start ! ");
+				CoinInfoThread coinInfoThread = new CoinInfoThread();
+				coinInfoThread.run();
+
+			}
+		}
+
+	=================================================================================================================
+
+	3. 실행하면 자동으로 실행이 됨
+
+
+	* 옵션
+		- fixedDelay :
+			이전 스케줄 작업이 종료된 후 밀리세컨드 이후에 시작함
+			ex) @Scheduled(fixedDelay = 30000)
+
+		- fixedDealyString : 
+			fixedDelay 와똑같으나, 시간을 문자로 입력받음
+			ex) @Scheduled(fixedDelay = "30000")
+
+		- fixedRate : 
+			설정된 시간마다 시작함, 이전작업이 종료가 안되어도 시작함
+			ex) @Scheduled(fixedRate = 30000)
+
+		- fixedRateString : 
+			fixedRate 와 동일함 시간을 문자로 받음
+			설정된 시간마다 시작함, 이전작업이 종료가 안되어도 시작함
+			ex) @Scheduled(fixedRate = "30000")
+
+		
+		- initalDelay 
+			프로그램이 시작하자마자 작업하는게 아닌, 시작을 설정된 시간만큼 지연한 뒤 시작
+			ex ) @Scheduled(initalDelay = 30000)
+
+		- initalDelayString
+			initalDelay 와똑같으며, 시간을 문자로 받음
+			ex ) @Scheduled(initalDelayString = "30000")
+			
+
+		- cron 
+			크론, 설정한 초 분 시간 일 월 요일로 작동함
+			ex) @Scheduled(cron = "0 0 12 * 0 ")
+			순서대로 
+			초 0-59
+			분 0-59
+			시간 0-23
+			일 1-31
+			월 1-12
+			요일 0-7
+
+
+		- zone 
+			크론옵션 뒤에 붙여서 사용하며, 미설정시 local시간대를 사용
+			ex) @Scheduled(cron = "0 0 12 * 0 " , zone = "Asia/Seoul")
+			
+
+			

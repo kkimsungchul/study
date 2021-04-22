@@ -1,0 +1,102 @@
+[ 스프링부트 - mybatis 사용하기 ]
+	※ XML을 사용하지 않고, mapper interface 를 생성하여서 쿼리문을 작성
+
+참고 URL : 
+	https://pooney.tistory.com/47
+	https://kouzie.github.io/spring/Spring-Boot-%EC%8A%A4%ED%94%84%EB%A7%81-%EB%B6%80%ED%8A%B8-Mybatis/#mybatis
+	https://passionha.tistory.com/45
+	https://dongdd.tistory.com/178
+
+
+# 그래들에 라이브러리 추가
+
+	dependencies {
+
+		//mybatis 사용을 위해 추가
+		compile 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.1.0'
+		compile 'org.springframework.boot:spring-boot-starter-jdbc'
+		compile 'mysql:mysql-connector-java'
+
+	}
+
+
+# 맵퍼 인터페이스 생성
+
+	=================================================================================================================
+
+	import org.apache.ibatis.annotations.*;
+
+	public interface CoinMapper {
+	
+	
+	}
+
+	=================================================================================================================
+
+
+# 어플리케이션 메인에 "@MapperScan" 어노테이션 추가
+	value 안에는 위에서 생성한 맵퍼 인터페이스의 경로를 설정
+	=================================================================================================================
+	@SpringBootApplication
+	@MapperScan(value={"com.sungchul.ifbuy.coin.mapper"})
+	public class IfbuyApplication {
+	
+	}
+
+	=================================================================================================================
+
+# 맵퍼인터페이스에 원하는 쿼리문 생성
+
+	=================================================================================================================
+
+	public interface CoinMapper {
+
+		@Select("SELECT now()")
+		public String time();
+
+		@Insert("INSERT INTO coin_price (" +
+				"korean_name, " +
+				"english_name, " +
+				"market, " +
+				"opening_price, " +
+				"high_price, " +
+				"low_price, " +
+				"trade_price, " +
+				"candle_acc_trade_price, " +
+				"candle_acc_trade_volume, " +
+				"unit, " +
+				"candle_date_time_kst, " +
+				"candle_date_time_utc )" +
+				"VALUES(" +
+				"#{koreanName}, " +
+				"#{englishName}, " +
+				"#{market}, " +
+				"#{coinPriceVO.openingPrice}, " +
+				"#{coinPriceVO.highPrice}, " +
+				"#{coinPriceVO.lowPrice}, " +
+				"#{coinPriceVO.tradePrice}, " +
+				"#{coinPriceVO.candleAccTradePrice}, " +
+				"#{coinPriceVO.candleAccTradeVolume}, " +
+				"#{coinPriceVO.unit}, " +
+				"#{coinPriceVO.candleDateTimeKst}, " +
+				"#{coinPriceVO.candleDateTimeUtc}) ")
+		public void insertCoinPrice(CoinVO coinVO);
+	}
+
+
+
+	=================================================================================================================
+
+
+
+# 서비스로직에서 사용
+
+	맵퍼인터페이스를 선언하여 사용,
+	@Autowired 를 사용해서 주입해도 됨
+	=================================================================================================================
+	public class CoinService {
+
+		CoinMapper coinMapper;
+
+
+	=================================================================================================================
