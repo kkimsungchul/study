@@ -1,0 +1,105 @@
+[ 스프링부트 - @Autowired null 문제 (bean 주입) ]
+	참고 URL : https://kongeebol.tistory.com/9
+
+# 문제 발생
+	스레드(Thread) 를 생성하여서 Service 로직을 사용하려고 하였음
+	@Autowired 로 불러온 Service 는 null이 뜨고 동작을 하지 않음..
+
+
+# 해결방안
+	Spring에서 Bean은 IOC Container가 자동으로 주입해주는데 
+	ApplicationContextProvider를 이용하여 Bean을 수동으로 주입 가능하다.
+
+	
+
+
+# ApplicationContextProvider  클래스 생성
+
+	@Component 를 사용하여 ApplicationContextProvider 생성
+
+	=================================================================================================================
+	@Component
+	public class ApplicationContextProvider implements ApplicationContextAware{
+		
+		private static ApplicationContext applicationContext;
+		
+		@Override
+		public void setApplicationContext(ApplicationContext ctx) throws BeansException {
+			applicationContext = ctx;
+		}
+		
+		public static ApplicationContext getApplicationContext() {
+			return applicationContext;
+		}
+
+	}
+
+	=================================================================================================================
+
+
+
+# BeanUtils 클래스 생성	
+	
+	위에서 생성한 "ApplicationContextProvider" 클래스를 호출하여 구현
+
+	=================================================================================================================
+
+	import org.springframework.context.ApplicationContext;
+
+	public class BeanUtils {
+		public static Object getBean(String bean) {
+			ApplicationContext applicationContext = ApplicationContextProvider.getApplicationContext();
+			return applicationContext.getBean(bean);
+		}
+	}
+
+	=================================================================================================================
+
+
+
+# CoinService 서비스 로직 작성
+	스레드에서 서비스로직의 이름으로 해당 빈을 주입할것임
+	별도의 서비스 이름을 지정하지 않으면 CoinService 로 클래스 이름을 작성하였으면 coinService 로 빈이 등록됨,
+	=================================================================================================================
+
+	@Service
+	public class CoinService {
+		//Service Logic
+	}
+
+	=================================================================================================================
+
+
+# CoinInfoThread 클래스 생성
+
+	스레드를 상속받아서 구현하며, 아래와 같이 빈을 주입하여 사용함
+	coinService =(CoinService) BeanUtils.getBean("coinService");
+
+	=================================================================================================================
+	public class CoinInfoThread extends Thread {
+		CoinService coinService;
+		public CoinInfoThread(){
+			coinService =(CoinService) BeanUtils.getBean("coinService");
+		}
+
+		public void run(){
+			List<CoinVO> coinList = coinService.getCoinValue();
+			try {
+				System.out.println("Thread Start~~");
+
+
+				CoinVO tempCoinVO = new CoinVO();
+				for (int i =0;i<coinList.size();i++){
+
+					tempCoinVO = coinService.getCoinPrice(coinList.get(i));
+					coinList.get(i).setCoinPriceVO(tempCoinVO.getCoinPriceVO());
+					System.out.println(tempCoinVO.getCoinPriceVO());
+					if(i%10==0){
+						Thread.sleep(2000);
+					}
+				}
+
+
+	=================================================================================================================
+
+
