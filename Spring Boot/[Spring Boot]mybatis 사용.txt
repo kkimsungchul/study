@@ -1,5 +1,0 @@
-[ 스프링부트 - mybatis 사용 ]
-
-	참고 URL : https://jason-moon.tistory.com/130
-
-
