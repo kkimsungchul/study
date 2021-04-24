@@ -1,0 +1,71 @@
+참고 URL :
+	https://secuinfo.tistory.com/entry/tip-github?category=857378
+	https://secuinfo.tistory.com/entry/Local-Project-GitHub?category=857378
+
+
+# Git Bash 실행 및 설정
+
+	#바탕화면에서 우클릭 후 "Git Bash here" 클릭
+
+	# 사용자 정보 입력 
+
+		$ git config --global user.name "kimsc1218" 
+		$ git config --global user.email "kimsc1218@gmail.com" 
+
+	# 쉘 color 지정 
+		$ git config --global color.ui "auto" 
+
+	# 사설 인증서를 사용할 경우 ssl 검증을 클라이언트에서 하지 않음 
+
+		$ git config --global --bool --add http.sslVerify false 
+
+	# Http POST 요청 버퍼 사이즈를 설정 
+
+		$ git config --global http.postBuffer 524288000 
+
+	#UTF-8 설정 (Windows만 해당됨) 
+
+		$ git config --global i18n.commitEncoding cp949 
+		$ git config --global i18n.logOutputEncoding cp949 
+
+	#intelliJ연동을 위해 ignored 기능 설정(Global Scope) 
+
+		$ vi ~/.gitignore_global 
+
+			target 
+			build 
+			bin 
+			.git 
+			.svn 
+			*.class 
+			*.bak 
+
+		$ git config --global core.excludesfile ~/.gitignore_global
+
+
+
+
+# 로컬 프로젝트를 깃허브에 등록
+
+	#프로젝트 폴더에서 우클릭 후 "Git Bash here" 클릭
+
+	# Git 초기화 
+		$ git init 
+
+	# Local Project를 Add를 통해 Staging to index 
+		$ git add . 
+
+	# Staging을 실제 Local Repository로 저장 
+		$ git commit -m "First Commit to existed local project" 
+
+	# Remote Repository로 Push를 위 한 URL설정 및 확인 
+		$ git remote add origin https://github.com/kkimsungchul/if_buy.git
+		$ git remote -v 
+
+	# Local to Remote Repository Push 
+		$ git push origin master
+
+
+
+
+

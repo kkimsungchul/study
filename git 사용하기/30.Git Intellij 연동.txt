@@ -1,0 +1,135 @@
+참고 URL : 
+	https://secuinfo.tistory.com/entry/Intellij-Github-Link
+	https://gbsb.tistory.com/409
+
+※ 아래의 내용을 순차적으로 진행
+
+
+# 인텔리J 실행
+	* 인텔리J 버전이 너무 낮으면 깃 설정이 안됩니다.
+	  JRE1.8 이상부터 되는거 같음
+	* 기존의 13버전의 인텔리J는 설정이 안되어 2018년도 버전으로 변경
+	* 인텔리J의 jre 버전 확인은 상단의 "Help" 메뉴에서 "About" 선택
+	  선택하면 나오는 화면에 JRE 버전이 써져있음
+
+
+# Git 실행 설정
+	1. Intellij 실행 후  [File] > [Settings]  메뉴로 진입(컨트롤+알트+S)
+	2. 좌측검색창에 git 을 검색
+	3. "Path to Git executable :" 항목에 Git의 실행파일 경로를 지정한다.
+
+	* 설치한 실행 파일의 경로는 자동으로 잡아주며 잡아주질 않을 경우에는
+	  Git 설치파일의 위치를 찾아서 잡아줍니다.
+	  ex ) C:\Program Files\Git\cmd\git.exe
+
+
+# Git Repository 생성
+
+	생성한 Project를 Git을 통해 관리하기 위해 Git Repository 를 생성
+	
+	1. 상단의 메뉴중 "VCS" 메뉴 클릭
+	2. "Import into Version Control" 메뉴 클릭
+	3. "Create Git Repository" 클릭
+
+	4. 팝업창이 하나 나오면서 프로젝트 폴더를 선택한 후 OK를 클릭
+
+
+
+
+
+# GitHub 계정등록
+	
+	 GitHub와 연동을 위해 생성한 GitHub계정을 Injtellij에 등록하여 자동로그인을 설정 (컨트롤+알트+S)
+
+	1. [File] > [Settings]  메뉴로 진입하여 좌측 상단의 검색에서 GitHub 검색
+	2. GitHub 메뉴에서 Host , Login,Password 를 입력
+		ex)
+		Host : github.com
+		Login : 
+		password : 
+
+
+
+#### 푸시방법 
+
+#1. Add 
+	프로젝트를 Commit 하기전에 Add를 통해 준비영역(Staging)에 코드를 저장하는 작업
+	1. 프로젝트 우클릭
+	2. Git 메뉴에서 "Add" 클릭
+	
+	* 단축키는 컨트롤+알트+A
+
+
+
+#2. Commit 
+	프로젝트를 Local Repository(head)에 코드를 저장하는 작업
+	*변경사항을 확정하느 로컬에 저장하는 단계이며 커밋에 대한 코멘트를 달수 있음
+
+	1. 프로젝트 우클릭
+	2. Git 메뉴에서 "Commit Directory..." 클릭	
+	3. 수정사항 및 작성자에 대한 코멘트와 버전을 추가
+
+#3. Push 
+	Push를 통해 Local Repository 에서 Remote Repository(원격저장지) 로 변경 코드를 발행하는 단계
+
+	1. 프로젝트 우클릭
+	2. Git 메뉴에서 "Repository" 클릭	
+	3. "Push" 클릭
+
+	* 단축키는 컨트롤+시프트+K
+
+
+
+### Clone 방법
+	Git 에서 Checkout 기능을 하는 것은 Clone 기능
+	Remote Repository 의 소스코드를 LocalRepository 로가져오는 것
+
+	1. 프로젝트 상단의 "VCS" 메뉴 클릭
+	2. "Checkout from Version Control" 클릭
+	3. "Git" 클릭
+
+	4. 팝업창이 나오면 Git Repository URL , Parent Directory , Directory Nmae 을 입력
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

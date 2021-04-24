@@ -1,6 +1,8 @@
 [ 스프링부트 - 어노테이션(Annotation) 및 클래스 설정 ]
 	참고 URL : https://victorydntmd.tistory.com/333?category=764331
 
+	* lombok 라이브러리 사용하였으며, 몇몇의 어노테이션은 lombok 라이브러리가 존재해야 사용가능함
+
 
 # 공통
 	@Slf4j
