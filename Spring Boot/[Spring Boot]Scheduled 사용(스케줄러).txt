@@ -1,7 +1,9 @@
 [ 스프링부트 - 스케쥴러 사용 ]
 	
-	참고 URL : https://api.qwer.pw/request/hangang_temp
-
+	참고 URL : 
+		https://copycoding.tistory.com/305
+		http://jmlim.github.io/spring/2018/11/27/spring-boot-schedule/
+		https://seolin.tistory.com/123
 # 스케줄러 종류
 
 	1. @Scheduled 
@@ -72,12 +74,12 @@
 			설정된 시간마다 시작함, 이전작업이 종료가 안되어도 시작함
 			ex) @Scheduled(fixedRate = "30000")
 
-		
-		- initalDelay 
+			
+		- initialDelay  
 			프로그램이 시작하자마자 작업하는게 아닌, 시작을 설정된 시간만큼 지연한 뒤 시작
 			ex ) @Scheduled(initalDelay = 30000)
 
-		- initalDelayString
+		- initialDelayString
 			initalDelay 와똑같으며, 시간을 문자로 받음
 			ex ) @Scheduled(initalDelayString = "30000")
 			
@@ -92,6 +94,15 @@
 			일 1-31
 			월 1-12
 			요일 0-7
+			
+			ex) 
+				"0 0 * * * *" = the top of every hour of every day.
+				"*/10 * * * * *" = 매 10초마다 실행한다.
+				"0 0 8-10 * * *" = 매일 8, 9, 10시에 실행한다
+				"0 0 6,19 * * *" = 매일 오전 6시, 오후 7시에 실행한다.
+				"0 0/30 8-10 * * *" = 8:00, 8:30, 9:00, 9:30, 10:00 and 10:30 every day.
+				"0 0 9-17 * * MON-FRI" = 오전 9시부터 오후 5시까지 주중(월~금)에 실행한다.
+				"0 0 0 25 12 ?" = every Christmas Day at midnight
 
 
 		- zone 
@@ -99,4 +110,38 @@
 			ex) @Scheduled(cron = "0 0 12 * 0 " , zone = "Asia/Seoul")
 			
 
-			
+
+# Scheduled 문제점
+	스프링부트의 스케줄러는 하나의 스레드에서만 실행됨,
+	여러개의 스케줄 작업이 있는경우 이전작업이 끝나야 실행이됨
+	아래의 클래스를 생성하여, 스프링 스케줄러의 스레드를 증가시키면 해결 가능함
+
+	=================================================================================================================
+		package com.sungchul.ifbuy.coin.job;
+
+		import org.springframework.context.annotation.Configuration;
+		import org.springframework.scheduling.annotation.SchedulingConfigurer;
+		import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+		import org.springframework.scheduling.config.ScheduledTaskRegistrar;
+
+		@Configuration
+		public class SchedulerConfig implements SchedulingConfigurer {
+			//스레드 풀 10개 생성
+			private final static int POOL_SIZE = 10;
+
+			@Override
+			public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
+				final ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
+
+				threadPoolTaskScheduler.setPoolSize(POOL_SIZE);
+				threadPoolTaskScheduler.setThreadNamePrefix("hello-");
+				threadPoolTaskScheduler.initialize();
+
+				taskRegistrar.setTaskScheduler(threadPoolTaskScheduler);
+			}
+		}
+
+
+
+
+	=================================================================================================================
