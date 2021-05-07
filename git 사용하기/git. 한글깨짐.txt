@@ -1,0 +1,18 @@
+[ 깃 한글 깨짐 ]
+
+	참고 URL : https://ezcocoa.com/2019-09-11-git-encoding-problem/
+
+	
+# 해결 방안
+
+	이유는 작성 인코딩 타입이 CP949(Window)로 되어있어 문제가 발생한다.
+
+	이를 변경하기 위해 아래의 과정을 거친다.
+	project/.git/config 파일 상단에 아래와 같이 위치해주자.
+
+	[i18n]
+	commitEncoding = utf-8
+	logOutputEncoding = utf-8
+	다시 git에서 한글을 확인해보자.
+
+	정상적으로 출력되는 것을 확인 할 수 있다.

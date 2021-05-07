@@ -1,6 +1,20 @@
 [ 스프링부트 - thymeleaf 사용 ]
 	참고 URL :https://qiita.com/rubytomato@github/items/ac65c2203d16d1a1bbd7
 
+	데이터 전송  :
+		https://www.leafcats.com/30
+		https://hyunsangwon93.tistory.com/19
+
+	데이터 출력 : 
+		https://snoop-study.tistory.com/48
+		https://eblo.tistory.com/55
+		https://cyberx.tistory.com/132
+		https://ttallaemideul.github.io/20200318/thymeleaf-js-001
+	
+	자바스크립트에서 사용 : 
+		https://easybrother0103.tistory.com/2
+
+		https://cyberx.tistory.com/160
 
 # HTML 페이지 생성
 	
@@ -41,3 +55,92 @@
 		</html>
 
 	=================================================================================================================
+
+
+# css JS 파일 추가
+
+	https://wonjinism.tistory.com/17
+
+
+
+# 서버(java) 에서 화면단(html) 으로 데이터 전송
+
+	모델(model)을 사용하여 전송,
+	아래는 예시로 작성하였음
+	=====================================================================================================================================================
+
+   /*
+     * 로그인
+     * @param AdminVO
+     * @return boolean
+     * */
+    @PostMapping("/")
+    public String loginCheck(AdminVo adminVo, HttpServletRequest httpServletRequest, Model model){
+
+        boolean loginCheck = mainService.loginCheck(adminVo);
+
+        if(loginCheck){
+            HttpSession session = httpServletRequest.getSession();
+            session.setAttribute("loginCheck","success");
+            return "main/main.html";
+        }
+
+        log.info("###Controller.loginCheck : {}",loginCheck );
+        model.addAttribute("loginFail","로그인이 실패하였습니다. ID / PW 를 확인해주세요");
+        return "login/login.html";
+
+    }
+
+	=====================================================================================================================================================
+
+# 화면단에서 세션에 있는 데이터 값 사용
+	
+	세션에 있는 데이터는 	${session.loginUser} 로 꺼내서 쓰면됨, 
+	session 은 따로 설정하는게 아니며 선언이 이미 되어 있는듯,
+	. 뒤에는 세션에 저장한 변수명
+	
+	=====================================================================================================================================================
+	
+	<p th:text="${session.loginUser}"> </p> 으로 사용하면 됨,
+	
+
+	=====================================================================================================================================================
+
+
+
+# 화면단에서 전송받은 데이터 값 사용
+	
+	th 문법은 다양하며 필요할때마다 찾아서 사용하면 됨
+	=====================================================================================================================================================
+
+	<p th:text="${변수명}"> </p> 으로 사용하면 됨,
+
+	또는
+	[[${user.name}]] 로 사용하면 됨
+
+	=====================================================================================================================================================
+
+# 자바스크립트에서 타임리프 값 사용
+
+	스크립트 선언부분에 th:inline="javascript" 추가
+	변수 사용부분을 아래와 같이 CDATA 로 묶어서 사용
+	또는 [[${loginFail}]]; 처럼 곧바로 사용이 가능
+	=====================================================================================================================================================
+
+    <script th:inline="javascript">
+        $(document).ready(function(){
+            /*<![CDATA[*/
+            var result = /*[[ ${test} ]]*/;
+            /*]]*/
+            alert(result);
+
+			var aa = [[${loginFail}]];
+
+
+	=====================================================================================================================================================
+
+
+# include 사용하기
+
+	URL : https://webisfree.com/2020-01-03/%EC%9E%90%EB%B0%94-%ED%85%9C%ED%94%8C%EB%A6%BF-thymeleaf%EC%97%90%EC%84%9C-html-%ED%8C%8C%EC%9D%BC-%EC%B6%94%EA%B0%80%ED%95%98%EB%8A%94-%EB%B0%A9%EB%B2%95-%EB%B0%8F-%EC%98%88%EC%A0%9C
+

@@ -1,0 +1,148 @@
+[ 스프링부트 - mybatis 사용하기 (XML) ]
+
+
+	참고 URL : 
+		https://antdev.tistory.com/30
+		https://inma.tistory.com/155
+		https://inma.tistory.com/156?category=1070891
+
+	
+	MSSQL 연동 참고 : 
+		https://taesan94.tistory.com/108
+
+
+# 그래들에 라이브러리 추가
+
+	dependencies {
+
+		//mybatis 사용을 위해 추가
+		compile 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.1.0'
+		compile 'org.springframework.boot:spring-boot-starter-jdbc'
+		compile 'mysql:mysql-connector-java'
+
+	}
+
+
+
+# 맵퍼 스캔 추가
+	메인클래스에 맵퍼 스캔부분 추가
+	=====================================================================================================================================================
+
+	@SpringBootApplication
+	@MapperScan(value={"com.securus.ciim.**.mapper"})
+
+	=====================================================================================================================================================
+
+# SqlSessionFactory 메소드 추가
+
+	=====================================================================================================================================================
+
+    @Bean
+    public SqlSessionFactory sqlSessionFactory(DataSource dataSource) throws Exception {
+        SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
+        sessionFactory.setDataSource(dataSource);
+        Resource[] res = new PathMatchingResourcePatternResolver().getResources("classpath:mapper/*Mapper.xml");
+        sessionFactory.setMapperLocations(res);
+
+        return sessionFactory.getObject();
+    }
+
+	=====================================================================================================================================================
+
+
+* 맵퍼스캔과 sqlSessionFactory 가 추가된 메인클래스
+
+	=====================================================================================================================================================
+
+	import org.apache.ibatis.session.SqlSessionFactory;
+	import org.mybatis.spring.SqlSessionFactoryBean;
+	import org.mybatis.spring.annotation.MapperScan;
+	import org.springframework.boot.SpringApplication;
+	import org.springframework.boot.autoconfigure.SpringBootApplication;
+	import org.springframework.context.annotation.Bean;
+	import org.springframework.core.io.Resource;
+	import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+
+	import javax.sql.DataSource;
+
+	@SpringBootApplication
+	@MapperScan(value={"com.securus.ciim.**.mapper"})
+	public class CiimApplication {
+
+		public static void main(String[] args) {
+			SpringApplication.run(CiimApplication.class, args);
+		}
+
+		@Bean
+		public SqlSessionFactory sqlSessionFactory(DataSource dataSource) throws Exception {
+			SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
+			sessionFactory.setDataSource(dataSource);
+			Resource[] res = new PathMatchingResourcePatternResolver().getResources("classpath:mapper/*Mapper.xml");
+			sessionFactory.setMapperLocations(res);
+
+			return sessionFactory.getObject();
+		}
+
+	}
+
+
+	=====================================================================================================================================================
+
+
+
+
+# 맵퍼 인터페이스 클래스 생성
+	
+	인터페이스 클래스로 만들어야 함
+	Mapper , Repository 어노테이션 추가
+
+	=====================================================================================================================================================
+	
+	package com.securus.ciim.main.mapper;
+
+	import com.securus.ciim.main.vo.AdminVo;
+	import org.apache.ibatis.annotations.Mapper;
+	import org.springframework.stereotype.Repository;
+
+	import java.util.HashMap;
+	import java.util.List;
+
+	@Repository
+	@Mapper
+	public interface MainMapper {
+
+		List<HashMap<String,String>> loginCheck(AdminVo adminVo);
+	}
+
+	=====================================================================================================================================================
+
+
+
+
+
+# 맵퍼 XML 파일 생성
+
+	namespace 는 위에서 생성한 인터페이스의 경로와 일치하도록 작성( 공백, 오탈자 주의)
+
+	=====================================================================================================================================================
+
+		<?xml version="1.0" encoding="UTF-8"?>
+		<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+				"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+		<mapper namespace="com.securus.ciim.main.mapper.MainMapper"><!--namespace를 통해 UserDAO와 연결합니다. -->
+
+			<select id="loginCheck" resultType="HashMap">
+				SELECT * FROM buy_user
+			</select>
+
+		</mapper>
+
+	=====================================================================================================================================================
+
+
+
+
+
+
+
