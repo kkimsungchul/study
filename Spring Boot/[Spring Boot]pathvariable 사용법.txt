@@ -1,0 +1,26 @@
+[ 스프링부트 - pathvariable 사용법 ] 
+	
+	참고 URL : https://elfinlas.github.io/2018/02/18/spring-parameter/
+				https://velog.io/@shson/%EC%8A%A4%ED%94%84%EB%A7%81-controller%EC%97%90%EC%84%9C-%ED%8C%8C%EB%9D%BC%EB%AF%B8%ED%84%B0%EB%A5%BC-%EB%B0%9B%EB%8A%94-%EB%8B%A4%EC%96%91%ED%95%9C-%EB%B0%A9%EB%B2%95-RequestParam-RequestBody-PathVariable
+				https://mindols.tistory.com/107
+
+# 사용 이유
+	레스트풀API 로 구현 하게되면 URI 에서 정보를 유추할 수 없어야 함
+	URI 를 깔끔하게 구현하면서, 유추할 수 없도록 구현하기 위해서 사용함
+
+
+# 사용 방법
+	
+	화면단에서 아래의 URL 호출
+		ex) sungchul.com/board/2
+
+	컨트롤러단에서의 처리
+	
+	@GetMapping("/board/{idx}")
+	public boardDetail(@PathVariable("idx") int idx){
+
+		~~~~
+	}
+
+
+
