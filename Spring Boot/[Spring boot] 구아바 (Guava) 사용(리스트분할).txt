@@ -1,0 +1,16 @@
+[ 스프링부트 - 리스트 분할 ]
+
+
+	참고 URL : https://jinseongsoft.tistory.com/312
+
+
+# 구아바 라이브러리 사용
+	해당 라이브러리를 사용하면 리스트를 분할할 수 있음
+
+
+# 사용 방법
+	List<List<UserVO>> excelDownloadList = new ArrayList<>();
+	excelDownloadList = Lists.partition(userList,20000);
+
+	
+	userList 리스트에 있는 값을 20000개씩 잘라서 excelDownloadList 에 넣음
