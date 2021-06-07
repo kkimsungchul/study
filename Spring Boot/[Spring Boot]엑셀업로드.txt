@@ -1,0 +1,109 @@
+[ 스프링부트 - 엑셀업로드 ] 
+
+	참고 URL : https://shinsunyoung.tistory.com/71
+
+
+# 라이브러리 추가
+
+	=====================================================================================================================================================
+	dependencies {
+		....중략....
+		//엑셀다운로드 사용을 위해 추가
+		compile group: 'org.apache.poi', name: 'poi', version: '4.1.2'        // HSSFWorkbook 사용가능
+		compile group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'  // XSSFWorkbook 사용가능
+
+		//엑셀 업로드 사용을 위해 추가,(확장자)
+		compile group: 'commons-io', name: 'commons-io', version: '2.4'  // XSSFWorkbook 사용가능
+
+	=====================================================================================================================================================
+
+
+
+# 엑셀파일 형변환 오류
+	참고 URL : https://needneo.tistory.com/20
+
+	엑셀에 지정된 타입이 아니면 오류가 발생함,
+	엑셀자체를 수정해서 업로드 하는방식이 있는 반면, 소스를 수정해서 하는방식이 있음
+	"setCellType(CellType.STRING);" 를 사용하면, 해당 셀의 타입을 스트링으로 변경해줌
+		row.getCell(1).setCellType(CellType.STRING);
+
+
+# 빈 셀 값 오류
+	for문으로 돌다보면 빈 셀을 만나서 오류가 발생함
+	그럴때는 처음부터 해당 세을 가져올대 null 인지, 체크하여서 null 일경우에는 공백으로 바꿔주도록 수정할 수 있음
+	아래와 같이 사용하면 되고, 널일경우 공백이 들어감
+		
+		row.getCell(mobile,Row.MissingCellPolicy.CREATE_NULL_AS_BLANK)
+
+	위와같이 값을 가져와서 if문으로 공백체크하면됨
+	if(row.getCell(mobile,Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).equla("")){
+	
+	}
+
+
+
+# 구현 소스
+
+
+	=====================================================================================================================================================
+
+
+    public void surveyExcelUpload(SurveyVO surveyVO) throws Exception{
+        int name=0;
+        int mobile=1;
+        int surveyClassification = surveyMapper.getSurveyClassification()+1;
+        DateUtil dateUtil = new DateUtil();
+        log.info("###### surveyClassification : {}", surveyClassification);
+        List<HashMap<Object,Object>> dataList = new ArrayList<>();
+
+        String extension = FilenameUtils.getExtension(surveyVO.getSurveyExcel().getOriginalFilename()); // 3
+
+        Workbook workbook = null;
+
+        if (extension.equals("xlsx")) {
+            workbook = new XSSFWorkbook(surveyVO.getSurveyExcel().getInputStream());
+        } else if (extension.equals("xls")) {
+            workbook = new HSSFWorkbook(surveyVO.getSurveyExcel().getInputStream());
+        }
+
+        Sheet worksheet = workbook.getSheetAt(0);
+
+        //현재 등록되어 있는 서베이의 다음 순차값을 가져옴
+
+
+        //현재 업로드된 엑셀파일에서 사용자 명과 연락처의 위치를 찾음
+        Row row = worksheet.getRow(0);
+
+        for(int i=0;;i++){
+
+            row.getCell(i, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellType(CellType.STRING);
+            if(row.getCell(i).getStringCellValue().equals("")){
+                break;
+            }
+
+            if(row.getCell(i).getStringCellValue().equals("survey_user_name")){
+                name=i;
+            }else if(row.getCell(i).getStringCellValue().equals("survey_user_mobile")){
+                mobile=i;
+            }
+        }
+
+        //반복문을 돌면서 vo를 생성하여 데이터베이스에 추가함
+        for (int j = 1; j < worksheet.getPhysicalNumberOfRows(); j++) {
+            row = worksheet.getRow(j);
+            row.getCell(name, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellType(CellType.STRING);
+            row.getCell(mobile,Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellType(CellType.STRING);
+            SurveyVO tempSurveyVO =  SurveyVO.builder()
+                    .surveyName(surveyVO.getSurveyName())
+                    .surveyClassification(surveyClassification)
+                    .surveyUserName(row.getCell(name).getStringCellValue())
+                    .surveyUserMobile(row.getCell(mobile).getStringCellValue())
+                    .surveyDate(dateUtil.getDate())
+                    .surveyTime(dateUtil.getTime())
+                    .build();
+            log.info("### tempSurveyVO {} :  {}",j,tempSurveyVO);
+        }
+    }
+
+
+	=====================================================================================================================================================

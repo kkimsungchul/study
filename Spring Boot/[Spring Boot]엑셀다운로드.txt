@@ -1,0 +1,73 @@
+[ 스프링부트 - 엑셀다운로드 ] 
+
+	참고 URL : https://jhhan009.tistory.com/67
+	메이븐 URL :https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml/4.1.2
+	환경 : 스프링부트 + 그래들
+	
+
+
+# 그래들에 라이브러리 추가
+
+	=====================================================================================================================================================
+
+	dependencies {
+		...중략...
+		compile group: 'org.apache.poi', name: 'poi', version: '4.1.2'        // HSSFWorkbook 사용가능 - xls
+		compile group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'  // XSSFWorkbook 사용가능 - xlsx
+
+	=====================================================================================================================================================
+
+
+# 서비스 생성
+	원하는 데이터를 아래와같이 넣어서 호출하면 됩,
+	HttpServletResponse 를 전달해줘야 파일이 다운로드 됨
+	제일상단행(Header) 은 제목으로 넣어주고, 그 밑에 행(Body)부터는 데이터로 넣어주면됨
+	※ 아래의 소스에서는 import가 없을수도 있음
+	=====================================================================================================================================================
+	import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+	import org.apache.poi.ss.usermodel.Cell;
+	import org.apache.poi.ss.usermodel.Row;
+	import org.apache.poi.ss.usermodel.Sheet;
+	import org.apache.poi.ss.usermodel.Workbook;
+	import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+		
+	Class ExcelDownload{	
+
+		public void userExcelDownload(HttpServletResponse response) throws IOException {
+			String orgfilename = "엑셀파일명.xlsx";
+			Workbook wb = new XSSFWorkbook();
+			Sheet sheet = wb.createSheet("첫번째 시트");
+			Row row = null;
+			Cell cell = null;
+			int rowNum = 0;
+
+			// Header
+			row = sheet.createRow(rowNum++);
+			cell = row.createCell(0);
+			cell.setCellValue("번호");
+			cell = row.createCell(1);
+			cell.setCellValue("이름");
+			cell = row.createCell(2);
+			cell.setCellValue("제목");
+
+			// Body
+			for (int i=0; i<3; i++) {
+				row = sheet.createRow(rowNum++);
+				cell = row.createCell(0);
+				cell.setCellValue(i);
+				cell = row.createCell(1);
+				cell.setCellValue(i+"_name");
+				cell = row.createCell(2);
+				cell.setCellValue(i+"_title");
+			}
+
+			//파일명 및 인코딩 설정
+			String encordedFilename = URLEncoder.encode(orgfilename,"UTF-8").replace("+", "%20");
+			response.setHeader("Content-Disposition", "attachment;filename=" + encordedFilename + ";filename*= UTF-8''" + encordedFilename);
+			response.setContentType("ms-vnd/excel");
+			wb.write(response.getOutputStream());
+			wb.close();
+
+		}
+}
+	=====================================================================================================================================================

@@ -1,0 +1,39 @@
+[ 스프링부트 - 파일다운로드 ]
+
+
+	https://programmer93.tistory.com/44
+	http://blog.naver.com/PostView.nhn?blogId=monkey5255&logNo=221600195073&parentCategoryNo=&categoryNo=46&viewDate=&isShowPopularPosts=false&from=postView
+
+	위의 두개의 링크를 보고 참고하여 아래의 코드로 사용함.
+	파일명을 변수로 전달해주면 다운받음
+
+# 정적 파일 다운로드
+
+
+	=====================================================================================================================================================
+    @GetMapping("/sample/{fileName}")
+    public ResponseEntity<Resource> download_file(@PathVariable String fileName) throws Exception{
+        Resource temp = resourceLoader.getResource("classpath:static/common/sample/"+ fileName);
+        File file = temp.getFile();	//파일이 없는 경우 fileNotFoundException error가 난다.
+        HttpHeaders header = new HttpHeaders();
+        header.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename="+fileName);
+        header.add("Cache-Control", "no-cache, no-store, must-revalidate");
+        header.add("Pragma", "no-cache");
+        header.add("Expires", "0");
+        Path path = Paths.get(file.getAbsolutePath());
+        ByteArrayResource resource = null;
+
+        try {
+            resource = new ByteArrayResource(Files.readAllBytes(path));
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+        return ResponseEntity.ok()
+                .headers(header)
+                .contentLength(file.length())
+                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .body(resource);
+    }
+
+
+	=====================================================================================================================================================
