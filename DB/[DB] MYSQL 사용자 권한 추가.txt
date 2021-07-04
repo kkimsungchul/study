@@ -1,0 +1,13 @@
+[ MYSQL 사용자 권한 추가 ]
+	참고 URL : https://velog.io/@devyang97/MySQL-%EC%82%AC%EC%9A%A9%EC%9E%90-%EC%B6%94%EA%B0%80-%EB%B0%8F-%EA%B6%8C%ED%95%9C-%EC%84%A4%EC%A0%95
+
+
+	// all DB, Table에 모든 권한 부여
+	grant all privileges on *.* to '사용자'@'localhost';
+	flush privileges;
+
+
+	// 특정 DB의 모든 Table에 모든 권한 부여
+	grant all privileges on DB이름.* to '사용자'@'localhost';
+	flush privileges;
+

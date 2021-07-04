@@ -1,0 +1,110 @@
+[ 스프링부트 - 세션타임아웃 ]
+
+
+# Configuration 어노테이션으로 설정
+
+	아래의 방법으로 선언해서 사용하도록 하였음,
+	=====================================================================================================================================================
+
+	import lombok.AllArgsConstructor;
+	import org.springframework.context.annotation.Configuration;
+
+	import javax.servlet.http.HttpSessionEvent;
+	import javax.servlet.http.HttpSessionListener;
+
+
+	@AllArgsConstructor
+	@Configuration
+	public class SessionTimeout implements HttpSessionListener {
+
+		@Override
+		public void sessionCreated(HttpSessionEvent sessionEvent) {
+			sessionEvent.getSession().setMaxInactiveInterval(600); //세션만료60분
+		}
+		@Override
+		public void sessionDestroyed(HttpSessionEvent sessionEvent) {
+		}
+	}
+
+	=====================================================================================================================================================
+
+
+
+# @Bean 으로 타임아웃 설정
+		
+
+	=====================================================================================================================================================
+
+	import javax.servlet.http.HttpSessionEvent;
+	import javax.servlet.http.HttpSessionListener;
+
+	public class SessionTimeout implements HttpSessionListener {
+
+		@Override
+		public void sessionCreated(HttpSessionEvent sessionEvent) {
+			sessionEvent.getSession().setMaxInactiveInterval(600); //초단위
+		}
+
+
+
+		@Override
+		public void sessionDestroyed(HttpSessionEvent sessionEvent) {
+		}
+	}
+
+
+	=====================================================================================================================================================
+
+
+
+	main 클래스에 아래의 내용 추가
+	=====================================================================================================================================================
+
+
+	@SpringBootApplication
+	@MapperScan(value={"com.securus.ciim.**.mapper"})
+	public class CiimApplication {
+
+		public static void main(String[] args) {
+			SpringApplication.run(CiimApplication.class, args);
+		}
+
+		@Bean
+		public HttpSessionListener httpSessionListener(){
+			return new SessionTimeout();
+		}
+	}
+
+
+
+
+	=====================================================================================================================================================
+
+
+
+
+# 설정파일로 설정 (yml, properties)
+	※ 무슨이유인지 잘 설정이 안됨, 내부톰캣도 사용하고있는데도 안댐..
+	
+	스프링부트의 내장톰캣을 사용할 경우 아래와 같이 "application.yml" 파일에 입력해주면 됨
+	뒤에 붙는 숫자는 초단위임, "초"
+	=====================================================================================================================================================
+	server :
+	  port : 80
+	  session:
+		timeout : 60
+
+	spring :
+	  session : 
+		timeout: 60
+
+	=====================================================================================================================================================
+
+
+	properties 파일을 사용할 경우
+	=====================================================================================================================================================
+
+
+	server.session.timeout=60
+
+	=====================================================================================================================================================

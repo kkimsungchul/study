@@ -1,0 +1,64 @@
+[ 스프링부트 - mybatis 설정파일 사용]
+
+	사용하게된 이유는,, application.yml 파일에 "map-underscore-to-camel-case: true" 옵션을 기재하였는데 적용이 안되었음
+	내용을 찾아보니까 xml파일에 설정을 넣어서 적용하면 된다고 하여서 사용하게 됨
+
+
+
+
+# Mybatis config 클래스 생성
+	경로 : src\main\java\com\securus\ciim\configuration\MybatisConfig.java
+
+	=====================================================================================================================================================
+
+	public class MybatisConfig {
+
+		@Autowired
+		ApplicationContext applicationContext;
+
+		@Bean
+		public  SqlSessionFactory sqlSessionFactory(DataSource dataSource) throws Exception {
+			final SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
+			sessionFactory.setDataSource(dataSource);
+			PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+			sessionFactory.setMapperLocations(resolver.getResources("classpath:mapper/*Mapper.xml"));
+			sessionFactory.setConfigLocation(applicationContext.getResource("classpath:mybatis-config.xml"));
+			sessionFactory.getObject().getConfiguration().setMapUnderscoreToCamelCase(true);
+			return sessionFactory.getObject();
+		}
+	}
+
+
+
+	=====================================================================================================================================================
+
+
+
+# mybatis-config.xml 파일 생성
+	
+	경로 : src\main\resources\mybatis-config.xml
+
+	=====================================================================================================================================================
+
+
+	<?xml version="1.0" encoding="UTF-8"?>
+	<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+			<!--mapUnderscoreToCamelCase : 스네이크 카멜 변환 -->
+			<!--callSettersOnNulls : 쿼리 결과 필드가 null인 경우, 누락이 되서 나오는데 누락이 안되게 하는 설정-->
+			<!--jdbcTypeForNull : 쿼리에 보내는 파라메터가 null인 경우, 오류 발생하는 것 방지  예) #{search.user}-->
+
+	<configuration>
+		<settings>
+			<setting name="mapUnderscoreToCamelCase" value="true"/>
+			<setting name="callSettersOnNulls" value="true"/>
+			<setting name="jdbcTypeForNull" value="NULL"/>
+		</settings>
+	</configuration>
+
+	=====================================================================================================================================================
+
+
+
+
+# 

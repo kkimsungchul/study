@@ -1,0 +1,145 @@
+[ javascript - input 컨트롤 하기 ]
+
+	페이지에 있는 모든 인풋을 가져와서, 특정값 또는 특정이름, 특정태그 안에 있는 인풋들을 컨트롤하기 위해서 작성함
+
+
+
+	아래는 특정 폼에 있는 input 태그들의 값을 전부다 지우려고 함,
+	버튼의 값은 지우지 않음
+	=====================================================================================================================================================
+
+			var userForm = $("#userInsertForm")[0];
+			var userFormLength = userForm.length;
+
+			for(var i=0;i<userFormLength;i++){
+				if(userForm[i].tagName=="INPUT" && userForm[i].type!="button"){
+					userForm[i].value="";
+				}
+			}
+
+	=====================================================================================================================================================
+
+
+
+
+
+
+
+
+
+	checkbox , radio 를 컨트롤하려고 작성했던 내용
+	페이지에 있는 모든 input 을 가져와서 배열에 저장하여서 컨트롤함
+	=====================================================================================================================================================
+	<html>
+	<head>
+	<title></title>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	</head>
+
+	<script>
+
+	//<input type="checkbox" value="<?php echo $loc[$i]->slug ?>" name="product_cat" <?php echo $local == $loc[$i]->slug ? "checked" : ""; ?>>
+
+	//	https://test.com/shop/?product_cat=top-recommendation&product_cat=show-concert&product_cat=private-driver&date1=&date2=&orderby=popularity
+	//	file:///C:/Users/SECURUS-GRAM/Desktop/temp1.html?product_cat=top-recommendation&product_cat=show-concert&product_cat=private-driver&date1=&date2=&orderby=popularity
+	//  ?product_cat=top-recommendation&product_cat=show-concert&product_cat=private-driver&date1=&date2=&orderby=popularity
+
+		//넘겨받은 변수를 통해서자동으로 체크하도록 수정
+
+		$(document).ready(function(){
+			var checkList = new Array();
+			var searchUrl = location.search.substring(1);
+			checkList = searchUrl.split("&");
+			for (var j =0; j< checkList.length ; j++ ){
+				var temp = new Array()
+				temp = checkList[j].split("=");
+				temp[0];
+				temp[1];
+				var inputList = $("input");
+				var inputListSize = $("input").length;
+				for(var i=0; i<inputListSize ; i++){
+					if(inputList[i].tagName=="INPUT" && inputList[i].type=="checkbox"){
+						//추후 수정하여서 사용할때는 아래의 값을 원하는 값으로 변경하면댐
+						//현재는 넘겨받은 벨류를 기준으로 하였음
+						if(inputList[i].value==temp[1]){
+							inputList[i].checked=true;
+						}
+
+						//넘겨받은 키값 기준
+						//if(inputList[i].name==temp[0]){
+						//	inputList[i].checked=true;
+						//}
+					}else if(inputList[i].tagName=="INPUT" && inputList[i].type=="radio"){
+						if(inputList[i].value==temp[1]){
+							inputList[i].checked=true;
+						}				
+					}
+				}
+			}
+		});
+
+
+
+		//모든 인풋태그의 값 가져오기, input 가져오기
+		function getCheckValue(){
+			var tempArray = new Array();
+			var inputList = $("input");
+			var inputListSize = $("input").length;
+			for(var i=0; i<inputListSize ; i++){
+				if(inputList[i].tagName=="INPUT" && inputList[i].type=="checkbox"){
+					if(inputList[i].checked==true){
+	//					console.log(inputList[i].closest("div"));
+	//					inputList[i].prop("checked", false);
+	//					console.log($("#aaqq"));
+	//					$("#aaqq").prop("checked",false);
+						console.log(inputList[i].value)
+						console.log(inputList[i])
+						console.log($("#input[value="+inputList[i].value+"]"));
+						console.log($("#aaqq"));
+	//					console.log($("#input[value="+inputList[i].value+"]").prop("checked",false));
+
+					}else{
+						inputList[i].checked=true;
+					}
+				}
+			}
+
+		}
+		
+
+		
+
+		
+
+	//?product_cat=top-recommendation&product_cat=show-concert&product_cat=private-driver&date1=&date2=&orderby=popularity
+	</script>
+	<body>
+
+	<div class="aaaa">
+	<input type="checkbox" id="aaqq" name="product_cat" value="top-recommendation">
+	<input type="checkbox" name="product_cat"value="2">
+	</div>
+	<div class="aaaa">
+	<input type="checkbox" name="product_cat" value="show-concert">
+	<input type="checkbox" name="product_cat" value="private-driver">
+	</div>
+	<div class="aaaa">
+	<input type="checkbox" name="c1">
+	<input type="checkbox" name="c2">
+	</div>
+	<div class="aaaa">
+	<input type="checkbox" name="d1">
+	<input type="checkbox" name="d2">
+	</div>
+	<div class="aaaa">
+	<input type="checkbox" name="e1">
+	<input type="checkbox" name="e2">
+	</div>
+
+
+	<input type="button" value="테스트" onclick="getCheckValue()"></button>
+	</body>
+	</html>
+
+
+	=====================================================================================================================================================
