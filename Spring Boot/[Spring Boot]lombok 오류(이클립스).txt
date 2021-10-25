@@ -1,0 +1,38 @@
+https://marsland.tistory.com/511
+
+https://dreamingdreamer.tistory.com/136
+ 
+
+# lombok 오류
+
+	lombok 라이브러리 추가 후 @Slf4j 어노테이션을 클래스 상단에 선헌 후 log.info() 를 사용하려고 하는데 찾을 수 없다는 메시지가 출력됨 (log cannot be resolved)
+
+	이와관련하여서 lombok의 어노테이션들이 정상적으로 작동을 하지 않음 (@AllArgsConstructor 등)
+
+ 
+
+# 해결 방안
+
+	lombok 라이브러리 설치
+	
+
+	1. 현재 프로젝트 내에서 추가한 lombok.jar 파일을 실행
+		(직접 내려받아서 실행해도 되나, 개발 툴안에서 실행하는게 편함)
+
+	2. 실행 시 설치화면이 나오면 이클립스의 설치디렉토리 경로를 찾아서 셀렉트
+
+	3. install/update 버튼 클릭
+
+	4. Quit Installer 클릭
+
+	5. 프로젝트 클린
+
+	6. 이클립스 재시작 
+
+	위의 방법으로 진행하면 정상적으로 작동함.
+
+	또한 설치 확인은 이클립스의 설치파일 "eclipse.ini" 를 열어보면 제일 하단에 아래의 내용이 추가되어 있음
+
+	-javaagent:C:\Users\gnew\Downloads\eclipse-jee-2021-09-R-win32-x86_64\eclipse\lombok.jar
+
+	
