@@ -1,0 +1,50 @@
+[ swagger 사용하기 ]
+
+# swagger 라이브러리 추가
+	
+	gradle 파일에 아래의 내용을 추가
+	=================================================================================================================
+    
+	compile 'io.springfox:springfox-swagger2:2.9.2'
+    compile 'io.springfox:springfox-swagger-ui:2.9.2'
+
+	=================================================================================================================
+
+# swagger Config 파일 생성
+	=================================================================================================================
+
+	@Configuration
+	@EnableSwagger2
+	public class SwaggerConfig {
+
+		@Bean
+		public Docket api(){
+			return new Docket(DocumentationType.SWAGGER_2)
+				.select()
+				.apis(RequestHandlerSelectors.any())
+				.paths(PathSelectors.any())
+				.build();
+		}
+	}
+
+	=================================================================================================================
+
+
+# 접속
+	http://localhost:8080/swagger-ui.html
+
+
+# 설명 적용
+
+	@ApiOperation 어노테이션을 통해서 API에 대한 설명을 작성
+	@ApiImplicitParam 을 통해서 해당 변수의 설명과 디폴트 값을 작성
+	=================================================================================================================
+    @GetMapping("/a")
+    @ApiOperation(value="a페이지" , notes="접속시 bye라는 단어를 리턴합니다.")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name="a" , value = "걍 테스트용 a변수에 대한 설명", defaultValue = "디폴트값")
+    })
+    public String bye(String a){
+        return "bye";
+    }
+	=================================================================================================================
