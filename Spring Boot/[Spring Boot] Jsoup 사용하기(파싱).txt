@@ -1,0 +1,51 @@
+[ Jsoup 사용하기 (파싱) ]
+
+# 그래들에 라이브러리 추가
+
+
+	=================================================================================================================
+
+		//jsoup 사용을 위해 추가 (파싱)
+		compile group: 'org.jsoup', name: 'jsoup', version: '1.11.3'
+
+	=================================================================================================================
+
+
+# 파싱을 진행할 서비스 클래스 생성 후 메소드 작성
+
+	=================================================================================================================
+
+    public void parsingOneStock(String stockCode)throws Exception{
+        HashMap<String,String> hashMap = new HashMap<>();
+        //String url = "https://finance.naver.com/item/fchart.naver?code=005930";
+        String url = "https://finance.naver.com/item/fchart.naver?code="+stockCode;
+
+        //HTML페이지 전체를 가져옴
+        Document doc = Jsoup.connect(url).get();
+
+        //가져온 HTMl문서에서 ID가 wrap인 태그에 속하는 부분만 가져옴
+        Elements elements = doc.select("#wrap");
+
+		//select() 를 사용하여서 HTMl태그(body), 아이디(#id) , 클래스명(.classname) 등으로 정보를 파싱 할수 있으며 정보가 여러개일 경우 배열로 저장됨
+		//select() 를 이어서 사용할수 있음
+		System.out.println("#### 기준 : " + elements.select("dl").get(0).select("dd").get(0).text());
+
+		//처음부터 원하는 위치 이전까지 파싱을 진행 후 꺼내오는 방법
+		Elements elements2 = doc.select("#wrap").select("dl").get(0).select("dd");
+		System.out.println("#### 기준 : " + elements2.get(0).text());
+        System.out.println("#### 종목명 : " + elements2.get(1).text());
+        System.out.println("#### 종목코드 : " + elements2.get(2).text());
+        System.out.println("#### 현재가 : " + elements2.get(3).text());
+        System.out.println("#### 전일가 : " + elements2.get(4).text());
+        System.out.println("#### 시가 : " + elements2.get(5).text());
+        System.out.println("#### 고가 : " + elements2.get(6).text());
+        System.out.println("#### 상한가 : " + elements2.get(7).text());
+        System.out.println("#### 저가 : " + elements2.get(8).text());
+        System.out.println("#### 하한가 : " + elements2.get(9).text());
+        System.out.println("#### 거래량 : " + elements2.get(10).text());
+        System.out.println("#### 거래대금 : " + elements2.get(11).text());
+
+	}
+	=================================================================================================================
+
+
