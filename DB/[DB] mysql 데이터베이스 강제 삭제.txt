@@ -1,18 +1,18 @@
-[ µ¥ÀÌÅÍº£ÀÌ½º °­Á¦ »èÁ¦ ] 
+[ ë°ì´í„°ë² ì´ìŠ¤ ê°•ì œ ì‚­ì œ ] 
 
-	* Äõ¸®¹®ÀÌ³ª Å×ÀÌºí ±¸Á¶ ÀûÀ¸·Î º¯°æÇÏ´Ù°¡,, ¹º°¡ Àß¸øµÇ¸é ÇØ´ç Å×ÀÌºíÀÌ ¿­¸®Áöµµ ¾Ê°í,
-	DROP ¸í·É¾îµµ ¸ÔÈ÷Áö ¾Ê´Â´Ù
+	* ì¿¼ë¦¬ë¬¸ì´ë‚˜ í…Œì´ë¸” êµ¬ì¡° ì ìœ¼ë¡œ ë³€ê²½í•˜ë‹¤ê°€,, ë­”ê°€ ìž˜ëª»ë˜ë©´ í•´ë‹¹ í…Œì´ë¸”ì´ ì—´ë¦¬ì§€ë„ ì•Šê³ ,
+	DROP ëª…ë ¹ì–´ë„ ë¨¹ížˆì§€ ì•ŠëŠ”ë‹¤
 
-	À©µµ¿ì ¼­ºñ½º¿¡ µé¾î°¡¼­ mysql À» ÁßÁö ÇÑ´Ù.
+	ìœˆë„ìš° ì„œë¹„ìŠ¤ì— ë“¤ì–´ê°€ì„œ mysql ì„ ì¤‘ì§€ í•œë‹¤.
 	
-	1. ½ÇÇàÃ¢¿¡¼­ services.msc ÀÔ·Â
-	2. mysql ¼­ºñ½º ÁßÁö
+	1. ì‹¤í–‰ì°½ì—ì„œ services.msc ìž…ë ¥
+	2. mysql ì„œë¹„ìŠ¤ ì¤‘ì§€
 
 
-	¾Æ·¡ÀÇ °æ·Î¿¡ °¡¼­ ÇØ´ç µ¥ÀÌÅÍº£ÀÌ½ºÀÇ µð·ºÅä¸®¸¦ »èÁ¦ ÇÑ´Ù.
-	°æ·Î : C:\ProgramData\MySQL\MySQL Server 5.7\Data
-		* ´Ù¸¥ ¹öÀüÀ» ¼³Ä¡ÇÏ¿´À» °æ¿ì Áß°£¿¡ MySQL Server 5.7 ¹öÀüÀ» ÇØ´ç µð·ºÅä¸®¿¡ ¸Â°Ô º¯°æÇÑ´Ù
+	ì•„ëž˜ì˜ ê²½ë¡œì— ê°€ì„œ í•´ë‹¹ ë°ì´í„°ë² ì´ìŠ¤ì˜ ë””ë ‰í† ë¦¬ë¥¼ ì‚­ì œ í•œë‹¤.
+	ê²½ë¡œ : C:\ProgramData\MySQL\MySQL Server 5.7\Data
+		* ë‹¤ë¥¸ ë²„ì „ì„ ì„¤ì¹˜í•˜ì˜€ì„ ê²½ìš° ì¤‘ê°„ì— MySQL Server 5.7 ë²„ì „ì„ í•´ë‹¹ ë””ë ‰í† ë¦¬ì— ë§žê²Œ ë³€ê²½í•œë‹¤
 	
 
-	ex) µ¥ÀÌÅÍº£ÀÌ½º¸í : securus_ciim
-	C:\ProgramData\MySQL\MySQL Server 5.7\Data\securus_ciim »èÁ¦
+	ex) ë°ì´í„°ë² ì´ìŠ¤ëª… : securus_ciim
+	C:\ProgramData\MySQL\MySQL Server 5.7\Data\securus_ciim ì‚­ì œ
