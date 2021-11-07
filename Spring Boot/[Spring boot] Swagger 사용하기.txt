@@ -1,4 +1,5 @@
 [ swagger 사용하기 ]
+https://kim-jong-hyun.tistory.com/49
 
 # swagger 라이브러리 추가
 	
@@ -38,13 +39,41 @@
 
 	@ApiOperation 어노테이션을 통해서 API에 대한 설명을 작성
 	@ApiImplicitParam 을 통해서 해당 변수의 설명과 디폴트 값을 작성
+	@ApiResponses http 상태코드에 따른 메시지를 작성
 	=================================================================================================================
     @GetMapping("/a")
     @ApiOperation(value="a페이지" , notes="접속시 bye라는 단어를 리턴합니다.")
     @ApiImplicitParams({
             @ApiImplicitParam(name="a" , value = "걍 테스트용 a변수에 대한 설명", defaultValue = "디폴트값")
     })
+	@ApiResponses({
+		@ApiResponse(code = 200, message = "성공", response = Map.class),
+		@ApiResponse(code = 403, message = "접근거부", response = HttpClientErrorException.Forbidden.class),
+		@ApiResponse(code = 500, message = "서버 에러", response = ServerError.class),
+    })
     public String bye(String a){
         return "bye";
     }
+	=================================================================================================================
+
+	@ApiModel vo클래스에 대한 설명 작성
+	@ApiModelProperty 변수에 대한 설명 작성
+
+	@ApiModelProperty 사용법
+	value - 파라메터 이름
+	name - Swagger에서 입력 받을 리얼 파라메터 명
+	notes - 부가설명
+	example - 지정된 임의 테스트 값을 입력 함
+	required - 필수 입력 여부
+
+	@JsonProperty 는 lombok에서 제공해주는 어노테이션이고, 스네이크케이스를 카멜케이스로 변환해줌
+	(화면단에서 stock_code 변수명으로 데이터를 전달하면, 서버단에서는 stockCode 로받음)
+	=================================================================================================================
+	@ApiModel("parsing VO")
+	public class ParsingVO {
+
+		@ApiModelProperty(required = true, name = "stock_code" ,value = "주식종목코드", notes = "필수", example = "005930")
+		@JsonProperty("stock_code")
+		private String stockCode;
+
 	=================================================================================================================

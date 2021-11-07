@@ -141,7 +141,28 @@
 	=====================================================================================================================================================
 
 
+# 맵퍼 config 파일 생성
 
+	파일명 : mybatis-config.xml
+	경로 : main/resocures 밑에 위치
+	=================================================================================================================
+	<?xml version="1.0" encoding="UTF-8"?>
+	<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+			<!--mapUnderscoreToCamelCase : 스네이크 카멜 변환 -->
+			<!--callSettersOnNulls : 쿼리 결과 필드가 null인 경우, 누락이 되서 나오는데 누락이 안되게 하는 설정-->
+			<!--jdbcTypeForNull : 쿼리에 보내는 파라메터가 null인 경우, 오류 발생하는 것 방지  예) #{search.user}-->
+
+	<configuration>
+		<settings>
+			<setting name="mapUnderscoreToCamelCase" value="true"/>
+			<setting name="callSettersOnNulls" value="true"/>
+			<setting name="jdbcTypeForNull" value="NULL"/>
+		</settings>
+	</configuration>
+
+
+	=================================================================================================================
 
 
 
