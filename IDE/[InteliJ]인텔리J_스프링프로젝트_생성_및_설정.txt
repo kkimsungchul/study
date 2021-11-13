@@ -1,0 +1,462 @@
+https://kamang-it.tistory.com/entry/Spring%EC%8A%A4%ED%94%84%EB%A7%81-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%EB%A7%8C%EB%93%A4%EA%B8%B0-intelliJ3
+
+
+
+# 메이븐 프로젝트 생성
+	파일 -> 뉴 프로젝트 -> 좌측탭에서 MAVEN 선택 -> NEXT 쭉쭉눌러서 생성 완료
+
+# 프로젝트 생성 후 스프링 추가
+
+
+	생성된 프로젝트명위에 마우스 우클릭 후 Add FrameWork support 선택 -> 스프링 선택후 use Libray 선택 -> Create 선택 -> 
+
+
+
+
+# 설정 파일들 셋팅
+
+
+* 컨트롤 + 시프트 + 알트 + S 키를 눌러 프로젝트 셋팅 창 실행, 또는 좌측상단의 file 클릭 후 Project structure 선택
+
+	Artifacts 탭 클릭 -> 우측 화면에서 Available Elements 에 있는 Spring 관련 라이브러리들 더블 클릭
+	Apply 클릭
+
+
+
+
+
+# dispacher-servlet.xml , applicationContext.xml 생성
+	
+	1. WEB-INF 경로 밑에 spring 폴더 생성
+
+	2. 폴더 생성 후 해당 폴더에서 우클릭 -> NEW - > XML configuration file 선택 -> Spring Config 선택
+
+	3. dispacher-servlet.xml 생성
+
+	4. 위와같은 방식으로 applicationContext.xml 생성
+
+	5. 컨트롤 + 시프트 + 알트 + S 또는 좌측상단의 file 클릭 후 Project structure 선택 을하여 프로젝트 셋팅창 실행
+	
+	6. 좌측의 탭에서 Facets 선택 -> 중간의 탭에서 Spring 하위에 있는 본인이 생성한 Spring(프로젝트명) 선택
+		-> 제일 우측의 탭 상단에 보면 초록색 볼펜모양 클릭(edit) -> 생성한 스프링 config 파일들을 선택
+
+
+# pom.xml 작성
+
+	pom.xml내용 안에 하단의 내용을 작성
+	groupId , artifactId , version 이 세개는 프로젝트 생성시 기본적으로 생성되는것이므로 변경하지 않음
+
+	properties 에는 사용할 버전들을 기록
+
+	================================================================================================================================================
+	    <groupId>com.securus.kr</groupId>
+	    <artifactId>springTest09</artifactId>
+	    <version>1.0-SNAPSHOT</version>
+	
+	    <properties>
+	        <java-version>1.8</java-version>
+	        <org.springframework-version>4.3.16.RELEASE</org.springframework-version>
+	        <org.aspectj-version>1.6.10</org.aspectj-version>
+	        <org.slf4j-version>1.6.6</org.slf4j-version>
+	    </properties>
+	================================================================================================================================================
+
+
+	<dependencies> 의 안에는 사용하려는 라이브러리들을 기재.
+	
+	ex)
+	================================================================================================================================================
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
+        </dependency>
+
+
+	================================================================================================================================================
+
+
+
+
+
+# web.xml 설정
+
+	* contextConfigLocation 설정, web.xml의 상단에 기재하며 하단의 내용과 비슷하게 작성하면됨.
+	param-name 은 변경하지 않고, 경로만 설정해주면되며, **는 해당경로의 모든 파일을 의미함
+	/WEB-INF/spring/*context.xml 는 뒤에 comtext.xml로 끝나는 파일들을 의미함
+	
+
+	* servlet-mapping 는 들어올 URL 패턴을 기재
+	* filter-mapping 는 들어올 URL 패턴을 기재
+	================================================================================================================================================
+	<?xml version="1.0" encoding="UTF-8"?>
+	<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+		 version="4.0">
+
+	    <context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>/WEB-INF/spring/applicationContext.xml</param-value>
+	    </context-param>
+	    <context-param>
+		<param-name>log4jConfigLocation</param-name>
+		<param-value>/WEB-INF/classes/log4j2.xml</param-value>
+	    </context-param>
+
+	    <listener>
+		<listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
+	    </listener>
+
+	    <listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	    </listener>
+
+	    <servlet>
+		<servlet-name>dispatcher</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+		    <param-name>contextConfigLocation</param-name>
+		    <param-value>/WEB-INF/spring/dispatcher-servlet.xml</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	    </servlet>
+
+	    <filter>
+		<filter-name>characterEncoding</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+		    <param-name>encoding</param-name>
+		    <param-value>UTF-8</param-value>
+		</init-param>
+	    </filter>
+	    <filter-mapping>
+		<filter-name>characterEncoding</filter-name>
+		<url-pattern>*.do</url-pattern>
+	    </filter-mapping>
+
+
+	    <servlet-mapping>
+		<servlet-name>dispatcher</servlet-name>
+		<url-pattern>*.do</url-pattern>
+	    </servlet-mapping>
+
+	    <welcome-file-list>
+		<welcome-file>main.jsp</welcome-file>
+	    </welcome-file-list>
+
+	</web-app>
+	
+	================================================================================================================================================
+
+
+
+# applicationContext.xml 설정
+	<context:component-scan base-package="com.securus.test"/> 컨트롤러와 서비스가 있는 패키지의 경로를 적어주면됨.
+	
+	<mvc:annotation-driven/>  어노테이션들을 읽어옴
+
+	================================================================================================================================================
+
+	<?xml version="1.0" encoding="UTF-8"?>
+	<beans xmlns="http://www.springframework.org/schema/beans"
+	       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	       xmlns:context="http://www.springframework.org/schema/context"
+	       xmlns:mvc="http://www.springframework.org/schema/mvc"
+	       xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+
+	    <context:component-scan base-package="com.**"/>
+
+	    <mvc:annotation-driven/>
+
+
+	    <!--viewResolver 설정-->
+	    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/views/"/>
+		<property name="suffix" value=""/>
+	    </bean>
+
+
+	</beans>
+	================================================================================================================================================
+
+
+
+# log4j.xml 설정
+	
+	경로 : web/WEB-INF/classes/log4j2.xml
+	* 로그관련 설정파일
+
+	================================================================================================================================================
+	    <appender name="console" class="org.apache.log4j.ConsoleAppender">
+		<!--<param name="Threshold" value="INFO" /> -->
+		<param name="Target" value="System.out"/>
+
+		<!-- layout : 로그를 어떤 형식으로 출력할 지 결정하는 곳 -->
+		<layout class="org.apache.log4j.PatternLayout">
+		    <param name="ConversionPattern" value="[%d] %-5p [%c{11}:%L:%M()] - %m%n"/>
+		</layout>
+	    </appender>
+
+	    <root>
+		<!--<priority value="info" /> -->
+		<!-- 레벨은 FATAL,ERROR,WARN,INFO,DEBUG,TRACE 등으로 구분함 -->
+		<level value="INFO"/>
+		<appender-ref ref="console"/>
+	    </root>
+
+
+	================================================================================================================================================
+	
+
+
+
+# 데이터 베이스 연동 (내용이 좀 김)
+
+
+##1 pom.xml 에 mybatis 라이브러리 및 사용하려고 하는 데이터베이스의 커넥터 라이브러리 추가
+* 상단에 보면 이미 추가해놓긴 했음
+	================================================================================================================================================
+		<!--Spring-Jdbc 라이브러리-->
+		<dependency>
+		    <groupId>org.springframework</groupId>
+		    <artifactId>spring-jdbc</artifactId>
+		    <version>${org.springframework-version}</version>
+		</dependency>
+		<!--Spring-Test 라이브러리-->
+		<dependency>
+		    <groupId>org.springframework</groupId>
+		    <artifactId>spring-test</artifactId>
+		    <version>${org.springframework-version}</version>
+		</dependency>
+		<!--MyBatis 라이브러리-->
+		<dependency>
+		    <groupId>org.mybatis</groupId>
+		    <artifactId>mybatis</artifactId>
+		    <version>3.4.1</version>
+		</dependency>
+		<!--MyBatis-Spring 라이브러리-->
+		<dependency>
+		    <groupId>org.mybatis</groupId>
+		    <artifactId>mybatis-spring</artifactId>
+		    <version>1.3.0</version>
+		</dependency>
+
+		<!-- mysql -->
+		<dependency>
+		    <groupId>mysql</groupId>
+		    <artifactId>mysql-connector-java</artifactId>
+		    <version>5.1.34</version>
+		</dependency>
+
+
+
+
+	================================================================================================================================================
+
+
+##2. applicationContext.xml 파일에 mybatis 설정 및 사용하려는 데이터베이스 정보 설정
+
+	* 하단의 내용들을 보고서 설정하면됨
+	* driverClassName 은 사용하려는 데이터베이스의 jdbc.Driver을 연결해주면 됨 오라클의 경우 oracle.jdbc.driver.OracleDriver 로 되어있으며, pom.xml에도 오라클 jdbc를 설정해야함
+	* url 은 사용하려고 하는 데이터베이스의 연결주소를 적어주면됨
+	* username 은 해당 데이터베이스의 사용자계정 명
+	* password 는 사용자의 비밀번호
+
+	* sqlSessionFactory 에서 configLocation 은 mybatis 의 설정파일의 경로
+	* mapperLocations 는 맵퍼에 사용할 xml파일들이 있는 경로를 기재해주면됨.
+
+	
+	================================================================================================================================================
+
+		    <!--사용할 데이터베이스 정보 입력-->
+	    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+		<property name="url"  value="jdbc:mysql://127.0.0.1:3306/ssologin03?useSSL=false&amp;serverTimezone=UTC"/>
+		<property name="username" value="securus"/>
+		<property name="password" value="securus1234"/>
+	    </bean>
+
+
+	    <!--맵퍼에 대한 정보 입력, 맵퍼의 위치와 맵퍼설정파일 위치-->
+	    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="configLocation" value="classpath:/mybatis-config.xml"/>
+		<property name="mapperLocations" value="classpath:/mappers/*Mapper.xml"></property>
+	    </bean>
+
+	    <!--데이터베이스 연결 및 종료 에 사용함-->
+	    <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate" destroy-method="clearCache">
+		<constructor-arg name="sqlSessionFactory" ref="sqlSessionFactory"></constructor-arg>
+	    </bean>
+
+
+	
+	================================================================================================================================================
+
+
+
+##3. mybatis 설정파일 생성 
+
+	* 2번항목에서 작성한 내용중 configLocation 의 경로에 mybatis-config.xml 파일을 생성   classpath:/mybatis-config.xml
+	* 아무런 설정도 적용하지 않았음, 해당파일이 없을경우 오류가 발생하니 필히 있어야 함
+	================================================================================================================================================
+	<?xml version="1.0" encoding="UTF-8"?>
+	<!DOCTYPE configuration
+	  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+	  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+	<configuration>
+		
+	</configuration>
+
+
+	================================================================================================================================================
+
+
+##4. mapper 파일 생성
+
+	* 2번항목에서 작성한 내용중 mapperLocations 의 경로에 사용할 맵퍼들을 생성하여 작성하면됨 classpath:/mappers/*Mapper.xml
+	경로 : src\main\resources\mappers\mainMapper.xml
+	* namespace 는 자바파일에서 맵퍼 클래스를 찾을때 사용하는 이름으로 다른 맵퍼파일과 이름이 중복되면 안됨 (고유해야함)
+
+================================================================================================================================================
+	<?xml version="1.0" encoding="UTF-8"?>
+	<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+	<mapper namespace="my.mappers.mainMapper">
+	    <!-- 자바클래스에서 mapper 을 찾는 경로
+		다른 mapper와 중복되지 않도록 네임 스페이스 기재-->
+
+
+	    <select id="mainList" resultType="HashMap">
+		select * from companytable01
+	    </select>
+
+	</mapper>
+
+
+
+================================================================================================================================================
+
+
+##5. service 인터페이스 클래스 생성
+
+	* 인터페이스 클래스를 생성함
+	* 해당 클래스를 가지고 serviceImple 클래스를 구현함
+
+
+	================================================================================================================================================
+	package com.securus.test.service;
+
+	import java.util.List;
+
+	/**
+	 * Created by kimsc on 2019-02-12.
+	 */
+
+	public interface MainService {
+
+
+	    public List<String> testMethod();
+	}
+
+	================================================================================================================================================
+
+
+
+##6. serviceImpl 클래스를 구현
+	
+	* 5번항목에서 만든 service 클래스를 구현
+	* 클래스명 위에 @Service("서비스명") 을 기재
+
+	* private SqlSession sqlSession; 의 코드 위에 @Inject 어노테이션 또는 @Autowired 를 기재하여 의존성 주입
+		** @Inject 는 자바 표준 어노테이션, @Autowired 는 스프링 전용 어노테이션
+	* namespace 는 4번 항목에서 기재하였던 namespace 와 동일하게 기재 
+
+	* service 인터페이스의 내용들을 구현하고 리턴타입은 sqlSession 에 있는 메소드를 사용하여 리턴함, 
+	  sqlSession() 에 들어갈 변수는 namespace+ ".맵퍼에서찾을쿼리문" 으로 되어있으면 됨,    " . " 이걸 빼먹으면안됨
+
+
+	
+================================================================================================================================================
+package com.securus.test.service;
+
+import org.apache.ibatis.session.SqlSession;
+import org.springframework.stereotype.Service;
+
+import javax.inject.Inject;
+import java.util.List;
+
+/**
+ * Created by kimsc on 2019-02-12.
+ */
+@Service("mainService")
+public class MainServiceImpl implements MainService{
+
+    @Inject
+    private SqlSession sqlSession;
+
+    private static final String namespace="my.mappers.mainMapper";
+
+
+    public List<String> testMethod(){
+
+        return sqlSession.selectList(namespace+".mainList");
+    }
+
+}
+
+
+================================================================================================================================================
+
+
+
+##7. 사용할 컨트롤러에서 서비스클래스에 대한 의존성 주입 
+
+	* 이전에 생성한 클래스에 대해서 의존성을 주입받음     
+		@Autowired
+		MainServiceImpl mService;
+
+	* 리턴타입을 맞춰서 호출하면 됨
+
+================================================================================================================================================
+
+@Controller
+public class MainController {
+
+    @Autowired
+    MainServiceImpl mService;
+
+
+    @RequestMapping("main.do")
+    public ModelAndView main (HttpServletRequest req,ModelAndView mav){
+        mav.setViewName("main.jsp");
+        List<String> list = mService.testMethod();
+        System.out.print(list);
+        return mav;
+    }
+}
+
+================================================================================================================================================
+
+
+
+
+
+
+
+# 인터셉터 클래스 생성
+
+
+
+
+# 트랜잭션 처리
+
+
+
+
