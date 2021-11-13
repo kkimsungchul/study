@@ -1,0 +1,61 @@
+[ Tomcat - 톰캣이 두번 실행되는 현상 ]
+
+# 증상
+	스프링 war 파일을 배포하기위에 톰캣에 실행시켰는데
+	톰캣의 log파일을 보니 해당 파일이 두번 실행되는 현상이 발생됨
+
+
+# 기존 설정
+
+	톰캣의 server.xml 파일
+	=================================================================================================================
+	  <Host name="localhost"  appBase="webapps"
+            unpackWARs="true" autoDeploy="true">
+			<Context docBase="/test" path="/" reloadable="true">
+		
+	=================================================================================================================
+
+# 실행시 발생 현상
+	위의 설정대로 톰캣을 실행하게되면 스프링이 두번 실행됨
+
+	URL 또한 내가 원한대로 localhost/ 이렇게 접속만 되는게 아니라
+	localhost/test 이렇게 두개가 접속이 가능하게됨
+
+
+#  해결 방안
+	
+	아래 두개의 옵션을 false로 지정하고 실행하면 한번만 배포함
+	autoDeploy="false" 
+	deployOnStartup="false"
+	
+	autoDeploy 해당 옵션은 webapps 경로밑에 파일들의 변경이 감지되면 다시 재배포를 실행할지 설정함
+	deployOnStartup 옵션은 톰캣 실행시 해당 war파일을 배포할건지의 여부를 확인함
+	
+	뭐 말이 좀 이상하긴한데 톰캣이 실행하게되면
+	host 에 지정한 경로에 있는 war파일과 context에 지정한 war파일을 배포함
+	그래서 총 두번배포를 해버리게됨, 그래서 host 옵션에서 deployOnStartup 를 주면 host에서 지정한 디렉토리는 배포하지않고
+	context에서 지정한 war파일만을 배포함 그래서 중복 실행이 안됨
+
+	또한 공식문서에도 해당 내용에 대해서 나와있음
+		https://tomcat.apache.org/tomcat-8.5-doc/config/host.html
+		URL에서 "Automatic Application Deployment" 문단을 보면 내용이 설명되어잇음
+
+	=================================================================================================================
+	  <Host name="localhost"  appBase="webapps"
+            unpackWARs="true" autoDeploy="false" deployOnStartup="false">
+			<Context docBase="/test" path="/" reloadable="true">
+	=================================================================================================================
+
+
+
+	
+	톰캣에 배포할 war파일을 ROOT.war 로 배포하면 편하긴한데, context 를 설정해야 할 경우도 있으니.. 위의 방법대로 옵션을 주면됨
+
+
+
+
+
+# 참고 URL 
+	https://theserverside.tistory.com/245
+	http://apieceofspace.blogspot.com/2018/09/spring-schedule.html
+	https://tomcat.apache.org/tomcat-8.5-doc/config/host.html
