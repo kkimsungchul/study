@@ -1,0 +1,224 @@
+# WAS 와 TOMCAT의 차이? / WAS와 웹서버의 차이?
+	web : 정적 컨텐츠 제공 , 
+		html, css , javascript, 이미지등 바로 응답 가능한 컨텐츠
+
+	was : 동적 컨텐츠 제공
+		jsp , php 등 의 파일을 실행 한후 결과를 다시 웹서버로 보내주는 역할을 함
+
+	https://helloworld-88.tistory.com/71
+
+
+# Spring과 Springboot의 차이점 설명
+	1. 설정이 간편함
+	2. 임베디드 톰캣 (스프링부트)
+	3. jar파일을 통한 배포 가능
+	4. spring starter 를 통한 버전관리의 편함
+
+	https://velog.io/@courage331/Spring-%EA%B3%BC-Spring-Boot-%EC%B0%A8%EC%9D%B4
+
+
+
+# REST 구조 설명 
+	자원의 이름으로 구분하여 해당 자원을 주고받는 방법
+	http프로토콜을 사용하기때문에 웹이 장점을 최대한 활용함
+	HTTP URI(Uniform Resource Identifier)를 통해 자원(Resource)을 명시하고, HTTP Method(POST, GET, PUT, DELETE)를 통해 해당 자원에 대한 CRUD Operation을 적용하는 것을 의미한다.
+
+	https://gmlwjd9405.github.io/2018/09/21/rest-and-restful.html
+
+# REST와 RESTFUL의 차이가 있다면 설명해봐라
+	REST 는 HTTP URI(Uniform Resource Identifier)를 통해 자원(Resource)을 명시하고, HTTP Method(POST, GET, PUT, DELETE)를 통해 해당 자원에 대한 CRUD Operation을 적용하는 것을 의미한다.
+	REST API 는 REST 기반으로 서비스 API 구현한것
+	RESTFul 은 REST 아키텍처를 구현하는 웹서비스를 나타내기 위해 사용되는 용어
+
+
+# 메서드 오버라이딩/오버로딩의 차이점? 쓰는 이유?
+	오버라이딩
+		부모의 메소드를 상속받은 자식클래스에서 부모의 메소드를 재정의 하는것
+
+	오버로딩
+		메소드명은 같지만 매게변수유형과 갯수를 다르게 하여, 같은 메소드명으로 다양한 호출에 응답하도록 하는것
+
+
+# 어노테이션의 뜻
+	메타데이터, 데이터에 대한 설명을 말하는 데이터
+	프로그램 실행과정에서 데이터를 어떻게 처리할 것인가 라고 알려주는 서브데이터라고 볼수 있음
+
+	사용 용도
+		1. 코드 문법 에러 체크 
+
+		2. 코드 자동 생성 정보 제공 
+
+		3. 런타임시 특정 기능을 실행하는 정보 제공 
+
+	https://simostory.tistory.com/32
+
+
+# Bean을 만드는 어노테이션
+	@Bean ,@Configuration
+		개발자가 직접 제어가 불가능한 외부 라이브러리 또는 설정을 위한 클래스를 Bean으로 등록할 때 @Bean 어노테이션을 활용
+		1개 이상의 @Bean을 제공하는 클래스의 경우 반드시 @Configuration을 명시해 주어야 함
+
+	@Component
+		개발자가 직접 개발한 클래스를 Bean으로 등록하고자 하는 경우 @Component 어노테이션을 활용
+
+	https://mangkyu.tistory.com/75
+
+
+# @SecondaryTable 란
+	JPA에서 사용하는 어노테이션
+	엔티티 하나에 여러테이블을 매핑할때 사용함
+
+
+# 서브 쿼리의 정의/종류/차이점?
+	하나의 SQL문에 포함되어 있는 또 다른 SQL문
+	
+	서브쿼리 ex)
+		SELECT C1,C2,C3 FROM T1
+		WHERE C3 = (SELECT C4 FROM T2 WHERE  C4 = '1')
+
+
+	반환 값에 따른 서브쿼리
+	 - Single row Subquery      : 서브쿼리 결과가 단일 행
+	  * 단일 행 비교 연산자에는 =, <, <=, > , >=, <>을 사용한다.
+
+	 
+	 - Multiple row Subquery    : 서브쿼리 결과가 여러 행
+	  * 다중 행 비교 연산자에는 IN, ALL, ANY, SOME, EXISTS가 있다.
+
+	 - Multiple column Subquery : 서브쿼리 결과가 여러 컬럼
+	  * 메인쿼리의 조건절에 여러 컬럼을 동시에 비교가 가능하다.
+	  * 비교하고자 하는 컬럼 개수와 컬럼의 위치가 동일해야 한다.	
+
+
+	Correlative Subquery(상관OR연관 서브쿼리)
+
+		 - 서브쿼리 내에 메인쿼리 컬럼이 사용된 서브 쿼리이다.
+		 - 실행 방식에 따른 구분 
+		 - 행 단위 처리를 위한 서브쿼리
+		 - 메인쿼리의 값을 서브쿼리가 사용하고, 서브쿼리의 값을 받아서 메인쿼리가 계산
+		 - 서브쿼리가 먼저 실행되지 못함
+		 - 실행되는 순서
+		1. 메인 쿼리가 먼저 실행
+		2. 후보행이 선택, 후보값이 서브쿼리 공급
+		3. 서브쿼리 실행, 결과를 리턴
+		4. 리턴 받은 결과를 위치에 따라 사용 (출력, 조건비교 등)
+		5. 다음 후보행이 없을 때까지 2~4단계 반복
+
+	Scalar Subquery(스칼라 서브쿼리)
+		 - 단일 column, row 리턴  
+		 - GROUP BY 절을 제외한 모든 절(COLUMN을 쓸 수있는 절)에서 사용 가능 
+		 - 반드시 하나의 결과만을 되돌려야 한다.
+
+	위치에 따른 Subquery의 분류
+		- SELECT문에 있는 서브쿼리 : Scalar Subquery
+		- FROM절에 있는 서브쿼리 : Inline View
+		- WHERE절에 있는 서브쿼리 : Subquery
+	
+	조건절의 Subquery(WHERE, HAVING)
+		  - 리턴되는 ROW, COLUMN에 따라 비교 연산자를 주의 해야 한다.
+		  - ORDER BY에는 사용할 수 없다.
+		  - HAVING절에서는 그룹함수와 함께 사용될 때 그룹핑된 결과에 대해 부가적인 조건을 주기 위해서 사용한다.
+
+	FROM절에서 사용되는 서브쿼리(Inline View)
+		 - Correlated Subquery 사용 불가능 하다.
+		 - ORDER BY 절에서는 사용 가능하다.
+		 - 둘이상의 ROW, COLUMN을 반환하는건 상관이 없다.
+		 - 필요한 테이블을 만들수 있는 결과식이 중요하다.
+
+	SELECT, ORDER BY 절 서브쿼리
+		 - Scalar Subquery 만 가능
+		 - SELECT절(Scalar Subquery)
+		 - 성능 저하가 주의 된다.
+
+
+	https://mozi.tistory.com/233
+	https://seungsami.tistory.com/77
+
+
+# SQL 실행순서 설명해봐라
+	
+	FROM -> ON -> JOIN -> WHERE -> GROUP BY -> CUBE | ROLLUP -> HAVING -> SELECT -> DISTINCT -> ORDER BY -> TOP
+
+
+
+	https://bicloud.tistory.com/20
+	https://myjamong.tistory.com/172
+
+# .ready() vs .onload() 특징 및 차이
+	
+	ready 가 실행 우선 순위가 높음
+
+	ready : DOM Tree 생성 완료 후 실행
+	onload : 모든 페이지 구성요소 페인팅 완료 후
+	
+	https://hahahoho5915.tistory.com/28
+
+
+# jQuery란 무엇인가
+	엘리먼트를 선택하는 강력한 방법과
+	선택된 엘리먼트들을 효율적으로 제어할 수 있는 다양한 수단을 제공하는
+	자바스크립트 라이브러리
+
+	https://opentutorials.org/course/53/45
+
+# MVC 패턴
+	디자인 패턴중 하나로 Model, View, Controler의 약자
+	사용자가 보는 페이지, 데이터처리, 그리고 이 2가지를 중간에서 제어하는 컨트롤, 
+	이 3가지로 구성되는 하나의 애플리케이션을 만들면 각각 맡은바에만 집중을 할 수 있게 됩니다.
+	
+	서로 분리되어 각자의 역할에 집중할 수 있게끔하여 개발을 하고 그렇게 애플리케이션을 만든다면, 
+	유지보수성, 애플리케이션의 확장성, 그리고 유연성이 증가하고, 
+	중복코딩이라는 문제점 또한 사라지게 되는 것입니다. 
+
+	Model : 
+		애플리케이션의 정보, 데이타를 나타냅니다. 
+		데이타베이스, 처음의 정의하는 상수, 초기화값, 변수 등을 뜻합니다. 
+		또한 이러한 DATA, 정보들의 가공을 책임지는 컴포넌트를 말합니다.
+
+	View : 
+		input 텍스트, 체크박스 항목 등과 같은 사용자 인터페이스 요소를 나타냅니다. 
+		다시 말해 데이터 및 객체의 입력, 그리고 보여주는 출력을 담당합니다. 
+		데이타를 기반으로 사용자들이 볼 수 있는 화면입니다.  
+
+	Controller : 
+		데이터와 사용자인터페이스 요소들을 잇는 다리역할을 합니다. 
+		즉, 사용자가 데이터를 클릭하고, 수정하는 것에 대한 "이벤트"들을 처리하는 부분을 뜻합니다.  
+
+
+
+	https://m.blog.naver.com/jhc9639/220967034588
+
+# EL JSTL JSP 정의 / 차이
+	
+	EL (Expression Language) : 
+		<%= %> , out.println()과 같은 자바코드를 더 이상 사용하지 않고 좀더 간편하게 출력을 지원하기 위한 도구.
+		배열이나 컬렉션에서도 사용되고, JavaBean의 프로퍼티에서도 사용됩니다.
+		Attribute형식에서는 <%= cnt + 1 %>를 쓰지 않고 ${cnt + 1}로 쓰고
+		Parameter형식에서는 ${param.abc}으로 씁니다.
+	
+	JSTL (Jsp Standard Tag Library) : 
+		JSP는 자신만의 태그를 추가할 수 있는 기능을 제공하고 있는데요. 
+		<jsp:include>나 <jsp:usebean>과 같은 커스텀 태그처럼
+		연산이나 조건문이나 반복문인 if문, for문, DB를 편하게 처리할 수 있는것이 JSTL입니다.
+		
+		<c:set> ,<c:out> ,<c:if> 등
+
+
+
+
+	https://hunit.tistory.com/203
+
+# DAO, DTO, Entity Class의 차이
+
+# maven vs gradle
+
+# rest 메서드 질문: template 사용한 이유와 왜 이 메서드를 썼는지?
+
+# inner join / outer join / full outer join 특징 설명
+
+# DI가 뭔지 아는가? 무엇인가?
+
+# Spring Aop가 무엇인가? 관련해서 사용해본 경험이 있는지?
+
+# 다른 팀원이 구현한 부분 질문 / 이 상황에 대해 어떻게 할 것인지?
+
