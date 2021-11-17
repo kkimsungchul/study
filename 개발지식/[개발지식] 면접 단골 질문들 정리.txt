@@ -1,3 +1,9 @@
+[ 개발 면접 단골 질문 정리 ]
+	질문 항목은 아래의 블로그에 있는 질문을 보고 그대로 가져와였으며, 
+	답변부분들은 구글 검색 또는 기존에 알고 있는지식으로 작성함
+
+	https://mand2.github.io/others/interviews/
+
 # WAS 와 TOMCAT의 차이? / WAS와 웹서버의 차이?
 	web : 정적 컨텐츠 제공 , 
 		html, css , javascript, 이미지등 바로 응답 가능한 컨텐츠
@@ -25,7 +31,7 @@
 
 	https://gmlwjd9405.github.io/2018/09/21/rest-and-restful.html
 
-# REST와 RESTFUL의 차이가 있다면 설명해봐라
+# REST와 RESTFUL의 차이
 	REST 는 HTTP URI(Uniform Resource Identifier)를 통해 자원(Resource)을 명시하고, HTTP Method(POST, GET, PUT, DELETE)를 통해 해당 자원에 대한 CRUD Operation을 적용하는 것을 의미한다.
 	REST API 는 REST 기반으로 서비스 API 구현한것
 	RESTFul 은 REST 아키텍처를 구현하는 웹서비스를 나타내기 위해 사용되는 용어
@@ -203,22 +209,30 @@
 		
 		<c:set> ,<c:out> ,<c:if> 등
 
+	JSP (JavaServer Pages) : 
+		HTML 코드에 JAVA 코드를 넣어 동적웹페이지를 생성하는 웹어플리케이션 도구이다.
 
-
-
+	https://javacpro.tistory.com/43
 	https://hunit.tistory.com/203
+
 
 # DAO, DTO, Entity Class의 차이
 
+
 # maven vs gradle
+
 
 # rest 메서드 질문: template 사용한 이유와 왜 이 메서드를 썼는지?
 
+
 # inner join / outer join / full outer join 특징 설명
+
 
 # DI가 뭔지 아는가? 무엇인가?
 
+
 # Spring Aop가 무엇인가? 관련해서 사용해본 경험이 있는지?
+
 
 # 다른 팀원이 구현한 부분 질문 / 이 상황에 대해 어떻게 할 것인지?
 
