@@ -1,0 +1,64 @@
+[ 신규 브런치 생성 - 깃랩]
+
+# 깃랩에서 브런치 생성
+
+	1. 깃랩 접속
+	2. + 버튼을 눌러서 New Branch 클릭
+	3. "Branch name" 은 원하는 이름을 지정, Create From 은 복제할 저장소 선택
+	4. Create branch 버튼 클릭 하여 생성
+
+
+# 이클립스에서 브런치 가져오기
+	
+	1. Git Repositories 에서 아래의 경로로 접근 하여 URL 더블클릭
+		프로젝트명
+		-> Remotes 
+		-> origin 
+		-> 초록색 아래방향 화살표로 되어있는 git URL 더블클릭
+
+		ex 실제)
+		d-space-portal 
+		-> Remotes 
+		-> origin 
+		-> https://gitlab.dspace.kr.co.kr/DS/d-space-portal.git 더블클릭
+	
+	
+	2. 더블클릭을 하면 아래의 경로에 브런치들이 전부다 생성됨
+		프로젝트명
+		-> Branches
+		-> Remote Tracking
+		-> 여기
+		
+	3. 셋팅을 원하는 브런치를 더블클릭
+		프로젝트명
+		-> Branches
+		-> Remote Tracking	
+		-> origin/staging 
+	
+	4. Check out remote-tracking brancg 창이 뜨면 아래의 버튼 클릭
+		Check Out as New Local Branch 선택
+	
+	5. Create Branchh 창이 뜨면 Branch Name 을 입력
+		Configure upstream for push and pull - 체크
+		Check out new branch -  체크
+		하고서 Finish 선택
+	
+	6. 선택이 완료되면 local 경로 밑에 받아온 브런치가 생성이 됨 
+		프로젝트명
+		-> Branches
+		-> Local 
+
+
+
+# 브런치 사용하기
+
+	1. 프로젝트 변경, 아래의 경로에서 원하는 브런치 더블클릭
+		프로젝트명
+		-> Branches
+		-> Local 
+	
+	2. 또는 프로젝트 우클릭 후 변경
+		Team
+		-> Switch to 
+		-> 원하는 브런치명
+		
