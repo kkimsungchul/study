@@ -1,0 +1,127 @@
+<html>
+<head>
+<title>테스트</title>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+	$( document ).ready(function() {
+		
+
+
+	});
+
+	//모든 인풋태그의 값 가져오기, input 가져오기
+	function getInputValue(){
+		$("#result").html("");
+		var dataArray = new Array();
+		var inputList = $("input");
+		var inputListSize = $("input").length;
+		for(var i=0; i<inputListSize ; i++){
+
+			if(inputList[i].tagName=="INPUT" && inputList[i].type=="radio"){
+				if(inputList[i].checked==true){
+					console.log(inputList[i].value)
+					console.log(inputList[i].name)
+					
+					var checkData = {"항목" : inputList[i].name , "값" : inputList[i].value}
+					dataArray.push(checkData);
+
+					$("#result").append("<br>" + "항목 : " + inputList[i].name + " , 값 : " + inputList[i].value)
+					}
+				}
+			}
+			console.log(dataArray);
+
+		}
+		
+
+</script>
+</head>
+<body>
+<button onclick="getInputValue()" >선택한 값만 출력</button>
+<table>
+  <tr>
+    <th name=k> 평가항목1 </th>
+  <td>
+    <form>
+      <div>
+        1점<input type="radio" name = "item1" value=1 checked=true>
+        2점<input type="radio" name = "item1" value=2>
+        3점<input type="radio" name = "item1" value=3>
+        4점<input type="radio" name = "item1" value=4>
+        5점<input type="radio" name = "item1" value=5>
+      </div>
+    </form>
+  </td>
+  </tr>
+</table>
+<table>
+  <tr>
+    <th name=k> 평가항목2 </th>
+  <td>
+    <form>
+      <div>
+        1점<input type="radio" name = "item2" value=1>
+        2점<input type="radio" name = "item2" value=2>
+        3점<input type="radio" name = "item2" value=3>
+        4점<input type="radio" name = "item2" value=4>
+        5점<input type="radio" name = "item2" value=5>
+      </div>
+    </form>
+  </td>
+  </tr>
+</table>
+<table>
+  <tr>
+    <th name=k> 평가항목3 </th>
+  <td>
+    <form>
+      <div>
+        1점<input type="radio" name = "item3" value=1>
+        2점<input type="radio" name = "item3" value=2>
+        3점<input type="radio" name = "item3" value=3>
+        4점<input type="radio" name = "item3" value=4>
+        5점<input type="radio" name = "item3" value=5>
+      </div>
+    </form>
+  </td>
+  </tr>
+</table>
+<table>
+  <tr>
+    <th name=k> 평가항목4 </th>
+  <td>
+    <form>
+      <div>
+        1점<input type="radio" name = "item4" value=1>
+        2점<input type="radio" name = "item4" value=2>
+        3점<input type="radio" name = "item4" value=3>
+        4점<input type="radio" name = "item4" value=4>
+        5점<input type="radio" name = "item4" value=5>
+      </div>
+    </form>
+  </td>
+  </tr>
+</table>
+<table>
+  <tr>
+    <th name=k> 평가항목5 </th>
+  <td>
+    <form>
+      <div>
+        1점<input type="radio" name = "item5" value=1>
+        2점<input type="radio" name = "item5" value=2>
+        3점<input type="radio" name = "item5" value=3>
+        4점<input type="radio" name = "item5" value=4>
+        5점<input type="radio" name = "item5" value=5>
+      </div>
+    </form>
+  </td>
+  </tr>
+</table>
+
+<div id="result">
+
+</div>
+</body>
+</html>
+
