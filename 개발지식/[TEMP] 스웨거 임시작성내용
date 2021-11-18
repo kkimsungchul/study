@@ -1,0 +1,76 @@
+@Bean
+    public Docket api() {
+//        return new Docket(DocumentationType.SWAGGER_2)
+//                .apiInfo(apiEndPointsInfo())
+//                .pathMapping("/")
+//                .forCodeGeneration(true)
+//                .genericModelSubstitutes(ResponseEntity.class)
+//                .ignoredParameterTypes(java.sql.Date.class)
+//                .directModelSubstitute(java.time.LocalDate.class, java.sql.Date.class)
+//                .directModelSubstitute(java.time.ZonedDateTime.class, Date.class)
+//                .directModelSubstitute(java.time.LocalDateTime.class, Date.class)
+//                .securityContexts(Lists.newArrayList(securityContext()))
+//                .securitySchemes(Lists.newArrayList(new ApiKey("JWT", "Authorization", "header")))
+//                .useDefaultResponseMessages(false);
+
+//        Set<String> protocols = new HashSet<String>();
+//        protocols.add("http");
+
+        String hostStr = "localhost:8080/api";
+        String serverHostName = null;
+        try
+        {
+            serverHostName = envUtil.getHostname();
+            String portStr = "8080";    //envUtil.getPort();
+            logger.debug("SwaggerConfig api() - Tomcat WAS Server HostName="+serverHostName+", Port="+portStr);
+
+        }catch(UnknownHostException e)
+        {
+            logger.error("SwaggerConfig api ERROR: ", e);
+        }
+
+
+        // 로컬에서 테스트시
+        if(!wasAddressList.contains(serverHostName))
+        {
+            hostStr = "localhost:8000";
+        }
+        // TB 혹은 PROD에서 실행시
+        else
+        {
+            if("https://aaaaa.ff.dd.qq/auth".equals(keycloakAuthRootUrl))
+            {
+                hostStr = "aaaa.bb.ccc.ddd/api";
+            }else if("https://aaaa.bb.ccco.dd/auth".equals(keycloakAuthRootUrl))
+            {
+                // RM 상용계 도메인을 통한 Swagger Rest API 접근
+                hostStr = "asdfasdf.bb.dd.ee/api";
+            }
+        }
+
+
+        return new Docket(DocumentationType.SWAGGER_2).apiInfo(apiEndPointsInfo())
+                .tags(
+                          new Tag("StockController", "Stock Manage Controller")
+                         ,new Tag("ParsingController", "Parsing Manage Controller")
+
+
+                     )
+                .forCodeGeneration(true).genericModelSubstitutes(ResponseEntity.class)
+                .ignoredParameterTypes(java.sql.Date.class)
+                .directModelSubstitute(java.time.LocalDate.class, java.sql.Date.class)
+                .directModelSubstitute(java.time.ZonedDateTime.class, Date.class)
+                .directModelSubstitute(java.time.LocalDateTime.class, Date.class)
+                .host(hostStr)
+//                .protocols(protocols)
+//                .globalOperationParameters(swaggerJwtAuthParams())
+                .select()
+                .apis(Predicates.not(RequestHandlerSelectors.basePackage("org.springframework.boot")))
+                .apis(RequestHandlerSelectors.withClassAnnotation(RestController.class))
+                .paths(PathSelectors.regex("/(application|msgInf|jenkins).*"))
+                .build()
+//                .securitySchemes(Arrays.asList(securitySchemeFromImplicitGrant()))
+//                .securityContexts(Arrays.asList(securityContextFromImplicitGrant()));
+                .securitySchemes(Arrays.asList(securitySchemeFromAuthorizationCodeGrant()))
+                .securityContexts(Arrays.asList(securityContextFromAuthorizationCodeGrant()));
+    }
