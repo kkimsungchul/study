@@ -1,0 +1,357 @@
+[Spring Boot  - Springsecurity 사용하기 (DB정보로 로그인) ]
+	
+	스프링에서 제공해주는 스프링시큐리티로 로그인 및 권한부분 구현
+	DB에 저장된 데이터를 통해서 로그인 하도록 구현하였음
+
+	* DB에 저장된 데이터를 통한 스프링시큐리티 로그인
+		https://dkyou.tistory.com/18?category=877213
+		https://wiper2019.tistory.com/214
+	
+# 들어가기전에
+	위에 있는 블로그 내용보면 잘정리해놨음 어캐하면된다던지 하는 내용들이
+	다만 나는 회원가입 폼도 만들기 귀찮았고;;
+	JPA도 안쓰고있음, 그래서 블로그내용과 다른 내용이 조금씩 보일수있음
+	뭐 대부분 복붙이긴함 그래도 변형해서 쓴게 어디야..
+
+# 기존에 구성한 SecurityConfig 파일 수정
+
+
+	기존에는 사용자 ID / PW 를 그냥 입력받은 값이랑 바로 비교해서 테스트하였는데
+	이제는 DB에서 가져와서 로그인 할거니까 기존 내용을 주석처리했음.
+	그리고 auth.userDetailsService(userDetailsService); 를 추가하였음
+	해당 클래스와 메소드는 "org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;" 이거 임포트한거임
+	=================================================================================================================
+	package com.sungchul.stock.config.security;
+
+	import lombok.extern.slf4j.Slf4j;
+	import org.springframework.beans.factory.annotation.Autowired;
+	import org.springframework.context.annotation.Bean;
+	import org.springframework.context.annotation.Configuration;
+	import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+	import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+	import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+	import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+	import org.springframework.security.core.userdetails.UserDetailsService;
+	import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+	import org.springframework.security.crypto.password.PasswordEncoder;
+
+	@Configuration
+	@EnableWebSecurity
+	@Slf4j
+	public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+		@Autowired
+		private UserDetailsService userDetailsService;
+
+		@Override
+		public void configure(AuthenticationManagerBuilder auth) throws Exception {
+
+	//        String password = passwordEncoder().encode("1111");
+	//        auth.inMemoryAuthentication().withUser("user").password(password).roles("USER");
+	//        auth.inMemoryAuthentication().withUser("manager").password(password).roles("MANAGER");
+	//        auth.inMemoryAuthentication().withUser("admin").password(password).roles("ADMIN");
+
+			auth.userDetailsService(userDetailsService);
+
+		}
+
+		@Bean
+		// BCryptPasswordEncoder는 Spring Security에서 제공하는 비밀번호 암호화 객체입니다.
+		// Service에서 비밀번호를 암호화할 수 있도록 Bean으로 등록합니다.
+		public PasswordEncoder passwordEncoder() {
+			return new BCryptPasswordEncoder();
+		}
+
+		@Override
+		protected void configure(HttpSecurity http) throws Exception {
+			http
+					.csrf().disable()
+					.authorizeRequests()
+					.antMatchers("/").permitAll()
+					.antMatchers("/user").hasRole("USER")
+					.antMatchers("/manager").hasRole("MANAGER")
+					.antMatchers("/admin" , "/test" , "/test/**").hasRole("ADMIN")
+					.anyRequest().authenticated()
+					.and()
+					.formLogin();
+		}
+
+
+	}
+
+
+
+	=================================================================================================================
+
+
+# CustomUserDetailsService.java 클래스 구현
+	해당 클래스는 UsernameNotFoundException 를 구현하는 클래스
+	
+	userMapper 를 사용하여서 DB에 있는 정보를 가져올거라서, 아래와 같이 구현하였음
+	그리고 여기서는 정확하게 사용자의 ID를 가지고 사용자의 정보만을 가져옴 
+	암호비교는 다른데서 할꺼임
+	=================================================================================================================
+
+	package com.sungchul.stock.config.security.user.service;
+
+	import com.sungchul.stock.config.security.user.mapper.UserMapper;
+	import com.sungchul.stock.config.security.user.vo.UserVO;
+	import lombok.AllArgsConstructor;
+	import org.springframework.security.core.GrantedAuthority;
+	import org.springframework.security.core.authority.SimpleGrantedAuthority;
+	import org.springframework.security.core.userdetails.UserDetails;
+	import org.springframework.security.core.userdetails.UserDetailsService;
+	import org.springframework.security.core.userdetails.UsernameNotFoundException;
+	import org.springframework.stereotype.Service;
+
+	import java.util.ArrayList;
+	import java.util.List;
+
+	@AllArgsConstructor
+	@Service("userDetailsService")
+	public class CustomUserDetailsService implements UserDetailsService {
+
+		private final UserMapper userMapper;
+
+		@Override
+		public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
+			UserVO userVO = userMapper.getUser(username);
+
+			if(userVO == null){
+				throw new UsernameNotFoundException("UsernameNotFoundException");
+			}
+
+			List<GrantedAuthority> roles = new ArrayList<>();
+			roles.add(new SimpleGrantedAuthority(userVO.getRoleId()));
+
+			UserContext userContext = new UserContext(userVO,roles);
+
+			return userContext;
+		}
+
+
+	}
+
+
+
+	=================================================================================================================
+
+
+
+
+
+# UserContext.java 클래스 구현
+
+	해당 클래스는 "org.springframework.security.core.userdetails.User" 를 상속받아서 구현함
+	뭐 클래스명에는 크게 연연하지말고 맘대로해도됨
+	
+	=================================================================================================================
+	package com.sungchul.stock.config.security.user.service;
+
+	import com.sungchul.stock.config.security.user.vo.UserVO;
+	import org.springframework.security.core.GrantedAuthority;
+	import org.springframework.security.core.userdetails.User;
+
+	import java.util.Collection;
+
+	public class UserContext extends User {
+
+		private final UserVO userVO;
+
+		public UserContext(UserVO userVO, Collection<? extends GrantedAuthority> authorities) {
+			super(userVO.getName(), userVO.getPassword(), authorities);
+			this.userVO = userVO;
+		}
+
+		public UserVO getUserVO() {
+			return userVO;
+		}
+	}
+
+
+
+	=================================================================================================================
+
+
+
+# 사용자 데이터 추가
+	
+	이부분이 중요함
+	난 회원가입로직을 만들기 전이였음
+	만들고 나서 해도되는데 일단 이게 잘 되야 회원가입 로직을 만들고 하지
+	그래서 생으로 DB에 데이터를 넣어서 로그인 테스트를 진행해봤음
+
+	=================================================================================================================
+	id : admin
+	pw : admin
+	=================================================================================================================
+
+	스프링시큐리티 로그인 페이지에서 로그인 시도를 했음
+	로그인 안됨
+
+	"Encoded password does not look like BCrypt" 개발툴 콘솔에 오류메시지가 출력됨
+	
+	해당 내용을 구글링해보니 바로 하나 나옴
+	https://okky.kr/article/1001565?note=2435028
+	"DB" 에 들어 있는 암호가 암호화가 안되어 있어서 발생한다는 내용임
+
+	?????아니 뭔 나는 암호화 하자고도 안했는데 왜 맘대로 암호화해서 비교하려고 하는건데??
+	
+	그래서 소스가서 분석해봄
+
+	
+	UserContext.java 클래스를 구현할때 생성자에서 받아온 사용자의 이름, 암호를 부모한테 넘기는게 있음
+	=================================================================================================================
+	super(userVO.getName(), userVO.getPassword(), authorities);
+	=================================================================================================================
+	
+	이거따라가서 보니까 생성자에 넣어주는데 받아온 password 를 passwordEncoder 를 통해서 암호화하는 내용이 보임
+	=================================================================================================================
+		public UserDetails build() {
+			String encodedPassword = this.passwordEncoder.apply(this.password);
+			return new User(this.username, encodedPassword, !this.disabled, !this.accountExpired,
+					!this.credentialsExpired, !this.accountLocked, this.authorities);
+		}
+
+	=================================================================================================================
+
+	passwordEncoder 따라가보면 "createDelegatingPasswordEncoder" 메소드를 통해서 단방향 암호화를 해줌
+	입력받은 비밀번호랑, DB에서 가져온 비밀번호랑 단방향 암호화를 비교해서 비교하는거 같음.
+	이거 뭐 비교 안할거면 아래와 같이 비밀번호에 {noop}를 붙여주면 된다고함
+	=================================================================================================================
+	super(userVO.getName(), "{noop}"+userVO.getPassword(), authorities);
+	=================================================================================================================
+	
+	그래서 결국 사용자 생성을 DB에서 직접하지않고 메소드를 통해서 생성하게함
+	결국 insertUser api에 토대를 만듬
+	위에 "SecurityConfig" 클래스에서 만들어준 "BCryptPasswordEncoder" 메소드를 통해서 암호화를 하여 디비에 저장하도록하였음
+	new BCryptPasswordEncoder()
+	
+	※ role 저장시 ROLE_를 앞에 붙여줘야함,	붙여서 저장해야 security 에서 비교할때 기본적으로 ROLE_붙은 값으로 비교함
+		https://offbyone.tistory.com/91
+	=================================================================================================================
+
+    public void insertUser(){
+        UserVO userVO = new UserVO();
+        userVO.setName("김성철");
+        userVO.setUserId("admin");
+        userVO.setPassword(new BCryptPasswordEncoder().encode("admin"));
+        userVO.setRegDate("20211120");
+        userVO.setRegTime("003900");
+        userVO.setStatus(1);
+        userVO.setRoleId("ROLE_ADMIN");
+        userMapper.insertUser(userVO);
+    }
+
+	=================================================================================================================
+
+
+#################################################################################################################
+# 위에 없는 VO , mapper.java , mapper.xml 파일 내용
+
+# UserVO.java
+	=================================================================================================================
+	package com.sungchul.stock.config.security.user.vo;
+
+
+	import com.fasterxml.jackson.annotation.JsonProperty;
+	import io.swagger.annotations.ApiModel;
+	import io.swagger.annotations.ApiModelProperty;
+	import lombok.Data;
+
+	@Data
+	@ApiModel("stock VO")
+	public class UserVO {
+
+		@ApiModelProperty(name = "user_id", value = "관리자ID", notes = "필수", example = "005930")
+		@JsonProperty("user_id")
+		private String userId;
+
+		@ApiModelProperty(name = "password", value = "비밀번호", notes = "필수", example = "005930")
+		@JsonProperty("password")
+		private String password;
+
+		@ApiModelProperty(name = "name", value = "이름", notes = "필수", example = "005930")
+		@JsonProperty("name")
+		private String name;
+
+		@ApiModelProperty(name = "reg_date", value = "등록일", notes = "필수", example = "005930")
+		@JsonProperty("reg_date")
+		private String regDate;
+
+		@ApiModelProperty(name = "reg_time", value = "등록시간", notes = "필수", example = "005930")
+		@JsonProperty("reg_time")
+		private String regTime;
+
+		@ApiModelProperty(name = "role_id", value = "관리자구분", notes = "필수", example = "005930")
+		@JsonProperty("role_id")
+		private String roleId;
+
+		@ApiModelProperty(name = "status", value = "상태", notes = "필수", example = "005930")
+		@JsonProperty("status")
+		private int status;
+
+		@ApiModelProperty(name = "otp", value = "OTP발행여부", notes = "필수", example = "005930")
+		@JsonProperty("otp")
+		private int otp;
+
+		@ApiModelProperty(name = "otp_key", value = "OTP key", notes = "필수", example = "005930")
+		@JsonProperty("otp_key")
+		private String otpKey;
+
+	}
+
+	=================================================================================================================
+
+
+
+# UserMapper.java
+	
+	=================================================================================================================
+
+	package com.sungchul.stock.config.security.user.mapper;
+
+	import com.sungchul.stock.config.security.user.vo.UserVO;
+
+	public interface UserMapper {
+
+		 UserVO getUser(String userID);
+
+		 int insertUser(UserVO userVO);
+	}
+
+	=================================================================================================================
+
+
+
+# userMapper.xml
+	
+	=================================================================================================================
+	<?xml version="1.0" encoding="UTF-8"?>
+	<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+			"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+	<mapper namespace="com.sungchul.stock.config.security.user.mapper.UserMapper"><!--namespace를 통해 UserDAO와 연결합니다. -->
+
+
+		<select id="getUser" resultType="com.sungchul.stock.config.security.user.vo.UserVO" parameterType="java.lang.String">
+			SELECT * FROM admin_user
+			WHERE user_id =#{userId}
+
+		</select>
+
+		<insert id="insertUser" parameterType="com.sungchul.stock.config.security.user.vo.UserVO">
+			INSERT INTO admin_user (user_id , password , name , reg_date , reg_time , role_id , status)
+			VALUES (#{userId} , #{password} , #{name} , #{regDate} , #{regTime} , #{roleId} , #{status})
+		</insert>
+
+
+
+	</mapper>
+
+
+	=================================================================================================================
+
+
+
