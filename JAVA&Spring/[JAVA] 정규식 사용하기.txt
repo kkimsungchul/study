@@ -46,7 +46,7 @@
 String regexProjectSlug = "^[a-zA-Z0-9\\-]{1,50}$";
 
 //한글 불가능 ,  영어대문자 숫자 가능, 10글자 이하 (10 글자 프로젝트 키는 대문자로 시작해야 하며, 1개 이상의 대문자 알파벳 숫자가 따라와야 합니다.)
-String regexJiraSlug = "^[A-Z0-9]{1,10}$";
+String regexJiraSlug = "^([A-Z]{1})[A-Z0-9]{1,9}$";
 //한글 불가능, 특수문자 - _ .  가능 (maximum is 255 characters)
 String regexGitlab = "^[a-zA-Z0-9-_.]{1,255}$";
 String regexGitlab = "^[a-zA-Z0-9\\-\\_\\.]{1,255}$";
