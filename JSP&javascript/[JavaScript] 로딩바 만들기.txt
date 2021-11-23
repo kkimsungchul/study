@@ -1,0 +1,76 @@
+[ 자바스크립트 - 로딩바 ]
+
+
+	데이터가 처리중일 때 로딩바를 만들어서 광클을 못하게 함 
+
+	참고 URL : https://newehblog.tistory.com/32
+
+
+
+	공통 스크립트 파일에 아래와 같이 함수를 두개 선언함
+	FunLoadingBarStart() 함수는 로딩바를 호출
+	FunLoadingBarEnd() 함수는 로딩바를 제거
+	=====================================================================================================================================================
+
+	//로딩바
+	function FunLoadingBarStart() {
+		var backHeight = $(document).height(); //뒷 배경의 상하 폭
+		var backWidth = window.document.body.clientWidth; //뒷 배경의 좌우 폭
+		var backGroundCover = "<div id='back'></div>"; //뒷 배경을 감쌀 커버
+		var loadingBarImage = ''; //가운데 띄워 줄 이미지
+		loadingBarImage += "<div id='loadingBar'>";
+		loadingBarImage += " <img src='/common/img/loding.gif'/>"; //로딩 바 이미지
+		loadingBarImage += "</div>";
+		$('body').append(backGroundCover).append(loadingBarImage);
+		$('#back').css({ 'width': backWidth, 'height': backHeight, 'opacity': '0.3' });
+		$('#back').show();
+		$('#loadingBar').show();
+	}
+
+	//로딩바 제거
+	function FunLoadingBarEnd() {
+		$('#back, #loadingBar').hide();
+		$('#back, #loadingBar').remove();
+	}
+
+
+
+
+	=====================================================================================================================================================
+
+
+
+
+
+	사용하는 곳에서 아래와 같이 선언함
+	로딩이 걸리기전에 로딩바를 호출하고, 완료되면 그때 로딩바 제거함수를 호출함
+	=====================================================================================================================================================
+
+	 /*엑셀 업로드*/
+		function surveyUpload(){
+			var form = $('#surveyUploadForm')[0];
+			var frmData = new FormData(form);
+			FunLoadingBarStart();						//로딩바 호출
+			$.ajax({
+				enctype: 'multipart/form-data',
+				processData: false,
+				contentType: false,
+				cache: false,
+				url : "/survey/survey",
+				method : "POST",
+				data : frmData,
+				success : function (data){
+					alert(data + "개의 설문조사 데이터가 업로드되었습니다.");
+					fn_layer_popup();
+					getSurveyList();
+					FunLoadingBarEnd();					//로딩바 제거
+				}, error : function (e){
+					alert(e);
+				}
+			})
+
+		}
+
+
+
+	=====================================================================================================================================================
