@@ -159,11 +159,12 @@
 
 		private final UserVO userVO;
 
+		//여기서 전달해준 ID를 토큰에 저장함
+		//다만 토큰에서 가져올때는 userDetails.getUsername() 로 가져옴. 이걸 바꾸려고 하면 UserDetails 인터페이스를 구현해야함
 		public UserContext(UserVO userVO, Collection<? extends GrantedAuthority> authorities) {
-			super(userVO.getName(), userVO.getPassword(), authorities);
+			super(userVO.getUserId(), userVO.getPassword(), authorities);
 			this.userVO = userVO;
 		}
-
 		public UserVO getUserVO() {
 			return userVO;
 		}
