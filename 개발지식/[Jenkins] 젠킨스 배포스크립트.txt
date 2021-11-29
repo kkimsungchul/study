@@ -1,0 +1,40 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git credentialsId: 'dspace_ci_backend_git', url: 'https://gitlab.dspace.kt.co.kr/DS/d-space-portal.git', branch: 'dev'
+            }
+        }
+
+        stage('Clean') {
+            steps {
+				sh "cd '/data/jenkins_home/workspace/Developer Space/D-Space CI BackEnd' && /maven/bin/mvn clean -e -s ./settings.xml"
+            }
+        }
+		stage('Build') {
+			steps {
+				sh "cd '/data/jenkins_home/workspace/Developer Space/D-Space CI BackEnd' && /maven/bin/mvn install -e -s ./settings.xml -Dmaven.test.skip=true"
+			}
+		}
+		stage('Deploy') {
+			steps {
+				sh "cd '/data/jenkins_home/workspace/Developer Space/D-Space CI BackEnd/target' && scp d-space-portal-0.0.1-SNAPSHOT.war sungchul@192.168.0.1:/home/sungchul/"
+			}
+		}
+        stage('Service') {
+			steps{
+				script {
+					def remote = [:]
+					remote.name = 'sungchulServer'
+					remote.host = '192.168.0.1'
+					remote.user = 'sungchul'
+					remote.password = '1111'
+					remote.allowAnyHosts = true
+					sshCommand remote: remote, command: "sudo systemctl stop tomcat && sudo sleep 5 && sudo rm -rf /app/application/* && sudo sleep 1 && sudo mv /home/sungchul/d-space-portal-0.0.1-SNAPSHOT.war /app/application && sudo chown tomcat:tomcat /app/application/d-space-portal-0.0.1-SNAPSHOT.war && sudo sleep 1 && sudo systemctl start tomcat"
+				} 
+			}		
+        }
+    }
+}
