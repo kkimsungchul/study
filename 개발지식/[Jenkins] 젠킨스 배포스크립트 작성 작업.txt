@@ -1,0 +1,578 @@
+# 작업순서
+	1. 젠킨스서버에서 키 생성
+	2. 젠킨스서버에서 생성한 키를 톰캣 서버에 등록
+	3. sudoers 파일 수정
+	4. 젠킨스툴에서 스크립트 작성
+	
+	
+
+# 서버 접속
+	- 톰캣
+		ssh sungchul@192.168.0.103
+		sudo -i 
+		password!
+	- 젠킨스
+		ssh sungchul@192.168.0.97
+		sudo -i 
+		password!
+
+
+ssh sungchul@192.168.0.26
+# 참고링크
+	- 원격지에서 톰캣 재실행
+		https://skysoul.tistory.com/61
+		https://dodonam.tistory.com/223
+		https://www.jacobbaek.com/870
+		https://sarc.io/index.php/cloud/2088-jenkins-pipeline
+	- settings.xml 파일 사용
+		https://nesoy.github.io/articles/2021-03/maven-settings
+		
+
+
+# 젠킨스 베포 로직
+
+====================================================================================================
+1.check out <--git에서 d-space-portal 소스를 내려받는다.		==> check out
+
+2.1번에 내려받은 jenkins내 로컬 repository에서 maven clean 함.	==> clean
+
+3.로컬 repository를 maven install or maven package		==> build
+
+4.war 파일을 ci portal was 서버의 scp 명령어로 원격 디렉토리에 업로드 ==> deploy 
+	4.1.ci portal 톰캣 서버를 죽인다.
+	4.2.기존 war 파일과 풀려있는 폴더를 삭제
+	4.3.7.4번에 업로드 받은 war파일을 /app/application/ 로 이동
+
+5.ci portal 톰캣 서버 재기동함.							==> service(=start)
+====================================================================================================
+
+# 젠킨스버서의 젠킨스 계정 /bin 옵션 변경
+	
+	vi /etc/passwd
+	해당 파일을 열어보면 jenkins 계정의 설정은 /bin/false 로 설정이 되어 있음
+		bin/false 옵션은 "시스템의 로그인은 불가능, FTP 서버 프로그램같은 프로그램도 불가능하다. 쉘이나 ssh과 같은 터널링(원격접속) 그리고 홈디렉토리를 사용할 수 없다." 라고함
+		그래서  sungchul 의 설정을 그대로 복사 붙여넣기해서 사용함
+	
+	
+	
+
+# 젠킨스 서버에서	sudoers 파일 수정
+	젠킨스 계정 로그인시 비밀번호를 묻지 안도록 하기위해 추가
+	
+	====================================================================================================
+	## Allow root to run any commands anywhere
+
+	root    ALL=(ALL)       ALL
+	sungchul ALL=(ALL)       ALL
+	jenkins ALL=(ALL)       ALL
+	====================================================================================================
+	
+	====================================================================================================
+	## Same thing without a password
+	# %wheel        ALL=(ALL)       NOPASSWD: ALL
+	jenkins         ALL=(ALL)       NOPASSWD: ALL
+	====================================================================================================
+	
+
+
+# 톰캣 서버에서 sudoers 파일 수정
+	sungchul 계정에서 sudo 명령어 사용시 비밀번호를 묻지 않도록 추가
+
+	====================================================================================================
+	## Same thing without a password
+	# %wheel        ALL=(ALL)       NOPASSWD: ALL
+	sungchul         ALL=(ALL)       NOPASSWD: ALL
+	====================================================================================================
+	
+
+# 키를 생성해서 접속
+	※ 젠킨스 서버에서 톰캣서버로 ssh 를 사용하여 파일 전송을 하려면 인증 키값이 있어야함. 그냥 전송을 하면 안되서 아래의 방법으로 진행함
+	젠킨스 서버에서 키를 생성하고, 해당 파일의 내용을 톰캣서버에 저장하고나서 접속함
+	
+	
+	
+	====================================================================================================
+	http://faq.add4s.com/?p=333
+	
+	젠킨스 서버 접속 
+	-> ssh sungchul@192.168.0.97
+	-> ssh-keygen -t rsa
+	-> 엔터쭊~~
+	-> cd /var/lib/jenkins/.ssh		-- 이거는 계정의 디렉토리임, jenkins의 디렉토리, sungchul의 디렉토리등
+									cd /root/.ssh/ 
+									cd /home/sungchul/.ssh
+	-> ll
+	-> vi id_rsa.pub
+	
+	톰캣 서버 접속  
+	-> ssh sungchul@192.168.0.103
+	-> cd /home/sungchul/.ssh
+	-> vi authorized_keys
+	여기에다가 젠킨스 서버의 id_rsa.pub 파일내용을 밑에 추가함
+	-> ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC2GyzhyCPjNxF1Lysu17l44sv+2V3bSPDGCxuTQ+4qVPtQ+EzfeQOC34F0tLO/qIqCQbLqs17feS3yVwE4nX3+qGAV6/eoSPlqm3SoBVxgZOAxRy2JitCOHm/iou3mc9PFFJQ0PovjZDnZ/Mvb0MrmBx+DF3sQQI5U+jkYWZ8DH1Xbs6lY8GFhwKvwKONMljdYk2Fu+36GQ/YeTIkGkJzCsP1jviQNBsYedZ4m5Y5tdkZ/Uur14mrJNjZso583ANjF8Cj4LCuiMV3w2aZKi0OcKxphGKy9C+f5xo4pu+wRkLznwwonfIM/sOfiVct3BrAgZ9EcXa2eYxDHDUxmAFB1 jenkins@p-stest-tk1-e02
+
+
+	젠킨스 서버에서 톰캣서버 접속 테스트
+	ssh sungchul@192.168.0.103
+	
+	※ 애는 루트임, 안씀 테스트용으로 해봣음
+		-> ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCyco7tKK/oD0OTcdARgb2NQNExcUQRyyI3DQADwjEkxc+vIbYzDDayMJ0tAD8vFcr/QJKPb+/yz5oaln8XeTOPc8IwVGo6/KBnkfVnwGQSXwtu4YXnJiCp2yNjzReE9Nnd52erHYGQVe8lUpjlHRbsXIIuxwd1/EyH9aFzyzqXKQsbJJVQSOgWbKCXkC3/G8piABqltY0kwLZDqnsTQzk7ZKsicS11ZufSQ6OxcHujPKXewvPijuv2L9Gpq4KsBAHiRVSmrVBKIy+6RdVdwSgnhE5xSmj8dArnUhiHg05JZtopcYERvea7dNBlsrrvqtwL+Ah4+zrMQd/KatBDQL/1 root@p-stest-tk1-e02	
+	※ 애는 sungchul
+		-> ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCfnOFf0eQVmDmpxZgFXZvcjfphLXUeEWYBuFsv5nx7lui5M2TdI1V4Ati5KfF5xz8VrNYFtz3q8kaAB6WC+gYlEdPEzQGHY/0kVsdORcWd8jiDKVSeQ/ZLXYEUUcMENWiiVn2NhYVQ0FuG8m0dorspztBQF4lEbd8U104vmitqbeRbTzs6aPRwiX8tkBZP7TNAG2WaRi7zeSp0uz66Y32q1EBCI4kp2M2VMgYPIJgieWJJQoDKY22ERijkWlMkODur5yoG2XA72+rGkgFQqQkrJ/pQITGdwjq9QPGzfuMqK3JqTaeVtwHz9+Fikfa3gGqX23BH8jYqwbx8dWIPPo13 sungchul@p-stest-tk1-e02
+
+	====================================================================================================
+
+
+
+# 원격접속이 안됨 (젠킨스->톰캣was서버)
+
+	로컬(김성철컴퓨터에서) 키 복사 해봄 : 안됨
+
+	/var/lib/jenkins/.ssh
+
+	mv id_ed25519 /home/sungchul
+	mv id_ed25519.pub /home/sungchul
+	mv known_hosts /home/sungchul
+
+
+
+# 젠킨스SSH 사용
+
+	====================================================================================================
+
+	pipeline {
+		agent any
+
+		stages {
+			stage('Service') {
+				steps{
+					script {
+						def remote = [:]
+						remote.name = 'p-stest-tk1-e07'
+						remote.host = '192.168.0.26'
+						remote.user = 'sungchul'
+						remote.password = 'password!'
+						remote.allowAnyHosts = true
+						sshCommand remote: remote, command: "sudo systemctl stop tomcat && sudo sleep 5 && sudo rm -rf /app/application/* && sudo sleep 1 && sudo mv /home/sungchul/d-space-portal-0.0.1-SNAPSHOT.war /app/application && sudo chown tomcat:tomcat /app/application/d-space-portal-0.0.1-SNAPSHOT.war && sudo sleep 1 && sudo systemctl start tomcat"
+					} 
+				}		
+			}
+		}
+	}
+
+	====================================================================================================
+
+
+
+
+
+####################################################################################################
+# 오류발생
+	com.jcraft.jsch.JSchException: Auth fail
+
+# 해결
+	remote.password = 'password!' 패스워드 필드를 안써줘서 발생하였음, 꼭 필수로 들어가야함
+	또한 문법오류도 잇엇음.. 아래는 다 고채서 해놓은거임
+	
+	====================================================================================================
+	pipeline {
+		agent any
+
+		stages {
+			stage('Service') {	
+				steps{
+					script {
+						def remote = [:]
+						remote.name = 'p-stest-tk1-e07'
+						remote.host = '192.168.0.26'
+						remote.user = 'sungchul'
+						remote.password = 'password!'
+						remote.allowAnyHosts = true
+						sshCommand remote: remote, command: "./test2.sh"
+					}
+				}
+			}
+		}			
+	}
+	====================================================================================================			
+
+
+
+####################################################################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+####################################################################################################
+# 오류발생
+	Host TB_ci_jenkins
+		HostName 192.168.0.97
+		User sungchul
+
+	해당 서버에서 https://repositoryURL/repository/maven-public/ 로 접근 됨, 메이븐 빌드시에 안되는거임
+
+
+	curl -u dspace-common:1234 https://repositoryURL/repository/maven-public/
+	curl -v -u dspace-common:1234 https://repositoryURL/repository/maven-public/
+	
+	curl -v -u dspace-common:1234 https://repositoryURL/repository/maven-public/org/springframework/boot/spring-boot-starter-parent/2.4.5/spring-boot-starter-parent-2.4.5.pom
+
+
+# 오류 해결 (settings.xml)
+	https://nesoy.github.io/articles/2021-03/maven-settings
+	
+	현재 프로젝트는 settings.xml 파일을 사용중임
+	해당 파일에는 maven 실행에 필요한 정보 들이 있고, portal 의 settings.xml 파일에는 repository 의 정보가 들어있음
+	그냥 mvn clean 을 하게되면, 메이븐 설정파일에 있는 settings.xml 파일을 사용함 
+		ex) MAVEN_HOME/conf/settings.xml 
+	근데 여기선 저거 쓰는게 아니라 커스컴한 settings.xml 파일을 사용해야 함
+		그렬경우 메이븐 명령어 뒤에 -s 옵션을 주고 파일 경로와 파일명을 적어주면 작동함
+		 -s ./setting/settings.xml
+
+	※ -e 명령어는 오류를 보기위해 기재했음, 나중에 오류 안나면 지우면댐
+
+	- 기존 명령어
+		====================================================================================================
+		cd '/data/jenkins_home/workspace/Developer Space/D-Space CI BackEnd' && /maven/bin/mvn clean -e
+		====================================================================================================
+	
+	- 수정된 명령어
+		====================================================================================================
+		cd '/data/jenkins_home/workspace/Developer Space/D-Space CI BackEnd' && /maven/bin/mvn clean -e -s ./settings.xml
+		====================================================================================================
+
+
+	- jenkins 파이프라인에 적용된 기존 명령어
+		====================================================================================================
+		sh "cd '/data/jenkins_home/workspace/Developer Space/D-Space CI BackEnd' && /maven/bin/mvn clean -e"
+		====================================================================================================
+	
+	- jenkins 파이프라인에 적용된 수정된 명령어
+		====================================================================================================
+		sh "cd '/data/jenkins_home/workspace/Developer Space/D-Space CI BackEnd' && /maven/bin/mvn clean -e -s ./settings.xml"		
+		====================================================================================================
+
+
+
+
+
+	https://nesoy.github.io/articles/2021-03/maven-settings
+####################################################################################################
+
+
+※ 오류 로그
+####################################################################################################
+####################################################################################################
+
+# 일반 로그
+====================================================================================================
+Started by user 김성철 협력사
+Running in Durability level: MAX_SURVIVABILITY
+[Pipeline] Start of Pipeline
+[Pipeline] node
+Running on Jenkins in /data/jenkins_home/workspace/Developer Space/D-Space CI BackEnd
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Checkout)
+[Pipeline] git
+The recommended git tool is: NONE
+using credential dspace_ci_backend_git
+Cloning the remote Git repository
+Cloning repository https://gitlab.dspace.kt.co.kr/DS/d-space-portal.git
+ > git init /data/jenkins_home/workspace/Developer Space/D-Space CI BackEnd # timeout=10
+Fetching upstream changes from https://gitlab.dspace.kt.co.kr/DS/d-space-portal.git
+ > git --version # timeout=10
+ > git --version # 'git version 1.8.3.1'
+using GIT_ASKPASS to set credentials D-Space CI BackEnd의 Git Repository의 사용자 계정
+ > git fetch --tags --progress https://gitlab.dspace.kt.co.kr/DS/d-space-portal.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git config remote.origin.url https://gitlab.dspace.kt.co.kr/DS/d-space-portal.git # timeout=10
+ > git config --add remote.origin.fetch +refs/heads/*:refs/remotes/origin/* # timeout=10
+Avoid second fetch
+ > git rev-parse refs/remotes/origin/dev^{commit} # timeout=10
+Checking out Revision bd04ab6cadb09618183e2f7417115b52b82d4aee (refs/remotes/origin/dev)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f bd04ab6cadb09618183e2f7417115b52b82d4aee # timeout=10
+ > git branch -a -v --no-abbrev # timeout=10
+ > git checkout -b dev bd04ab6cadb09618183e2f7417115b52b82d4aee # timeout=10
+Commit message: "Merge branch 'dev' of https://gitlab.dspace.kt.co.kr/DS/d-space-portal.git into dev"
+ > git rev-list --no-walk d365142583ef2c95855a6d00143de4bd33aeb342 # timeout=10
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Clean)
+[Pipeline] sh
++ cd '/data/jenkins_home/workspace/Developer Space/D-Space CI BackEnd'
++ /maven/bin/mvn clean
+[INFO] Scanning for projects...
+Downloading from sw-central: https://repositoryURL/repository/maven-public/org/springframework/boot/spring-boot-starter-parent/2.4.5/spring-boot-starter-parent-2.4.5.pom
+Downloading from central: https://repo.maven.apache.org/maven2/org/springframework/boot/spring-boot-starter-parent/2.4.5/spring-boot-starter-parent-2.4.5.pom
+[ERROR] [ERROR] Some problems were encountered while processing the POMs:
+[WARNING] 'dependencies.dependency.systemPath' for com.xroshot.openapi.sdk:xroshot_openapi_sdk:jar should not point at files within the project directory, ${project.basedir}/src/main/webapp/WEB-INF/lib/xroshot_openapi_sdk-1.2.jar will be unresolvable by dependent projects @ line 159, column 25
+[FATAL] Non-resolvable parent POM for com.kt.dspace.portal:d-space-portal:0.0.1-SNAPSHOT: Could not transfer artifact org.springframework.boot:spring-boot-starter-parent:pom:2.4.5 from/to sw-central (https://repositoryURL/repository/maven-public/): authentication failed for https://repositoryURL/repository/maven-public/org/springframework/boot/spring-boot-starter-parent/2.4.5/spring-boot-starter-parent-2.4.5.pom, status: 401 Unauthorized and 'parent.relativePath' points at no local POM @ line 6, column 13
+ @ 
+[ERROR] The build could not read 1 project -> [Help 1]
+[ERROR]   
+[ERROR]   The project com.kt.dspace.portal:d-space-portal:0.0.1-SNAPSHOT (/data/jenkins_home/workspace/Developer Space/D-Space CI BackEnd/pom.xml) has 1 error
+[ERROR]     Non-resolvable parent POM for com.kt.dspace.portal:d-space-portal:0.0.1-SNAPSHOT: Could not transfer artifact org.springframework.boot:spring-boot-starter-parent:pom:2.4.5 from/to sw-central (https://repositoryURL/repository/maven-public/): authentication failed for https://repositoryURL/repository/maven-public/org/springframework/boot/spring-boot-starter-parent/2.4.5/spring-boot-starter-parent-2.4.5.pom, status: 401 Unauthorized and 'parent.relativePath' points at no local POM @ line 6, column 13 -> [Help 2]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/ProjectBuildingException
+[ERROR] [Help 2] http://cwiki.apache.org/confluence/display/MAVEN/UnresolvableModelException
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+ERROR: script returned exit code 1
+Finished: FAILURE
+
+====================================================================================================
+
+
+# 상세로그
+====================================================================================================
+Started by user 김성철 협력사
+Running in Durability level: MAX_SURVIVABILITY
+[Pipeline] Start of Pipeline
+[Pipeline] node
+Running on Jenkins in /data/jenkins_home/workspace/Developer Space/D-Space CI BackEnd
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Checkout)
+[Pipeline] git
+The recommended git tool is: NONE
+using credential dspace_ci_backend_git
+ > git rev-parse --resolve-git-dir /data/jenkins_home/workspace/Developer Space/D-Space CI BackEnd/.git # timeout=10
+Fetching changes from the remote Git repository
+ > git config remote.origin.url https://gitlab.dspace.kt.co.kr/DS/d-space-portal.git # timeout=10
+Fetching upstream changes from https://gitlab.dspace.kt.co.kr/DS/d-space-portal.git
+ > git --version # timeout=10
+ > git --version # 'git version 1.8.3.1'
+using GIT_ASKPASS to set credentials D-Space CI BackEnd의 Git Repository의 사용자 계정
+ > git fetch --tags --progress https://gitlab.dspace.kt.co.kr/DS/d-space-portal.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git rev-parse refs/remotes/origin/dev^{commit} # timeout=10
+Checking out Revision 1c394c5184eac08761bf2221b9c1087b09656ffd (refs/remotes/origin/dev)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f 1c394c5184eac08761bf2221b9c1087b09656ffd # timeout=10
+ > git branch -a -v --no-abbrev # timeout=10
+ > git branch -D dev # timeout=10
+ > git checkout -b dev 1c394c5184eac08761bf2221b9c1087b09656ffd # timeout=10
+Commit message: "[DSP-1558][DSP-1644][DSP-1645][DSP-1646] 사용자별 즐겨찾기 가능하도록 수정"
+ > git rev-list --no-walk bd04ab6cadb09618183e2f7417115b52b82d4aee # timeout=10
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Clean)
+[Pipeline] sh
++ cd '/data/jenkins_home/workspace/Developer Space/D-Space CI BackEnd'
++ /maven/bin/mvn clean -e
+[INFO] Error stacktraces are turned on.
+[INFO] Scanning for projects...
+Downloading from sw-central: https://repositoryURL/repository/maven-public/org/springframework/boot/spring-boot-starter-parent/2.4.5/spring-boot-starter-parent-2.4.5.pom
+Downloading from central: https://repo.maven.apache.org/maven2/org/springframework/boot/spring-boot-starter-parent/2.4.5/spring-boot-starter-parent-2.4.5.pom
+[ERROR] [ERROR] Some problems were encountered while processing the POMs:
+[WARNING] 'dependencies.dependency.systemPath' for com.xroshot.openapi.sdk:xroshot_openapi_sdk:jar should not point at files within the project directory, ${project.basedir}/src/main/webapp/WEB-INF/lib/xroshot_openapi_sdk-1.2.jar will be unresolvable by dependent projects @ line 159, column 25
+[FATAL] Non-resolvable parent POM for com.kt.dspace.portal:d-space-portal:0.0.1-SNAPSHOT: Could not transfer artifact org.springframework.boot:spring-boot-starter-parent:pom:2.4.5 from/to sw-central (https://repositoryURL/repository/maven-public/): authentication failed for https://repositoryURL/repository/maven-public/org/springframework/boot/spring-boot-starter-parent/2.4.5/spring-boot-starter-parent-2.4.5.pom, status: 401 Unauthorized and 'parent.relativePath' points at no local POM @ line 6, column 13
+ @ 
+[ERROR] The build could not read 1 project -> [Help 1]
+org.apache.maven.project.ProjectBuildingException: Some problems were encountered while processing the POMs:
+[WARNING] 'dependencies.dependency.systemPath' for com.xroshot.openapi.sdk:xroshot_openapi_sdk:jar should not point at files within the project directory, ${project.basedir}/src/main/webapp/WEB-INF/lib/xroshot_openapi_sdk-1.2.jar will be unresolvable by dependent projects @ line 159, column 25
+[FATAL] Non-resolvable parent POM for com.kt.dspace.portal:d-space-portal:0.0.1-SNAPSHOT: Could not transfer artifact org.springframework.boot:spring-boot-starter-parent:pom:2.4.5 from/to sw-central (https://repositoryURL/repository/maven-public/): authentication failed for https://repositoryURL/repository/maven-public/org/springframework/boot/spring-boot-starter-parent/2.4.5/spring-boot-starter-parent-2.4.5.pom, status: 401 Unauthorized and 'parent.relativePath' points at no local POM @ line 6, column 13
+
+    at org.apache.maven.project.DefaultProjectBuilder.build (DefaultProjectBuilder.java:397)
+    at org.apache.maven.graph.DefaultGraphBuilder.collectProjects (DefaultGraphBuilder.java:414)
+    at org.apache.maven.graph.DefaultGraphBuilder.getProjectsForMavenReactor (DefaultGraphBuilder.java:405)
+    at org.apache.maven.graph.DefaultGraphBuilder.build (DefaultGraphBuilder.java:82)
+    at org.apache.maven.DefaultMaven.buildGraph (DefaultMaven.java:507)
+    at org.apache.maven.DefaultMaven.doExecute (DefaultMaven.java:219)
+    at org.apache.maven.DefaultMaven.doExecute (DefaultMaven.java:192)
+    at org.apache.maven.DefaultMaven.execute (DefaultMaven.java:105)
+    at org.apache.maven.cli.MavenCli.execute (MavenCli.java:972)
+    at org.apache.maven.cli.MavenCli.doMain (MavenCli.java:293)
+    at org.apache.maven.cli.MavenCli.main (MavenCli.java:196)
+    at sun.reflect.NativeMethodAccessorImpl.invoke0 (Native Method)
+    at sun.reflect.NativeMethodAccessorImpl.invoke (NativeMethodAccessorImpl.java:62)
+    at sun.reflect.DelegatingMethodAccessorImpl.invoke (DelegatingMethodAccessorImpl.java:43)
+    at java.lang.reflect.Method.invoke (Method.java:498)
+    at org.codehaus.plexus.classworlds.launcher.Launcher.launchEnhanced (Launcher.java:282)
+    at org.codehaus.plexus.classworlds.launcher.Launcher.launch (Launcher.java:225)
+    at org.codehaus.plexus.classworlds.launcher.Launcher.mainWithExitCode (Launcher.java:406)
+    at org.codehaus.plexus.classworlds.launcher.Launcher.main (Launcher.java:347)
+[ERROR]   
+[ERROR]   The project com.kt.dspace.portal:d-space-portal:0.0.1-SNAPSHOT (/data/jenkins_home/workspace/Developer Space/D-Space CI BackEnd/pom.xml) has 1 error
+[ERROR]     Non-resolvable parent POM for com.kt.dspace.portal:d-space-portal:0.0.1-SNAPSHOT: Could not transfer artifact org.springframework.boot:spring-boot-starter-parent:pom:2.4.5 from/to sw-central (https://repositoryURL/repository/maven-public/): authentication failed for https://repositoryURL/repository/maven-public/org/springframework/boot/spring-boot-starter-parent/2.4.5/spring-boot-starter-parent-2.4.5.pom, status: 401 Unauthorized and 'parent.relativePath' points at no local POM @ line 6, column 13 -> [Help 2]
+org.apache.maven.model.resolution.UnresolvableModelException: Could not transfer artifact org.springframework.boot:spring-boot-starter-parent:pom:2.4.5 from/to sw-central (https://repositoryURL/repository/maven-public/): authentication failed for https://repositoryURL/repository/maven-public/org/springframework/boot/spring-boot-starter-parent/2.4.5/spring-boot-starter-parent-2.4.5.pom, status: 401 Unauthorized
+    at org.apache.maven.project.ProjectModelResolver.resolveModel (ProjectModelResolver.java:196)
+    at org.apache.maven.project.ProjectModelResolver.resolveModel (ProjectModelResolver.java:242)
+    at org.apache.maven.model.building.DefaultModelBuilder.readParentExternally (DefaultModelBuilder.java:1077)
+    at org.apache.maven.model.building.DefaultModelBuilder.readParent (DefaultModelBuilder.java:853)
+    at org.apache.maven.model.building.DefaultModelBuilder.build (DefaultModelBuilder.java:344)
+    at org.apache.maven.model.building.DefaultModelBuilder.build (DefaultModelBuilder.java:252)
+    at org.apache.maven.project.DefaultProjectBuilder.build (DefaultProjectBuilder.java:448)
+    at org.apache.maven.project.DefaultProjectBuilder.build (DefaultProjectBuilder.java:414)
+    at org.apache.maven.project.DefaultProjectBuilder.build (DefaultProjectBuilder.java:377)
+    at org.apache.maven.graph.DefaultGraphBuilder.collectProjects (DefaultGraphBuilder.java:414)
+    at org.apache.maven.graph.DefaultGraphBuilder.getProjectsForMavenReactor (DefaultGraphBuilder.java:405)
+    at org.apache.maven.graph.DefaultGraphBuilder.build (DefaultGraphBuilder.java:82)
+    at org.apache.maven.DefaultMaven.buildGraph (DefaultMaven.java:507)
+    at org.apache.maven.DefaultMaven.doExecute (DefaultMaven.java:219)
+    at org.apache.maven.DefaultMaven.doExecute (DefaultMaven.java:192)
+    at org.apache.maven.DefaultMaven.execute (DefaultMaven.java:105)
+    at org.apache.maven.cli.MavenCli.execute (MavenCli.java:972)
+    at org.apache.maven.cli.MavenCli.doMain (MavenCli.java:293)
+    at org.apache.maven.cli.MavenCli.main (MavenCli.java:196)
+    at sun.reflect.NativeMethodAccessorImpl.invoke0 (Native Method)
+    at sun.reflect.NativeMethodAccessorImpl.invoke (NativeMethodAccessorImpl.java:62)
+    at sun.reflect.DelegatingMethodAccessorImpl.invoke (DelegatingMethodAccessorImpl.java:43)
+    at java.lang.reflect.Method.invoke (Method.java:498)
+    at org.codehaus.plexus.classworlds.launcher.Launcher.launchEnhanced (Launcher.java:282)
+    at org.codehaus.plexus.classworlds.launcher.Launcher.launch (Launcher.java:225)
+    at org.codehaus.plexus.classworlds.launcher.Launcher.mainWithExitCode (Launcher.java:406)
+    at org.codehaus.plexus.classworlds.launcher.Launcher.main (Launcher.java:347)
+Caused by: org.eclipse.aether.resolution.ArtifactResolutionException: Could not transfer artifact org.springframework.boot:spring-boot-starter-parent:pom:2.4.5 from/to sw-central (https://repositoryURL/repository/maven-public/): authentication failed for https://repositoryURL/repository/maven-public/org/springframework/boot/spring-boot-starter-parent/2.4.5/spring-boot-starter-parent-2.4.5.pom, status: 401 Unauthorized
+    at org.eclipse.aether.internal.impl.DefaultArtifactResolver.resolve (DefaultArtifactResolver.java:425)
+    at org.eclipse.aether.internal.impl.DefaultArtifactResolver.resolveArtifacts (DefaultArtifactResolver.java:229)
+    at org.eclipse.aether.internal.impl.DefaultArtifactResolver.resolveArtifact (DefaultArtifactResolver.java:207)
+    at org.eclipse.aether.internal.impl.DefaultRepositorySystem.resolveArtifact (DefaultRepositorySystem.java:262)
+    at org.apache.maven.project.ProjectModelResolver.resolveModel (ProjectModelResolver.java:192)
+    at org.apache.maven.project.ProjectModelResolver.resolveModel (ProjectModelResolver.java:242)
+    at org.apache.maven.model.building.DefaultModelBuilder.readParentExternally (DefaultModelBuilder.java:1077)
+    at org.apache.maven.model.building.DefaultModelBuilder.readParent (DefaultModelBuilder.java:853)
+    at org.apache.maven.model.building.DefaultModelBuilder.build (DefaultModelBuilder.java:344)
+    at org.apache.maven.model.building.DefaultModelBuilder.build (DefaultModelBuilder.java:252)
+    at org.apache.maven.project.DefaultProjectBuilder.build (DefaultProjectBuilder.java:448)
+    at org.apache.maven.project.DefaultProjectBuilder.build (DefaultProjectBuilder.java:414)
+    at org.apache.maven.project.DefaultProjectBuilder.build (DefaultProjectBuilder.java:377)
+    at org.apache.maven.graph.DefaultGraphBuilder.collectProjects (DefaultGraphBuilder.java:414)
+    at org.apache.maven.graph.DefaultGraphBuilder.getProjectsForMavenReactor (DefaultGraphBuilder.java:405)
+    at org.apache.maven.graph.DefaultGraphBuilder.build (DefaultGraphBuilder.java:82)
+    at org.apache.maven.DefaultMaven.buildGraph (DefaultMaven.java:507)
+    at org.apache.maven.DefaultMaven.doExecute (DefaultMaven.java:219)
+    at org.apache.maven.DefaultMaven.doExecute (DefaultMaven.java:192)
+    at org.apache.maven.DefaultMaven.execute (DefaultMaven.java:105)
+    at org.apache.maven.cli.MavenCli.execute (MavenCli.java:972)
+    at org.apache.maven.cli.MavenCli.doMain (MavenCli.java:293)
+    at org.apache.maven.cli.MavenCli.main (MavenCli.java:196)
+    at sun.reflect.NativeMethodAccessorImpl.invoke0 (Native Method)
+    at sun.reflect.NativeMethodAccessorImpl.invoke (NativeMethodAccessorImpl.java:62)
+    at sun.reflect.DelegatingMethodAccessorImpl.invoke (DelegatingMethodAccessorImpl.java:43)
+    at java.lang.reflect.Method.invoke (Method.java:498)
+    at org.codehaus.plexus.classworlds.launcher.Launcher.launchEnhanced (Launcher.java:282)
+    at org.codehaus.plexus.classworlds.launcher.Launcher.launch (Launcher.java:225)
+    at org.codehaus.plexus.classworlds.launcher.Launcher.mainWithExitCode (Launcher.java:406)
+    at org.codehaus.plexus.classworlds.launcher.Launcher.main (Launcher.java:347)
+Caused by: org.eclipse.aether.transfer.ArtifactTransferException: Could not transfer artifact org.springframework.boot:spring-boot-starter-parent:pom:2.4.5 from/to sw-central (https://repositoryURL/repository/maven-public/): authentication failed for https://repositoryURL/repository/maven-public/org/springframework/boot/spring-boot-starter-parent/2.4.5/spring-boot-starter-parent-2.4.5.pom, status: 401 Unauthorized
+    at org.eclipse.aether.connector.basic.ArtifactTransportListener.transferFailed (ArtifactTransportListener.java:52)
+    at org.eclipse.aether.connector.basic.BasicRepositoryConnector$TaskRunner.run (BasicRepositoryConnector.java:369)
+    at org.eclipse.aether.util.concurrency.RunnableErrorForwarder$1.run (RunnableErrorForwarder.java:75)
+    at org.eclipse.aether.connector.basic.BasicRepositoryConnector$DirectExecutor.execute (BasicRepositoryConnector.java:628)
+    at org.eclipse.aether.connector.basic.BasicRepositoryConnector.get (BasicRepositoryConnector.java:262)
+    at org.eclipse.aether.internal.impl.DefaultArtifactResolver.performDownloads (DefaultArtifactResolver.java:514)
+    at org.eclipse.aether.internal.impl.DefaultArtifactResolver.resolve (DefaultArtifactResolver.java:402)
+    at org.eclipse.aether.internal.impl.DefaultArtifactResolver.resolveArtifacts (DefaultArtifactResolver.java:229)
+    at org.eclipse.aether.internal.impl.DefaultArtifactResolver.resolveArtifact (DefaultArtifactResolver.java:207)
+    at org.eclipse.aether.internal.impl.DefaultRepositorySystem.resolveArtifact (DefaultRepositorySystem.java:262)
+    at org.apache.maven.project.ProjectModelResolver.resolveModel (ProjectModelResolver.java:192)
+    at org.apache.maven.project.ProjectModelResolver.resolveModel (ProjectModelResolver.java:242)
+    at org.apache.maven.model.building.DefaultModelBuilder.readParentExternally (DefaultModelBuilder.java:1077)
+    at org.apache.maven.model.building.DefaultModelBuilder.readParent (DefaultModelBuilder.java:853)
+    at org.apache.maven.model.building.DefaultModelBuilder.build (DefaultModelBuilder.java:344)
+    at org.apache.maven.model.building.DefaultModelBuilder.build (DefaultModelBuilder.java:252)
+    at org.apache.maven.project.DefaultProjectBuilder.build (DefaultProjectBuilder.java:448)
+    at org.apache.maven.project.DefaultProjectBuilder.build (DefaultProjectBuilder.java:414)
+    at org.apache.maven.project.DefaultProjectBuilder.build (DefaultProjectBuilder.java:377)
+    at org.apache.maven.graph.DefaultGraphBuilder.collectProjects (DefaultGraphBuilder.java:414)
+    at org.apache.maven.graph.DefaultGraphBuilder.getProjectsForMavenReactor (DefaultGraphBuilder.java:405)
+    at org.apache.maven.graph.DefaultGraphBuilder.build (DefaultGraphBuilder.java:82)
+    at org.apache.maven.DefaultMaven.buildGraph (DefaultMaven.java:507)
+    at org.apache.maven.DefaultMaven.doExecute (DefaultMaven.java:219)
+    at org.apache.maven.DefaultMaven.doExecute (DefaultMaven.java:192)
+    at org.apache.maven.DefaultMaven.execute (DefaultMaven.java:105)
+    at org.apache.maven.cli.MavenCli.execute (MavenCli.java:972)
+    at org.apache.maven.cli.MavenCli.doMain (MavenCli.java:293)
+    at org.apache.maven.cli.MavenCli.main (MavenCli.java:196)
+    at sun.reflect.NativeMethodAccessorImpl.invoke0 (Native Method)
+    at sun.reflect.NativeMethodAccessorImpl.invoke (NativeMethodAccessorImpl.java:62)
+    at sun.reflect.DelegatingMethodAccessorImpl.invoke (DelegatingMethodAccessorImpl.java:43)
+    at java.lang.reflect.Method.invoke (Method.java:498)
+    at org.codehaus.plexus.classworlds.launcher.Launcher.launchEnhanced (Launcher.java:282)
+    at org.codehaus.plexus.classworlds.launcher.Launcher.launch (Launcher.java:225)
+    at org.codehaus.plexus.classworlds.launcher.Launcher.mainWithExitCode (Launcher.java:406)
+    at org.codehaus.plexus.classworlds.launcher.Launcher.main (Launcher.java:347)
+Caused by: org.apache.maven.wagon.authorization.AuthorizationException: authentication failed for https://repositoryURL/repository/maven-public/org/springframework/boot/spring-boot-starter-parent/2.4.5/spring-boot-starter-parent-2.4.5.pom, status: 401 Unauthorized
+    at org.apache.maven.wagon.providers.http.wagon.shared.AbstractHttpClientWagon.fillInputData (AbstractHttpClientWagon.java:1184)
+    at org.apache.maven.wagon.providers.http.wagon.shared.AbstractHttpClientWagon.fillInputData (AbstractHttpClientWagon.java:1140)
+    at org.apache.maven.wagon.StreamWagon.getInputStream (StreamWagon.java:126)
+    at org.apache.maven.wagon.StreamWagon.getIfNewer (StreamWagon.java:88)
+    at org.apache.maven.wagon.StreamWagon.get (StreamWagon.java:61)
+    at org.eclipse.aether.transport.wagon.WagonTransporter$GetTaskRunner.run (WagonTransporter.java:546)
+    at org.eclipse.aether.transport.wagon.WagonTransporter.execute (WagonTransporter.java:430)
+    at org.eclipse.aether.transport.wagon.WagonTransporter.get (WagonTransporter.java:407)
+    at org.eclipse.aether.connector.basic.BasicRepositoryConnector$GetTaskRunner.runTask (BasicRepositoryConnector.java:457)
+    at org.eclipse.aether.connector.basic.BasicRepositoryConnector$TaskRunner.run (BasicRepositoryConnector.java:364)
+    at org.eclipse.aether.util.concurrency.RunnableErrorForwarder$1.run (RunnableErrorForwarder.java:75)
+    at org.eclipse.aether.connector.basic.BasicRepositoryConnector$DirectExecutor.execute (BasicRepositoryConnector.java:628)
+    at org.eclipse.aether.connector.basic.BasicRepositoryConnector.get (BasicRepositoryConnector.java:262)
+    at org.eclipse.aether.internal.impl.DefaultArtifactResolver.performDownloads (DefaultArtifactResolver.java:514)
+    at org.eclipse.aether.internal.impl.DefaultArtifactResolver.resolve (DefaultArtifactResolver.java:402)
+    at org.eclipse.aether.internal.impl.DefaultArtifactResolver.resolveArtifacts (DefaultArtifactResolver.java:229)
+    at org.eclipse.aether.internal.impl.DefaultArtifactResolver.resolveArtifact (DefaultArtifactResolver.java:207)
+    at org.eclipse.aether.internal.impl.DefaultRepositorySystem.resolveArtifact (DefaultRepositorySystem.java:262)
+    at org.apache.maven.project.ProjectModelResolver.resolveModel (ProjectModelResolver.java:192)
+    at org.apache.maven.project.ProjectModelResolver.resolveModel (ProjectModelResolver.java:242)
+    at org.apache.maven.model.building.DefaultModelBuilder.readParentExternally (DefaultModelBuilder.java:1077)
+    at org.apache.maven.model.building.DefaultModelBuilder.readParent (DefaultModelBuilder.java:853)
+    at org.apache.maven.model.building.DefaultModelBuilder.build (DefaultModelBuilder.java:344)
+    at org.apache.maven.model.building.DefaultModelBuilder.build (DefaultModelBuilder.java:252)
+    at org.apache.maven.project.DefaultProjectBuilder.build (DefaultProjectBuilder.java:448)
+    at org.apache.maven.project.DefaultProjectBuilder.build (DefaultProjectBuilder.java:414)
+    at org.apache.maven.project.DefaultProjectBuilder.build (DefaultProjectBuilder.java:377)
+    at org.apache.maven.graph.DefaultGraphBuilder.collectProjects (DefaultGraphBuilder.java:414)
+    at org.apache.maven.graph.DefaultGraphBuilder.getProjectsForMavenReactor (DefaultGraphBuilder.java:405)
+    at org.apache.maven.graph.DefaultGraphBuilder.build (DefaultGraphBuilder.java:82)
+    at org.apache.maven.DefaultMaven.buildGraph (DefaultMaven.java:507)
+    at org.apache.maven.DefaultMaven.doExecute (DefaultMaven.java:219)
+    at org.apache.maven.DefaultMaven.doExecute (DefaultMaven.java:192)
+    at org.apache.maven.DefaultMaven.execute (DefaultMaven.java:105)
+    at org.apache.maven.cli.MavenCli.execute (MavenCli.java:972)
+    at org.apache.maven.cli.MavenCli.doMain (MavenCli.java:293)
+    at org.apache.maven.cli.MavenCli.main (MavenCli.java:196)
+    at sun.reflect.NativeMethodAccessorImpl.invoke0 (Native Method)
+    at sun.reflect.NativeMethodAccessorImpl.invoke (NativeMethodAccessorImpl.java:62)
+    at sun.reflect.DelegatingMethodAccessorImpl.invoke (DelegatingMethodAccessorImpl.java:43)
+    at java.lang.reflect.Method.invoke (Method.java:498)
+    at org.codehaus.plexus.classworlds.launcher.Launcher.launchEnhanced (Launcher.java:282)
+    at org.codehaus.plexus.classworlds.launcher.Launcher.launch (Launcher.java:225)
+    at org.codehaus.plexus.classworlds.launcher.Launcher.mainWithExitCode (Launcher.java:406)
+    at org.codehaus.plexus.classworlds.launcher.Launcher.main (Launcher.java:347)
+[ERROR] 
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/ProjectBuildingException
+[ERROR] [Help 2] http://cwiki.apache.org/confluence/display/MAVEN/UnresolvableModelException
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+ERROR: script returned exit code 1
+Finished: FAILURE
+====================================================================================================
+
