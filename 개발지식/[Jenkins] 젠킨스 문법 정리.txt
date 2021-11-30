@@ -1,0 +1,509 @@
+[ Jenkins - 문법 정리 ]
+
+	https://blog.voidmainvoid.net/104
+	https://waspro.tistory.com/554
+	
+# 파이프 라인 선언
+	- 파이프라인 선언은 간단하게 아래와 같은 block으로 이루어 진짐
+	- 모든 파이프라인은 반드시 pipeline block으로 감싸져야 함 
+	- 파이프라인 안쪽의 statement, expression은 groovy 언어를 따름
+	- 파이프라인의 top level은 반드시 pipeline {} block 으로 이루어져야 함
+	- 세미콜론은 없음
+	====================================================================================================
+	pipeline {
+		/* insert Declarative Pipeline here */
+	}	
+	====================================================================================================
+
+	다양한 방식으로 구현이 가능함
+	- Jenkins Webadmin : 일반적인 방식으로 Jenkins 파이프라인을 생성하여 Shell Script를 직접 생성하여 빌드하는 방식
+
+	- Git SCM : Git Repository에 JenkinsFile을 작성하여 빌드하는 방식
+
+	- Blue Ocean : 파이프라인을 시각화하여 손쉽게 구성하여 빌드하는 방식	
+
+
+# 섹션(Sections)
+	- 섹션은 파이프라인에서 하나이상의 스텝(Steps)이나 지시(Directives)로 이루어져 있음
+	
+	
+	- agent : agent를 선택할 경우, 젠킨스 environment가 해당 agent로 설정됨
+			  - agent는 pipeline의 최상위에 포함되어야 하며, agent가 none으로 작성되었을 경우 stage에 포함되어야 함
+		agent에 사용한 파라메터
+		====================================================================================================
+		any : 사용가능한 agent
+
+		none : global agent는 설정되지 않음. 대신 각 stage에 설정 필요
+
+		label : 특정 label 명으로 된 environment로 설정
+
+		node : label과 유사
+
+		docker : 특정 도커 이미지로 수행
+
+		dockerfile : 도커 파일 기반으로 수행
+		====================================================================================================
+
+		작성 위치
+		====================================================================================================
+		pipeline top level(필수)
+
+		stage block(선택)		
+		====================================================================================================
+	
+
+	- post : 특정 스테이지 이전 혹은 이후에 실행될 condition block
+	
+		파라미터
+		====================================================================================================
+		always : 실행 끝나고나서 실행되는 step
+
+		changed : previous run과 다른 status이면 실행되는 step
+
+		failure : 실패하면 실행되는 step
+
+		success : 성공하면 실행되는 step
+
+		unstable : test fail, code violation 등일때 실행되는 step
+
+		aborted : 강제로 중지됬을 때 실행되는 step
+		====================================================================================================
+
+		위치
+		====================================================================================================
+		pipeline top level(선택)
+
+		stage block(선택)
+		====================================================================================================
+
+
+		eX)
+		====================================================================================================
+		pipeline {
+			agent any
+			stages {
+				stage('Example') {
+					steps {
+						echo 'Hello World'
+					}
+				}
+			}
+			post { 
+				always { 
+					echo 'I will always say Hello again!'
+				}
+			}
+		}		
+		====================================================================================================
+
+
+
+	- stages : 스테이지의 모음
+				pipeline 블록 안에서 한번만 실행 될 수 있음
+				stages 내부에서는 여러 stage를 포함할 수 있음
+		위치
+		====================================================================================================
+		pipeline block에서 단 한번
+		====================================================================================================
+	
+		ex)
+		====================================================================================================
+		pipeline {
+			agent any
+			stages { 
+				stage('Example') {
+					steps {
+						echo 'Hello World'
+					}
+				}
+			}
+		}​		
+		====================================================================================================
+
+	
+	- steps : stage 내부 block에서 여러번 호출 될 수 있는 block
+			  stage 내부에서 실행되는 단계를 정의함
+		위치
+		====================================================================================================
+		각 stage block 에서 여러번
+		====================================================================================================
+
+
+# Directives(파이프라인 configure)
+	
+	- environment : key-value style로 파이프라인 내부에서 사용할 변수로 선언 가능함
+	
+		위치
+		====================================================================================================
+		파이프라인 혹은 스테이지 블락 내부
+		====================================================================================================
+
+		ex)
+		====================================================================================================
+		pipeline {
+			agent any
+			environment { 
+				CC = 'clang'
+			}
+			stages {
+				stage('Example') {
+					environment { 
+						AN_ACCESS_KEY = credentials('my-prefined-secret-text') 
+					}
+					steps {
+						sh 'printenv'
+					}
+				}
+			}
+		}		
+		====================================================================================================
+
+
+	- options : pipeline의 옵션을 선택적으로 집어 넣을 수 있음
+		
+		위치
+		====================================================================================================
+		파이프라인 블락 안쪽 단 한번만 정의할수 있음
+		====================================================================================================
+	
+		종류
+		====================================================================================================
+		- buildDiscarder
+		특정 수의 최근 파이프 라인 실행에 대한 아티팩트 및 콘솔 출력을 유지하십시오.
+		예를 들면 다음과 같습니다.
+		options { buildDiscarder(logRotator(numToKeepStr: '1')) }
+		
+		- checkoutToSubdirectory
+		작업 공간의 서브 디렉토리에서 자동 소스 제어 체크 아웃을 수행하십시오.
+		예를 들면 다음과 같습니다.
+		options { checkoutToSubdirectory('foo') }
+
+		- disableConcurrentBuilds
+		파이프 라인의 동시 실행을 허용하지 않습니다. 공유 리소스 등에 대한 동시 액세스를 방지하는 데 유용 할 수 있습니다.
+		예를 들면 다음과 같습니다.
+		options { disableConcurrentBuilds() }
+
+		- disableResume
+		마스터가 다시 시작되면 파이프 라인을 다시 시작하지 마십시오.
+		예를 들면 다음과 같습니다.
+		options { disableResume() }
+
+		- newContainerPerStage
+		함께 사용 docker 또는 dockerfile로 지정된 경우 각 스테이지는 동일한 컨테이너 인스턴스에서 실행되는 모든 스테이지가 아니라 동일한 노드의 새 컨테이너 인스턴스에서 실행됩니다.
+
+		- overrideIndexTriggers
+		분기 인덱싱 트리거의 기본 처리를 재정의 할 수 있습니다.
+		멀티 브랜치 또는 조직 레이블에서 분기 인덱싱 트리거가 비활성화 된 options { overrideIndexTriggers(true) } 경우에 대해서만 활성화됩니다.
+		그렇지 않으면 options { overrideIndexTriggers(false) }이 작업에 대해서만 분기 인덱싱 트리거를 비활성화합니다.
+
+		- preserveStashes
+		스테이지를 다시 시작할 때 사용할 수 있도록 완료된 빌드에서 숨김을 유지하십시오.
+		예를 들어 options { preserveStashes() }
+		가장 최근에 완료된 빌드 options { preserveStashes(buildCount: 5) }에서 stash를 보존 하거나 가장 최근에 완료된 5 개의 빌드에서 stash를 보존합니다.
+
+		- quietPeriod
+		파이프 라인에 대한 자동 기간을 초 단위로 설정하여 글로벌 기본값을 대체하십시오.
+		예를 들면 다음과 같습니다.
+		options { quietPeriod(30) }
+		- retry
+		실패하면 전체 파이프 라인을 지정된 횟수만큼 재 시도하십시오.
+		예를 들면 다음과 같습니다.
+		options { retry(3) }
+
+		- skipDefaultCheckout
+		agent 지시문에서 기본적으로 소스 제어에서 코드 체크 아웃을 건너 뜁니다.
+		예를 들면 다음과 같습니다.
+		options { skipDefaultCheckout() }
+
+		- skipStagesAfterUnstable
+		빌드 상태가 불안정 해지면 단계를 건너 뜁니다.
+		예를 들면 다음과 같습니다.
+		options { skipStagesAfterUnstable() }
+
+		- timeout
+		Jenkins가 파이프 라인을 중단한 후 파이프 라인 실행에 대한 제한 시간을 설정하십시오.
+		예를 들면 다음과 같습니다.
+		options { timeout(time: 1, unit: 'HOURS') }
+
+		- timestamps
+		파이프라인 실행에서 생성된 모든 콘솔 출력 앞에 라인이 생성 된 시간을 추가하십시오.
+		예를 들면 다음과 같습니다.
+		options { timestamps() }
+
+		- parallelsAlwaysFailFast
+		파이프 라인의 모든 후속 병렬 단계에 대해 failfast를 true로 설정하십시오.
+		예를 들면 다음과 같습니다.
+		options { parallelsAlwaysFailFast() }
+		====================================================================================================
+
+
+		ex1)
+		====================================================================================================
+		pipeline {
+			agent any
+			options {
+				timeout(time: 1, unit: 'HOURS') 
+			}
+			stages {
+				stage('Example') {
+					steps {
+						echo 'Hello World'
+					}
+				}
+			}
+		}		
+		====================================================================================================
+		
+		ex2)
+		====================================================================================================
+		pipeline {
+			agent any
+			options {
+				timeout(time: 1, unit: 'HOURS') 
+			}
+			stages {
+				stage('Example') {
+					steps {
+						echo 'Hello World'
+					}
+				}
+			}
+		}		
+		====================================================================================================
+
+
+	- parameters : 유저로부터 트리거링 받은 변수들에 대해서 선언할 수 있음
+	
+		위치
+		====================================================================================================
+		파이프라인 블락 안쪽 단 한번aks 정의함
+		====================================================================================================
+		
+		파라메터
+		====================================================================================================
+		String
+		- A parameter of a string type, for example: parameters { string(name: 'DEPLOY_ENV', defaultValue: 'staging', description: '') }
+
+		booleanParam
+		- A boolean parameter, for example: parameters { booleanParam(name: 'DEBUG_BUILD', defaultValue: true, description: '') }  
+		
+		text
+		
+		choice
+		
+		password 
+		====================================================================================================
+
+		ex)
+		====================================================================================================
+		pipeline {
+			agent any
+			parameters {
+				string(name: 'PERSON', defaultValue: 'Mr Jenkins', description: 'Who should I say hello to?')
+		 
+				text(name: 'BIOGRAPHY', defaultValue: '', description: 'Enter some information about the person')
+		 
+				booleanParam(name: 'TOGGLE', defaultValue: true, description: 'Toggle this value')
+		 
+				choice(name: 'CHOICE', choices: ['One', 'Two', 'Three'], description: 'Pick something')
+		 
+				password(name: 'PASSWORD', defaultValue: 'SECRET', description: 'Enter a password')
+			}
+			stages {
+				stage('Example') {
+					steps {
+						echo "Hello ${params.PERSON}"
+		 
+						echo "Biography: ${params.BIOGRAPHY}"
+		 
+						echo "Toggle: ${params.TOGGLE}"
+		 
+						echo "Choice: ${params.CHOICE}"
+		 
+						echo "Password: ${params.PASSWORD}"
+					}
+				}
+			}
+		}		
+		
+		====================================================================================================
+		
+
+	- triggers : 파이프라인을 다시 트리거해야 하는 자동화된 방법을 정의함
+		cront, pollSCM, upstream 등 여러방식으로 트리거를 구성할 수 있음
+		
+		ex)
+		====================================================================================================
+		pipeline {
+			agent any
+			triggers {
+				cron('H */4 * * 1-5')
+			}
+			stages {
+				stage('Example') {
+					steps {
+						echo 'Hello World'
+					}
+				}
+			}
+		}		
+		====================================================================================================
+
+	- tools : 설치 도구를 정의함
+			  agent none으로 지정된 경우 무시됨
+			  지원되는 도구는 maven, jdk, gradle이 있음
+			  tools 이름은 Jenkins 관리의 Global Tool Configuration에서 사전 정의되어 있어야 함
+		ex)
+		====================================================================================================
+		pipeline {
+			agent any
+			tools {
+				maven 'apache-maven-3.0.1' 
+			}
+			stages {
+				stage('Example') {
+					steps {
+						sh 'mvn --version'
+					}
+				}
+			}
+		}		
+		====================================================================================================
+	
+	
+	-input : input 지시문을 stage에 사용하면 input 단계를 사용하여 입력하라는 메시지를 표시할 수 있음
+			 사용 가능한 옵션으로는 message, id, ok, submitter, submitterParameter, parameters가 있음
+		ex)
+		====================================================================================================
+		pipeline {
+			agent any
+			stages {
+				stage('Example') {
+					input {
+						message "Should we continue?"
+						ok "Yes, we should."
+						submitter "alice,bob"
+						parameters {
+							string(name: 'PERSON', defaultValue: 'Mr Jenkins', description: 'Who should I say hello to?')
+						}
+					}
+					steps {
+						echo "Hello, ${PERSON}, nice to meet you."
+					}
+				}
+			}
+		}		
+		
+		
+		====================================================================================================
+	
+
+# Jenkins 파이프라인의 실행
+	
+	ex) 순차적 실행 예제
+	====================================================================================================
+	pipeline {
+		agent none
+		stages {
+			stage('Non-Sequential Stage') {
+				agent {
+					label 'for-non-sequential'
+				}
+				steps {
+					echo "On Non-Sequential Stage"
+				}
+			}
+			stage('Sequential') {
+				agent {
+					label 'for-sequential'
+				}
+				environment {
+					FOR_SEQUENTIAL = "some-value"
+				}
+				stages {
+					stage('In Sequential 1') {
+						steps {
+							echo "In Sequential 1"
+						}
+					}
+					stage('In Sequential 2') {
+						steps {
+							echo "In Sequential 2"
+						}
+					}
+					stage('Parallel In Sequential') {
+						parallel {
+							stage('In Parallel 1') {
+								steps {
+									echo "In Parallel 1"
+								}
+							}
+							stage('In Parallel 2') {
+								steps {
+									echo "In Parallel 2"
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+		
+	====================================================================================================
+	
+	
+	ex) 평행 실행 예제
+	====================================================================================================
+	pipeline {
+		agent any
+		stages {
+			stage('Non-Parallel Stage') {
+				steps {
+					echo 'This stage will be executed first.'
+				}
+			}
+			stage('Parallel Stage') {
+				when {
+					branch 'master'
+				}
+				failFast true
+				parallel {
+					stage('Branch A') {
+						agent {
+							label "for-branch-a"
+						}
+						steps {
+							echo "On Branch A"
+						}
+					}
+					stage('Branch B') {
+						agent {
+							label "for-branch-b"
+						}
+						steps {
+							echo "On Branch B"
+						}
+					}
+					stage('Branch C') {
+						agent {
+							label "for-branch-c"
+						}
+						stages {
+							stage('Nested 1') {
+								steps {
+									echo "In stage Nested 1 within Branch C"
+								}
+							}
+							stage('Nested 2') {
+								steps {
+									echo "In stage Nested 2 within Branch C"
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}	
+	====================================================================================================
