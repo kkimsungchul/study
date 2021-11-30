@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git credentialsId: 'dspace_ci_backend_git', url: 'https://gitlab.dspace.kt.co.kr/DS/d-space-portal.git', branch: 'dev'
+                git credentialsId: 'jenkins_id', url: 'https://github.com/kkimsungchul/stock.git', branch: 'dev'
             }
         }
 
@@ -20,19 +20,24 @@ pipeline {
 		}
 		stage('Deploy') {
 			steps {
-				sh "cd '/data/jenkins_home/workspace/Developer Space/D-Space CI BackEnd/target' && scp d-space-portal-0.0.1-SNAPSHOT.war sungchul@192.168.0.1:/home/sungchul/"
+				sh "cd '/data/jenkins_home/workspace/Developer Space/D-Space CI BackEnd/target' && scp d-space-portal-0.0.1-SNAPSHOT.war linuxUser@10.217.66.103:/home/linuxUser/"
 			}
 		}
         stage('Service') {
 			steps{
 				script {
 					def remote = [:]
-					remote.name = 'sungchulServer'
-					remote.host = '192.168.0.1'
-					remote.user = 'sungchul'
-					remote.password = '1111'
+					remote.name = 'p-stest-tk1-e07'
+					remote.host = '192.168.0.103'
+					remote.user = 'linuxUser'
+					remote.password = 'linuxPassword'
 					remote.allowAnyHosts = true
-					sshCommand remote: remote, command: "sudo systemctl stop tomcat && sudo sleep 5 && sudo rm -rf /app/application/* && sudo sleep 1 && sudo mv /home/sungchul/d-space-portal-0.0.1-SNAPSHOT.war /app/application && sudo chown tomcat:tomcat /app/application/d-space-portal-0.0.1-SNAPSHOT.war && sudo sleep 1 && sudo systemctl start tomcat"
+					sshCommand remote: remote, command:"sudo systemctl stop tomcat && sudo sleep 5"
+					sshCommand remote: remote, command:"sudo mv /app/application/d-space-portal-0.0.1-SNAPSHOT.war /home/linuxUser/d-space-portal-0.0.1-SNAPSHOT.war_\$(date '+%Y%m%d') && sudo sleep 1"
+					sshCommand remote: remote, command:"sudo rm -rf /app/application/* && sudo sleep 1"
+					sshCommand remote: remote, command:"sudo mv /home/linuxUser/d-space-portal-0.0.1-SNAPSHOT.war /app/application "
+					sshCommand remote: remote, command:"sudo chown tomcat:tomcat /app/application/d-space-portal-0.0.1-SNAPSHOT.war && sudo sleep 1"
+					sshCommand remote: remote, command:"sudo systemctl start tomcat"
 				} 
 			}		
         }
