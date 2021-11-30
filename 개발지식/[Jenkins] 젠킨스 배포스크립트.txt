@@ -20,7 +20,7 @@ pipeline {
 		}
 		stage('Deploy') {
 			steps {
-				sh "cd '/data/jenkins_home/workspace/Developer Space/D-Space CI BackEnd/target' && scp d-space-portal-0.0.1-SNAPSHOT.war linuxUser@10.217.66.103:/home/linuxUser/"
+				sh "cd '/data/jenkins_home/workspace/Developer Space/D-Space CI BackEnd/target' && scp d-space-portal-0.0.1-SNAPSHOT.war linuxUser@192.168.0.103:/home/linuxUser/"
 			}
 		}
         stage('Service') {
