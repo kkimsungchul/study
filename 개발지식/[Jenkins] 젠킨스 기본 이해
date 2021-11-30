@@ -47,6 +47,15 @@
   
 
 
+# 젠킨스 툴
+
+젠킨스 툴에서 빌드 후 조치 메뉴가 안보일 경우 "Deploy to container Plugin" 플러그인 설치
+
+젠킨스에서 ssh key 로 배포서버와 간단히 통신하려고 한다면 "Publish Over SSH" 플러그인 설치
+
+젠킨스 툴에서 "blue ocean" 을 사용하려고 한다면 "blue ocean" 플러그인 설치
+  https://logical-code.tistory.com/179
+  블루오션은 UX에 중점을 두고 좀더 시각화 해서 사용하기 편하게 해줌
 
 
   
