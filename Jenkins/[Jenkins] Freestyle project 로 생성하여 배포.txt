@@ -1,0 +1,120 @@
+병합하기
+	https://jeong-pro.tistory.com/106
+
+
+	
+	
+
+[ Jenkins - Freestyle project 로 배포하기 ]
+
+
+# Global Tool Configuration 설정하기
+	Maven 을 젠킨스에서 설치하였으면 상관이 없으나, 내가 직접 설치하여 구성하였을 경우 젠킨스에서 사용할 수 있도록 설정을 해줘야 함
+	
+	1. 젠킨스 관리에 들어간다
+	2. Global Tool Configuration 를 클릭한다
+	3. Mavner 항목이 보이면 Add Maven 을 클릭한다.
+	4. name 에는 내가 사용할 메이븐의 이름을 지지정한다 (ex. mvn3.8.3)
+	5. MAVEN_HOME 에는 메이븐의 홈디렉토리를 설정해준다 (ex. /maven)
+		bin까지 하는거 아님, 걍 maven의 홈만해주면됨
+		
+	6. install automatically 는 체크하지 않는다.
+	※ 젠킨스에서 설치를 한다고 하면 설정하면된다. 하지만 지금은 이미 설치되어 있어서 체크하지 않았음 체크하게되면 또 메이븐설치함;;
+	
+	
+
+# Job 생성
+	
+	젠킨스 폴더에 들어가서 new Item을 클릭 한 후 Freestyle project 로 생성 (test002)
+	
+
+# 작성
+	
+	새로생성한 (test002) 에 아래의 내용들을 삽입
+	
+	
+	- 소스코드 관리 항목
+		git url : 사용할 깃의 URL 
+			ex) https://github.com/kkimsungchul/stock.git
+		Credentials : 
+			사용할 깃 계정 
+			이부분은 젠킨스 설정에서 등록해줘야 표시가 됨
+		Branches to build : */dev
+			브런치 명을 입력
+		
+		Repository browser : 자동
+		
+	- Build 항목
+		invoke top-level Maven targers 선택
+		
+		maven Version : mvn3.8.3
+			해당 항목은 젠킨스에 Global Tool Configuration 설정에서 추가해야 보임
+			
+		Goals : clean install
+			이부분에는 어떠한 작업을 할지 목표를 적는다
+		
+		우측하단의 고급.. 버튼을 클릭
+		
+		POM : pom.xml
+			사용할 pom.xml 파일의 위치를지정한다. 절대경로를 입력하지 않으면 프로젝트의 루트경로부터 시작함
+			비워두면 해당프로젝트의 pom.xml 을 사용함
+			굳이 입력안해도됨
+		
+		Properties : 
+			설정값들 넣는곳인데 딱히 넣을게 없음
+		
+		JVM OPtions : 
+			JVM 옵션인데 이것도 넣을거 없음
+		
+		Settings file : Settings file in filesystem
+			settings.xml 파일을 사용할지를 묻는거, 기본적인 메이븐의 settings.xml 파일을 사용할거라면 default 를 아니라면 setting file in filesystem을 선택
+			아래와 같이 3개의 옵션이 있음
+				Use default maven settings
+				Provided settings.xml
+				Settings file in filesystem
+					
+			File Path : settings.xml
+				직접 작성한 settings.xml 파일을 사용하려면 넣어준다.
+				경로는 프로젝트의 경로에서 시작하므로 settings.xml 만 널어주면 해당 프로젝트의 settings.xml 파일을 참고함
+		
+		
+		Global Settings file : Use default maven global settings
+			별다른 설정없이 사용할것이므로 아래와같이하였음
+			아래와 같이 3개의 옵션이 있음, 
+			Use default maven global settings
+			Global settings file on filesystem
+			provided global settings.xml
+
+			
+# 실행
+
+	위와 같이 작성하고나서 실행을 하면 프로젝트를 받아서 빌드까지 완료된다.
+	
+# 배포
+	배포는 "Deploy to container" 플러그인을 설치해야 하는데 설치가 안되잇어서 진행하지 않음
+
+
+
+# 오류발생
+	Global Tool Configuration 설정을 안해줘서 발생했었음
+	- 메이븐 오류 
+	https://roadrunner.tistory.com/627
+	https://midas123.tistory.com/230
+	====================================================================================================
+	FATAL: command execution failed
+
+	java.io.IOException: error=2, No such file or directory
+
+		   at java.lang.UNIXProcess.forkAndExec(Native Method)
+
+		   at java.lang.UNIXProcess.<init>(UNIXProcess.java:247)
+
+		   at java.lang.ProcessImpl.start(ProcessImpl.java:134)
+
+		   at java.lang.ProcessBuilder.start(ProcessBuilder.java:1029)
+
+	Caused: java.io.IOException: Cannot run program "mvn" (in directory
+	====================================================================================================
+
+
+		
