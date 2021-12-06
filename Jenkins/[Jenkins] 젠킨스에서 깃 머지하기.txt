@@ -72,7 +72,26 @@
 # pipeline script 작성 1
 
 	====================================================================================================
-ㅕ
+	pipeline {
+	    agent any
+
+	    stages {
+		stage('Checkout') {
+		    steps {
+					git credentialsId: 'dspace_ci_backend_git', url: 'https://github.com/kkimsungchul/stock.git', branch: 'master'
+					git credentialsId: 'dspace_ci_backend_git', url: 'https://github.com/kkimsungchul/stock.git', branch: 'dev'
+		    }
+		}
+			stage('merge') {
+		    steps {
+					sh 'git checkout master'
+					sh 'git branch '
+					sh 'git merge dev'
+		    }
+		}
+	    }
+	}
+
 	
 	====================================================================================================
 
