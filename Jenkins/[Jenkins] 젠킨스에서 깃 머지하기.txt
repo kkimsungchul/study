@@ -20,7 +20,8 @@
 
 	# git merge 하는법
 		https://wotres.tistory.com/entry/git-merge-%ED%95%98%EB%8A%94-%EB%B2%95
-		
+	
+	# 
 	
 
 - 오류 메시지
@@ -70,26 +71,32 @@
 
 
 # pipeline script 작성 1
-
+	아래의 오류메시지가 출력됨
+	git push origin master_old
+	fatal: could not read Username for 'https://github.com/kkimsungchul/stock.git': No such device or address
 	====================================================================================================
 	pipeline {
-	    agent any
+		agent any
 
-	    stages {
-		stage('Checkout') {
-		    steps {
-					git credentialsId: 'dspace_ci_backend_git', url: 'https://github.com/kkimsungchul/stock.git', branch: 'master'
-					git credentialsId: 'dspace_ci_backend_git', url: 'https://github.com/kkimsungchul/stock.git', branch: 'dev'
-		    }
-		}
+		stages {
+			stage('Checkout') {
+				steps {
+					git credentialsId: 'ksc_git', url: 'https://github.com/kkimsungchul/stock.git', branch: 'master_old'
+					git credentialsId: 'ksc_git', url: 'https://github.com/kkimsungchul/stock.git', branch: 'dev'
+				}
+			}
 			stage('merge') {
-		    steps {
-					sh 'git checkout master'
+				steps {
+					sh 'git checkout master_old'
 					sh 'git branch '
+					sh 'git config user.name "kimsungchul"'
+					sh 'git config user.email gnew@DESKTOP-MT075B9'
 					sh 'git merge dev'
-		    }
+					sh 'git log -p -2'
+					sh 'git push origin master_old'
+				}
+			}
 		}
-	    }
 	}
 
 	
@@ -119,8 +126,8 @@
 		stages {
 			stage('Checkout') {
 				steps {
-					git credentialsId: 'dspace_ci_backend_git', url: 'https://github.com/kkimsungchul/stock.git', branch: 'master_old'
-					git credentialsId: 'dspace_ci_backend_git', url: 'https://github.com/kkimsungchul/stock.git', branch: 'dev'
+					git credentialsId: 'ksc_git', url: 'https://github.com/kkimsungchul/stock.git', branch: 'master_old'
+					git credentialsId: 'ksc_git', url: 'https://github.com/kkimsungchul/stock.git', branch: 'dev'
 				}  
 			}
 			stage('merge') {
@@ -144,7 +151,7 @@
 									name: 'kimsungchul'
 								],
 							],
-							userRemoteConfigs: [[credentialsId: 'dspace_ci_backend_git', url: 'https://gitlab.dspace.kt.co.kr/DS/d-space-portal']]
+							userRemoteConfigs: [[credentialsId: 'ksc_git', url: 'https://github.com/kkimsungchul/stock']]
 						]
 					)
 
@@ -168,7 +175,7 @@
 					checkout([$class: 'GitSCM',
 							  branches: [[name: 'dev']],
 							  extensions: [],
-							  userRemoteConfigs: [[credentialsId: 'dspace_ci_backend_git', url: 'https://github.com/kkimsungchul/stock.git']]
+							  userRemoteConfigs: [[credentialsId: 'ksc_git', url: 'https://github.com/kkimsungchul/stock.git']]
 							  ])
 				}
 			}
