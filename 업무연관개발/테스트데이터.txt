@@ -1,0 +1,82 @@
+"jenkins":{
+	"folders":[
+		{
+			"id":1,
+			"jenkinsFolderName":"newFolder0011",
+			"division" : "1",
+			"folders":[
+				{
+					"id":2,
+					"jenkinsFolderName":"newFolder0011-1",
+					"division" : "1",
+					"folders":[],
+					"jobs":[
+						{
+							"id":1,
+							"jenkinsJobName":"newJob0012",
+							"jenkinsJobType":"10401",
+							"division" : "2",
+							"deleteFlag":0,
+							"serviceStatus":2
+						}
+					],
+					"deleteFlag":0
+				},
+				{
+					"id":2,
+					"jenkinsFolderName":"newFolder0011-2",
+					"division" : "1",
+					"folders":[],
+					"jobs":[
+						{
+							"id":1,
+							"jenkinsJobName":"newJob0014",
+							"jenkinsJobType":"10401",
+							"division" : "2",
+							"deleteFlag":0,
+							"serviceStatus":2
+						}
+					],
+					"deleteFlag":0
+				}  				
+			],
+			"jobs":[
+				{
+					"id":2,
+					"jenkinsJobName":"newJob0013",
+					"jenkinsJobType":"10401",
+					"division" : "2",
+					"deleteFlag":0,
+					"serviceStatus":2
+				}
+			],
+			"deleteFlag":0
+		}
+	],
+	"jobs":[
+		{
+			"id":1,
+			"jenkinsJobName":"newJob0011-1",
+			"jenkinsJobType":"10401",
+			"division" : "2",
+			"deleteFlag":0,
+			"serviceStatus":2
+		},
+		{
+			"id":2,
+			"jenkinsJobName":"newJob0011-2",
+			"jenkinsJobType":"10401",
+			"division" : "2",
+			"deleteFlag":0,
+			"serviceStatus":2
+		},
+		{
+			"id":3,
+			"jenkinsJobName":"newJob0011-3",
+			"jenkinsJobType":"10401",
+			"division" : "2",
+			"deleteFlag":0,
+			"serviceStatus":2
+		}
+	]
+}
