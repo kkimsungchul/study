@@ -1,0 +1,275 @@
+[ Jenkins 목록조회 (트리구조) ]
+재귀함수를 사용하여서, 하위목록이 있을 경우 계속 호출하게 작성하였음
+
+VO의 생성자는 Object 로 넘어온 값을 파싱하여 각각에 맞는 필드에 넣어주도록 수정하였음
+
+Serivce의 getJenkinsListAPI 메소드에서는 재귀함수로 호출해서 받아오는 값을 add 하지않고 set 으로 변경하도록 하였음
+add를 하게되면 본인 하위에 본인이 또 추가되서 두개씩 출력되는 상황이 발생함 (무한루프는안돌고 두번씩돔)
+그래서 조회된 값으로 변경하도록 수정하였음
+
+
+# 컨트롤러
+
+	====================================================================================================
+	@ApiOperation(value = "Jenkins 목록 조회",notes = "프로젝트에 포함되어 있는 Jenkins 목록 조회")
+	@RequestMapping(value = "/jenkins/{projectId}", method = RequestMethod.GET)
+	public ResponseEntity<ApiResponseEntity> getJenkinsList(@PathVariable("projectId") Long projectId ) {
+		List<NewJenkinsParamVO> jenkins = newJenkinsService.getJenkinsList(projectId);
+		String statusMsg = DbMessageManager.getMessage("I0001", "ko");
+		ApiResponseEntity message = new ApiResponseEntity(statusMsg, jenkins, null, null);
+
+		return new ResponseEntity<ApiResponseEntity>(message, HttpStatus.OK);   
+	}
+	
+	====================================================================================================
+
+# 서비스
+	
+	전달받은 프로젝트 id로, DB에 저장되어 있는 Jenkins 목록의 uri를 생성하여 getJenkinsListAPI() 메소드를 호출 한 후,
+	리턴받은 값을 리스트에 담아서 리턴
+	====================================================================================================
+	/**
+	 * 프로젝트 상세 조회 - Jenkins 전체 목록 조회
+	 * @param projectId
+	 * @return List<NewJenkinsParamVO>
+	 */
+    public List<NewJenkinsParamVO> getJenkinsList(Long projectId) {
+    	
+    	System.out.println(newJenkinsMapper.getJenkinsList(projectId));
+    	List<NewJenkinsParamVO> jenkinsTopList = newJenkinsMapper.getJenkinsList(projectId);
+    	List<NewJenkinsParamVO> result = new ArrayList<>();
+    	String uri="";
+
+    	for(int i=0;i<jenkinsTopList.size();i++) {
+    		if("".equals(jenkinsTopList.get(i).getJenkinsFolderName()) || jenkinsTopList.get(i).getJenkinsFolderName()==null) {
+    			uri = jenkinsUrl + "/job/" + jenkinsTopList.get(i).getJenkinsJobName();	
+    		}else {
+    			uri = jenkinsUrl + "/job/" + jenkinsTopList.get(i).getJenkinsFolderName();
+    		}
+    		
+    		NewJenkinsParamVO newJenkinsParamVO = getJenkinsListAPI(uri);
+    		result.add(newJenkinsParamVO);
+    	}
+    	System.out.println(result);
+    	return result;
+    }
+    ====================================================================================================
+	
+	
+	전달받은 uri를 기준으로 하위목록 전체를 조회하여 트리구조로 리턴
+	====================================================================================================
+	/**
+	 * 프로젝트 상세조회 - 최상단 job, folder 기준으로 하위 목록 job, folder 조회
+	 * @param uri
+	 * @return List<NewJenkinsParamVO>
+	 */
+    public NewJenkinsParamVO getJenkinsListAPI(String uri) {
+    	String params="";
+    	ResponseEntity<String> result = null;
+    	result = restService.getRestApiForJson(uri+"/api/json", makeHttpHeader(), params);
+    	NewJenkinsParamVO newJenkinsParamVO =  getJenkinsProject(result.getBody());
+    	if(newJenkinsParamVO.getFolders().size()>0) {
+    		for(int i=0;i < newJenkinsParamVO.getFolders().size();i++) {
+    			//newJenkinsFolderParamVO.getNewJenkinsFolderList().add(getJenkinsListAPI(newJenkinsFolderParamVO.getNewJenkinsFolderList().get(i).getJenkinsFolderName(),uri+"/job/"+newJenkinsFolderParamVO.getNewJenkinsFolderList().get(i).getJenkinsFolderName()));
+    			NewJenkinsParamVO newJenkinsFolderParamVO2 = new NewJenkinsParamVO();
+    			newJenkinsFolderParamVO2 = getJenkinsListAPI(uri+"/job/"+newJenkinsParamVO.getFolders().get(i).getJenkinsFolderName());
+    			//newJenkinsFolderParamVO.getNewJenkinsFolderList().get(i).getNewJenkinsFolderList().add(newJenkinsFolderParamVO2);
+    			newJenkinsParamVO.getFolders().set(i, newJenkinsFolderParamVO2);
+    		}
+    	}
+    	return newJenkinsParamVO;
+    }
+	
+	====================================================================================================
+
+# VO
+	NewJenkinsParamVO , 젠킨스에서 전달해준 값을을 화면으로 보내는데 사용하는 VO
+	Jenkins 에서 보내준 값을 파싱하여서 저장하도록 작성함
+	====================================================================================================
+	package com.kt.dspace.portal.project.jenkins.test;
+
+	import java.util.ArrayList;
+
+	import org.json.JSONArray;
+	import org.json.JSONObject;
+
+	import io.swagger.annotations.ApiModel;
+	import io.swagger.annotations.ApiModelProperty;
+
+	@ApiModel(value = "New 잰킨스 VO", description = "New 잰킨스 VO")
+	public class NewJenkinsParamVO {
+
+		/**
+		 * 프로젝트 ID
+		 */
+		@ApiModelProperty(name = "projectId", value = "프로젝트 ID", dataType = "Long")
+		private Long projectId;
+		
+		@ApiModelProperty(name = "jenkinsFolderName", value = "folder명", dataType = "String")
+		public String jenkinsFolderName;
+		
+		@ApiModelProperty(name = "jenkinsMnJobName", value = "job명", dataType = "String")
+		public String jenkinsMnJobName;
+		
+		@ApiModelProperty(name = "flagClass", value = "folder , job 구분", dataType = "String")
+		public String flagClass;
+		
+		@ApiModelProperty(name = "url", value = "jenkins url", dataType = "String")
+		public String url;
+		
+		@ApiModelProperty(name = "newJenkinsFolderList", value = "folder 목록", dataType = "String")
+		public ArrayList<NewJenkinsParamVO> folders;
+		
+		@ApiModelProperty(name = "newJenkinsJobList", value = "job 목록", dataType = "String")
+		public ArrayList<NewJenkinsParamVO> jobs;
+		
+		/**
+		 * jenkins service status
+		 */
+		@ApiModelProperty(name = "serviceStatus", value = "Jenkins 상태코드", dataType = "Integer")
+		private Integer serviceStatus;
+		
+		public NewJenkinsParamVO() {
+			super();
+			folders=new ArrayList<>();
+			jobs=new ArrayList<>();
+		}
+		public NewJenkinsParamVO(JSONObject object) {
+			
+			folders=new ArrayList<>();
+			jobs=new ArrayList<>();
+			
+			if(object.has("_class")) {
+				if(object.get("_class") == JSONObject.NULL) {
+					this.flagClass = "";
+				} else {
+					String tempFlagClass[] = object.get("_class").toString().split("\\.");
+					this.flagClass = tempFlagClass[tempFlagClass.length-1];
+					if(this.flagClass.contains("Folder")) {
+						this.jenkinsFolderName = object.getString("name");
+					}else {
+						this.jenkinsMnJobName = object.getString("name");
+					}
+					
+				}
+			}
+			if(object.has("url")) {
+				if(object.get("url") == JSONObject.NULL) {
+					this.url = "";
+				} else {
+					this.url = object.getString("url");
+					
+				}
+			}
+			
+			try {
+				if(object.has("jobs")) {
+					//하위 jobs 존재여부 확인
+					if(object.get("jobs") != JSONObject.NULL) {
+						JSONArray jsonArray = (JSONArray) object.get("jobs");
+						for(int i=0;i<jsonArray.length();i++) {
+							
+							if(((String) jsonArray.getJSONObject(i).get("_class")).contains("Folder")) {
+								NewJenkinsParamVO tempNewJenkinsVO = new NewJenkinsParamVO(jsonArray.getJSONObject(i));
+								folders.add(tempNewJenkinsVO);
+							}else {
+								NewJenkinsParamVO tempNewJenkinsJobVO = new NewJenkinsParamVO(jsonArray.getJSONObject(i));
+								jobs.add(tempNewJenkinsJobVO);
+							}
+						}
+					}
+				}
+			}catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+			
+		}
+		public Long getProjectId() {
+			return projectId;
+		}
+		public void setProjectId(Long projectId) {
+			this.projectId = projectId;
+		}
+		public String getJenkinsFolderName() {
+			return jenkinsFolderName;
+		}
+		public void setJenkinsFolderName(String jenkinsFolderName) {
+			this.jenkinsFolderName = jenkinsFolderName;
+		}
+		public String getJenkinsMnJobName() {
+			return jenkinsMnJobName;
+		}
+		public void setJenkinsMnJobName(String jenkinsMnJobName) {
+			this.jenkinsMnJobName = jenkinsMnJobName;
+		}
+		public String getFlagClass() {
+			return flagClass;
+		}
+		public void setFlagClass(String flagClass) {
+			this.flagClass = flagClass;
+		}
+		public String getUrl() {
+			return url;
+		}
+		public void setUrl(String url) {
+			this.url = url;
+		}
+		public ArrayList<NewJenkinsParamVO> getFolders() {
+			return folders;
+		}
+		public void setFolders(ArrayList<NewJenkinsParamVO> folders) {
+			this.folders = folders;
+		}
+		public ArrayList<NewJenkinsParamVO> getJobs() {
+			return jobs;
+		}
+		public void setJobs(ArrayList<NewJenkinsParamVO> jobs) {
+			this.jobs = jobs;
+		}
+		public Integer getServiceStatus() {
+			return serviceStatus;
+		}
+		public void setServiceStatus(Integer serviceStatus) {
+			this.serviceStatus = serviceStatus;
+		}
+		@Override
+		public String toString() {
+			return "NewJenkinsParamVO [projectId=" + projectId + ", jenkinsFolderName=" + jenkinsFolderName
+					+ ", jenkinsMnJobName=" + jenkinsMnJobName + ", flagClass=" + flagClass + ", url=" + url + ", folders="
+					+ folders + ", jobs=" + jobs + ", serviceStatus=" + serviceStatus + "]";
+		}
+		
+		
+	}
+
+	====================================================================================================
+	
+	
+
+# 맵퍼 (java)
+
+	====================================================================================================
+	
+	public List<NewJenkinsParamVO> getJenkinsList(Long projectId);
+	
+	====================================================================================================
+
+
+# 맵퍼 (xml)
+	====================================================================================================
+    <!-- M:N 추가개발 -->
+    <select id="getJenkinsList" resultType="NewJenkinsParamVO">
+        select 
+            project_id , 
+            jenkins_folder_name , 
+            jenkins_mn_job_name , 
+            service_status
+        from jenkins_mn_job
+        where 
+        project_id = #{projectId}
+        AND service_status = 0
+        
+    </select>
+	====================================================================================================
+	

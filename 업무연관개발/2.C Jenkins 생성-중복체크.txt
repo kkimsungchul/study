@@ -1,0 +1,465 @@
+[ Jenkins 생성 중복체크 ]
+	프로젝트 생성시에 중복체크 하도록 작성
+	
+# 순서
+	
+	1. 최상단일 경우에는 DB와 Jenkins에서 둘다 확인한다.
+		job 이든 folder이든 같은 이름 사용은 불가능
+		ex) job으로 jenkins001 을 생성햇으면 folder 로 jenkins001 을 생성 할 수 없음
+		
+		정규식 체크 해야함
+	
+	
+	2. 최상단이 아닐경우 해당 폴더 내에 존재하는 job과 folder의 이름들중 중복되는 값이 있는지 체크
+		정규식 체크 해야함
+	
+	
+	
+
+
+# 1. 최상단 중복 체크
+	
+	1. DB에서 해당 프로젝트의 Jenkins를 전부다 들고옴
+	2. 들고온 list와 현재 받아온 job , folder 리스트를 비교함
+	3. DB비교가 다 끝난 애들은 jenkins 서버와 비교를 시작함
+	4. 종료
+	
+	2번항목에서 이중for문 , 3번항목에서 이중for문으로 중복되는데
+	DB체크를 다 끝낸뒤에 API를 호출해서 중복체크하는게 좋아보임
+
+
+
+# 컨트롤러
+	NewInsertProjectVO 를 넘겨받아서 거기서 jenkins만 추출해서 보냄.
+	현재 중복체크로직도 저렇게 저부분만 빼내서 보내고있음
+	====================================================================================================
+		@ApiOperation(value = "Jenkins 중복체크",notes = "프로젝트 생성시 전달되는 insertvo를 그대로 받아서 젠킨스만 중복체크함")
+		@RequestMapping(value = "/jenkins/ValidationCheck", method = RequestMethod.POST)
+		public void jenkinsValidationCheck(@RequestBody  NewInsertProjectVO newInsertProjectVO ) {
+			System.out.println(newJenkinsService.jenkinsDBValidationCheck(newInsertProjectVO.getJenkins()));
+		}
+	====================================================================================================
+	
+# 서비스
+
+	중복체크 첫번째 메소드 jenkinsDBValidationCheck
+	애는 최상단의 job 과 folder 를 DB에서 체크하도록 하였음
+	DB에서 중복이 발생하면 굳이 서버나 다른곳까지 체크할 필요가없으니까
+	
+	====================================================================================================
+    /**
+     * jenkins 최상위 folder , job 의 중복체크
+     * @param jenkins
+     * @return boolean
+     */
+    public Map<String, Object> jenkinsDBValidationCheck(NewInsertJenkinsVO jenkins) { 
+    	
+		Map<String, Object> result = new HashMap<String, Object>();
+		List<NewInsertJenkinsVO> insertJenkinsFolderList = jenkins.getFolders();
+		List<NewInsertJenkinsVO> insertJenkinsJobList = jenkins.getJobs();
+		
+
+		for(int i=0;i<insertJenkinsFolderList.size();i++) {
+			//최상단 folder DB 목록 중복 체크
+			if(newJenkinsMapper.validJenkinsCheck(insertJenkinsFolderList.get(i))!=0) {
+				result.put("msg", DbMessageManager.getMessage("E0016", "Jenkins 폴더명", "ko"));
+				return result;				
+			}
+			//folder 정규식 체크
+			result = jenkinsToolValidationCheck(insertJenkinsFolderList,null);
+			if(!result.isEmpty()) {
+				return result;
+			}
+		}
+		
+		for(int i=0;i<insertJenkinsJobList.size();i++) {
+			//최상단 job 목록 DB Check 중복 체크
+			if(newJenkinsMapper.validJenkinsCheck(insertJenkinsJobList.get(i))!=0) {
+				result.put("msg", DbMessageManager.getMessage("E0016", "Jenkins job명", "ko"));
+				return result;		
+			}
+		}
+		//job 정규식 체크
+		result = jenkinsToolValidationCheck(insertJenkinsJobList,null);
+		if(!result.isEmpty()) {
+			return result;
+		}
+		
+    	return result;
+    }
+
+
+	====================================================================================================
+
+	
+	중복체크 두번째 메소드 jenkinsToolValidationCheck
+	정규식 체크와 tool에 존재하는지 체크하는메소드 
+	별도로 진행하면 좋긴한데, 그러면 for문도 두번돌아야되고.. 하나꺼낼때마다 하나씩 체크하도록 했음
+	재귀함수로 이뤄져있어서, 하위의 폴더나 잡이있으면 계속 호출됨
+	====================================================================================================
+    /**
+     * 젠킨스의 folder , job 의 정규식 체크, 재귀함수로 사용중이여서 하위폴더 , 하위job까지 확인
+     * @param insertJenkinsFolderList
+     * @param uri
+     * @return boolean
+     */
+    public Map<String, Object> jenkinsToolValidationCheck(List<NewInsertJenkinsVO> insertJenkinsFolderList,String uri){
+		Matcher match;
+		Map<String, Object> result = new HashMap<String, Object>();
+		String regexJenkins  = "^([A-Za-z0-9ㄱ-힣]{1})[a-zA-Z0-9ㄱ-힣-_(),.\\s]{0,84}$";
+		
+		if(uri==null) {
+			uri = jenkinsUrl;
+		}
+		
+		//List<NewInsertJenkinsVO> insertJenkinsFolderList = insertJenkinsFolderList
+		
+
+		
+		
+		for(int i=0; i<insertJenkinsFolderList.size();i++) {
+
+			if(insertJenkinsFolderList.get(i).getDivision()==1) {
+				String folderName = insertJenkinsFolderList.get(i).getJenkinsFolderName();	
+				//정규식 체크
+		        match = Pattern.compile(regexJenkins).matcher(folderName);
+		        if(!match.find()) {
+				    result.put("msg", DbMessageManager.getMessage("E0125", new Object[]{"Jenkins 폴더명", "특수문자로 시작할 수 없으며 한글,영문대소문자,숫자,특수문자 -_().,","1","85"}, "ko"));
+				    return result;  
+		        }
+		        
+		        if(existFolderOrJob(uri, insertJenkinsFolderList.get(i).getJenkinsFolderName())) {
+					result.put("msg", DbMessageManager.getMessage("E0016", "Jenkins 폴더명", "ko"));
+					return result;	
+		        }
+		        
+		        //하위폴더 체크
+		        if(insertJenkinsFolderList.get(i).getFolders().size()>0) {
+
+		        	result = jenkinsToolValidationCheck(insertJenkinsFolderList.get(i).getFolders(),uri+ "/" + insertJenkinsFolderList.get(i).getJenkinsFolderName());
+		        	
+					if(!result.isEmpty()) {
+						return result;
+					}
+		        }
+		        //하위 잡 체크
+		        if(insertJenkinsFolderList.get(i).getJobs().size()>0) {
+
+		        	result = jenkinsToolValidationCheck(insertJenkinsFolderList.get(i).getJobs(),uri+ "/" + insertJenkinsFolderList.get(i).getJenkinsFolderName());
+
+					if(!result.isEmpty()) {
+						return result;
+					}
+		        }
+				
+			}else {
+				String jobName = insertJenkinsFolderList.get(i).getJenkinsJobName();
+				//정규식 체크
+				match = Pattern.compile(regexJenkins).matcher(jobName);
+				if(!match.find()) {
+					result.put("msg", DbMessageManager.getMessage("E0125", new Object[]{"Jenkins job명", "특수문자로 시작할 수 없으며 한글,영문대소문자,숫자,특수문자 -_().,","1","85"}, "ko"));
+					return result;  
+				}	
+				if(existFolderOrJob(uri, insertJenkinsFolderList.get(i).getJenkinsJobName())) {
+					result.put("msg", DbMessageManager.getMessage("E0016", "Jenkins job명", "ko"));
+					return result;	
+				}
+				
+			}
+			
+			
+		}
+
+		
+		
+		return result;
+    }
+	
+	
+	====================================================================================================
+
+	중복체크 세번째 메소드 existFolderOrJob
+	애는 해당 폴더 또는 해당 job이 tool 에 존재하는지 체크하는 애임
+	어쩌피 최상단이 신규이면 tool 체크는 하지 않아도 되는데 프로젝트 수정부분에서 사용하려고 좀더 만들어놨음.
+	기존의 메소드랑 같은 이름이며, 기존의 메소드는 foldername , jobname 등을 다 받아서 처리하도록 해놨었음.
+	근데 이제 하위로계속 생길수 있기에, 최종적으로 확인해야 할 folder 명 이나 job명과 url 을 받도록 하였음
+	====================================================================================================
+	 /**
+     * Jenkins Folder 또는 Job이 존재하는지 Validation Check
+     * @param uri
+     * @param name
+     * @return
+     */
+    public boolean existFolderOrJob(String uri,String name) {
+        uri = uri +  "/job/" + name + "/api/json";
+        try {
+            ResponseEntity<String> responseResult = callJenkinsRestApiForJson("GET", uri, null);
+
+            if(responseResult.getStatusCode() == HttpStatus.OK) {
+                LOGGER.info("Jenkins REST API : Get jenkins informatin is found!");
+            } else {
+                if(responseResult.getStatusCode() == HttpStatus.NOT_FOUND) {
+                    LOGGER.info("Jenkins REST API : Get jenkins informatin is not found!");
+                    return false;
+                } else {
+                    LOGGER.error("Jenkins REST API is fail, Return code : " + responseResult.getStatusCodeValue());
+                }
+            }
+
+        } catch(HttpClientErrorException ce) {
+            HttpStatus status = ce.getStatusCode();
+            if(status == HttpStatus.NOT_FOUND) {
+                LOGGER.info("Jenkins REST API : Get jenkins informatin is not found!");
+                return false;
+            } else {
+                LOGGER.error("Jenkins REST API error: {}", ce.getMessage());
+            }
+        } catch(HttpServerErrorException se) {
+            LOGGER.error("Jenkins REST API error: {}", se.getMessage());
+        }
+        
+        
+    	return true;
+    }
+	
+	
+	
+	====================================================================================================
+
+# VO	
+	====================================================================================================
+package com.kt.dspace.portal.project.jenkins.test;
+
+import java.util.List;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+@ApiModel(value = "NewInsertJenkinsVO", description = "젠킨스 insert VO")
+public class NewInsertJenkinsVO {
+	
+    /**
+     * Jenkins id
+     */
+	@ApiModelProperty(name = "id", value = "Jenkins id", dataType = "String")
+	public String id;
+	
+    /**
+     * 프로젝트 ID
+     */
+    @ApiModelProperty(name = "projectId", value = "프로젝트 ID", dataType = "Long")
+    private Long projectId;
+    /**
+     * Jenkins 폴더명
+     */
+	@ApiModelProperty(name = "jenkinsFolderName", value = "Jenkins 폴더명", dataType = "String")
+	public String jenkinsFolderName;
+	
+    /**
+     * Jenkins job 명
+     */
+	@ApiModelProperty(name = "jenkinsJobName", value = "Jenkins job 명", dataType = "String")
+	public String jenkinsJobName;
+	
+    /**
+     * jenkins service status
+     */
+    @ApiModelProperty(name = "serviceStatus", value = "Jenkins 상태코드", dataType = "Integer")
+    private Integer serviceStatus;
+	
+    /**
+     * Jenkins 등록자
+     */
+    @ApiModelProperty(name = "createdBy", value = "Jenkins 등록자", dataType = "String")
+    private String createdBy;
+    
+    /**
+     * Jenkins 등록일시
+     */
+    @ApiModelProperty(name = "createdDate", value = "Jenkins 등록일시", dataType = "String")
+    private String createdDate;
+    /**
+     * Jenkins 수정자
+     */
+    @ApiModelProperty(name = "lastModifiedBy", value = "Jenkins 수정자", dataType = "String")
+    private String lastModifiedBy;
+    
+    /**
+     * Jenkins 수정일시
+     */
+    @ApiModelProperty(name = "lastModifiedDate", value = "Jenkins 수정일시", dataType = "String")
+    private String lastModifiedDate;
+
+    /**
+     * Jenkins job 타입명(FreeStyle or Pipeline or...)
+     */
+    @ApiModelProperty(name = "jenkinsJobType", value = "Jenkins Job 타입 코드(10301 - FreeStyle, 10302 - Pipeline)", dataType = "String", example = "10302")
+    public String jenkinsJobType;
+	
+    /**
+     * 구분코드 1: folder, 2: job
+     */
+    @ApiModelProperty(name = "division", value = "구분코드 1: folder, 2: job", dataType = "String", example = "10302")
+    public int division;
+    
+    /**
+     * Jenkins deleteFlag 
+     */
+    @ApiModelProperty(name = "deleteFlag", value = "Jenkins deleteFlag 값이 존재할경우 삭제 (1)", dataType = "String", example = "Pipeline")
+	public String deleteFlag;
+	
+
+	@ApiModelProperty(name = "folders", value = "폴더목록", dataType = "List")
+	public List<NewInsertJenkinsVO> folders;
+	
+	@ApiModelProperty(name = "jobs", value = "job목록", dataType = "List")
+	public List<NewInsertJenkinsVO> jobs;
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public Long getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(Long projectId) {
+		this.projectId = projectId;
+	}
+
+	public String getJenkinsFolderName() {
+		return jenkinsFolderName;
+	}
+
+	public void setJenkinsFolderName(String jenkinsFolderName) {
+		this.jenkinsFolderName = jenkinsFolderName;
+	}
+
+	public String getJenkinsJobName() {
+		return jenkinsJobName;
+	}
+
+	public void setJenkinsJobName(String jenkinsJobName) {
+		this.jenkinsJobName = jenkinsJobName;
+	}
+
+	public Integer getServiceStatus() {
+		return serviceStatus;
+	}
+
+	public void setServiceStatus(Integer serviceStatus) {
+		this.serviceStatus = serviceStatus;
+	}
+
+	public String getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public String getCreatedDate() {
+		return createdDate;
+	}
+
+	public void setCreatedDate(String createdDate) {
+		this.createdDate = createdDate;
+	}
+
+	public String getLastModifiedBy() {
+		return lastModifiedBy;
+	}
+
+	public void setLastModifiedBy(String lastModifiedBy) {
+		this.lastModifiedBy = lastModifiedBy;
+	}
+
+	public String getLastModifiedDate() {
+		return lastModifiedDate;
+	}
+
+	public void setLastModifiedDate(String lastModifiedDate) {
+		this.lastModifiedDate = lastModifiedDate;
+	}
+
+	public String getJenkinsJobType() {
+		return jenkinsJobType;
+	}
+
+	public void setJenkinsJobType(String jenkinsJobType) {
+		this.jenkinsJobType = jenkinsJobType;
+	}
+
+	public int getDivision() {
+		return division;
+	}
+
+	public void setDivision(int division) {
+		this.division = division;
+	}
+
+	public String getDeleteFlag() {
+		return deleteFlag;
+	}
+
+	public void setDeleteFlag(String deleteFlag) {
+		this.deleteFlag = deleteFlag;
+	}
+
+	public List<NewInsertJenkinsVO> getFolders() {
+		return folders;
+	}
+
+	public void setFolders(List<NewInsertJenkinsVO> folders) {
+		this.folders = folders;
+	}
+
+	public List<NewInsertJenkinsVO> getJobs() {
+		return jobs;
+	}
+
+	public void setJobs(List<NewInsertJenkinsVO> jobs) {
+		this.jobs = jobs;
+	}
+
+	@Override
+	public String toString() {
+		return "NewInsertJenkinsVO [id=" + id + ", projectId=" + projectId + ", jenkinsFolderName=" + jenkinsFolderName
+				+ ", jenkinsJobName=" + jenkinsJobName + ", serviceStatus=" + serviceStatus + ", createdBy="
+				+ createdBy + ", createdDate=" + createdDate + ", lastModifiedBy=" + lastModifiedBy
+				+ ", lastModifiedDate=" + lastModifiedDate + ", jenkinsJobType=" + jenkinsJobType + ", division="
+				+ division + ", deleteFlag=" + deleteFlag + ", folders=" + folders + ", jobs=" + jobs + "]";
+	}
+
+	
+
+}
+	
+	
+	====================================================================================================
+
+	
+# 맵퍼(java)
+	
+	====================================================================================================
+	public int validJenkinsCheck(NewInsertJenkinsVO vo);
+	====================================================================================================
+
+# 맵퍼(xml)
+	====================================================================================================
+    <select id="validJenkinsCheck" resultType="Integer" parameterType="NewJenkinsParamVO" >
+	   select count(*) from jenkins_mn_job
+        <if test='jenkinsFolderName!=null and jenkinsFolderName!=""'>
+            where jenkins_folder_name = #{jenkinsFolderName}
+        </if>
+        <if test='jenkinsJobName!=null and jenkinsJobName!=""'>
+            where jenkins_job_name = #{jenkinsJobName}
+        </if>
+    </select>	
+	
+	====================================================================================================

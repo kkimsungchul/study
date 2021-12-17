@@ -1,0 +1,111 @@
+{
+"id":"",
+"projectGroupId":"",
+"projectGroupSlug":"",
+"projectName":"kscProject263",
+"projectSlug":"kscProject263",
+"projectDesc":"kscProject263",
+"members":[
+{
+"loginId":"91296885",
+"dept":"협력사",
+"name":"김성철",
+"roleId":"201"
+},
+{
+"dept":"SW아키텍처팀",
+"loginId":"10029288",
+"name":"정용섭",
+"roleId":"203"
+}
+],
+"sparrows":[
+],
+"codeeyes":[
+],
+"jira":{
+"jiraKey":"KSCJIRA263",
+"jiraName":"KSCJIRAName263"
+},
+"git":{
+"gitGroupName":"kscGit263",
+"gitGroupPath":"kscGit263",
+"projects":[
+{
+"gitProjectName":"kscGitProject263",
+"gitProjectPath":"kscGitProject263"
+}
+]
+},
+"exists":{
+"jira":true,
+"gitlab":true,
+"jenkins":true,
+"nexus":false
+},
+"jenkins":{
+	"folders":[
+		{
+			"folderId":1,
+			"jenkinsFolderName":"newFolder001",
+			"division" : "1",
+			"folders":[
+				{
+					"folderId":2,
+					"jenkinsFolderName":"newFolder001-1",
+					"division" : "1",
+					"folders":[],
+					"jobs":[
+						{
+							"jobId":1,
+							"jenkinsJobName":"newJob002",
+							"jenkinsJobType":"10401",
+							"division" : "2",
+							"deleteFlag":0,
+							"serviceStatus":2
+						}
+					],
+					"deleteFlag":0
+				}    
+			],
+			"jobs":[
+				{
+					"jobId":2,
+					"jenkinsJobName":"newJob003",
+					"jenkinsJobType":"10401",
+					"division" : "2",
+					"deleteFlag":0,
+					"serviceStatus":2
+				}
+			],
+			"deleteFlag":0
+		}
+	],
+	"jobs":[
+		{
+			"jobId":1,
+			"jenkinsJobName":"newJob001-1",
+			"jenkinsJobType":"10401",
+			"division" : "2",
+			"deleteFlag":0,
+			"serviceStatus":2
+		},
+		{
+			"jobId":2,
+			"jenkinsJobName":"newJob001-2",
+			"jenkinsJobType":"10401",
+			"division" : "2",
+			"deleteFlag":0,
+			"serviceStatus":2
+		},
+		{
+			"jobId":3,
+			"jenkinsJobName":"newJob001-3",
+			"jenkinsJobType":"10401",
+			"division" : "2",
+			"deleteFlag":0,
+			"serviceStatus":2
+		}
+	]
+}
+}
