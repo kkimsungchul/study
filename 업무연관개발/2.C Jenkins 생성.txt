@@ -255,6 +255,12 @@
 		public String jenkinsJobType;
 		
 		/**
+		 * Jenkins job 타입명(FreeStyle or Pipeline or...)
+		 */
+		@ApiModelProperty(name = "jenkinsJobTypeName", value = "Jenkins Job 타입명(FreeStyle, Pipeline)", dataType = "String", example = "Pipeline")
+		private String jenkinsJobTypeName;
+		
+		/**
 		 * 구분코드 1: folder, 2: job
 		 */
 		@ApiModelProperty(name = "division", value = "구분코드 1: folder, 2: job", dataType = "String", example = "10302")
@@ -353,6 +359,14 @@
 			this.jenkinsJobType = jenkinsJobType;
 		}
 
+		public String getJenkinsJobTypeName() {
+			return jenkinsJobTypeName;
+		}
+
+		public void setJenkinsJobTypeName(String jenkinsJobTypeName) {
+			this.jenkinsJobTypeName = jenkinsJobTypeName;
+		}
+
 		public int getDivision() {
 			return division;
 		}
@@ -388,16 +402,15 @@
 		@Override
 		public String toString() {
 			return "NewInsertJenkinsVO [id=" + id + ", projectId=" + projectId + ", jenkinsFolderName=" + jenkinsFolderName
-					+ ", jenkinsJobName=" + jenkinsJobName + ", serviceStatus=" + serviceStatus + ", createdBy="
-					+ createdBy + ", createdDate=" + createdDate + ", lastModifiedBy=" + lastModifiedBy
-					+ ", lastModifiedDate=" + lastModifiedDate + ", jenkinsJobType=" + jenkinsJobType + ", division="
-					+ division + ", deleteFlag=" + deleteFlag + ", folders=" + folders + ", jobs=" + jobs + "]";
+					+ ", jenkinsJobName=" + jenkinsJobName + ", serviceStatus=" + serviceStatus + ", createdBy=" + createdBy
+					+ ", createdDate=" + createdDate + ", lastModifiedBy=" + lastModifiedBy + ", lastModifiedDate="
+					+ lastModifiedDate + ", jenkinsJobType=" + jenkinsJobType + ", jenkinsJobTypeName=" + jenkinsJobTypeName
+					+ ", division=" + division + ", deleteFlag=" + deleteFlag + ", folders=" + folders + ", jobs=" + jobs
+					+ "]";
 		}
 
-		
-
 	}
-		
+
 	
 	====================================================================================================
 # 맵퍼 (JAVA)

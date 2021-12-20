@@ -3,84 +3,92 @@
 	
 # 순서
 	
-	1. 최상단일 경우에는 DB와 Jenkins에서 둘다 확인한다.
+	1. url이 있는지 확인한다.
+	
+	2. url 이 있는 경우 중복체크를 하지 않는다
+		( 젠킨스는 이름 변경이 불가능하기때문)
+	
+	3. URL 이 존재하지 않을 경우 아래의 순서대로 처리한다
+
+	4. 최상단일 경우에는 DB와 Jenkins에서 둘다 확인한다.
 		job 이든 folder이든 같은 이름 사용은 불가능
 		ex) job으로 jenkins001 을 생성햇으면 folder 로 jenkins001 을 생성 할 수 없음
-		
-		정규식 체크 해야함
 	
-	
-	2. 최상단이 아닐경우 해당 폴더 내에 존재하는 job과 folder의 이름들중 중복되는 값이 있는지 체크
-		정규식 체크 해야함
-	
+	5. 최상단이 아닐경우 해당 폴더 내에 존재하는 job과 folder의 이름들중 중복되는 값이 있는지 체크
 	
 	
 
+	
 
-# 1. 최상단 중복 체크
-	
-	1. DB에서 해당 프로젝트의 Jenkins를 전부다 들고옴
-	2. 들고온 list와 현재 받아온 job , folder 리스트를 비교함
-	3. DB비교가 다 끝난 애들은 jenkins 서버와 비교를 시작함
-	4. 종료
-	
-	2번항목에서 이중for문 , 3번항목에서 이중for문으로 중복되는데
-	DB체크를 다 끝낸뒤에 API를 호출해서 중복체크하는게 좋아보임
+
+# 로직
+	로직은 insert 시 정규식 체크하는 로직을 그대로 복사해서 새로 생성하여 사용했음.
+	다른점은 insertJenkinsVO가 아닌 updateJenkinsVO 를 사용하는것과 , url 이 있는지 없는지 체크하는 로직임
 
 
 
 # 컨트롤러
-	NewInsertProjectVO 를 넘겨받아서 거기서 jenkins만 추출해서 보냄.
+	NewUpdateProjectVO 를 넘겨받아서 거기서 jenkins만 추출해서 보냄.
 	현재 중복체크로직도 저렇게 저부분만 빼내서 보내고있음
 	====================================================================================================
-	@ApiOperation(value = "Jenkins insert 중복체크",notes = "프로젝트 생성시 전달되는 insertvo를 그대로 받아서 젠킨스만 중복체크함")
-	@RequestMapping(value = "/jenkins/insertValidationCheck", method = RequestMethod.POST)
-	public void jenkinsValidationCheck(@RequestBody  NewInsertProjectVO newInsertProjectVO ) {
-		System.out.println(newJenkinsService.insertJenkinsDBValidationCheck(newInsertProjectVO.getJenkins()));
+	@ApiOperation(value = "Jenkins update 중복체크",notes = "프로젝트 수정시 전달되는 insertvo를 그대로 받아서 젠킨스만 중복체크함")
+	@RequestMapping(value = "/jenkins/updateValidationCheck", method = RequestMethod.POST)
+	public void updateValidationCheck(@RequestBody  NewUpdateProjectVO newUpdateProjectVO ) {
+		System.out.println(newJenkinsService.updateJenkinsDBValidationCheck(newUpdateProjectVO.getJenkins()));
 	}
 	====================================================================================================
 	
 # 서비스
 
 	중복체크 첫번째 메소드 jenkinsDBValidationCheck
-	애는 최상단의 job 과 folder 를 DB에서 체크하도록 하였음
-	DB에서 중복이 발생하면 굳이 서버나 다른곳까지 체크할 필요가없으니까
-	
+	URL이 없을 경우 최상단의 job 과 folder 를 DB에서 체크하도록 하였음
 	====================================================================================================
-	/**
-     * jenkins 최상위 folder , job 의 DB 중복체크 - insert 에서 사용
+        /**
+     * jenkins 최상위 folder , job 의 DB 중복체크 - update 에서 사용
      * @param jenkins
      * @return boolean
      */
-    public Map<String, Object> insertJenkinsDBValidationCheck(NewInsertJenkinsVO jenkins) { 
+    public Map<String, Object> updateJenkinsDBValidationCheck(NewUpdateJenkinsVO jenkins) { 
     	
 		Map<String, Object> result = new HashMap<String, Object>();
-		List<NewInsertJenkinsVO> insertJenkinsFolderList = jenkins.getFolders();
-		List<NewInsertJenkinsVO> insertJenkinsJobList = jenkins.getJobs();
+		List<NewUpdateJenkinsVO> updateJenkinsFolderList = jenkins.getFolders();
+		List<NewUpdateJenkinsVO> updateJenkinsJobList = jenkins.getJobs();
 		
-
-		for(int i=0;i<insertJenkinsFolderList.size();i++) {
+		
+		for(int i=0;i<updateJenkinsFolderList.size();i++) {
 			//최상단 folder DB 목록 중복 체크
-			if(newJenkinsMapper.insertValidJenkinsCheck(insertJenkinsFolderList.get(i))!=0) {
-				result.put("msg", DbMessageManager.getMessage("E0016", "Jenkins 폴더명", "ko"));
-				return result;				
+			
+			if(!"".equals(updateJenkinsFolderList.get(i).getUrl()) && updateJenkinsFolderList.get(i).getUrl()!=null) {
+				//url이 존재할 경우 이미 등록된 jenkins로 판단하여 정규식 체크를 진행하지 않음				
+			}else {
+				if(newJenkinsMapper.updateValidJenkinsCheck(updateJenkinsFolderList.get(i))!=0) {
+					result.put("msg", DbMessageManager.getMessage("E0016", "Jenkins 폴더명", "ko"));
+					return result;				
+				}
+				//folder 정규식 체크
+				result = updateJenkinsToolValidationCheck(updateJenkinsFolderList,null);
+				if(!result.isEmpty()) {
+					return result;
+				}			
+			
 			}
-			//folder 정규식 체크
-			result = insertJenkinsToolValidationCheck(insertJenkinsFolderList,null);
-			if(!result.isEmpty()) {
-				return result;
-			}
+
 		}
 		
-		for(int i=0;i<insertJenkinsJobList.size();i++) {
-			//최상단 job 목록 DB Check 중복 체크
-			if(newJenkinsMapper.insertValidJenkinsCheck(insertJenkinsJobList.get(i))!=0) {
-				result.put("msg", DbMessageManager.getMessage("E0016", "Jenkins job명", "ko"));
-				return result;		
+		for(int i=0;i<updateJenkinsJobList.size();i++) {
+			if(!"".equals(updateJenkinsJobList.get(i).getUrl()) && updateJenkinsJobList.get(i).getUrl()!=null) {
+				
+			}else {
+				//최상단 job 목록 DB Check 중복 체크
+				if(newJenkinsMapper.updateValidJenkinsCheck(updateJenkinsJobList.get(i))!=0) {
+					result.put("msg", DbMessageManager.getMessage("E0016", "Jenkins job명", "ko"));
+					return result;		
+				}
 			}
+
 		}
 		// 정규식 체크 및 tool중복 체크
-		result = insertJenkinsToolValidationCheck(insertJenkinsJobList,null);
+		result = updateJenkinsToolValidationCheck(updateJenkinsJobList,null);
 		if(!result.isEmpty()) {
 			return result;
 		}
@@ -92,18 +100,17 @@
 	====================================================================================================
 
 	
-	중복체크 두번째 메소드 jenkinsToolValidationCheck
+	중복체크 두번째 메소드 updateJenkinsFolderList
 	정규식 체크와 tool에 존재하는지 체크하는메소드 
-	별도로 진행하면 좋긴한데, 그러면 for문도 두번돌아야되고.. 하나꺼낼때마다 하나씩 체크하도록 했음
 	재귀함수로 이뤄져있어서, 하위의 폴더나 잡이있으면 계속 호출됨
 	====================================================================================================
     /**
-     * 젠킨스의 folder , job 의 정규식 체크, 재귀함수로 사용중이여서 하위폴더 , 하위job까지 확인 - insert 에서 사용
-     * @param insertJenkinsFolderList
+     * 젠킨스의 folder , job 의 정규식 체크, 재귀함수로 사용중이여서 하위폴더 , 하위job까지 확인 - update 에서 사용
+     * @param updateJenkinsFolderList
      * @param uri
      * @return boolean
      */
-    public Map<String, Object> insertJenkinsToolValidationCheck(List<NewInsertJenkinsVO> insertJenkinsFolderList,String uri){
+    public Map<String, Object> updateJenkinsToolValidationCheck(List<NewUpdateJenkinsVO> updateJenkinsFolderList,String uri){
 		Matcher match;
 		Map<String, Object> result = new HashMap<String, Object>();
 		String regexJenkins  = "^([A-Za-z0-9ㄱ-힣]{1})[a-zA-Z0-9ㄱ-힣-_(),.\\s]{0,84}$";
@@ -112,73 +119,69 @@
 			uri = jenkinsUrl;
 		}
 		
-		//List<NewInsertJenkinsVO> insertJenkinsFolderList = insertJenkinsFolderList
-		for(int i=0; i<insertJenkinsFolderList.size();i++) {
+		//List<NewUpdateJenkinsVO> updateJenkinsFolderList = updateJenkinsFolderList
+		for(int i=0; i<updateJenkinsFolderList.size();i++) {
 
-			if(insertJenkinsFolderList.get(i).getDivision()==1) {
-				String folderName = insertJenkinsFolderList.get(i).getJenkinsFolderName();	
-				//정규식 체크
-		        match = Pattern.compile(regexJenkins).matcher(folderName);
-		        if(!match.find()) {
-				    result.put("msg", DbMessageManager.getMessage("E0125", new Object[]{"Jenkins 폴더명", "특수문자로 시작할 수 없으며 한글,영문대소문자,숫자,특수문자 -_().,","1","85"}, "ko"));
-				    return result;  
-		        }
-		        
-		        if(existFolderOrJob(uri, insertJenkinsFolderList.get(i).getJenkinsFolderName())) {
-					result.put("msg", DbMessageManager.getMessage("E0016", "Jenkins 폴더명", "ko"));
-					return result;	
-		        }
-		        
-		        //하위폴더 체크
-		        if(insertJenkinsFolderList.get(i).getFolders().size()>0) {
-
-		        	result = insertJenkinsToolValidationCheck(insertJenkinsFolderList.get(i).getFolders(),uri+ "/" + insertJenkinsFolderList.get(i).getJenkinsFolderName());
-		        	
-					if(!result.isEmpty()) {
-						return result;
-					}
-		        }
-		        //하위 잡 체크
-		        if(insertJenkinsFolderList.get(i).getJobs().size()>0) {
-
-		        	result = insertJenkinsToolValidationCheck(insertJenkinsFolderList.get(i).getJobs(),uri+ "/" + insertJenkinsFolderList.get(i).getJenkinsFolderName());
-
-					if(!result.isEmpty()) {
-						return result;
-					}
-		        }
+			if(!"".equals(updateJenkinsFolderList.get(i).getUrl()) && updateJenkinsFolderList.get(i).getUrl()!=null) {
+				//url이 존재할 경우 이미 등록된 jenkins로 판단하여 정규식 체크를 진행하지 않음
 				
 			}else {
-				String jobName = insertJenkinsFolderList.get(i).getJenkinsJobName();
-				//정규식 체크
-				match = Pattern.compile(regexJenkins).matcher(jobName);
-				if(!match.find()) {
-					result.put("msg", DbMessageManager.getMessage("E0125", new Object[]{"Jenkins job명", "특수문자로 시작할 수 없으며 한글,영문대소문자,숫자,특수문자 -_().,","1","85"}, "ko"));
-					return result;  
-				}	
-				if(existFolderOrJob(uri, insertJenkinsFolderList.get(i).getJenkinsJobName())) {
-					result.put("msg", DbMessageManager.getMessage("E0016", "Jenkins job명", "ko"));
-					return result;	
-				}
-				
-			}
-			
-			
-		}
+				if(updateJenkinsFolderList.get(i).getDivision()==1) {
+					String folderName = updateJenkinsFolderList.get(i).getJenkinsFolderName();	
+					//정규식 체크
+			        match = Pattern.compile(regexJenkins).matcher(folderName);
+			        if(!match.find()) {
+					    result.put("msg", DbMessageManager.getMessage("E0125", new Object[]{"Jenkins 폴더명", "특수문자로 시작할 수 없으며 한글,영문대소문자,숫자,특수문자 -_().,","1","85"}, "ko"));
+					    return result;  
+			        }
+			        
+			        if(existFolderOrJob(uri, updateJenkinsFolderList.get(i).getJenkinsFolderName())) {
+						result.put("msg", DbMessageManager.getMessage("E0016", "Jenkins 폴더명", "ko"));
+						return result;	
+			        }
+			        
+			        //하위폴더 체크
+			        if(updateJenkinsFolderList.get(i).getFolders().size()>0) {
 
-		
-		
+			        	result = updateJenkinsToolValidationCheck(updateJenkinsFolderList.get(i).getFolders(),uri+ "/" + updateJenkinsFolderList.get(i).getJenkinsFolderName());
+			        	
+						if(!result.isEmpty()) {
+							return result;
+						}
+			        }
+			        //하위 잡 체크
+			        if(updateJenkinsFolderList.get(i).getJobs().size()>0) {
+
+			        	result = updateJenkinsToolValidationCheck(updateJenkinsFolderList.get(i).getJobs(),uri+ "/" + updateJenkinsFolderList.get(i).getJenkinsFolderName());
+
+						if(!result.isEmpty()) {
+							return result;
+						}
+			        }
+					
+				}else {
+					String jobName = updateJenkinsFolderList.get(i).getJenkinsJobName();
+					//정규식 체크
+					match = Pattern.compile(regexJenkins).matcher(jobName);
+					if(!match.find()) {
+						result.put("msg", DbMessageManager.getMessage("E0125", new Object[]{"Jenkins job명", "특수문자로 시작할 수 없으며 한글,영문대소문자,숫자,특수문자 -_().,","1","85"}, "ko"));
+						return result;  
+					}	
+					if(existFolderOrJob(uri, updateJenkinsFolderList.get(i).getJenkinsJobName())) {
+						result.put("msg", DbMessageManager.getMessage("E0016", "Jenkins job명", "ko"));
+						return result;	
+					}
+					
+				}
+			}
+		}
 		return result;
     }
-	
 	
 	====================================================================================================
 
 	중복체크 세번째 메소드 existFolderOrJob
-	애는 해당 폴더 또는 해당 job이 tool 에 존재하는지 체크하는 애임
-	어쩌피 최상단이 신규이면 tool 체크는 하지 않아도 되는데 프로젝트 수정부분에서 사용하려고 좀더 만들어놨음.
-	기존의 메소드랑 같은 이름이며, 기존의 메소드는 foldername , jobname 등을 다 받아서 처리하도록 해놨었음.
-	근데 이제 하위로계속 생길수 있기에, 최종적으로 확인해야 할 folder 명 이나 job명과 url 을 받도록 하였음
+	애는 insert꺼 그대로 사용했음, api 호출하는것뿐이라서 굳이 새로 만들필요를 못느낌
 	====================================================================================================
 	 /**
      * Jenkins Folder 또는 Job이 존재하는지 Validation Check
@@ -218,6 +221,8 @@
     	return true;
     }
 	
+	
+	
 	====================================================================================================
 
 # VO	
@@ -229,8 +234,8 @@
 	import io.swagger.annotations.ApiModel;
 	import io.swagger.annotations.ApiModelProperty;
 
-	@ApiModel(value = "NewInsertJenkinsVO", description = "젠킨스 insert VO")
-	public class NewInsertJenkinsVO {
+	@ApiModel(value = "NewUpdateJenkinsVO", description = "젠킨스 Update VO")
+	public class NewUpdateJenkinsVO {
 		
 		/**
 		 * Jenkins id
@@ -287,7 +292,7 @@
 		/**
 		 * Jenkins job 타입명(FreeStyle or Pipeline or...)
 		 */
-		@ApiModelProperty(name = "jenkinsJobType", value = "Jenkins Job 타입 코드(10301 - FreeStyle, 10302 - Pipeline)", dataType = "String", example = "10302")
+		@ApiModelProperty(name = "jenkinsJobType", value = "Jenkins Job 타입명(FreeStyle, Pipeline)", dataType = "String", example = "Pipeline")
 		public String jenkinsJobType;
 		
 		/**
@@ -295,25 +300,29 @@
 		 */
 		@ApiModelProperty(name = "jenkinsJobTypeName", value = "Jenkins Job 타입명(FreeStyle, Pipeline)", dataType = "String", example = "Pipeline")
 		private String jenkinsJobTypeName;
-		
 		/**
 		 * 구분코드 1: folder, 2: job
 		 */
 		@ApiModelProperty(name = "division", value = "구분코드 1: folder, 2: job", dataType = "String", example = "10302")
 		public int division;
-		
 		/**
 		 * Jenkins deleteFlag 
 		 */
 		@ApiModelProperty(name = "deleteFlag", value = "Jenkins deleteFlag 값이 존재할경우 삭제 (1)", dataType = "String", example = "Pipeline")
 		public String deleteFlag;
 		
+		/**
+		 * Jenkins URL , 해당 폴더나 job의 URL
+		 */
+		@ApiModelProperty(name = "url", value = "jenkins url", dataType = "String")
+		public String url;
+		
 
 		@ApiModelProperty(name = "folders", value = "폴더목록", dataType = "List")
-		public List<NewInsertJenkinsVO> folders;
+		public List<NewUpdateJenkinsVO> folders;
 		
 		@ApiModelProperty(name = "jobs", value = "job목록", dataType = "List")
-		public List<NewInsertJenkinsVO> jobs;
+		public List<NewUpdateJenkinsVO> jobs;
 
 		public String getId() {
 			return id;
@@ -419,48 +428,57 @@
 			this.deleteFlag = deleteFlag;
 		}
 
-		public List<NewInsertJenkinsVO> getFolders() {
+		public String getUrl() {
+			return url;
+		}
+
+		public void setUrl(String url) {
+			this.url = url;
+		}
+
+		public List<NewUpdateJenkinsVO> getFolders() {
 			return folders;
 		}
 
-		public void setFolders(List<NewInsertJenkinsVO> folders) {
+		public void setFolders(List<NewUpdateJenkinsVO> folders) {
 			this.folders = folders;
 		}
 
-		public List<NewInsertJenkinsVO> getJobs() {
+		public List<NewUpdateJenkinsVO> getJobs() {
 			return jobs;
 		}
 
-		public void setJobs(List<NewInsertJenkinsVO> jobs) {
+		public void setJobs(List<NewUpdateJenkinsVO> jobs) {
 			this.jobs = jobs;
 		}
 
 		@Override
 		public String toString() {
-			return "NewInsertJenkinsVO [id=" + id + ", projectId=" + projectId + ", jenkinsFolderName=" + jenkinsFolderName
+			return "NewUpdateJenkinsVO [id=" + id + ", projectId=" + projectId + ", jenkinsFolderName=" + jenkinsFolderName
 					+ ", jenkinsJobName=" + jenkinsJobName + ", serviceStatus=" + serviceStatus + ", createdBy=" + createdBy
 					+ ", createdDate=" + createdDate + ", lastModifiedBy=" + lastModifiedBy + ", lastModifiedDate="
 					+ lastModifiedDate + ", jenkinsJobType=" + jenkinsJobType + ", jenkinsJobTypeName=" + jenkinsJobTypeName
-					+ ", division=" + division + ", deleteFlag=" + deleteFlag + ", folders=" + folders + ", jobs=" + jobs
-					+ "]";
+					+ ", division=" + division + ", deleteFlag=" + deleteFlag + ", url=" + url + ", folders=" + folders
+					+ ", jobs=" + jobs + "]";
 		}
 
+
+
+		
 	}
 
-	
-	
 	====================================================================================================
 
 	
 # 맵퍼(java)
 	
 	====================================================================================================
-	public int insertValidJenkinsCheck(NewInsertJenkinsVO vo);
+	public int updateValidJenkinsCheck(NewUpdateJenkinsVO vo);
 	====================================================================================================
 
 # 맵퍼(xml)
 	====================================================================================================
-    <select id="insertValidJenkinsCheck" resultType="Integer" parameterType="NewJenkinsParamVO" >
+    <select id="updateValidJenkinsCheck" resultType="Integer" parameterType="NewJenkinsParamVO" >
 	   select count(*) from jenkins_mn_job
         <if test='jenkinsFolderName!=null and jenkinsFolderName!=""'>
             where jenkins_folder_name = #{jenkinsFolderName}
