@@ -1,0 +1,68 @@
+충돌 해결 및 log4j 라이브러리 업데이트
+
+[ git 충돌 해결하기 ]
+
+
+# 현상
+	
+	dev :
+		현재 A , BB , C , DD ,E파일이 존재 
+	
+	staging
+		:
+		현재 A , B , C , D ,EE 파일이 존재
+		
+		※ BB , DD 는 수정된 B , D 파일
+	
+	
+	하고싶은 작업 : 
+		dev와 머지해서 staging에 있는 E 파일을 수정해서 올리려고 함
+		또한 BB , DD 는 staging에 반영되면 안됨
+	
+	안되는 이유
+		Dev와 staging의 E ,EE 파일이 서로 다름
+	
+
+# 해결방법
+
+	1. Dev 를 staging과 머지하고서 충돌났던 지점으로 변경
+	
+	2. Dev 와 staging을 merge 함
+		머지하면서 충돌난 부분을 해결
+	
+	3. 해결되면 해당 staging을 커밋 및 푸쉬
+	
+	4. dev는 다시 pull 로 원래 소스를 내려받음
+	
+	5. 추후 모든 문제가 해결되면 다시한번 위의 과정을 반복
+
+
+# 실제 작업 방법
+	※ 이클립스 기준
+	
+	1. 로컨 브런치를 전부다 내려받음 (staging , dev)
+	
+	2. dev 브런치 선택
+	
+	3. 하단의 history 에서 원하는 버전 우클릭 후 Reset -> hard 클릭
+		※ 이거하면 작업소스 다 날아가니 백업 해둬야함
+	
+	4. staging 브런치로 변경
+	
+	5. 프로젝트 우클릭 -> team -> merge 선택 
+		선택후 remote에 있는 브런치를 선택하지말고 로컬에 있는 dev 를 선택
+		
+	6. 머지가 되면서 충돌이 발생
+	
+	7. 프로젝트 우클릭 -> team -> merge Tool 선택
+	
+	8. 충돌난 소스들을 해결
+	
+	9. staging commit 후  push
+	
+	10. dev 브런치로 변경 후 pull 
+	
+	
+
+
+		
