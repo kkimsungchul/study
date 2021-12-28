@@ -1,4 +1,4 @@
-[ Jenkins MN 개발 ]
+[ Jenkins CI MN 개발 ]
 
 # 필요한 API 목록
 	- 등록
