@@ -1,0 +1,285 @@
+{
+"id":"695",
+"projectGroupId":"",
+"projectGroupSlug":"",
+"projectName":"kscProject263",
+"projectSlug":"kscProject263",
+"projectDesc":"kscProject263",
+"members":[
+{
+"loginId":"91296885",
+"dept":"협력사",
+"name":"김성철",
+"roleId":"201"
+},
+{
+"dept":"SW아키텍처팀",
+"loginId":"10029288",
+"name":"정용섭",
+"roleId":"203"
+}
+],
+"sparrows":[
+],
+"codeeyes":[
+],
+"jira":{
+"jiraKey":"KSCJIRA263",
+"jiraName":"KSCJIRAName263"
+},
+"git":{
+"gitGroupName":"kscGit263",
+"gitGroupPath":"kscGit263",
+"projects":[
+{
+"gitProjectName":"kscGitProject263",
+"gitProjectPath":"kscGitProject263"
+}
+]
+},
+"exists":{
+"jira":true,
+"gitlab":true,
+"jenkins":true,
+"nexus":false
+},
+"jenkins":{
+
+    "folders": [
+      {
+        "id": 88,
+        "projectId": 695,
+        "jenkinsFolderName": "newJenkins012-Folder001",
+        "jenkinsJobName": null,
+        "flagClass": "Folder",
+        "jenkinsJobType": null,
+        "jenkinsJobTypeName": null,
+        "division": 1,
+        "url": "https://jenkinssungchul.co.kr/job/newJenkins012-Folder001/",
+        "folders": [
+          {
+            "id": 0,
+            "projectId": 695,
+            "jenkinsFolderName": "newJenkins012-Folder001-1",
+            "jenkinsJobName": null,
+            "flagClass": "Folder",
+            "jenkinsJobType": null,
+            "jenkinsJobTypeName": null,
+            "division": 1,
+            "url": "https://jenkinssungchul.co.kr/job/newJenkins012-Folder001/job/newJenkins012-Folder001-1/",
+            "folders": [],
+            "jobs": [
+              {
+                "id": 0,
+                "projectId": 695,
+                "jenkinsFolderName": null,
+                "jenkinsJobName": "newJenkins012-Job002",
+                "flagClass": "FreeStyleProject",
+                "jenkinsJobType": "10401",
+                "jenkinsJobTypeName": "FreeStyle",
+                "division": 2,
+                "url": "https://jenkinssungchul.co.kr/job/newJenkins012-Folder001/job/newJenkins012-Folder001-1/job/newJenkins012-Job002/",
+                "folders": [],
+                "jobs": [],
+                "serviceStatus": 2
+              }
+            ],
+            "serviceStatus": 0
+          },
+          {
+            "id": 0,
+            "projectId": 695,
+            "jenkinsFolderName": "newJenkins012-Folder001-2",
+            "jenkinsJobName": null,
+            "flagClass": "Folder",
+            "jenkinsJobType": null,
+            "jenkinsJobTypeName": null,
+            "division": 1,
+            "url": "https://jenkinssungchul.co.kr/job/newJenkins012-Folder001/job/newJenkins012-Folder001-2/",
+            "folders": [],
+            "jobs": [
+              {
+                "id": 0,
+                "projectId": 695,
+                "jenkinsFolderName": null,
+                "jenkinsJobName": "newJenkins012-Job002",
+                "flagClass": "FreeStyleProject",
+                "jenkinsJobType": "10401",
+                "jenkinsJobTypeName": "FreeStyle",
+                "division": 2,
+                "url": "https://jenkinssungchul.co.kr/job/newJenkins012-Folder001/job/newJenkins012-Folder001-2/job/newJenkins012-Job002/",
+                "folders": [],
+                "jobs": [],
+                "serviceStatus": 2
+              }
+            ],
+            "serviceStatus": 0
+          }
+        ],
+        "jobs": [
+          {
+            "id": 0,
+            "projectId": 695,
+            "jenkinsFolderName": null,
+            "jenkinsJobName": "newJenkins012-Job003",
+            "flagClass": "FreeStyleProject",
+            "jenkinsJobType": "10401",
+            "jenkinsJobTypeName": "FreeStyle",
+            "division": 2,
+            "url": "https://jenkinssungchul.co.kr/job/newJenkins012-Folder001/job/newJenkins012-Job003/",
+            "folders": [],
+            "jobs": [],
+            "serviceStatus": 2
+          }
+        ],
+        "serviceStatus": 0
+      },
+      {
+        "id": 89,
+        "projectId": 695,
+        "jenkinsFolderName": "newJenkins012-Folder002",
+        "jenkinsJobName": null,
+        "flagClass": "Folder",
+        "jenkinsJobType": null,
+        "jenkinsJobTypeName": null,
+        "division": 1,
+        "url": "https://jenkinssungchul.co.kr/job/newJenkins012-Folder002/",
+        "folders": [
+          {
+            "id": 0,
+            "projectId": 695,
+            "jenkinsFolderName": "newJenkins012-Folder002-1",
+            "jenkinsJobName": null,
+            "flagClass": "Folder",
+            "jenkinsJobType": null,
+            "jenkinsJobTypeName": null,
+            "division": 1,
+            "url": "https://jenkinssungchul.co.kr/job/newJenkins012-Folder002/job/newJenkins012-Folder002-1/",
+            "folders": [],
+            "jobs": [
+              {
+                "id": 0,
+                "projectId": 695,
+                "jenkinsFolderName": null,
+                "jenkinsJobName": "newJenkins012-Job002",
+                "flagClass": "FreeStyleProject",
+                "jenkinsJobType": "10401",
+                "jenkinsJobTypeName": "FreeStyle",
+                "division": 2,
+                "url": "https://jenkinssungchul.co.kr/job/newJenkins012-Folder002/job/newJenkins012-Folder002-1/job/newJenkins012-Job002/",
+                "folders": [],
+                "jobs": [],
+                "serviceStatus": 2
+              }
+            ],
+            "serviceStatus": 0
+          },
+          {
+            "id": 0,
+            "projectId": 695,
+            "jenkinsFolderName": "newJenkins012-Folder002-2",
+            "jenkinsJobName": null,
+            "flagClass": "Folder",
+            "jenkinsJobType": null,
+            "jenkinsJobTypeName": null,
+            "division": 1,
+            "url": "https://jenkinssungchul.co.kr/job/newJenkins012-Folder002/job/newJenkins012-Folder002-2/",
+            "folders": [],
+            "jobs": [
+              {
+                "id": 0,
+                "projectId": 695,
+                "jenkinsFolderName": null,
+                "jenkinsJobName": "newJenkins012-Job002",
+                "flagClass": "FreeStyleProject",
+                "jenkinsJobType": "10401",
+                "jenkinsJobTypeName": "FreeStyle",
+                "division": 2,
+                "url": "https://jenkinssungchul.co.kr/job/newJenkins012-Folder002/job/newJenkins012-Folder002-2/job/newJenkins012-Job002/",
+                "folders": [],
+                "jobs": [],
+                "serviceStatus": 2
+              }
+            ],
+            "serviceStatus": 0
+          }
+        ],
+        "jobs": [
+          {
+            "id": 0,
+            "projectId": 695,
+            "jenkinsFolderName": null,
+            "jenkinsJobName": "newJenkins012-Job003",
+            "flagClass": "FreeStyleProject",
+            "jenkinsJobType": "10401",
+            "jenkinsJobTypeName": "FreeStyle",
+            "division": 2,
+            "url": "https://jenkinssungchul.co.kr/job/newJenkins012-Folder002/job/newJenkins012-Job003/",
+            "folders": [],
+            "jobs": [],
+            "serviceStatus": 2
+          }
+        ],
+        "serviceStatus": 0
+      }
+    ],
+    "jobs": [
+      {
+        "id": 90,
+        "projectId": 695,
+        "jenkinsFolderName": null,
+        "jenkinsJobName": "newJenkins012-Job001-1",
+        "flagClass": "FreeStyleProject",
+        "jenkinsJobType": "10401",
+        "jenkinsJobTypeName": "FreeStyle",
+        "division": 2,
+        "url": "https://jenkinssungchul.co.kr/job/newJenkins012-Job001-1/",
+        "folders": [],
+        "jobs": [],
+        "serviceStatus": 2
+      },
+      {
+        "id": 91,
+        "projectId": 695,
+        "jenkinsFolderName": null,
+        "jenkinsJobName": "newJenkins012-Job001-2",
+        "flagClass": "FreeStyleProject",
+        "jenkinsJobType": "10401",
+        "jenkinsJobTypeName": "FreeStyle",
+        "division": 2,
+        "url": "https://jenkinssungchul.co.kr/job/newJenkins012-Job001-2/",
+        "folders": [],
+        "jobs": [],
+        "serviceStatus": 2
+      },
+      {
+        "id": 92,
+        "projectId": 695,
+        "jenkinsFolderName": null,
+        "jenkinsJobName": "newJenkins012-Job001-3",
+        "flagClass": "FreeStyleProject",
+        "jenkinsJobType": "10401",
+        "jenkinsJobTypeName": "FreeStyle",
+        "division": 2,
+        "url": "https://jenkinssungchul.co.kr/job/newJenkins012-Job001-3/",
+        "folders": [],
+        "jobs": [],
+        "serviceStatus": 2
+      },
+	  {
+        "id": "",
+        "projectId": 695,
+        "jenkinsFolderName": null,
+        "jenkinsJobName": "newJenkins012-Job001-4",
+        "flagClass": "FreeStyleProject",
+        "jenkinsJobType": "10401",
+        "jenkinsJobTypeName": "FreeStyle",
+        "division": 2,
+        "url": "",
+        "folders": [],
+        "jobs": [],
+        "serviceStatus": 2
+      }
+    ]  
+}
+}

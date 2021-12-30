@@ -1,0 +1,568 @@
+[ Jenkins 수정 ]
+
+수정 (수정에서 job,folder 신규 생성)데이터 : 0.Jenkins 수정 테스트 데이터.txt
+활성화 비활성화 테스트 데이터 : 0.Jenkins 수정 테스트 데이터-활성화 비활성화상태변경.txt
+
+
+# 필요한 작업내용
+	
+	젠킨스 job, folder 추가 등록
+	job 비활성화 , 활성화 변경기능
+	
+	이두개의 기능외에 삭제 또는 이름변경등의 기능은 제공하고 있지 않음
+	
+	※ 최상위 폴더와 job을 제외하고서는 tool 에서 직접 받아오기때문에 툴에서 수정하면됨
+	
+
+# 순서
+	
+	1. Jenkins 목록을 전달 받는다.
+	2. 정규식 체크를 진행한다.
+		2-1. 최상단 목록들은 Jenkins API 를 호출하여 중복 체크를 진행한다.
+		2-2. 하위목록은 하위목록의 같은 폴더나 같은 잡 안에서 중복이 있나 체크한다.
+	3. 전달받은 데이터중 url 이 존재하지 않는 데이터에 대해서는 반복문을 돌면서 insert를 진행한다
+	4. insert 중 해당 항목의 하위폴더에 내용이 존재한다면 임시목록(TempList)에 추가한다.
+	5. insert 가 끝난 후에 임시목록(TempList)에 데이터가 존재하는지 확인하고, 존재한다면 다시 3번으로 돌아간다.	
+	
+	6. url 이 있는 값들은 service status 에 따른 활성화 비활성화 처리를 한다.
+
+
+# 컨틀롤러
+
+	기존에 사용하던 UpdateProjectVO 를 사용하되, JenkinsVO를 NewUpdateProjectVO 로 변경로 변경한 NewUpdateProjectVO 를 사용
+	현재 포탈에서 프로젝트 수정 사용하는 json 구조와 똑같이 받아서 사용함
+	====================================================================================================
+	@ApiOperation(value = "Jenkins 수정",notes = "프로젝트 수정시 전달되는 projectvo를 그대로 받아서 젠킨스만 중복체크함")
+	@RequestMapping(value = "/jenkins", method = RequestMethod.PUT)
+	public void jenkinsUpdate(@RequestBody  NewUpdateProjectVO newUpdateProjectVO ) {
+		if(newJenkinsService.updateJenkinsDBValidationCheck(newUpdateProjectVO.getJenkins()).isEmpty()) {
+			newJenkinsService.doJenkins(newUpdateProjectVO);	
+		}
+	}
+	
+	====================================================================================================
+
+# 서비스
+	
+	
+	NewUpdateProjectVO 를 받아서 job 과 folder를 구분하여 folder 생성 , job 생성 및 수정 메소드로 각각 리스트를 전달함
+	====================================================================================================
+    /**
+     * jenkins 폴더, job 수정
+     * @param newUpdateProjectVO
+     * @return boolean
+     */
+    public boolean doJenkins(NewUpdateProjectVO newUpdateProjectVO) {
+	    boolean isSuccess = false;
+		//String loginId = insertProjectVo.getCreatedBy();
+	    String loginId = "91296885";
+	    long projectId = newUpdateProjectVO.getId();
+		NewUpdateJenkinsVO jenkins = newUpdateProjectVO.getJenkins();
+		
+		List<NewUpdateJenkinsVO> updateJenkinsFolderList = jenkins.getFolders();
+		List<NewUpdateJenkinsVO> updateJenkinsJobList = jenkins.getJobs();
+		String uri = jenkinsUrl;
+		updateJenkinsFolder(updateJenkinsFolderList,uri , projectId, true);
+		updateJenkinsJob(updateJenkinsJobList,uri , projectId, true);
+		
+		isSuccess = true;
+		return isSuccess;
+	}	
+	
+	====================================================================================================
+	
+	createJenkinFolder의 메소드와의 차이점은 URL이 있나 없나를 비교하는 부분과
+	그후에 하위 폴더와 job을 처리하는 메소드 호출하는 부분이 조금 다름, 
+	거의 같은 로직을 사용하고 있기에 수정하게되면 이전에 작성한 createJenkinFolder 메소드도 같이 수정
+	
+	url 이 없을 경우 없는 것으로 간주하고 생성함
+	하나로 합칠수도 있지만, 합칠경우에 IF문이 너무 많이 들어갈거 같아서 나눠놓음
+	
+	또한 A폴더는 이전에 생성하였고, B폴더와  C 잡은 이번에 생성했을 경우도 있을 수 있어, url 이 있는 경우에도 하단의 job과 folder의 목록을 체크하여 다시 호출하도록 수정하였음
+	====================================================================================================
+        /**
+	 * Jenkins Folder 생성 - jenkinsUpdate 에서 사용함
+	 * @param updateJenkinsFolderList folder 목록
+	 * @param uri 생성할 경로
+	 * @param projectId 포탈 project id
+	 * @param topFlag 최상위 구분 여부 true :  최상위 
+	 * @return Map<String, String>
+	 */
+    public Map<String, String> updateJenkinsFolder(List<NewUpdateJenkinsVO> updateJenkinsFolderList,String uri , long projectId , boolean topFlag) {
+    	String templateJobName ="";
+    	String loginId = keyCloakSession.getLoginId();
+    	Map<String, String> result = new HashMap<String, String>();
+    	
+    	if(updateJenkinsFolderList.size()>0) {
+    		for(int i=0;i<updateJenkinsFolderList.size();i++) {
+    			
+    			//이미생성된 jenkins의 경우 url이 존재함
+    			if(!"".equals(updateJenkinsFolderList.get(i).getUrl()) && updateJenkinsFolderList.get(i).getUrl()!=null) {
+    				
+    			}else {
+    				
+        		    //폴더 생성
+        			//String uri = jenkinsUrl + "/createItem?name=" + folderName +"&mode=com.cloudbees.hudson.plugins.folder.Folder";
+        			String tempUri = uri+"/createItem?name=" + updateJenkinsFolderList.get(i).getJenkinsFolderName() + "&mode=com.cloudbees.hudson.plugins.folder.Folder";
+        			
+        			try {
+        	            ResponseEntity<String> responseResult = callJenkinsRestApi("POST", tempUri, null);
+        	            
+        	            if (responseResult.getStatusCode() == HttpStatus.OK) {
+        	                LOGGER.info("Jenkins REST API : Folder create success! , HttpStatus.OK");
+        	                result.put("status", DbMessageManager.getMessage("I0001", "ko"));
+        	                result.put("msg", "");
+        	                //최상위일 경우에만 DB에 저장
+        	                if(topFlag) {
+        	                	NewInsertJenkinsVO newInsertJenkinsVO = new NewInsertJenkinsVO();
+        	                	newInsertJenkinsVO.setCreatedBy(loginId);
+        	                	newInsertJenkinsVO.setLastModifiedBy(loginId);
+        	                	newInsertJenkinsVO.setProjectId(projectId);
+        	                	newInsertJenkinsVO.setDivision(updateJenkinsFolderList.get(i).getDivision());
+        	                	newInsertJenkinsVO.setJenkinsFolderName(updateJenkinsFolderList.get(i).getJenkinsFolderName());
+        	                	newJenkinsMapper.insertJenkins(newInsertJenkinsVO);	
+        	                }
+        	            } else {
+        	                // ssl 오류에 대해서는 무시한다 (정상으로 처리)
+        	                if (responseResult.getStatusCode() == HttpStatus.FOUND) {
+        	                	LOGGER.info("Jenkins REST API : Folder create success! , HttpStatus.FOUND");
+        	                    result.put("status", DbMessageManager.getMessage("I0001", "ko"));
+        	                    result.put("msg", "");
+            	                //최상위일 경우에만 DB에 저장
+            	                if(topFlag) {
+            	                	NewInsertJenkinsVO newInsertJenkinsVO = new NewInsertJenkinsVO();
+            	                	newInsertJenkinsVO.setCreatedBy(loginId);
+            	                	newInsertJenkinsVO.setLastModifiedBy(loginId);
+            	                	newInsertJenkinsVO.setProjectId(projectId);
+            	                	newInsertJenkinsVO.setDivision(updateJenkinsFolderList.get(i).getDivision());
+            	                	newInsertJenkinsVO.setJenkinsFolderName(updateJenkinsFolderList.get(i).getJenkinsFolderName());
+            	                	
+            	                	newJenkinsMapper.insertJenkins(newInsertJenkinsVO);	
+            	                }
+        	                } else {
+        	                    LOGGER.error("Jenkins REST API is fail, Return code : " + responseResult.getStatusCodeValue());
+        	                    throw new ApiException(responseResult.getStatusCode(), "E0015");
+        	                }
+        	            }
+
+        	        } catch(HttpClientErrorException ce) {
+        	        	ce.printStackTrace();
+        	            throw HttpErrorExceptionDetail.getApiException(ce, "Jenkins REST API error", uri);
+        	        } catch (HttpServerErrorException se) {
+        	            throw HttpErrorExceptionDetail.getApiException(se, "Jenkins REST API error", uri);
+        	        }
+    			}
+
+    			if(updateJenkinsFolderList.get(i).getJobs().size()>0) {
+    				String createJobUri = uri + "/job/" + updateJenkinsFolderList.get(i).getJenkinsFolderName() +"/";
+    				
+    				updateJenkinsJob(updateJenkinsFolderList.get(i).getJobs() , createJobUri , projectId ,false);
+    			}
+    			if(updateJenkinsFolderList.get(i).getFolders().size()>0) {
+    				String createFolderUri = uri + "/job/" + updateJenkinsFolderList.get(i).getJenkinsFolderName() +"/";
+    				updateJenkinsFolder(updateJenkinsFolderList.get(i).getFolders() , createFolderUri , projectId , false);
+    			}
+    			
+    			
+    			
+    		}
+    		
+    	}
+    	
+    	return result;
+    }
+	
+	
+	====================================================================================================
+	
+	
+	job 목록을 받아서, url 이 존재할 경우 serviceStatus 를 기준으로 1은 비활성화 2는 활성화 되도록 api를 호출
+	url 이 존재하지 않을 경우 없는것으로 판단하여 jenkins job 을 생성함
+	====================================================================================================
+	/**
+	 * Jenkins job 생성 및 수정 - jenkinsUpdate 에서 사용함
+	 * @param updateJenkinsJobList job목록
+	 * @param uri 생성할 경로
+	 * @param projectId 포탈 project id
+	 * @param topFlag 최상위 구분 여부 true :  최상위 
+	 * @return Map<String, String>
+	 */
+    public Map<String, String> updateJenkinsJob(List<NewUpdateJenkinsVO> updateJenkinsJobList,String uri, long projectId , boolean topFlag) {
+    	String templateJobName ="";
+    	String loginId = keyCloakSession.getLoginId();
+    	Map<String, String> result = new HashMap<String, String>();
+    	String tempUri="";
+    	if(updateJenkinsJobList.size()>0) {
+    		for(int i=0;i<updateJenkinsJobList.size();i++) {
+    			switch (updateJenkinsJobList.get(i).getJenkinsJobType()) {
+    			case "10401": //FreeStyle Template Folder 내용 복사
+    				templateJobName = "DSpace_FreeStyle_Template";
+    				break;
+    			case "10402":  //Pipeline Template Folder 내용 복사
+    				templateJobName = "DSpace_Pipeline_Template";
+    				break;
+    			}
+    			
+    			//이미생성된 jenkins의 경우 url이 존재함
+    			if(!"".equals(updateJenkinsJobList.get(i).getUrl()) && updateJenkinsJobList.get(i).getUrl()!=null) {
+    				
+    				//활성화
+    				if(updateJenkinsJobList.get(i).getServiceStatus()==2) {
+    					
+    					//enableJenkinsJob(uri+"/job/"+updateJenkinsJobList.get(i).getJenkinsJobName());
+    					enableAndDisableJenkinsJob(updateJenkinsJobList.get(i).getUrl(),updateJenkinsJobList.get(i).getServiceStatus());
+    				//비활성화
+    				}else if(updateJenkinsJobList.get(i).getServiceStatus()==1) {
+    					
+    					//disableJenkinsJob(uri+"/job/"+updateJenkinsJobList.get(i).getJenkinsJobName());
+    					enableAndDisableJenkinsJob(updateJenkinsJobList.get(i).getUrl(),updateJenkinsJobList.get(i).getServiceStatus());
+    				}
+    				
+    				
+    			//신규생성
+    			}else {
+    				 //잡생성
+        			//uri = jenkinsUrl + "/job/" + folderName +"/createItem?name=" + jobName + "&mode=copy&from=" + copyJobName;
+        			tempUri = uri+"/createItem?name=" + updateJenkinsJobList.get(i).getJenkinsJobName() + "&mode=copy&from=" + templateJobName;
+        			
+        			try 
+        	        {
+        	            // resources의 jenkinsJobConfig.xml 파일을 읽어 온다
+        	            String xmlStr = IOUtils.toString(getClass().getResourceAsStream("/xml/jenkens/jenkinsJobConfig.xml"), "UTF-8");
+        	            ResponseEntity<String> responseResult = callJenkinsRestApiForXml("POST", tempUri, xmlStr);
+        	            
+        	            if (responseResult.getStatusCode() == HttpStatus.OK || responseResult.getStatusCode() == HttpStatus.FOUND) {
+        	                LOGGER.info("Jenkins REST API : Job create success!");
+
+        	                //최상위일 경우에만 DB에 저장
+        	                if(topFlag) {
+        	                	NewInsertJenkinsVO newInsertJenkinsVO = new NewInsertJenkinsVO();
+        	                	newInsertJenkinsVO.setCreatedBy(loginId);
+        	                	newInsertJenkinsVO.setLastModifiedBy(loginId);
+        	                	newInsertJenkinsVO.setProjectId(projectId);
+        	                	newInsertJenkinsVO.setDivision(updateJenkinsJobList.get(i).getDivision());
+        	                	newInsertJenkinsVO.setJenkinsJobName(updateJenkinsJobList.get(i).getJenkinsJobName());
+        	                	newInsertJenkinsVO.setJenkinsJobType(updateJenkinsJobList.get(i).getJenkinsJobType());
+        	                	newJenkinsMapper.insertJenkins(newInsertJenkinsVO);	
+        	                }
+        	                
+        	                result.put("status", DbMessageManager.getMessage("I0001", "ko"));
+        	                result.put("msg", "");
+        	                
+        	            } else {
+        	                LOGGER.error("Jenkins REST API is fail, Return code : " + responseResult.getStatusCodeValue());
+        	                throw new ApiException(responseResult.getStatusCode(), "E0015");
+        	            }
+
+        	        } catch(IOException ie) {
+        	            // 파일 읽기 에러
+        	            throw new ApiException("E0017", "Jenkins REST API error : " + "Job config File");
+        	        } catch(HttpClientErrorException ce) {
+        	            throw HttpErrorExceptionDetail.getApiException(ce, "Jenkins REST API error", tempUri);
+        	        } catch (HttpServerErrorException se) {
+        	            throw HttpErrorExceptionDetail.getApiException(se, "Jenkins REST API error", tempUri);
+        	        } 
+    			}
+    			
+    			
+    		   
+    		}
+    		
+    	}
+
+        return result;
+    }
+	
+	====================================================================================================
+	
+	job 활성화 메소드로 기존에 사용하던것과 똑같음.
+	다만 전달받은 인자를 URL 과 serviceStatus를 받음 
+	1일경우 비활성화 , 2일경우 활성화 URL 호출
+	====================================================================================================
+    /**
+     * Jenkins Job 비활성화 비활성화
+     * @param folderName
+     * @param jobName
+     */
+    public Map<String, String> enableAndDisableJenkinsJob(String uri , int status) {
+        Map<String, String> result = new HashMap<String, String>();
+        
+        if(status==1) {
+        	uri = uri+"/disable";	
+        }else if(status==2) {
+        	uri = uri+"/enable";
+        }
+        try {
+            ResponseEntity<String> responseResult = callJenkinsRestApiForXml("POST", uri, null);
+            
+            LOGGER.info("Jenkins Job Disable : " + responseResult.getStatusCode());
+            
+            result.put("status", DbMessageManager.getMessage("I0001", "ko"));
+            result.put("msg", "");
+            return result;
+            
+        } catch(HttpClientErrorException ce) {
+            throw HttpErrorExceptionDetail.getApiException(ce, "Jenkins REST API error", uri);
+        } catch (HttpServerErrorException se) {
+            throw HttpErrorExceptionDetail.getApiException(se, "Jenkins REST API error", uri);
+        }
+    }
+	
+	====================================================================================================
+# VO
+	새로 생성하였음, DB구조가 변경되어서 그에 맞도록 수정하였으며, job과 folder을 하나의 vo로 사용함
+	====================================================================================================
+	package com.sumgchuldspace.portal.project.jenkins.test;
+
+	import java.util.List;
+
+	import io.swagger.annotations.ApiModel;
+	import io.swagger.annotations.ApiModelProperty;
+
+	@ApiModel(value = "NewUpdateJenkinsVO", description = "젠킨스 Update VO")
+	public class NewUpdateJenkinsVO {
+		
+		/**
+		 * Jenkins id
+		 */
+		@ApiModelProperty(name = "id", value = "Jenkins id", dataType = "String")
+		public int id;
+		
+		/**
+		 * 프로젝트 ID
+		 */
+		@ApiModelProperty(name = "projectId", value = "프로젝트 ID", dataType = "Long")
+		private Long projectId;
+		/**
+		 * Jenkins 폴더명
+		 */
+		@ApiModelProperty(name = "jenkinsFolderName", value = "Jenkins 폴더명", dataType = "String")
+		public String jenkinsFolderName;
+		
+		/**
+		 * Jenkins job 명
+		 */
+		@ApiModelProperty(name = "jenkinsJobName", value = "Jenkins job 명", dataType = "String")
+		public String jenkinsJobName;
+		
+		/**
+		 * jenkins service status
+		 */
+		@ApiModelProperty(name = "serviceStatus", value = "Jenkins 상태코드", dataType = "Integer")
+		private Integer serviceStatus;
+		
+		/**
+		 * Jenkins 등록자
+		 */
+		@ApiModelProperty(name = "createdBy", value = "Jenkins 등록자", dataType = "String")
+		private String createdBy;
+		
+		/**
+		 * Jenkins 등록일시
+		 */
+		@ApiModelProperty(name = "createdDate", value = "Jenkins 등록일시", dataType = "String")
+		private String createdDate;
+		/**
+		 * Jenkins 수정자
+		 */
+		@ApiModelProperty(name = "lastModifiedBy", value = "Jenkins 수정자", dataType = "String")
+		private String lastModifiedBy;
+		
+		/**
+		 * Jenkins 수정일시
+		 */
+		@ApiModelProperty(name = "lastModifiedDate", value = "Jenkins 수정일시", dataType = "String")
+		private String lastModifiedDate;
+
+		/**
+		 * Jenkins job 타입명(FreeStyle or Pipeline or...)
+		 */
+		@ApiModelProperty(name = "jenkinsJobType", value = "Jenkins Job 타입명(FreeStyle, Pipeline)", dataType = "String", example = "Pipeline")
+		public String jenkinsJobType;
+		
+		/**
+		 * Jenkins job 타입명(FreeStyle or Pipeline or...)
+		 */
+		@ApiModelProperty(name = "jenkinsJobTypeName", value = "Jenkins Job 타입명(FreeStyle, Pipeline)", dataType = "String", example = "Pipeline")
+		private String jenkinsJobTypeName;
+		/**
+		 * 구분코드 1: folder, 2: job
+		 */
+		@ApiModelProperty(name = "division", value = "구분코드 1: folder, 2: job", dataType = "String", example = "10302")
+		public int division;
+		/**
+		 * Jenkins deleteFlag 
+		 */
+		@ApiModelProperty(name = "deleteFlag", value = "Jenkins deleteFlag 값이 존재할경우 삭제 (1)", dataType = "String", example = "Pipeline")
+		public String deleteFlag;
+		
+		/**
+		 * Jenkins URL , 해당 폴더나 job의 URL
+		 */
+		@ApiModelProperty(name = "url", value = "jenkins url", dataType = "String")
+		public String url;
+		
+
+		@ApiModelProperty(name = "folders", value = "폴더목록", dataType = "List")
+		public List<NewUpdateJenkinsVO> folders;
+		
+		@ApiModelProperty(name = "jobs", value = "job목록", dataType = "List")
+		public List<NewUpdateJenkinsVO> jobs;
+
+		public int getId() {
+			return id;
+		}
+
+		public void setId(int id) {
+			this.id = id;
+		}
+
+		public Long getProjectId() {
+			return projectId;
+		}
+
+		public void setProjectId(Long projectId) {
+			this.projectId = projectId;
+		}
+
+		public String getJenkinsFolderName() {
+			return jenkinsFolderName;
+		}
+
+		public void setJenkinsFolderName(String jenkinsFolderName) {
+			this.jenkinsFolderName = jenkinsFolderName;
+		}
+
+		public String getJenkinsJobName() {
+			return jenkinsJobName;
+		}
+
+		public void setJenkinsJobName(String jenkinsJobName) {
+			this.jenkinsJobName = jenkinsJobName;
+		}
+
+		public Integer getServiceStatus() {
+			return serviceStatus;
+		}
+
+		public void setServiceStatus(Integer serviceStatus) {
+			this.serviceStatus = serviceStatus;
+		}
+
+		public String getCreatedBy() {
+			return createdBy;
+		}
+
+		public void setCreatedBy(String createdBy) {
+			this.createdBy = createdBy;
+		}
+
+		public String getCreatedDate() {
+			return createdDate;
+		}
+
+		public void setCreatedDate(String createdDate) {
+			this.createdDate = createdDate;
+		}
+
+		public String getLastModifiedBy() {
+			return lastModifiedBy;
+		}
+
+		public void setLastModifiedBy(String lastModifiedBy) {
+			this.lastModifiedBy = lastModifiedBy;
+		}
+
+		public String getLastModifiedDate() {
+			return lastModifiedDate;
+		}
+
+		public void setLastModifiedDate(String lastModifiedDate) {
+			this.lastModifiedDate = lastModifiedDate;
+		}
+
+		public String getJenkinsJobType() {
+			return jenkinsJobType;
+		}
+
+		public void setJenkinsJobType(String jenkinsJobType) {
+			this.jenkinsJobType = jenkinsJobType;
+		}
+
+		public String getJenkinsJobTypeName() {
+			return jenkinsJobTypeName;
+		}
+
+		public void setJenkinsJobTypeName(String jenkinsJobTypeName) {
+			this.jenkinsJobTypeName = jenkinsJobTypeName;
+		}
+
+		public int getDivision() {
+			return division;
+		}
+
+		public void setDivision(int division) {
+			this.division = division;
+		}
+
+		public String getDeleteFlag() {
+			return deleteFlag;
+		}
+
+		public void setDeleteFlag(String deleteFlag) {
+			this.deleteFlag = deleteFlag;
+		}
+
+		public String getUrl() {
+			return url;
+		}
+
+		public void setUrl(String url) {
+			this.url = url;
+		}
+
+		public List<NewUpdateJenkinsVO> getFolders() {
+			return folders;
+		}
+
+		public void setFolders(List<NewUpdateJenkinsVO> folders) {
+			this.folders = folders;
+		}
+
+		public List<NewUpdateJenkinsVO> getJobs() {
+			return jobs;
+		}
+
+		public void setJobs(List<NewUpdateJenkinsVO> jobs) {
+			this.jobs = jobs;
+		}
+
+		@Override
+		public String toString() {
+			return "NewUpdateJenkinsVO [id=" + id + ", projectId=" + projectId + ", jenkinsFolderName=" + jenkinsFolderName
+					+ ", jenkinsJobName=" + jenkinsJobName + ", serviceStatus=" + serviceStatus + ", createdBy=" + createdBy
+					+ ", createdDate=" + createdDate + ", lastModifiedBy=" + lastModifiedBy + ", lastModifiedDate="
+					+ lastModifiedDate + ", jenkinsJobType=" + jenkinsJobType + ", jenkinsJobTypeName=" + jenkinsJobTypeName
+					+ ", division=" + division + ", deleteFlag=" + deleteFlag + ", url=" + url + ", folders=" + folders
+					+ ", jobs=" + jobs + "]";
+		}
+
+
+
+		
+	}
+
+	====================================================================================================
+
+
+# 맵퍼(java)
+	손댄것 없음, 
+	jenkins 생성에서 사용하던것 그대로 사용함
+# 맵퍼(XML)
+	손댄것 없음, 
+	jenkins 생성에서 사용하던것 그대로 사용함
+
+
+	
+	
+	

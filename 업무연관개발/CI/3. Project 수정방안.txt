@@ -1,0 +1,304 @@
+[ VO 수정]
+	projectVO 수정
+		insertProjectVo
+		updateProjectVo
+	위 두개의 vo안에 있는 jenkinsVO를 각각 NewInsertJenkinsVO , NewUpdateJenkinsVO 로 변경
+
+[ 조회 ]
+	# 기존에 Jenkins 목록을 불러오는 API 변경 (R)
+		
+		기존에는 DB에 있는 정보만 조회하면 끝났지만, 지금은 하위에 있는 모든 프로젝트들을 조회해야 함
+		
+		- 기존
+		====================================================================================================
+		/**
+		 * 프로젝트 상세 - Jenkins Job 현황 목록
+		 */
+		@ApiOperation(value = "프로젝트 상세 조회 - Jenkins Job 현황 목록 조회",notes = "프로젝트 상세 내용 중 Jenkins Job 현황 목록을 조회합니다.")
+		@RequestMapping(value = "/jenkins/{jenkinsFolderName}", method = RequestMethod.GET)
+		public ResponseEntity<ApiResponseEntity> getJenkinsList(@PathVariable("jenkinsFolderName") String jenkinsFolderName) {
+			
+			List<GetJenkinsJobVO> jenkins = projectService.findJenkinsList(jenkinsFolderName);   
+			
+			String statusMsg = DbMessageManager.getMessage("I0001", "ko");
+			ApiResponseEntity message = new ApiResponseEntity(statusMsg, jenkins, null, null);
+
+			return new ResponseEntity<ApiResponseEntity>(message, HttpStatus.OK);   
+			
+		}
+		====================================================================================================
+		
+		
+		- 수정
+		====================================================================================================
+		@ApiOperation(value = "Jenkins 목록 조회",notes = "프로젝트에 포함되어 있는 Jenkins 목록 조회")
+		@RequestMapping(value = "/jenkins/{projectId}", method = RequestMethod.GET)
+		public ResponseEntity<ApiResponseEntity> getJenkinsList(@PathVariable("projectId") Long projectId ) {
+			NewJenkinsParamVO jenkins = newJenkinsService.getJenkinsList(projectId);
+			String statusMsg = DbMessageManager.getMessage("I0001", "ko");
+			ApiResponseEntity message = new ApiResponseEntity(statusMsg, jenkins, null, null);
+
+			return new ResponseEntity<ApiResponseEntity>(message, HttpStatus.OK);   
+		}	
+		====================================================================================================
+		
+
+	# 프로젝트 수정할 목록을 조회하는 부분 수정 (R)
+
+		- 기존
+		findProjectDetailByProjectId() -> getJenkinsByProjectId() 
+		====================================================================================================
+		returnVo.setJenkins(getJenkinsByProjectId(getProjectVo.getId()));
+		====================================================================================================
+		
+		
+		- 수정
+		====================================================================================================
+		returnVo.setJenkins(newJenkinsService.getJenkinsList(getProjectVo.getId()));
+		====================================================================================================
+
+
+[ 생성 ]
+	# 프로젝트 생성 시 중복 및 정규식 체크하는 부분 수정 (C)
+
+		기본에는 DB 체크, 정규식 체크 , 서버 체크를 "createProjectValidationCheck()" 메소드 내에서 진행했지만
+		조회해야할 양이 하위까지 생겨서 따로 메소드를 생성하여서 체크하도록 수정
+		"insertJenkinsDBValidationCheck()" 메소드에서 전부다 체크함
+		
+		- 기존
+		====================================================================================================
+		// Jenkins Check
+			String jenkinsFolderNm = insertProjectVo.getJenkins().getJenkinsFolderName();
+			//List<String> jenkinsJobNm = updateProjectVo.getJenkins().getJenkinsJobName();
+			List<JenkinsJobListVO> jenkinsJobList = insertProjectVo.getJenkins().getJenkinsJob();
+			
+			if ((jenkinsFolderNm == null || jenkinsFolderNm.isEmpty()) && (ObjectUtils.isEmpty(jenkinsJobList))) {}
+			else {
+				
+				// 접속여부 check
+				boolean jenkinsExists = dSpaceUserService.checkUserJenkinsLogin(getUserId());
+				if(!jenkinsExists) {
+					LOGGER.error("프로젝트 생성 전 Jenkins 접속은 필수입니다.");
+					result.put("msg", DbMessageManager.getMessage("E0121", "ko"));
+					return result;
+				}
+				
+				if (!ObjectUtils.isEmpty(jenkinsJobList)) {
+					if (jenkinsFolderNm == null || "".equals(jenkinsFolderNm)) {
+						result.put("msg", DbMessageManager.getMessage("E0009", "Jenkins 폴더명", "ko"));
+						return result;
+					}
+					//젠킨스 CI JOB 정규식 체크 : 한글 가능, 특수문자 `,.-_(){} 가능 varchar100
+					//(다만 특수문자가 들어갈 시 호출 API 에서 오류 발생, API호출에서 사용할 수 있는 특수문자 -_().,)
+					String regexJenkins  = "^([A-Za-z0-9ㄱ-힣]{1})[a-zA-Z0-9ㄱ-힣-_(),.\\s]{0,84}$";
+					match = Pattern.compile(regexJenkins).matcher(jenkinsFolderNm);
+					if(!match.find()) {
+						result.put("msg", DbMessageManager.getMessage("E0125", new Object[]{"Jenkins 폴더명", "특수문자로 시작할 수 없으며 한글,영문대소문자,숫자,특수문자 -_().,","1","85"}, "ko"));
+						return result;  
+					}
+					
+					if(checkJenkinsFolderNameDuplicate(null, jenkinsFolderNm)) {
+						result.put("msg", DbMessageManager.getMessage("E0016", "Jenkins 폴더명", "ko"));
+						return result;
+					}
+					
+
+					//validation check why ? front에서 
+					int jenkinsJobSize = jenkinsJobList.size();
+					for(int i=0;i<jenkinsJobSize;i++) {
+						String jobNm = jenkinsJobList.get(i).getJenkinsJobName();
+						for(int j=1; j<jenkinsJobSize;j++) {
+							
+							if(i!=j && i!=jenkinsJobSize-1) {
+								if(jobNm.equalsIgnoreCase(jenkinsJobList.get(j).getJenkinsJobName())) {
+									result.put("msg", DbMessageManager.getMessage("E0016", "Jenkins job명", "ko"));
+									return result;
+								}
+							}
+						}
+						match = Pattern.compile(regexJenkins).matcher(jobNm);
+						if(!match.find()) {
+							result.put("msg", DbMessageManager.getMessage("E0125", new Object[]{"Jenkins job명", "특수문자로 시작할 수 없으며 한글,영문대소문자,숫자,특수문자 -_().,","1","85"}, "ko"));
+							return result;  
+						}
+						
+					}		
+				}
+			}	
+		
+		
+		====================================================================================================
+		
+		
+		- 수정
+		리턴하는부분은 추후 map으로 받은 다음에 확인 후 리턴하는 거로 변경
+		====================================================================================================
+			
+			// Jenkins Check
+			// 접속여부 check
+			boolean jenkinsExists = dSpaceUserService.checkUserJenkinsLogin(getUserId());
+			if(!jenkinsExists) {
+				LOGGER.error("프로젝트 생성 전 Jenkins 접속은 필수입니다.");
+				result.put("msg", DbMessageManager.getMessage("E0121", "ko"));
+				return result;
+			}
+			
+			//비어있지 않을경우 return
+			if(!newJenkinsService.insertJenkinsDBValidationCheck(newInsertProjectVO.getJenkins()).isEmpty()) {
+			
+			}else{
+				return newJenkinsService.insertJenkinsDBValidationCheck(newInsertProjectVO.getJenkins());
+			}
+		
+		====================================================================================================
+		
+		
+
+	# 프로젝트 생성 시 젠킨스 생성하는 부분 수정 (C)
+		
+		기존에는 projectService 내에 있는 doJenkins 메소드를 사용했지만, jenkinsService 에 있는 doJenkins() 메소드를 사용하도록 수정
+		====================================================================================================
+		newJenkinsService.doJenkins(insertProjectVo);
+		====================================================================================================
+[ 수정 ]
+# 프로젝트 수정 시 중복 및 정규식 체크하는 부분 수정 (U)
+	- 기존
+	====================================================================================================
+		// JENKINSVALID
+		// Jenkins 기존 Data Validation Check
+		JenkinsVO jenkinsVo = new JenkinsVO();
+		jenkinsVo.setProjectId(updateProjectVo.getId());
+		List<JenkinsVO> originJenkins = jenkinsMapper.findJenkins(jenkinsVo);
+
+		if(!ObjectUtils.isEmpty(originJenkins)) {
+		    // Jenkins에 Folder가 실제로 존재하는지 체크. Tool에서 삭제된 상태면 Portal에서도 삭제 상태로 변경.
+		    String originJenkinsFolder = originJenkins.get(0).getJenkinsFolderName();
+	        if(originJenkinsFolder != null) {
+	            if(!jenkinsRestService.existFolderOrJob(originJenkinsFolder, null)) {
+	                updateJenkinsDeleteFlag(updateProjectVo.getId());
+	                result.put("msg", DbMessageManager.getMessage("E0017", "Jenkins 폴더", "ko"));
+	                return result;
+	            } else {
+	                // Jenkins에 Job이 실제로 존재하는지 체크. Tool에서 삭제된 상태면 Portal에서도 삭제 상태로 변경.
+	                for(JenkinsVO vo : originJenkins) {
+	                    if(!jenkinsRestService.existFolderOrJob(vo.getJenkinsFolderName(), vo.getJenkinsJobName())) {
+	                        updateJenkinsJobDeleteFlag(vo.getJenkinsJobId());
+	                        result.put("msg", DbMessageManager.getMessage("E0017", "Jenkins Job", "ko"));
+	                        return result;
+	                    }
+	                }
+	            }
+	        }
+		}
+
+		String jenkinsFolderNm = updateProjectVo.getJenkins().getJenkinsFolderName();
+		//List<String> jenkinsJobNm = updateProjectVo.getJenkins().getJenkinsJobName();
+		List<JenkinsJobListVO> jenkinsJobList = updateProjectVo.getJenkins().getJenkinsJob();
+		if ((ObjectUtils.isEmpty(jenkinsFolderNm)) && (ObjectUtils.isEmpty(jenkinsJobList))) {}
+		else {
+			// 접속여부 check
+			boolean jenkinsExists = dSpaceUserService.checkUserJenkinsLogin(getUserId());
+			if(!jenkinsExists) {
+				LOGGER.error("프로젝트 수정 전 Jenkins 접속은 필수입니다.");
+				result.put("msg", DbMessageManager.getMessage("E0121", "ko"));
+				return result;
+			}
+			
+			if (ObjectUtils.isEmpty(jenkinsJobList)) {
+			    result.put("msg", DbMessageManager.getMessage("E0009", "Jenkins Job", "ko"));
+                return result;
+
+			} else {
+				if (jenkinsFolderNm == null || "".equals(jenkinsFolderNm)) {
+					result.put("msg", DbMessageManager.getMessage("E0009", "Jenkins 폴더명", "ko"));
+					return result;
+				}
+				
+		        //젠킨스 CI JOB 정규식 체크 : 한글 가능, 특수문자 `,.-_(){} 가능 varchar100
+		        //(다만 특수문자가 들어갈 시 호출 API 에서 오류 발생, API호출에서 사용할 수 있는 특수문자 -_().,)
+				String regexJenkins  = "^([A-Za-z0-9ㄱ-힣]{1})[a-zA-Z0-9ㄱ-힣-_(),.\\s]{0,84}$";
+		        match = Pattern.compile(regexJenkins).matcher(jenkinsFolderNm);
+		        if(!match.find()) {
+				    result.put("msg", DbMessageManager.getMessage("E0125", new Object[]{"Jenkins 폴더명", "특수문자로 시작할 수 없으며 한글,영문대소문자,숫자,특수문자 -_().,","1","85"}, "ko"));
+				    return result;  
+		        }
+				
+				
+				if(checkJenkinsFolderNameDuplicate(updateProjectVo.getId(), jenkinsFolderNm)) {
+					result.put("msg", DbMessageManager.getMessage("E0016", "Jenkins 폴더명", "ko"));
+					return result;
+				}
+
+//				for(JenkinsJobListVO jobVo : jenkinsJobList) {
+//					// 이미 한번 사용한 Jenkins Job인지 체크
+//					GetJenkinsJobVO getJenkinsJobVO = jenkinsRestService.getJenkinsJobBuildList(jenkinsFolderNm, jobVo.getJenkinsJobName());
+//					if(getJenkinsJobVO != null) {
+//						if(getJenkinsJobVO.isArchived()) {
+//							result.put("msg", DbMessageManager.getMessage("E0122", new Object[]{jobVo.getJenkinsJobName(), "Jenkins Job(보관정책)", "Jenkins Job"}, "ko"));
+//							return result;
+//						}
+//					}
+//				}
+				
+				//validation check why ? front에서 
+				int jenkinsJobSize = jenkinsJobList.size();
+				for(int i=0;i<jenkinsJobSize;i++) {
+					String jobNm = jenkinsJobList.get(i).getJenkinsJobName();
+					for(int j=1; j<jenkinsJobSize;j++) {
+						
+						if(i!=j && i!=jenkinsJobSize-1) {
+							if(jobNm.equalsIgnoreCase(jenkinsJobList.get(j).getJenkinsJobName())) {
+								result.put("msg", DbMessageManager.getMessage("E0016", "Jenkins job명", "ko"));
+								return result;
+							}
+						}
+					}
+					match = Pattern.compile(regexJenkins).matcher(jobNm);
+					if(!match.find()) {
+						result.put("msg", DbMessageManager.getMessage("E0125", new Object[]{"Jenkins job명", "특수문자로 시작할 수 없으며 한글,영문대소문자,숫자,특수문자 -_().,","1","85"}, "ko"));
+						return result;  
+					}
+					
+					if(jenkinsJobList.get(i).getJenkinsJobId()==null) {
+						if(jenkinsRestService.existFolderOrJob(jenkinsFolderNm, jobNm)) {
+							result.put("msg", DbMessageManager.getMessage("E0016", "Jenkins job명", "ko"));
+							return result;
+		                }							
+					}
+					
+				}		
+			}
+		}	
+	
+	====================================================================================================
+
+
+	-수정
+	리턴하는부분은 추후 map으로 받은 다음에 확인 후 리턴하는 거로 변경
+	====================================================================================================
+		// 접속여부 check
+		boolean jenkinsExists = dSpaceUserService.checkUserJenkinsLogin(getUserId());
+		if(!jenkinsExists) {
+			LOGGER.error("프로젝트 수정 전 Jenkins 접속은 필수입니다.");
+			result.put("msg", DbMessageManager.getMessage("E0121", "ko"));
+			return result;
+		}
+		if(!newJenkinsService.updateJenkinsDBValidationCheck(newUpdateProjectVO.getJenkins()).isEmpty()) {
+			return newJenkinsService.updateJenkinsDBValidationCheck(newUpdateProjectVO.getJenkins());	
+		}
+	
+	
+	====================================================================================================
+
+# 프로젝트 수정 시 젠킨스 생성하는 부분 수정 (U)
+	
+	-기존
+	====================================================================================================
+	doJenkinsUpdate(updateProjectVo)
+	====================================================================================================
+	
+	-수정
+	jenkinsService 에 있는 doJenkinsUpdate() 메소드를 사용하도록 수정
+	====================================================================================================
+	newJenkinsService.doJenkinsUpdate(updateProjectVo)
+	====================================================================================================

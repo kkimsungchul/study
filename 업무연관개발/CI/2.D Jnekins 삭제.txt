@@ -1,0 +1,154 @@
+[ Jenkins 삭제 ]
+
+	툴에서 물리적인 삭제( 완전히지우는것) 은 하지않고 있고,
+	포탈에서 삭제할 경우 
+	
+		- 포탈DB의 service status는 9로 변경
+		- Jenkins tool 에서는 비활성화 상태로 변경
+	
+	폴더의 경우에는 비활성화 상태가 존재하지 않음
+	job만 찾아서 비활성화 상태로 변경하면 됨
+	
+	
+	※ DB에서 사용하는 service_status에 1. 비활성화 2 활성화는 넣지 않아도 됨 이미 젠킨스 툴에서 받아오고 있어서, 0이랑 9로만 구분하면되고 잡과 폴더 구문은 뒤에 division 으로 구분하면됨
+
+	
+# 삭제 테스트 데이터
+	insert into jenkins_mn_job (project_id , jenkins_folder_name, jenkins_job_name , service_status , created_by , last_modified_by  ,division)
+	values ('697', 'kscJenkins218', '' , '0' , '91296885','91296885',1);
+	
+	insert into jenkins_mn_job (project_id , jenkins_folder_name, jenkins_job_name , service_status , created_by , last_modified_by  ,division)
+	values ('697', 'kscJenkins225', '' , '0' , '91296885','91296885',1);
+	
+	insert into jenkins_mn_job (project_id , jenkins_folder_name, jenkins_job_name , service_status , created_by , last_modified_by  ,division)
+	values ('697', 'kscJenkins251', '' , '0' , '91296885','91296885',1);
+	
+	insert into jenkins_mn_job (project_id , jenkins_job_name , service_status , created_by , last_modified_by , jenkins_job_type ,division)
+	values ('697',  'kscJenkins0001' , '0' , '91296885','91296885','',2);
+
+
+# 컨트롤러
+	
+	넘겨받은 projectId 를 그대로 사용해서 disable 처리하는 메소드를 호출
+	====================================================================================================
+	@ApiOperation(value = "Jenkins 삭제",notes = "프로젝트 수정시 전달되는 insertvo를 그대로 받아서 젠킨스만 중복체크함")
+	@RequestMapping(value = "/jenkins/{projectId}", method = RequestMethod.DELETE)
+	public void deleteJenkins(@PathVariable("projectId") Long projectId  ) {
+		newJenkinsService.jenkinsDisableList(projectId);
+	}
+	====================================================================================================
+	
+# 서비스
+
+	프로젝트 ID로 젠킨스의 목록을 조회해 와서 jenkinsDisable 메소드로 전달함
+	목록조회에는 getJenkinsList() 메소드를 사용함
+	또한 jenkinsDisable 메소드의 작업이 끝나면 DB에 저장되어 있는 jenkins 최상단 데이터들의 serivce_status 를 9 로 변경
+	====================================================================================================
+    /**
+     * Jenkins job 목록 전체 disable 처리를 위한 목록 조회
+     * @param projectId
+     * @return boolean
+     */
+    public boolean jenkinsDisableList(Long projectId) {
+    	//아래의 메소드는 무조건 true가 리턴됨, 단방향 통신이기때문에 jenkins tool 에서 오류가 발생할 시 rollback 이 어렵기 때문에 무조건 true로 리턴
+    	
+    	//jenkins 전체 목록 조회
+    	//List<NewJenkinsParamVO> jenkins = getJenkinsList(projectId);
+    	NewJenkinsParamVO jenkins = getJenkinsList(projectId);
+    	
+    	if(jenkins.getFolders().size()>0) {
+        	if(jenkinsDisable(jenkins.getFolders(),null)) {
+        		NewUpdateJenkinsVO newUpdateJenkinsVO = new NewUpdateJenkinsVO();
+        		newUpdateJenkinsVO.setLastModifiedBy(keyCloakSession.getLoginId());
+        		newUpdateJenkinsVO.setServiceStatus(9);
+        		
+        		//DB에 저장되어 있는 최상단 목록의 serivce_status 를 9로 변경
+        		for(NewJenkinsParamVO newJenkinsParamVO : jenkins.getFolders()) {
+        			newUpdateJenkinsVO.setId(newJenkinsParamVO.getId());
+        			
+        			newJenkinsMapper.updateJenkins(newUpdateJenkinsVO);
+        			LOGGER.info("ID : "+newJenkinsParamVO.getId());
+        		}
+        		
+        	};
+        	return true;
+    	}
+    	
+    	if(jenkins.getJobs().size()>0) {
+        	if(jenkinsDisable(jenkins.getJobs(),null)) {
+        		NewUpdateJenkinsVO newUpdateJenkinsVO = new NewUpdateJenkinsVO();
+        		newUpdateJenkinsVO.setLastModifiedBy(keyCloakSession.getLoginId());
+        		newUpdateJenkinsVO.setServiceStatus(9);
+        		
+        		//DB에 저장되어 있는 최상단 목록의 serivce_status 를 9로 변경
+        		for(NewJenkinsParamVO newJenkinsParamVO : jenkins.getJobs()) {
+        			newUpdateJenkinsVO.setId(newJenkinsParamVO.getId());
+        			
+        			newJenkinsMapper.updateJenkins(newUpdateJenkinsVO);
+        			LOGGER.info("ID : "+newJenkinsParamVO.getId());
+        		}
+        		
+        	};
+        	return true;
+    	}
+    	
+    	 return true;
+    }
+	====================================================================================================
+	
+	
+	넘겨받은 jenkins 목록에서 job만 추출하여 disable 시켜줌.
+	폴더는 disable이 없음
+	====================================================================================================
+    /**
+     * Jenkins job 목록 전체를 disable 처리
+     * @param jenkins url
+     * @param url 
+     * @return boolean
+     */
+    public boolean jenkinsDisable(List<NewJenkinsParamVO> jenkins , String url) {
+    	if("".equals(url) || url==null) {
+    		url = jenkinsUrl;
+    	}
+    	for(int i=0; i<jenkins.size();i++) {
+    		//폴더
+    		if(jenkins.get(i).getDivision()==1) {
+    			if(jenkins.get(i).getFolders().size()>0) {
+    				jenkinsDisable(jenkins.get(i).getFolders(),url + "/job"+jenkins.get(i).getJenkinsFolderName());	
+    			}
+    			if(jenkins.get(i).getJobs().size()>0) {
+    				jenkinsDisable(jenkins.get(i).getJobs(),url + "/job"+jenkins.get(i).getJenkinsFolderName());
+    			}
+    			
+    		//job
+    		}else if(jenkins.get(i).getDivision()==2){
+    			
+    			//serviceStauts 를 2로 변경해서 보내면 전부다 복구됨
+    			//1로 보낼경우 전부다 disable 처리함
+    			
+    			LOGGER.info("jenkinsDisable url : "+url);
+    			enableAndDisableJenkinsJob(jenkins.get(i).getUrl(),1);
+    		}
+    	}
+    	return true;
+    }
+	====================================================================================================
+
+
+# 맵퍼(JAVA)
+
+	====================================================================================================
+	public int updateJenkins(NewUpdateJenkinsVO newUpdateJenkinsVO);
+	====================================================================================================
+# 맵퍼(XML)
+
+	====================================================================================================
+    <update id="updateJenkins" useGeneratedKeys="true" keyProperty="id" parameterType="NewUpdateJenkinsVO">
+        UPDATE jenkins_mn_job
+           SET 
+               last_modified_by = #{lastModifiedBy},
+               last_modified_date = now(),
+               service_status = #{serviceStatus}
+         WHERE id = #{id}
+    </update>
+	====================================================================================================
