@@ -1,0 +1,2 @@
+	insert into jenkins_mn_job_cd (project_id , jenkins_cd_folder_name, jenkins_job_name , service_status , created_by , last_modified_by  ,division , server_type_code , server_zone_code)
+	values ('698', 'kscJenkins267', '' , '0' , '91296885','91296885',1,10101,10201);
