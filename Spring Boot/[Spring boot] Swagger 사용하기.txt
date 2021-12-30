@@ -1,9 +1,22 @@
-[ swagger »ç¿ëÇÏ±â ]
+[ swagger ì‚¬ìš©í•˜ê¸° ]
 https://kim-jong-hyun.tistory.com/49
 https://dev-jwblog.tistory.com/20
-# swagger ¶óÀÌºê·¯¸® Ãß°¡
+
+â€» ì°¸ê³ ë¡œ í˜„ì¬ ìŠ¤í”„ë§ 2.6 ë²„ì „ëŒ€ì—ì„œëŠ” ìŠ¤ì›¨ê±° 3.0 ì„ ì‚¬ìš©í•˜ì§€ ëª»í•˜ëŠ” ì´ìŠˆê°€ ì¡´ì¬í•¨
+	https://stackoverflow.com/questions/70036953/springboot-2-6-0-spring-fox-3-failed-to-start-bean-documentationpluginsboot
+	2.5 ë²„ì „ëŒ€ë¡œ ë‚´ë¦¬ë©´ ì ìƒì ìœ¼ë¡œ ì‘ë™í•¨
+	=================================================================================================================
+	This problem's caused by a bug in Springfox. It's making an assumption about how Spring MVC is set up that doesn't always hold true. Specifically, it's assuming that MVC's path matching will use the Ant-based path matcher and not the PathPattern-based matcher. PathPattern-based matching has been an option for some time now and is the default as of Spring Boot 2.6.
+
+	As described in Spring Boot 2.6's release notes, you can restore the configuration that Springfox assumes will be used by setting spring.mvc.pathmatch.matching-strategy to ant-path-matcher in your application.properties file. Note that this will only work if you are not using Spring Boot's Actuator. The Actuator always uses PathPattern-based parsing, irrespective of the configured matching-strategy. A change to Springfox will be required to if you want to use it with the Actuator in Spring Boot 2.6 and later.	
 	
-	gradle ÆÄÀÏ¿¡ ¾Æ·¡ÀÇ ³»¿ëÀ» Ãß°¡
+	
+	=================================================================================================================
+
+
+# swagger ë¼ì´ë¸ŒëŸ¬ë¦¬ ì¶”ê°€
+	
+	gradle íŒŒì¼ì— ì•„ë˜ì˜ ë‚´ìš©ì„ ì¶”ê°€
 	=================================================================================================================
     
 	compile 'io.springfox:springfox-swagger2:2.9.2'
@@ -11,7 +24,7 @@ https://dev-jwblog.tistory.com/20
 
 	=================================================================================================================
 
-# swagger Config ÆÄÀÏ »ı¼º
+# swagger Config íŒŒì¼ ìƒì„±
 	=================================================================================================================
 
 	@Configuration
@@ -31,57 +44,57 @@ https://dev-jwblog.tistory.com/20
 	=================================================================================================================
 
 
-# Á¢¼Ó
+# ì ‘ì†
 	http://localhost:8080/swagger-ui.html
 
 
-# ¼³¸í Àû¿ë
+# ì„¤ëª… ì ìš©
 
-	@ApiOperation ¾î³ëÅ×ÀÌ¼ÇÀ» ÅëÇØ¼­ API¿¡ ´ëÇÑ ¼³¸íÀ» ÀÛ¼º
-	@ApiImplicitParam À» ÅëÇØ¼­ ÇØ´ç º¯¼öÀÇ ¼³¸í°ú µğÆúÆ® °ªÀ» ÀÛ¼º
-	@ApiResponses http »óÅÂÄÚµå¿¡ µû¸¥ ¸Ş½ÃÁö¸¦ ÀÛ¼º
+	@ApiOperation ì–´ë…¸í…Œì´ì…˜ì„ í†µí•´ì„œ APIì— ëŒ€í•œ ì„¤ëª…ì„ ì‘ì„±
+	@ApiImplicitParam ì„ í†µí•´ì„œ í•´ë‹¹ ë³€ìˆ˜ì˜ ì„¤ëª…ê³¼ ë””í´íŠ¸ ê°’ì„ ì‘ì„±
+	@ApiResponses http ìƒíƒœì½”ë“œì— ë”°ë¥¸ ë©”ì‹œì§€ë¥¼ ì‘ì„±
 	=================================================================================================================
     @GetMapping("/a")
-    @ApiOperation(value="aÆäÀÌÁö" , notes="Á¢¼Ó½Ã bye¶ó´Â ´Ü¾î¸¦ ¸®ÅÏÇÕ´Ï´Ù.")
+    @ApiOperation(value="aí˜ì´ì§€" , notes="ì ‘ì†ì‹œ byeë¼ëŠ” ë‹¨ì–´ë¥¼ ë¦¬í„´í•©ë‹ˆë‹¤.")
     @ApiImplicitParams({
-            @ApiImplicitParam(name="a" , value = "°Á Å×½ºÆ®¿ë aº¯¼ö¿¡ ´ëÇÑ ¼³¸í", defaultValue = "µğÆúÆ®°ª")
+            @ApiImplicitParam(name="a" , value = "ê± í…ŒìŠ¤íŠ¸ìš© aë³€ìˆ˜ì— ëŒ€í•œ ì„¤ëª…", defaultValue = "ë””í´íŠ¸ê°’")
     })
 	@ApiResponses({
-		@ApiResponse(code = 200, message = "¼º°ø", response = Map.class),
-		@ApiResponse(code = 403, message = "Á¢±Ù°ÅºÎ", response = HttpClientErrorException.Forbidden.class),
-		@ApiResponse(code = 500, message = "¼­¹ö ¿¡·¯", response = ServerError.class),
+		@ApiResponse(code = 200, message = "ì„±ê³µ", response = Map.class),
+		@ApiResponse(code = 403, message = "ì ‘ê·¼ê±°ë¶€", response = HttpClientErrorException.Forbidden.class),
+		@ApiResponse(code = 500, message = "ì„œë²„ ì—ëŸ¬", response = ServerError.class),
     })
     public String bye(String a){
         return "bye";
     }
 	=================================================================================================================
 
-	@ApiModel voÅ¬·¡½º¿¡ ´ëÇÑ ¼³¸í ÀÛ¼º
-	@ApiModelProperty º¯¼ö¿¡ ´ëÇÑ ¼³¸í ÀÛ¼º
+	@ApiModel voí´ë˜ìŠ¤ì— ëŒ€í•œ ì„¤ëª… ì‘ì„±
+	@ApiModelProperty ë³€ìˆ˜ì— ëŒ€í•œ ì„¤ëª… ì‘ì„±
 
-	@ApiModelProperty »ç¿ë¹ı
-	value - ÆÄ¶ó¸ŞÅÍ ÀÌ¸§
-	name - Swagger¿¡¼­ ÀÔ·Â ¹ŞÀ» ¸®¾ó ÆÄ¶ó¸ŞÅÍ ¸í
-	notes - ºÎ°¡¼³¸í
-	example - ÁöÁ¤µÈ ÀÓÀÇ Å×½ºÆ® °ªÀ» ÀÔ·Â ÇÔ
-	required - ÇÊ¼ö ÀÔ·Â ¿©ºÎ
+	@ApiModelProperty ì‚¬ìš©ë²•
+	value - íŒŒë¼ë©”í„° ì´ë¦„
+	name - Swaggerì—ì„œ ì…ë ¥ ë°›ì„ ë¦¬ì–¼ íŒŒë¼ë©”í„° ëª…
+	notes - ë¶€ê°€ì„¤ëª…
+	example - ì§€ì •ëœ ì„ì˜ í…ŒìŠ¤íŠ¸ ê°’ì„ ì…ë ¥ í•¨
+	required - í•„ìˆ˜ ì…ë ¥ ì—¬ë¶€
 
-	@JsonProperty ´Â lombok¿¡¼­ Á¦°øÇØÁÖ´Â ¾î³ëÅ×ÀÌ¼ÇÀÌ°í, ½º³×ÀÌÅ©ÄÉÀÌ½º¸¦ Ä«¸áÄÉÀÌ½º·Î º¯È¯ÇØÁÜ
-	(È­¸é´Ü¿¡¼­ stock_code º¯¼ö¸íÀ¸·Î µ¥ÀÌÅÍ¸¦ Àü´ŞÇÏ¸é, ¼­¹ö´Ü¿¡¼­´Â stockCode ·Î¹ŞÀ½)
+	@JsonProperty ëŠ” lombokì—ì„œ ì œê³µí•´ì£¼ëŠ” ì–´ë…¸í…Œì´ì…˜ì´ê³ , ìŠ¤ë„¤ì´í¬ì¼€ì´ìŠ¤ë¥¼ ì¹´ë©œì¼€ì´ìŠ¤ë¡œ ë³€í™˜í•´ì¤Œ
+	(í™”ë©´ë‹¨ì—ì„œ stock_code ë³€ìˆ˜ëª…ìœ¼ë¡œ ë°ì´í„°ë¥¼ ì „ë‹¬í•˜ë©´, ì„œë²„ë‹¨ì—ì„œëŠ” stockCode ë¡œë°›ìŒ)
 	=================================================================================================================
 	@ApiModel("parsing VO")
 	public class ParsingVO {
 
-		@ApiModelProperty(required = true, name = "stock_code" ,value = "ÁÖ½ÄÁ¾¸ñÄÚµå", notes = "ÇÊ¼ö", example = "005930")
+		@ApiModelProperty(required = true, name = "stock_code" ,value = "ì£¼ì‹ì¢…ëª©ì½”ë“œ", notes = "í•„ìˆ˜", example = "005930")
 		@JsonProperty("stock_code")
 		private String stockCode;
 
 	=================================================================================================================
 
 
-# CSRF ÅäÅ« ÄÁÆ®·Ñ·¯ »ı¼º
+# CSRF í† í° ì»¨íŠ¸ë¡¤ëŸ¬ ìƒì„±
 
-	swagger »ç¿ë½Ã http://localhost:/csrf 404 ¿À·ù¸Ş½ÃÁö°¡ Ãâ·ÂµÇ¾î¼­ ±¸ÇöÇÔ
+	swagger ì‚¬ìš©ì‹œ http://localhost:/csrf 404 ì˜¤ë¥˜ë©”ì‹œì§€ê°€ ì¶œë ¥ë˜ì–´ì„œ êµ¬í˜„í•¨
 
 	=================================================================================================================
 
@@ -95,7 +108,7 @@ https://dev-jwblog.tistory.com/20
 	import javax.servlet.http.HttpServletRequest;
 
 
-	//swagger »ç¿ë½Ã http://localhost:/csrf 404 ¿À·ù¸Ş½ÃÁö°¡ Ãâ·ÂµÇ¾î¼­ ±¸ÇöÇÔ
+	//swagger ì‚¬ìš©ì‹œ http://localhost:/csrf 404 ì˜¤ë¥˜ë©”ì‹œì§€ê°€ ì¶œë ¥ë˜ì–´ì„œ êµ¬í˜„í•¨
 	//https://stackoverflow.com/questions/55582023/when-loading-the-swagger-ui-html-page-a-request-is-made-to-hostport-and-host
 	@Controller
 	public class CSRFController {
