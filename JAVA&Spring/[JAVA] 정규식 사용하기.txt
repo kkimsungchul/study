@@ -58,78 +58,100 @@ String regexJenkins  = "^[a-zA-Z0-9가-힣-_(),.]{1,50}$";
 
 # 아래는 실제로 작성해서 사용한 정규식
 	=======================================================================================================================================
-		Matcher match;
-		boolean bPassCombine;
-		boolean bPassRepeat;
-		String regexpCombine = "^(?=.*\\d)(?=.*[~`!@#$%\\^&*()-])(?=.*[A-z]).{8,}$";
-		String regexpRepeat = "(\\w)\\1\\1";
+	import java.util.regex.Matcher;
+	import java.util.regex.Pattern;
 
+	public class RegexTestClass {
 
-		//프로젝트 이름 : 한글 가능 5-20글자
+		public static void main(String[]args) {
+			Matcher match;
+
+		//프로젝트 이름 : 한글 가능 5-50글자	varchar50
 		String regexProjectName; 
 
-		//프로젝트 URL : 한글 불가능영문,숫자,특수문자(-) 가능
-		String regexProjectSlug = "^[a-zA-Z0-9\\-]*$";
-			String projectSlug = "adsfada2341234dfa-aaa";
+		//프로젝트 URL : 한글 불가능영문,숫자,특수문자(-) 가능 varchar50
+		String regexProjectSlug = "^[a-zA-Z0-9\\-]{1,50}$";
+			String projectSlug = "projectslug-aaa";
 		match = Pattern.compile(regexProjectSlug).matcher(projectSlug);
-		System.out.println(projectSlug);
-		System.out.println(match.find()); 
-		System.out.println();
+		System.out.print(projectSlug); 
+		System.out.println(" : "+match.find()); 
 
-		//JIRA 프로젝트 이름 : 한글 가능
+
+
+		//JIRA 프로젝트 이름 : 한글 가능 (최대 80 문자.)
 		String regexJiraName;
 
-		//JIRA URL : 한글 불가능 ,  영어대문자 숫자 가능, 10글자 이하
-		String regexJiraSlug = "^[A-Z0-9]{0,10}$";
-		String jiraSlug = "AAA3";
+		//JIRA URL : 한글 불가능 ,  영어대문자 숫자 가능, 10글자 이하 (10 글자 프로젝트 키는 대문자로 시작해야 하며, 1개 이상의 대문자 알파벳 숫자가 따라와야 합니다.)
+		String regexJiraSlug = "^([A-Z]{1})[A-Z0-9]{1,9}$";
+		String jiraSlug = "JIRAURL101";
 		match = Pattern.compile(regexJiraSlug).matcher(jiraSlug);
-		System.out.println(jiraSlug);
-		System.out.println(match.find());
-		System.out.println();
+		System.out.print(jiraSlug);
+		System.out.println(" : "+match.find());
 
-		//Gitlab 그룹 이름 : 한글 불가능, 특수문자 - _ .  가능
 
-		String regexGitlab = "^[a-zA-Z0-9\\-\\_\\.]*$";
-		String gitlabName = "AAA3asdfasdf-_.";
-		//Gitlab 그룹 URL : 한글 불가능, 특수문자 - _ .  가능
-		String gitlabSlug = "AAA3asdttt44fasdf-_.";
-		//Gitlab 프로젝트 이름 : 한글 불가능, 특수문자 - _ .  가능
-		String regexGitlabProjectName = "asdf123-_-...aaAA";
-		//Gitlab 프로젝트 URL : 한글 불가능, 특수문자 - _ .  가능
-		String regexGitlabProjectSlug = "-_-...ZZzz....";
+		//Gitlab 그룹 이름 : 한글 불가능, 특수문자 - _ .  가능 (maximum is 255 characters)
+		//Gitlab 그룹 URL : 한글 불가능, 특수문자 - _ .  가능 (maximum is 255 characters)
+		//Gitlab 프로젝트 이름 : 한글 불가능, 특수문자 - _ .  가능 (maximum is 255 characters)
+		//Gitlab 프로젝트 URL : 한글 불가능, 특수문자 - _ .  가능 (maximum is 255 characters)
+		String regexGitlab = "^([A-Za-z0-9]{1})[a-zA-Z0-9-_.\s]{0,253}$";
 
+		String gitlabName = " ";
+		String gitlabSlug = "GitLabSlug-_.";
+		String gitlabProjectName = "GitLabProjectName-_-...a  aAA";
+		String gitlabProjectSlug = "GitLabProjectSlug-_-...ZZzz....";
 		match = Pattern.compile(regexGitlab).matcher(gitlabName);
-		System.out.println(gitlabName);
-		System.out.println(match.find());
-		System.out.println();
+		System.out.print(gitlabName);
+		System.out.println(" : "+match.find()); 
+
 
 		match = Pattern.compile(regexGitlab).matcher(gitlabSlug);
-		System.out.println(gitlabSlug);
-		System.out.println(match.find());
-		System.out.println();
+		System.out.print(gitlabSlug);
+		System.out.println(" : "+match.find()); 
 
-		match = Pattern.compile(regexGitlab).matcher(regexGitlabProjectName);
-		System.out.println(regexGitlabProjectName);
-		System.out.println(match.find());
-		System.out.println();
 
-		match = Pattern.compile(regexGitlab).matcher(regexGitlabProjectSlug);
-		System.out.println(regexGitlabProjectSlug);
-		System.out.println(match.find());
-		System.out.println();
+		match = Pattern.compile(regexGitlab).matcher(gitlabProjectName);
+		System.out.print(gitlabProjectName);
+		System.out.println(" : "+match.find()); 
 
-		//젠킨스 CI : 한글 가능, 특수문자 가능 (다만 특수문자가 들어갈 시 호출 API 에서 오류 발생, 이름으로 불러오기때문에) 
-		//젠킨스 CD : 한글 가능, 특수문자 가능
-		String regexJenkins  = "^[a-zA-Z0-9가-힣\\-\\_\\.]*$";
-		String jenkinsName = "Jenkins-001";
-		match = Pattern.compile(regexJenkins).matcher(jenkinsName);
-		System.out.println(jenkinsName);
-		System.out.println(match.find());
-		System.out.println();        
 
+		match = Pattern.compile(regexGitlab).matcher(gitlabProjectSlug);
+		System.out.print(gitlabProjectSlug);
+		System.out.println(" : "+match.find()); 
+
+
+		//젠킨스 CI : 한글 가능, 특수문자 `,.-_(){} 가능 varchar100	
+		//젠킨스 CI JOB : 한글 가능, 특수문자 `,.-_(){} 가능 varchar100
+		//젠킨스 CD : 한글 가능, 특수문자 가능 varchar100	-- CD는 툴에 접속을 하지 못해서 확인 못햇음
+		//젠킨스 CD JOB : varchar100 -- CD는 툴에 접속을 하지 못해서 확인 못햇음
+		//(다만 특수문자가 들어갈 시 호출 API 에서 오류 발생, API호출에서 사용할 수 있는 특수문자 -_().,)
+
+		//String regexJenkins  = "^[a-zA-Z0-9가-힣\\-\\_\\(\\)\\,\\.]{1,100}$";
+		String regexJenkins  = "^([A-Za-z0-9ㄱ-힣]{1})[a-zA-Z0-9ㄱ-힣-_(),.]{1,99}$";
+		String jenkinsName = "Jenkins-00-1";
 		String jenkinsJobName = "JenkinsJob-001";
+		match = Pattern.compile(regexJenkins).matcher(jenkinsName);
+		System.out.print(jenkinsName);
+		System.out.println(" : "+match.find()); 
+
 		match = Pattern.compile(regexJenkins).matcher(jenkinsJobName);
-		System.out.println(jenkinsJobName);
-		System.out.println(match.find());
-		System.out.println();        
+		System.out.print(jenkinsJobName);
+		System.out.println(" : "+match.find()); 
+
+
+
+		String regexGitlabPath = "^([A-Za-z0-9]{1})([a-zA-Z0-9-_.]{0,253})([a-zA-Z0-9-_]{1})$";
+		String regexGitlabPathNumber = "[^0-9]+";
+		String gitPath = "a-";
+		System.out.println("####################################");
+		match = Pattern.compile(regexGitlabPath).matcher(gitPath);
+		System.out.print(gitPath);
+		System.out.println(" gitPath : "+match.find());
+		match = Pattern.compile(regexGitlabPathNumber).matcher(gitPath);
+		System.out.print(gitPath);
+		System.out.println(" gitPath : "+match.find());
+
+
+		}
+	}
+  
 	=======================================================================================================================================        
