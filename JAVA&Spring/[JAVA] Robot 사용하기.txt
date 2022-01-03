@@ -8,6 +8,7 @@
 	키보드 버튼 값 매핑
 		https://stackoverflow.com/questions/15313469/java-keyboard-keycodes-list/31637206
 
+	https://github.com/kkimsungchul/study/tree/master/JAVA%26Spring/%5BJAVA%5D%20Robot%20%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0
 
 	자바로도 매크로가 만들어 지나 테스트 해봄
 
