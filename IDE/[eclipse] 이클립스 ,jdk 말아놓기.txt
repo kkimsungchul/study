@@ -1,0 +1,40 @@
+
+# 현재 말려있는 버전
+	JDK : Openjdk 11.0.2
+	이클립스 : 2021-09
+	※ JDK1.8 버전은 이클립스 2021-09 버전에서 지원해주지 않음
+
+
+1. 이클립스 다운로드 www.eclipse.org 
+	이클립스 자체는 포터블 프로그램이라 따로 작업이 필요치 않고
+	USB나 기타 저장소에 그냥 압축풀면 됨.
+	(단 경로에 한글은 없게..)
+
+2. 자바 JDK다운로드 www.oracle.com/technetwork/java/javase/downloads/index.html
+
+3. JDK 설치 - JDK 설치폴더를 추출하기 위해 한번은 설치해줘야함
+
+4. JDK 디폴트 설치 경로는 "c:\Program Files\java\jdk(버전)" 이고 jdk 폴더를 통채로 복사해서
+	eclipse 폴더에 (즉 eclipse 실행파일이 있는 그 폴더에) 붙여넣기함.
+
+5. eclipse 설치정보파일 (eclipse.ini)를 메모장 등으로 열어서 -vmargs구문 바로 위에 -vm 정보를 추가함.
+
+	-vm
+	.\jdk\bin\javaw.exe
+	-vmargs
+	-Dosgi.requiredJavaVersion=1.5
+	-Dhelp.lucene.tokenizer=standard
+	-Xms40m
+	-Xmx512m
+
+
+	아시다시피 .은 현재 디렉토리를 가리키고 있으니, . .. \ 등을 이용해 다른 폴더를 지정해줄수도 있음.
+	해당 경로에 javaw.exe 있는지 꼭 확인할것
+
+ 
+
+6. 실행시키면 끝
+
+
+
+참고 : https://blog.naver.com/gooclo/150142516986
