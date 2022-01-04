@@ -1,0 +1,30 @@
+[Tomcat - 윈도우 서비스에 등록하기]
+
+	참고링크 : https://papababo.tistory.com/entry/%ED%86%B0%EC%BA%A3%EC%9D%84-%EC%9C%88%EB%8F%84%EC%9A%B0-%EC%84%9C%EB%B9%84%EC%8A%A4%EB%A1%9C-%EB%93%B1%EB%A1%9D%ED%95%98%EA%B8%B0
+
+
+	※ service.bat 파일이 없는 경우 다른버전의 톰캣을 다운받아서 사용
+
+# service.bat 파일 세팅
+	1. 톰캣 디렉토리/bin 밑에 있는 "service.bat" 파일을 메모장으로 연다
+	2. 해당파일에서 아래의 부분을 찾아서 수정한다
+		==================================================================================================================================================
+		rem Set default Service name
+		set SERVICE_NAME=Tomcat8
+		set DISPLAYNAME=Apache Tomcat 8.0 %SERVICE_NAME%	
+		==================================================================================================================================================
+		
+		SERVICE_NAME : 윈도우 작업관리자에 표시될 서비스 이름
+		DISPLAYNAME : 윈도우 서비스창에서 표시할 이름
+		
+		ex)
+		위와 같이 등록했을 경우 작업관리자 화면에서는 Tomcat8 로 표시됨
+		윈도우 서비스 창(service.msc) 에서는 Apache Tomcat 8.0 Tomcat8 로 표시됨
+	
+	3. 해당파일을 CMD 에서 install 명령어와 같이 실행
+		cd C:\apache-tomcat-8.0.30\bin
+		service.bat install
+		
+	4. 서비스가 등록됨
+		
+			
