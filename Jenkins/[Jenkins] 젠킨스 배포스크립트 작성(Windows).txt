@@ -27,6 +27,9 @@
 
 
 # Jenkins 배포 스크립트 작성
+	※ 작성 전 톰캣을 윈도우 서비스에 등록해놔야 함
+		https://github.com/kkimsungchul/study/blob/master/tomcat/%5BTomcat%5D%20%EC%9C%88%EB%8F%84%EC%9A%B0%20%EC%84%9C%EB%B9%84%EC%8A%A4%EC%97%90%20%EB%93%B1%EB%A1%9D%ED%95%98%EA%B8%B0.txt
+
 	1. Jenkins 화면의 좌측에서 새로운 item 클릭
 	
 	2. Folder 선택 후 폴더명 입력 한 뒤 폴더 생성
@@ -53,6 +56,24 @@
 					bat './gradlew.bat clean build'
 				}
 			}
+			stage('service_stop') {
+				steps {
+					bat """
+					net stop Tomcat8
+					"""
+					
+				}
+			}
+			stage('backup') {
+				steps {
+					bat """
+					cd C:/apache-tomcat-8.0.30/webapps
+					del ROOT
+					rename ROOT.war ROOTwar.backup.%date%
+					"""
+					
+				}
+			}
 			stage('depoly') {
 				steps {
 					bat """
@@ -65,12 +86,11 @@
 			stage('service_start') {
 				steps {
 					bat """
-					cd C:/apache-tomcat-8.0.30/bin
-					startup.bat
+					net start Tomcat8
 					"""
 					
 				}
-			}			
+			}		
 			
 		}
 	}
@@ -89,4 +109,4 @@
 	7. 빌드가 완료되면 아래의 폴더에 war 파일이 생성되고, 톰캣디렉토리로 이동됨
 		C:/ProgramData/Jenkins/.jenkins/workspace/JenkinsTest/gitTest/build/libs
 	
-	8. 서비스 시작부분에서는 현재 안댐, 톰캣을 윈도우 서비스로 등록하고나서 사용해야 할듯
+	
