@@ -1,0 +1,101 @@
+[Eclipse - 이클립스에서 stock 프로젝트 import 하기]
+
+
+
+# 현재 stock 프로젝트에서 사용하는 환경설정
+	gradle : 6.8.3
+	JDK : 1.8
+	Springboot : 2.5.6
+
+
+
+
+# 오류 1 - 이클립스 버전 안맞음
+	Version: 2021-12 (4.22.0)
+	이클립스 2021-12 버전을 사용해서 STS 를 설치하려고 시도
+	
+	STS4 는 설치가 되나, STS3 관련 플러그인들은 설치가 불가능함
+	
+	Spring Tools4 - 설치가능
+	Spring Tools3 - 설치 불가능
+	
+	2021-09 이상버전에서는 STS3 을 지원하지 않는다고 함
+	
+	실패
+
+# 오류 2 - STS 버전 안맞음 4.13.0
+	https://spring.io/tools 에서 최신 버전인 STS4.13.0 버전을 설치
+	Gradle 6.8.3 버전을 찾을수 없다는 오류가 계속 표시가 됨.
+	
+	실패
+	
+	
+# 오류 3 - STS 버전 안맞음 3.9.18
+	STS 3.9.18 버전을 사용
+		URL : https://github.com/spring-projects/toolsuite-distribution/wiki/Spring-Tool-Suite-3
+	
+	해당버전에서는 JDK1.8을 지원해주지 않음
+	STS.ini 파일에서 JDK 버전을 바꾸면 된다고는 하는데 해당버전에서는 바꾸면 오류가 발생함
+	-Dosgi.requiredJavaVersion=11 이부분을 -Dosgi.requiredJavaVersion=1.8 로 
+	
+
+# 해결 - STS 3.9.14 
+	STS 3.9.18 버전을 사용
+		URL : https://github.com/spring-projects/toolsuite-distribution/wiki/Spring-Tool-Suite-3	
+	
+	해당 버전을 다운로드 받고 STS.ini 에서 JDK 버전을 1.8 로 변경
+	-Dosgi.requiredJavaVersion=1.8
+	
+	프로젝트 추가시 File - > Import -> Gradle -> Existing Gradle Project 선택 후 임포트
+	
+	정상 작동함
+
+
+# 오류 4 - Lombok 오류발생
+	일단 build.gradle 파일에 lombok은 있음.
+	또한 intellij 에서도 툴에서 추가로 lombok 을 설치해서 사용했었음
+	
+	https://github.com/kkimsungchul/study/blob/master/Spring%20Boot/%5BSpring%20Boot%5D%20lombok%20%EC%98%A4%EB%A5%98(%EC%9D%B4%ED%81%B4%EB%A6%BD%EC%8A%A4).txt 
+	
+	해당 경로의 파일 참고
+	
+	==================================================================================================================================================
+	
+	# 해결 방안
+
+		lombok 라이브러리 설치
+		
+
+		1. 현재 프로젝트 내에서 추가한 lombok.jar 파일을 실행
+			(직접 내려받아서 실행해도 되나, 개발 툴안에서 실행하는게 편함)
+
+		2. 실행 시 설치화면이 나오면 이클립스의 설치디렉토리 경로를 찾아서 셀렉트
+
+		3. install/update 버튼 클릭
+
+		4. Quit Installer 클릭
+
+		5. 프로젝트 클린
+
+		6. 이클립스 재시작 
+
+		위의 방법으로 진행하면 정상적으로 작동함.
+
+		또한 설치 확인은 이클립스의 설치파일 "eclipse.ini" 를 열어보면 제일 하단에 아래의 내용이 추가되어 있음
+
+		-javaagent:C:\Users\gnew\Downloads\eclipse-jee-2021-09-R-win32-x86_64\eclipse\lombok.jar	
+	
+		Help > About Spring Tool Suite 4 에도 lombok이 추가되어 있음
+
+	==================================================================================================================================================
+	
+	완료 후 
+	이렇게 했는데도 컴파일 오류가 나면 아래의 방법을 시도
+
+		- 프로젝트 우측 마우스 > Maven > Update Project
+
+		- 프로젝트 우측 마우스 > Gradle > Refresh Gradle Project
+
+
+	그래도 안되면 프로젝트 삭제 후 재임포트
+
