@@ -1,0 +1,24 @@
+[git - 프로젝트 처음 올리기] 
+	
+	
+	
+	//로컬 저장소 생성
+	git init
+
+	//해당디렉토리의 파일 깃에 추가
+	//* 로 추가가 안된 파일들은 직접 추가해주면 된다 .gitignore 파일의 경우에는 앞에 -f 옵션을 준다
+	git add *
+	git add .mvn
+	git add -f .gitignore
+
+	//커밋
+	git commit -m "first commit"
+
+	//브런치 생성
+	git branch -M main
+
+	//원격 저장소 추가
+	git remote add origin https://github.com/kkimsungchul/test1515.git
+
+	//원격 저장소에 push
+	git push -u origin main
