@@ -1,0 +1,27 @@
+[ Jenkins - 플러그인 수동 설치 ]
+
+	참고 URL : https://server-engineer.tistory.com/763
+	
+	뭐 젠킨스 관리에서 플러그인이 바로설치가 된다면 상관없는데
+	폐쇄망일 경우에는 접근이 안되서 설치가 안되는 경우도 있음,
+	그래서 작성함
+	
+
+# 아래의 사이트에서 필요한 플러그인 파일 다운로드 (확장자 .hpi)
+	
+	URL : https://plugins.jenkins.io/
+	필요한 플러그인 : Deploy to container
+	
+	해당 사이트에서 검색하면 나오는 hpi 파일을 다운로드함
+
+
+# 내려받은 hpi 파일을 jenkins plugins 폴더에 추가
+	경로 : C:\ProgramData\Jenkins\.jenkins\plugins
+	파일명 : deploy.hpi
+
+	설치경로는 각자 다 다를수가 있음, 윈도우 기준임
+
+# 젠킨스 재시작
+	
+	젠킨스 서비스를 재시작하면, 자동으로 해당 플러그인이 설치되어 있음
+	
