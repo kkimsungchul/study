@@ -1,0 +1,43 @@
+[ Jenkins - Freestyle Project 생성]
+
+
+
+# Freestyle Project 작성
+	가. Freestyle Project 생성
+		새로운 Item을 클릭하여 Freestyle Project 로 생성
+
+	나. 소스 코드 관리 부분에서 아래의 정보 입력
+		1. git 체크
+		
+		2. Repository URL 
+			https://github.com/kkimsungchul/stock
+		
+		3. Credentials
+			아래의 URL을 보고 생성한 키를 등록
+			https://github.com/kkimsungchul/study/blob/master/Jenkins/%5BJenkins%5D%20credentials%20%EB%93%B1%EB%A1%9D%20%EB%B0%8F%20%EC%82%AC%EC%9A%A9.txt
+		
+		4. Branches to build
+			브런치 명 입력
+		
+	다. Buile 부분에서 아래의 정보 입력
+		
+		1. Add build Step 클릭 후 Invoke Gradle Script선택
+		
+		2. Gradle Version 은 gradle_build 선택
+		
+		3. Tasks 에는 아래의 내용을 입력 (각 줄마다입력)
+			clean
+			build 
+		
+		4. Tasks 옆에 있는 고급 버튼 클릭 후 하단에 나오는 Build file 에 아래의 내용 기재
+			build.gradle
+		
+
+# Build now 클릭
+	build now 를 클릭하면 배포파일이 생성됨
+		C:\ProgramData\Jenkins\.jenkins\workspace\JenkinsTest\test\build\libs
+		ROOT.war
+		stock-0.0.1-SNAPSHOT-plain.war
+		
+	ROOT로 나오는 이유는 내가 프로젝트에서 ROOT 로 설정해놔서 그럼
+	
