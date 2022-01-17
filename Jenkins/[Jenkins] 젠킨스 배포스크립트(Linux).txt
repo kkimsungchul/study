@@ -20,7 +20,7 @@ pipeline {
 		}
 		stage('Deploy') {
 			steps {
-				sh "cd '/data/jenkins_home/workspace/Developer Space/D-Space CI BackEnd/target' && scp d-space-portal-0.0.1-SNAPSHOT.war linuxUser@192.168.0.103:/home/linuxUser/"
+				sh "cd '/data/jenkins_home/workspace/Developer Space/D-Space CI BackEnd/target' && scp ROOT.war linuxUser@192.168.0.103:/home/linuxUser/"
 			}
 		}
         stage('Service') {
@@ -33,10 +33,10 @@ pipeline {
 					remote.password = 'linuxPassword'
 					remote.allowAnyHosts = true
 					sshCommand remote: remote, command:"sudo systemctl stop tomcat && sudo sleep 5"
-					sshCommand remote: remote, command:"sudo mv /app/application/d-space-portal-0.0.1-SNAPSHOT.war /home/linuxUser/d-space-portal-0.0.1-SNAPSHOT.war_\$(date '+%Y%m%d') && sudo sleep 1"
+					sshCommand remote: remote, command:"sudo mv /app/application/ROOT.war /home/linuxUser/ROOT.war_\$(date '+%Y%m%d') && sudo sleep 1"
 					sshCommand remote: remote, command:"sudo rm -rf /app/application/* && sudo sleep 1"
-					sshCommand remote: remote, command:"sudo mv /home/linuxUser/d-space-portal-0.0.1-SNAPSHOT.war /app/application "
-					sshCommand remote: remote, command:"sudo chown tomcat:tomcat /app/application/d-space-portal-0.0.1-SNAPSHOT.war && sudo sleep 1"
+					sshCommand remote: remote, command:"sudo mv /home/linuxUser/ROOT.war /app/application "
+					sshCommand remote: remote, command:"sudo chown tomcat:tomcat /app/application/ROOT.war && sudo sleep 1"
 					sshCommand remote: remote, command:"sudo systemctl start tomcat"
 				} 
 			}		
