@@ -1,0 +1,78 @@
+[ 잡다한 내용 - 인벤 사이트 글 일괄 지우기 ]
+	
+	디아블로2 하면서 아이템 거래할려고 거래게시판에다가 글을 많이썻음.
+	너무많이써서 글이 1000개가 넘어감
+	이거 하나씩 지우는거만 되서 인터넷에 찾아보니,, 글 지우는 프로그램도 있었는데 전부다 사라짐
+	그래서 걍 크롬 콘솔에서 스크립트로 지우도록 짜놨음
+	아래의 링크에 있는거는 작동을 안해서 내가 좀 손봐서 사용했음
+	참고링크 : https://bbs.ruliweb.com/community/board/300143/read/41927885
+
+
+# 콘솔창에 아래의 내용 입력 후 엔터
+
+삭제할때는 해당 게시판의 내글에서 해야 함,
+document.getElementsByClassName("num") 현재 보고 있는 게시판화면에 있는 게시글들의 번호를 가져오는 거임
+내글이 아니면 삭제도 안되니까.. 내글목록가서 꼭해야함
+
+	======================================================================================================
+	var temp = new Array();
+	temp = Array.prototype.slice.call(document.getElementsByClassName("num"));
+	var deleteList = new Array();
+	for(var i=0; i<temp.length;i++){
+	   if(temp[i].localName=="td"){
+		  var f1 = document.createElement("form");
+		  f1.target = "target";
+		  f1.name = "frmViewAction";
+		  f1.action="https://www.inven.co.kr/board/bbs/include/multi_delete.php";f1.method = "POST";
+		  var if1 = document.createElement("iframe");
+		  if1.name = "target";
+
+		  var inp1 = document.createElement("input");
+		  inp1.type = "hidden";
+		  inp1.name = "come_idx";
+		  //게시판코드, 디아블로2 거래게시판 5737
+		  inp1.value = "5737"
+
+		  var inp2 = document.createElement("input");
+		  inp2.type = "hidden";
+		  inp2.name = "p";
+		  inp2.value = "1";
+
+
+		  var inp3 = document.createElement("input");
+		  inp3.type = "hidden";
+		  inp3.name = "l"
+		  inp3.value = temp[i].innerText;
+
+		  var inp4 = document.createElement("input");
+		  inp4.type = "hidden";
+		  inp4.name = "my";
+		  inp4.value = "post";
+
+		  f1.appendChild(inp1);
+		  f1.appendChild(inp2);
+		  f1.appendChild(inp3);
+		  f1.appendChild(inp4);
+
+		  $("body").append(f1);
+		  $("body").append(if1);
+		  console.log(f1)
+		  
+		  deleteList.push(f1)
+	   }
+	}
+
+	var count = 0;
+	function deleteGo(){
+	   if(count>=deleteList.length){
+		  alert("삭제 완료");
+		  location.reload();
+		  clearInterval(timer);
+		  return;
+	   }
+	   deleteList[count++].submit();
+	}
+	var timer = setInterval(deleteGo,800);
+
+
+	======================================================================================================
