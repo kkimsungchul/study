@@ -1,0 +1,184 @@
+
+# 참고링크 
+	https://dkyou.tistory.com/48
+	https://www.youtube.com/watch?v=gEJpwogGbHw&t=160s
+
+
+# 다운로드 링크
+	https://www.keycloak.org/downloads
+	* 파일 다운로드 후 압축 풀기 
+
+
+# 키클락 실행 
+	키클락폴더\bin\standalone.bat
+	ex)
+		C:\Users\USER\Desktop\kimsc\개발\keycloak-16.1.1\keycloak-16.1.1\bin\standalone.bat
+
+# 계정생성 : 
+	
+	1. http://localhost:8080/auth/	 접속
+	2. 화면에 표시되는 곳중 ID / PW 를 입력하는 곳에 정보를 입력하여 계정을 생성
+		ID / PW : kimsc1218 / admin
+
+# 접속 : 
+	1. http://localhost:8080/auth/admin/
+	2. 생성한 ID / PW 로 로그인
+		ID / PW : kimsc1218 / admin
+
+
+# realm 생성
+	
+	1. http://localhost:8080/auth/admin/ 로그인 
+	
+	2. http://localhost:8080/auth/admin/master/console/#/create/realm URL 접속
+		또는 좌측 상단의 마스터위에 마우스를 올리면 파란색 박스의 "Add realm" 클릭
+	
+	3. Name : demo 를 넣고 Create 버튼 클릭
+
+
+# Token 설정 변경
+	
+	1. 좌측의 Configure 탭의 RealmSettings 클릭
+
+	2. 우측화면에서 Token 탭 클릭
+
+	3. Access Token Lifespan 를 24,Hours 로 변경
+		※ 테스트를 위해서 토큰의 유효시간을 24시간으로 변경
+
+# Client 설정 
+
+	1. 좌측의 Configure 탭의 Clients 클릭
+
+	2. 우측의 Create 클릭
+
+	3. Add Client 화면이 뜨면 Cilent ID , Root URL 을 입력 후 생성
+		Client Id : my_client
+		Cilent Protocal : openid-connect
+		Root URL : http://localhost:8080/
+			※ 키클락 주소
+	
+	4. 생성된 my_cilent 에서 아래의 설정 변경
+		
+		Access Type : confidential
+		Vaild Redirect URIs : http://localhost:9999/
+
+	
+
+
+	
+	# my_cilent의  Role 설정
+		1. 좌측의 Configure 탭의 Clients 클릭
+
+		2. 화면에 표시되는 탭에서 Roles 클릭
+
+		3. 우측의 Add Role 클릭
+		
+		4. 아래의 정보 입력 후 저장
+			Role Name : ROLE_ADMIN
+		
+		5. 다시 한번 생성화면에 들어가서 아래의 정보 입력 후 저장
+			Role Name : ROLE_USER 
+
+
+
+	※ Client Authenticator : XafEZWyEQDgd0rmn86rO4H7K674l5zM9
+		해당 값은 생성하고 나면 Credentials 의 탭에 표시되는 값
+
+# 사용자 생성
+	
+	1. http://localhost:8080/auth/admin/master/console/#/realms/demo 
+		realm 생성하면 바로 위의 링크로 가지며, 다시 접속 할 경우에는
+		아래와 같이 접속함
+		1-1. http://localhost:8080/auth/admin/ 로그인 
+		1-2.  좌측 상단의 마스터위에 마우스를 올리면 Master 또는 Demo가 보임 여기서 원하는 realm을 선택
+	
+	2. 좌측탭의 Manage 밑의 Users 클릭
+
+	3. 표시되는 우측화면에서 Add user 클릭
+
+	4. 아래의 정보를 입력 후 save 버튼 클릭
+		username : sungchul
+			※ 로그인에 사용함
+		Email : sungchul@gmail.com
+		First Name : kim
+		Last Name : sungchul
+
+	====
+	관리자 계정도 위와 같이 생성
+	username : ADMIN 
+	password : admin
+
+
+# 임시 비밀번호 생성
+	
+	1. 생성한 사용자 화면에서 credentials 탭으로 이동
+	
+	2. Set Password 항목에서 아래의 값을 입력하고 Set Password 버튼을 클릭
+		Password : admin
+		Password Confirmation : admin
+		Temporary : OFF 로 변경
+		※ off 로 변경하지 않을 경우 처음 로그인 시 비밀번호를 변경하라고 나옴
+
+
+# 사용자의 Role Mapping
+	1. 좌측의 Manage 탭에서 Users 클릭
+	
+	2. 생성된 사용자중에 sungchul 클릭
+
+	3. 화면에 표시되는 탭에서 Role Mappings 클릭
+
+	4. Client Roles 에서 이전에 생성한 my_client 선택
+	
+	5. ROLE_USER 추가
+	※ 별도의 세이브 없이 추가하면 자동으로 저장됨
+	===
+	관리자 계정은 
+	ROLE_USER , ROLE_ADMIN 둘다 추가
+
+
+# 사용자 생성 완료 테스트
+	
+	토큰 요청 (sungchul) : 
+curl -X POST "http://localhost:8080/auth/realms/demo/protocol/openid-connect/token" ^
+--header "Content-Type:application/x-www-form-urlencoded" ^
+--data-urlencode "grant_type=password" ^
+--data-urlencode "client_id=my_client" ^
+--data-urlencode "client_secret=XafEZWyEQDgd0rmn86rO4H7K674l5zM9" ^
+--data-urlencode "username=sungchul" ^
+--data-urlencode "password=admin"
+	
+	응답값 : 
+		{"access_token":"eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPdGViQldzSmdhRWozeXVaMGZlbTVWclFmbkZpcDlLczE5aVN6anBybGw0In0.eyJleHAiOjE2NDQzNDE5MzYsImlhdCI6MTY0NDMwNTkzNiwianRpIjoiNDM4ZjkzZGEtZmU5ZC00ZmVlLTg5ZmQtMjY2YTdhNTM2YmNmIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL2F1dGgvcmVhbG1zL2RlbW8iLCJhdWQiOiJhY2NvdW50Iiwic3ViIjoiNzNkNWYwOWUtZTY2Ny00YjA2LTgwZDctMTk3ZDM1NzQyNmQ0IiwidHlwIjoiQmVhcmVyIiwiYXpwIjoibXlfY2xpZW50Iiwic2Vzc2lvbl9zdGF0ZSI6IjgzMjBmNjdhLTNmZWYtNGRiMS1iMDA1LTk0OTMzNGY1MTY5YSIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwIl0sInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJvZmZsaW5lX2FjY2VzcyIsInVtYV9hdXRob3JpemF0aW9uIiwiZGVmYXVsdC1yb2xlcy1kZW1vIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsibXlfY2xpZW50Ijp7InJvbGVzIjpbIlJPTEVfVVNFUiJdfSwiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJwcm9maWxlIGVtYWlsIiwic2lkIjoiODMyMGY2N2EtM2ZlZi00ZGIxLWIwMDUtOTQ5MzM0ZjUxNjlhIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJuYW1lIjoia2ltIHN1bmdjaHVsIiwicHJlZmVycmVkX3VzZXJuYW1lIjoic3VuZ2NodWwiLCJnaXZlbl9uYW1lIjoia2ltIiwiZmFtaWx5X25hbWUiOiJzdW5nY2h1bCIsImVtYWlsIjoia2ltc2MxMjE4QGdtYWlsLmNvbSJ9.WNx3PCifntNCZxft_vzfptesU1i4X7WPlALxuQgadSEH6k-csdHkdORcYuGDK6TK2ycjbvOvy7AhDlj1GHbGxqFLX6Xr-iEsMeoBkmqaM8uPMoCfGFYcIznqCi6cvQE3YXFBbtUWz3VEH_wWyqNNoz8ssvUce0mU31kt5ePzFr_svbLSJimNEzpJAIjLEj3dOAU-mbBMUZm5Dnuhllaxa8bKsjRRWvBDzgGRyP_-q2Y9C0QpaBwcpfypGE3ptp_ZrZlGat-neGnPmcj9j2-rmwJID0fOqZatBTNbb85shjw46JEoxf2AjyDcNXJ0jWcobHYwFa8AA48_ZDNTHidW2A","expires_in":36000,"refresh_expires_in":1800,"refresh_token":"eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJhZDM2NmVmOS1kMTNmLTQyM2YtOTRhMS04OTI4M2YxN2JmNGUifQ.eyJleHAiOjE2NDQzMDc3MzYsImlhdCI6MTY0NDMwNTkzNiwianRpIjoiMTMzZWI4YWItMDA5ZC00NDM2LWJjOTktOGVmMWJjYmM1Yzc5IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL2F1dGgvcmVhbG1zL2RlbW8iLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvYXV0aC9yZWFsbXMvZGVtbyIsInN1YiI6IjczZDVmMDllLWU2NjctNGIwNi04MGQ3LTE5N2QzNTc0MjZkNCIsInR5cCI6IlJlZnJlc2giLCJhenAiOiJteV9jbGllbnQiLCJzZXNzaW9uX3N0YXRlIjoiODMyMGY2N2EtM2ZlZi00ZGIxLWIwMDUtOTQ5MzM0ZjUxNjlhIiwic2NvcGUiOiJwcm9maWxlIGVtYWlsIiwic2lkIjoiODMyMGY2N2EtM2ZlZi00ZGIxLWIwMDUtOTQ5MzM0ZjUxNjlhIn0.WvzPDJ7sx_DwvrNSCcX_5o6khGtbu6K3XUco6Upanug","token_type":"Bearer","not-before-policy":0,"session_state":"8320f67a-3fef-4db1-b005-949334f5169a","scope":"profile email"}
+
+	https://jwt.io/ 접속하여 위의 토큰값을 입력하면 제대로 발급되었는지, 어떠한 정보가 들어있는지 확인 가능
+
+
+	토큰 요청 (admin) : 
+curl -X POST "http://localhost:8080/auth/realms/demo/protocol/openid-connect/token" ^
+--header "Content-Type:application/x-www-form-urlencoded" ^
+--data-urlencode "grant_type=password" ^
+--data-urlencode "client_id=my_client" ^
+--data-urlencode "client_secret=XafEZWyEQDgd0rmn86rO4H7K674l5zM9" ^
+--data-urlencode "username=admin" ^
+--data-urlencode "password=admin"
+
+# 새로운 사용자로 로그인
+	
+	1. http://localhost:8080/auth/realms/demo/account
+		위의 URL 은 이전에 생성한 demo 의 URL임
+	2. 사용자 정보 입력
+		ID / PW : sungchul / aaaa1111
+	
+	3. 처음 로그인 시 비밀번호를 바꾸라는 메시지가 표시되면 비밀번호를 변경
+		aaaa1111
+
+	4. 로그인 완료
+
+
+
+
+
+
+
+
+
