@@ -1,3 +1,5 @@
+[ Keycloak 설치 및 세팅 ]
+
 
 # 참고링크 
 	https://dkyou.tistory.com/48
@@ -162,12 +164,13 @@ curl -X POST "http://localhost:8080/auth/realms/demo/protocol/openid-connect/tok
 --data-urlencode "username=admin" ^
 --data-urlencode "password=admin"
 
+
 # 새로운 사용자로 로그인
 	
 	1. http://localhost:8080/auth/realms/demo/account
 		위의 URL 은 이전에 생성한 demo 의 URL임
 	2. 사용자 정보 입력
-		ID / PW : sungchul / aaaa1111
+		ID / PW : sungchul / admin
 	
 	3. 처음 로그인 시 비밀번호를 바꾸라는 메시지가 표시되면 비밀번호를 변경
 		aaaa1111
