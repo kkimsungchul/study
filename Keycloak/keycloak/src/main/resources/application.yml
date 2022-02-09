@@ -1,0 +1,22 @@
+server:
+  port: 9999
+
+keycloak:
+  realm: demo
+  auth-server-url: http://localhost:8080/auth
+  ssl-required: external
+  resource: my_client
+  credentials:
+    secret: XafEZWyEQDgd0rmn86rO4H7K674l5zM9
+  use-resource-role-mappings: true
+  bearer-only: true
+
+logging:
+  level:
+    root: INFO
+    com.sumgchul.keycloak: DEBUG
+
+
+spring:
+  main:
+    allow-circular-references : true
