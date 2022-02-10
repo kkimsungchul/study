@@ -1,0 +1,339 @@
+[ keycloak - 암호화 적용 ]
+
+	참고 링크 : 
+		https://edwin.baculsoft.com/2021/03/how-to-encrypt-and-decrypt-password-on-keycloak-or-red-hat-sso/
+
+
+# 프로젝트 생성
+	1. File -> New -> Project -> Maven
+
+	2. 정보 입력
+		Group ID : com.sungchul
+		ArtifactId : KeycloakPasswordEncryptor
+		Project name : KeycloakPasswordEncryptor
+
+
+# Pom.xml 작성
+	위의 참고링크의 내용
+	현재 진행중인 프로젝트 내용
+	내가 사용중인 keycloak 의 버전을 참고하여 작성하였음
+
+	=================================================================================================================
+	<?xml version="1.0" encoding="UTF-8"?>
+	<project xmlns="http://maven.apache.org/POM/4.0.0"
+			 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+		<modelVersion>4.0.0</modelVersion>
+
+		<groupId>com.sungchul</groupId>
+		<artifactId>KeycloakPasswordEncryptor</artifactId>
+		<version>1.0-SNAPSHOT</version>
+
+		<properties>
+			<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+			<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+			<maven.compiler.source>1.8</maven.compiler.source>
+			<maven.compiler.target>1.8</maven.compiler.target>
+
+			<keycloak.version>9.0.2</keycloak.version>
+			<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+			<maven-wildfly-plugin.version>2.0.2.Final</maven-wildfly-plugin.version>
+		</properties>
+
+
+		<dependencies>
+			<dependency>
+				<groupId>org.keycloak</groupId>
+				<artifactId>keycloak-core</artifactId>
+				<version>${keycloak.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.keycloak</groupId>
+				<artifactId>keycloak-server-spi</artifactId>
+				<version>${keycloak.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.keycloak</groupId>
+				<artifactId>keycloak-server-spi-private</artifactId>
+				<version>${keycloak.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.keycloak</groupId>
+				<artifactId>keycloak-services</artifactId>
+				<version>${keycloak.version}</version>
+				<scope>provided</scope>
+			</dependency>
+
+			<!--        unit testing -->
+			<dependency>
+				<groupId>org.junit.jupiter</groupId>
+				<artifactId>junit-jupiter-engine</artifactId>
+				<version>5.1.0</version>
+				<scope>test</scope>
+			</dependency>
+		</dependencies>
+
+
+		<build>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>${maven-compiler-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.wildfly.plugins</groupId>
+					<artifactId>wildfly-maven-plugin</artifactId>
+					<version>${maven-wildfly-plugin.version}</version>
+					<configuration>
+						<skip>false</skip>
+					</configuration>
+				</plugin>
+			</plugins>
+		</build>
+
+	</project>
+	=================================================================================================================
+
+
+# CustomKeycloakPasswordEncryptor.java 파일 생성
+	경로 : src\main\java\com\sungchul\keycloak\spi\
+	파일명 : CustomKeycloakPasswordEncryptor.java
+	=================================================================================================================
+	package com.sungchul.keycloak.spi;
+
+	import com.sungchul.keycloak.spi.helper.EncryptionHelper;
+	import org.keycloak.authentication.AuthenticationFlowContext;
+	import org.keycloak.authentication.AuthenticationFlowError;
+	import org.keycloak.authentication.Authenticator;
+	import org.keycloak.models.KeycloakSession;
+	import org.keycloak.models.RealmModel;
+	import org.keycloak.models.UserCredentialModel;
+	import org.keycloak.models.UserModel;
+	import org.keycloak.models.credential.PasswordUserCredentialModel;
+
+	import javax.ws.rs.core.Response;
+	import java.util.List;
+
+	public class CustomKeycloakPasswordEncryptor implements Authenticator {
+
+		public void authenticate(AuthenticationFlowContext authenticationFlowContext) {
+
+			// not bringing username
+			if(authenticationFlowContext.getHttpRequest().getFormParameters().get("username") == null
+					|| authenticationFlowContext.getHttpRequest().getFormParameters().get("username").isEmpty()) {
+
+				Response challenge =  Response.status(400)
+						.entity("{\"error\":\"invalid_request\",\"error_description\":\"No Username\"}")
+						.header("Content-Type", "application/json")
+						.build();
+				authenticationFlowContext.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
+				return;
+			}
+
+			// not bringing password
+			if(authenticationFlowContext.getHttpRequest().getFormParameters().get("password") == null
+					|| authenticationFlowContext.getHttpRequest().getFormParameters().get("password").isEmpty()) {
+
+				Response challenge =  Response.status(400)
+						.entity("{\"error\":\"invalid_request\",\"error_description\":\"No Password\"}")
+						.header("Content-Type", "application/json")
+						.build();
+				authenticationFlowContext.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
+				return;
+			}
+
+			// capture username
+			String username = authenticationFlowContext.getHttpRequest().getFormParameters().getFirst("username").trim();
+
+			// search for corresponding user
+			List<UserModel> userModels = authenticationFlowContext.getSession().users().searchForUser(username, authenticationFlowContext.getRealm());
+
+			// user not exists
+			if(userModels.isEmpty()) {
+				Response challenge =  Response.status(400)
+						.entity("{\"error\":\"invalid_request\",\"error_description\":\"User Not Found\"}")
+						.header("Content-Type", "application/json")
+						.build();
+				authenticationFlowContext.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
+				return;
+			}
+
+			// capture usermodel, means user is exist
+			UserModel userModel = userModels.get(0);
+
+			// capture password and dont forget to html-decode the content (im using a string replacement for this example)
+			String password = authenticationFlowContext.getHttpRequest().getFormParameters().getFirst("password").trim();
+			password = password.replace("%3D", "=");
+
+			// decrypt the password
+			password = EncryptionHelper.decrypt(password);
+
+			// password is incorrect
+			PasswordUserCredentialModel credentialInput = UserCredentialModel.password(password);
+			boolean valid = authenticationFlowContext.getSession().userCredentialManager().isValid(authenticationFlowContext.getRealm(),
+					userModel,
+					new PasswordUserCredentialModel[]{credentialInput} );
+			if( !valid ) {
+				Response challenge =  Response.status(400)
+						.entity("{\"error\":\"invalid_request\",\"error_description\":\"User Not Found\"}")
+						.header("Content-Type", "application/json")
+						.build();
+				authenticationFlowContext.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
+				return;
+			}
+
+			// set user
+			authenticationFlowContext.setUser(userModel);
+
+			// all validation success
+			authenticationFlowContext.success();
+		}
+
+		public void action(AuthenticationFlowContext authenticationFlowContext) {
+			authenticationFlowContext.success();
+		}
+
+		public boolean requiresUser() {
+			return false;
+		}
+
+		public boolean configuredFor(KeycloakSession keycloakSession, RealmModel realmModel, UserModel userModel) {
+			return false;
+		}
+
+		public void setRequiredActions(KeycloakSession keycloakSession, RealmModel realmModel, UserModel userModel) {
+
+		}
+
+		public void close() {
+
+		}
+	}
+
+	=================================================================================================================
+
+
+# CustomKeycloakPasswordEncryptorFactory.java 파일 생성
+	경로 : src\main\java\com\sungchul\keycloak\spi\
+	파일명 : CustomKeycloakPasswordEncryptorFactory.java
+	=================================================================================================================
+
+
+	=================================================================================================================
+
+
+# EncryptionHelper.java 파일 생성
+	Base64 를 사용하였음,
+	테스트를 위해서 Base64를 사용한것이고 실제로 사용할때는 암복호화가 가능한 AES256 을 사용할 예정임
+
+	경로 : src\main\java\com\sungchul\keycloak\spi\helper\
+	파일명 : EncryptionHelper.java
+	=================================================================================================================
+	package com.sungchul.keycloak.spi.helper;
+
+	import java.util.Base64;
+
+	/**
+	 * <pre>
+	 *     com.edw.keycloak.spi.helper.EncryptionHelper
+	 * </pre>
+	 *
+	 * Dont use this, this is a sample encryption only and not for production use.
+	 *
+	 * @author Muhammad Edwin < edwin at redhat dot com >
+	 * 30 Mar 2021 17:49
+	 */
+	public class EncryptionHelper {
+
+		private static final String KEY = "12345678";
+
+		/**
+		 * sample decryption, do not use it for production
+		 *
+		 * @param password
+		 * @return decrypted password
+		 */
+		public static final String decrypt(String password) {
+			try {
+				return xorMessage(new String(Base64.getDecoder().decode(password.getBytes())));
+			} catch (Exception ex) {
+				System.err.println(ex.getMessage());
+				return "";
+			}
+		}
+
+		/**
+		 * sample encryption, do not use it for production
+		 *
+		 * @param password
+		 * @return encrypted password
+		 */
+		public static final String encrypt(String password) {
+			try {
+				return Base64.getEncoder().encodeToString(xorMessage(password).getBytes());
+			} catch (Exception ex) {
+				System.err.println(ex.getMessage());
+				return "";
+			}
+		}
+
+		private static String xorMessage(String message) {
+			try {
+				if (message == null) return null;
+
+				char[] keys = KEY.toCharArray();
+				char[] mesg = message.toCharArray();
+
+				int ml = mesg.length;
+				int kl = keys.length;
+				char[] newmsg = new char[ml];
+
+				for (int i = 0; i < ml; i++) {
+					newmsg[i] = (char)(mesg[i] ^ keys[i % kl]);
+				}
+				return new String(newmsg);
+			} catch (Exception e) {
+				return null;
+			}
+		}
+
+	}
+
+	=================================================================================================================
+
+
+# org.keycloak.authentication.AuthenticatorFactory 파일 생성
+	경로 : src\main\resources\META-INF\services\
+	파일명 : org.keycloak.authentication.AuthenticatorFactory
+	=================================================================================================================
+
+
+	=================================================================================================================	
+
+
+
+
+
+
+curl -X POST "http://localhost:8080/auth/realms/demo/protocol/openid-connect/token" ^
+--header "Content-Type:application/x-www-form-urlencoded" ^
+--data-urlencode "grant_type=password" ^
+--data-urlencode "client_id=my_client" ^
+--data-urlencode "client_secret=XafEZWyEQDgd0rmn86rO4H7K674l5zM9" ^
+--data-urlencode "username=sungchul" ^
+--data-urlencode "password=1"
+
+
+
+curl -X POST "http://localhost:8080/auth/realms/demo/protocol/openid-connect/token" ^
+--header "Content-Type:application/x-www-form-urlencoded" ^
+--data-urlencode "grant_type=password" ^
+--data-urlencode "client_id=my_client" ^
+--data-urlencode "client_secret=XafEZWyEQDgd0rmn86rO4H7K674l5zM9" ^
+--data-urlencode "username=sungchul" ^
+--data-urlencode "password=AA=="
