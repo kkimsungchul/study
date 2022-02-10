@@ -17,215 +17,21 @@
 	위의 참고링크의 내용
 	현재 진행중인 프로젝트 내용
 	내가 사용중인 keycloak 의 버전을 참고하여 작성하였음
-
-	=================================================================================================================
-	<?xml version="1.0" encoding="UTF-8"?>
-	<project xmlns="http://maven.apache.org/POM/4.0.0"
-			 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-			 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-		<modelVersion>4.0.0</modelVersion>
-
-		<groupId>com.sungchul</groupId>
-		<artifactId>KeycloakPasswordEncryptor</artifactId>
-		<version>1.0-SNAPSHOT</version>
-
-		<properties>
-			<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-			<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
-			<maven.compiler.source>1.8</maven.compiler.source>
-			<maven.compiler.target>1.8</maven.compiler.target>
-
-			<keycloak.version>9.0.2</keycloak.version>
-			<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
-			<maven-wildfly-plugin.version>2.0.2.Final</maven-wildfly-plugin.version>
-		</properties>
+	https://github.com/kkimsungchul/study/blob/master/Keycloak/KeycloakPasswordEncryptor/pom.xml
 
 
-		<dependencies>
-			<dependency>
-				<groupId>org.keycloak</groupId>
-				<artifactId>keycloak-core</artifactId>
-				<version>${keycloak.version}</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.keycloak</groupId>
-				<artifactId>keycloak-server-spi</artifactId>
-				<version>${keycloak.version}</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.keycloak</groupId>
-				<artifactId>keycloak-server-spi-private</artifactId>
-				<version>${keycloak.version}</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.keycloak</groupId>
-				<artifactId>keycloak-services</artifactId>
-				<version>${keycloak.version}</version>
-				<scope>provided</scope>
-			</dependency>
 
-			<!--        unit testing -->
-			<dependency>
-				<groupId>org.junit.jupiter</groupId>
-				<artifactId>junit-jupiter-engine</artifactId>
-				<version>5.1.0</version>
-				<scope>test</scope>
-			</dependency>
-		</dependencies>
-
-
-		<build>
-			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<version>${maven-compiler-plugin.version}</version>
-				</plugin>
-				<plugin>
-					<groupId>org.wildfly.plugins</groupId>
-					<artifactId>wildfly-maven-plugin</artifactId>
-					<version>${maven-wildfly-plugin.version}</version>
-					<configuration>
-						<skip>false</skip>
-					</configuration>
-				</plugin>
-			</plugins>
-		</build>
-
-	</project>
-	=================================================================================================================
-
-
+※ 아래의 파일들의 내용은 링크에서 확인이 가능함.
+※ 프로젝트 파일URL : https://github.com/kkimsungchul/study/tree/master/Keycloak/KeycloakPasswordEncryptor
 # CustomKeycloakPasswordEncryptor.java 파일 생성
 	경로 : src\main\java\com\sungchul\keycloak\spi\
 	파일명 : CustomKeycloakPasswordEncryptor.java
-	=================================================================================================================
-	package com.sungchul.keycloak.spi;
-
-	import com.sungchul.keycloak.spi.helper.EncryptionHelper;
-	import org.keycloak.authentication.AuthenticationFlowContext;
-	import org.keycloak.authentication.AuthenticationFlowError;
-	import org.keycloak.authentication.Authenticator;
-	import org.keycloak.models.KeycloakSession;
-	import org.keycloak.models.RealmModel;
-	import org.keycloak.models.UserCredentialModel;
-	import org.keycloak.models.UserModel;
-	import org.keycloak.models.credential.PasswordUserCredentialModel;
-
-	import javax.ws.rs.core.Response;
-	import java.util.List;
-
-	public class CustomKeycloakPasswordEncryptor implements Authenticator {
-
-		public void authenticate(AuthenticationFlowContext authenticationFlowContext) {
-
-			// not bringing username
-			if(authenticationFlowContext.getHttpRequest().getFormParameters().get("username") == null
-					|| authenticationFlowContext.getHttpRequest().getFormParameters().get("username").isEmpty()) {
-
-				Response challenge =  Response.status(400)
-						.entity("{\"error\":\"invalid_request\",\"error_description\":\"No Username\"}")
-						.header("Content-Type", "application/json")
-						.build();
-				authenticationFlowContext.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
-				return;
-			}
-
-			// not bringing password
-			if(authenticationFlowContext.getHttpRequest().getFormParameters().get("password") == null
-					|| authenticationFlowContext.getHttpRequest().getFormParameters().get("password").isEmpty()) {
-
-				Response challenge =  Response.status(400)
-						.entity("{\"error\":\"invalid_request\",\"error_description\":\"No Password\"}")
-						.header("Content-Type", "application/json")
-						.build();
-				authenticationFlowContext.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
-				return;
-			}
-
-			// capture username
-			String username = authenticationFlowContext.getHttpRequest().getFormParameters().getFirst("username").trim();
-
-			// search for corresponding user
-			List<UserModel> userModels = authenticationFlowContext.getSession().users().searchForUser(username, authenticationFlowContext.getRealm());
-
-			// user not exists
-			if(userModels.isEmpty()) {
-				Response challenge =  Response.status(400)
-						.entity("{\"error\":\"invalid_request\",\"error_description\":\"User Not Found\"}")
-						.header("Content-Type", "application/json")
-						.build();
-				authenticationFlowContext.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
-				return;
-			}
-
-			// capture usermodel, means user is exist
-			UserModel userModel = userModels.get(0);
-
-			// capture password and dont forget to html-decode the content (im using a string replacement for this example)
-			String password = authenticationFlowContext.getHttpRequest().getFormParameters().getFirst("password").trim();
-			password = password.replace("%3D", "=");
-
-			// decrypt the password
-			password = EncryptionHelper.decrypt(password);
-
-			// password is incorrect
-			PasswordUserCredentialModel credentialInput = UserCredentialModel.password(password);
-			boolean valid = authenticationFlowContext.getSession().userCredentialManager().isValid(authenticationFlowContext.getRealm(),
-					userModel,
-					new PasswordUserCredentialModel[]{credentialInput} );
-			if( !valid ) {
-				Response challenge =  Response.status(400)
-						.entity("{\"error\":\"invalid_request\",\"error_description\":\"User Not Found\"}")
-						.header("Content-Type", "application/json")
-						.build();
-				authenticationFlowContext.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
-				return;
-			}
-
-			// set user
-			authenticationFlowContext.setUser(userModel);
-
-			// all validation success
-			authenticationFlowContext.success();
-		}
-
-		public void action(AuthenticationFlowContext authenticationFlowContext) {
-			authenticationFlowContext.success();
-		}
-
-		public boolean requiresUser() {
-			return false;
-		}
-
-		public boolean configuredFor(KeycloakSession keycloakSession, RealmModel realmModel, UserModel userModel) {
-			return false;
-		}
-
-		public void setRequiredActions(KeycloakSession keycloakSession, RealmModel realmModel, UserModel userModel) {
-
-		}
-
-		public void close() {
-
-		}
-	}
-
-	=================================================================================================================
-
+	URL : https://github.com/kkimsungchul/study/blob/master/Keycloak/KeycloakPasswordEncryptor/src/main/java/com/sungchul/keycloak/spi/CustomKeycloakPasswordEncryptor.java
 
 # CustomKeycloakPasswordEncryptorFactory.java 파일 생성
 	경로 : src\main\java\com\sungchul\keycloak\spi\
 	파일명 : CustomKeycloakPasswordEncryptorFactory.java
-	=================================================================================================================
-
-
-	=================================================================================================================
-
+	URL : https://github.com/kkimsungchul/study/blob/master/Keycloak/KeycloakPasswordEncryptor/src/main/java/com/sungchul/keycloak/spi/CustomKeycloakPasswordEncryptorFactory.java
 
 # EncryptionHelper.java 파일 생성
 	Base64 를 사용하였음,
@@ -233,107 +39,167 @@
 
 	경로 : src\main\java\com\sungchul\keycloak\spi\helper\
 	파일명 : EncryptionHelper.java
-	=================================================================================================================
-	package com.sungchul.keycloak.spi.helper;
-
-	import java.util.Base64;
-
-	/**
-	 * <pre>
-	 *     com.edw.keycloak.spi.helper.EncryptionHelper
-	 * </pre>
-	 *
-	 * Dont use this, this is a sample encryption only and not for production use.
-	 *
-	 * @author Muhammad Edwin < edwin at redhat dot com >
-	 * 30 Mar 2021 17:49
-	 */
-	public class EncryptionHelper {
-
-		private static final String KEY = "12345678";
-
-		/**
-		 * sample decryption, do not use it for production
-		 *
-		 * @param password
-		 * @return decrypted password
-		 */
-		public static final String decrypt(String password) {
-			try {
-				return xorMessage(new String(Base64.getDecoder().decode(password.getBytes())));
-			} catch (Exception ex) {
-				System.err.println(ex.getMessage());
-				return "";
-			}
-		}
-
-		/**
-		 * sample encryption, do not use it for production
-		 *
-		 * @param password
-		 * @return encrypted password
-		 */
-		public static final String encrypt(String password) {
-			try {
-				return Base64.getEncoder().encodeToString(xorMessage(password).getBytes());
-			} catch (Exception ex) {
-				System.err.println(ex.getMessage());
-				return "";
-			}
-		}
-
-		private static String xorMessage(String message) {
-			try {
-				if (message == null) return null;
-
-				char[] keys = KEY.toCharArray();
-				char[] mesg = message.toCharArray();
-
-				int ml = mesg.length;
-				int kl = keys.length;
-				char[] newmsg = new char[ml];
-
-				for (int i = 0; i < ml; i++) {
-					newmsg[i] = (char)(mesg[i] ^ keys[i % kl]);
-				}
-				return new String(newmsg);
-			} catch (Exception e) {
-				return null;
-			}
-		}
-
-	}
-
-	=================================================================================================================
+	URL : https://github.com/kkimsungchul/study/blob/master/Keycloak/KeycloakPasswordEncryptor/src/main/java/com/sungchul/keycloak/spi/helper/EncryptionHelper.java
 
 
 # org.keycloak.authentication.AuthenticatorFactory 파일 생성
 	경로 : src\main\resources\META-INF\services\
 	파일명 : org.keycloak.authentication.AuthenticatorFactory
-	=================================================================================================================
-
-
-	=================================================================================================================	
+	URL : https://github.com/kkimsungchul/study/blob/master/Keycloak/KeycloakPasswordEncryptor/src/main/resources/META-INF/services/org.keycloak.authentication.AuthenticatorFactory
 
 
 
+# Build
+	※ IntelliJ 에서 테스트 및 개발을 진행하였으므로 IntelliJ 기준으로 작성함
+	※ 이클립스의 경우에는 maven install 을 사용하면 됨
+	Project Structure 
+	-> Artifacts 
+	-> + 버튼 클릭
+	-> Jar 선택
+	-> KeycloakPasswordEncryptor 선택
+	-> Create JAR From Mudules 창이 뜨면 모듈에 "KeycloakPasswordEncryptor" 로 선택되어 있는 것을 확인 후 OK 버튼 클릭
 
 
 
-curl -X POST "http://localhost:8080/auth/realms/demo/protocol/openid-connect/token" ^
---header "Content-Type:application/x-www-form-urlencoded" ^
---data-urlencode "grant_type=password" ^
---data-urlencode "client_id=my_client" ^
---data-urlencode "client_secret=XafEZWyEQDgd0rmn86rO4H7K674l5zM9" ^
---data-urlencode "username=sungchul" ^
---data-urlencode "password=1"
+# JAR 파일을 keycloak의 모듈배포폴더로 이동
+	※ 본인은 윈도우에서 테스트를 진행하였으므로 윈도우 기준으로 작성
+
+	경로 : keycloak-16.1.1\standalone\deployments
+		ex.실제경로) C:\Users\USER\Desktop\kimsc\개발\keycloak-16.1.1\keycloak-16.1.1\standalone\deployments
+	
+	해당 위치에 KeycloakPasswordEncryptor.jar 파일을 복사
 
 
+# keyCloak 실행 및 세팅
+	
+	1. 설치되어 있는 keycloak 를 실행
+		참고링크 : https://github.com/kkimsungchul/study/blob/master/Keycloak/%5BKeycloak%5D%20%EC%84%A4%EC%B9%98%20%EB%B0%8F%20%EC%84%B8%ED%8C%85.txt
 
-curl -X POST "http://localhost:8080/auth/realms/demo/protocol/openid-connect/token" ^
---header "Content-Type:application/x-www-form-urlencoded" ^
---data-urlencode "grant_type=password" ^
---data-urlencode "client_id=my_client" ^
---data-urlencode "client_secret=XafEZWyEQDgd0rmn86rO4H7K674l5zM9" ^
---data-urlencode "username=sungchul" ^
---data-urlencode "password=AA=="
+	2. http://localhost:8080/auth/ 접속 후 로그인 
+
+	
+	3. 적용할 realm 을 선택
+		본인은 Demo라는 이름으로 생성한 realm 을 선택함
+	
+	4. 좌측 Configure 탭의 Authentication 클릭
+
+	5. Authentication 화면에서 New 버튼을 클릭
+
+	6. Create Top Level Form 화면에서 아래의 정보를 입력
+		Alias : Decrypt Password
+		Description : Decrypt Password
+		Top Level Flow : generic
+	
+	7. 다시 Authentication 화면으로 돌아와서 셀렉트 박스에서 좀전에 생성한 "Decrypt Password" 선택
+
+	8. Add execution 클릭
+
+	9. Provider 셀렉트 박스에서 "Simple Password Encryption" 선택 후 save
+		Simple Password Encryption 이름은 "CustomKeycloakPasswordEncryptorFactory.java" 파일에서 지정해준 이름
+		해당이름이 표시되지 않는다면 아래의 내용들을 확인할것
+			- 생성한 파일들의 파일명은 제대로 되어 있는가
+			- 생성한 파일들의 경로들은 제대로 되어 있는가
+			- pom.xml 의 라이브러리들이 제대로 추가 되었는가
+			- 오타는 없는가
+			※ 본인은 경로 틀려서 삽질함
+		
+	10. 생성이 완료되면
+		Authentication 화면에서 "Decrypt Password" 셀렉트 박스를 선택 하면 "Simple Password Encryption" 가 표시됨
+		Requirement 부분에서 "REQUIRED" 선택
+	
+	
+	11. 사용자 생성
+		이전에 생성해놓은 My_client 에서 사용자를 생성
+			참고링크 : https://github.com/kkimsungchul/study/blob/master/Keycloak/%5BKeycloak%5D%20%EC%84%A4%EC%B9%98%20%EB%B0%8F%20%EC%84%B8%ED%8C%85.txt
+			※ 이름이랑 비밀번호 설정페이지는 별도임 위의 링크 참고
+
+		username : sungchul
+		password : 1
+		
+
+		
+
+#  토큰 발급 테스트
+	CMD 창에서 아래의 명령어를 통해 토큰이 발급되는지 테스트
+
+	1. 암호화 미적용 
+		=================================================================================================================
+		curl -X POST "http://localhost:8080/auth/realms/demo/protocol/openid-connect/token" ^
+		--header "Content-Type:application/x-www-form-urlencoded" ^
+		--data-urlencode "grant_type=password" ^
+		--data-urlencode "client_id=my_client" ^
+		--data-urlencode "client_secret=XafEZWyEQDgd0rmn86rO4H7K674l5zM9" ^
+		--data-urlencode "username=sungchul" ^
+		--data-urlencode "password=1"
+		=================================================================================================================
+
+		결과 : {"error":"invalid_request","error_description":"User Not Found"}
+
+	2. 암호화 적용
+
+		=================================================================================================================
+		curl -X POST "http://localhost:8080/auth/realms/demo/protocol/openid-connect/token" ^
+		--header "Content-Type:application/x-www-form-urlencoded" ^
+		--data-urlencode "grant_type=password" ^
+		--data-urlencode "client_id=my_client" ^
+		--data-urlencode "client_secret=XafEZWyEQDgd0rmn86rO4H7K674l5zM9" ^
+		--data-urlencode "username=sungchul" ^
+		--data-urlencode "password=AA=="
+		=================================================================================================================
+
+		결과 : 
+		{"access_token":"eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPdGViQldzSmdhRWozeXVaMGZlbTVWclFmbkZpcDlLczE5aVN6anBybGw0In0.eyJleHAiOjE2NDQ1MjIzMDksImlhdCI6MTY0NDQ4NjMwOSwianRpIjoiYmM4ZGI5ZTAtYjZmYy00OWJlLWI0MjItZjBiZDcxNGQ2YzJiIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL2F1dGgvcmVhbG1zL2RlbW8iLCJhdWQiOiJhY2NvdW50Iiwic3ViIjoiNzNkNWYwOWUtZTY2Ny00YjA2LTgwZDctMTk3ZDM1NzQyNmQ0IiwidHlwIjoiQmVhcmVyIiwiYXpwIjoibXlfY2xpZW50Iiwic2Vzc2lvbl9zdGF0ZSI6ImIwNTVhMTRlLWY3N2QtNGVkYS04MTE1LWE2Y2NmZDFkNzRhMiIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwIl0sInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJvZmZsaW5lX2FjY2VzcyIsInVtYV9hdXRob3JpemF0aW9uIiwiZGVmYXVsdC1yb2xlcy1kZW1vIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsibXlfY2xpZW50Ijp7InJvbGVzIjpbIlJPTEVfVVNFUiJdfSwiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJwcm9maWxlIGVtYWlsIiwic2lkIjoiYjA1NWExNGUtZjc3ZC00ZWRhLTgxMTUtYTZjY2ZkMWQ3NGEyIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJuYW1lIjoia2ltIHN1bmdjaHVsIiwicHJlZmVycmVkX3VzZXJuYW1lIjoic3VuZ2NodWwiLCJnaXZlbl9uYW1lIjoia2ltIiwiZmFtaWx5X25hbWUiOiJzdW5nY2h1bCIsImVtYWlsIjoia2ltc2MxMjE4QGdtYWlsLmNvbSJ9.QacHvhWS7myXfOgXhwtxLiyf7k4s7C_UowNgSxAipUxUBPa-2V5PHOatV68jqi1V9Np-Gbmj8iTlo4-PqTK3hImZRGx19YBM1hQ3uSGOQOg3QUVS9VMHIV8DBUl_bKfN92uQfg8b_Bqf4q9AT4ZNnvAk2yx5RlahDWi_qaH76qbECj04R6qrBJe9EgDJyxZB8xcMdT494TCMlCCyAV3rJ4KALDdBp7kSuQFlQHSLGY_Ti4K8y6TjWAE5jXpYRPUyq-27gymhhdrl9yktvb2LJluKgSjvDJ4tixMPYGOYTJWhqUTfWDfQncraGLd0vzJEev0GHb_aZ4mx67W_Ypz9pQ","expires_in":36000,"refresh_expires_in":1800,"refresh_token":"eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJhZDM2NmVmOS1kMTNmLTQyM2YtOTRhMS04OTI4M2YxN2JmNGUifQ.eyJleHAiOjE2NDQ0ODgxMDksImlhdCI6MTY0NDQ4NjMwOSwianRpIjoiMzdlNzM4OWUtMGYyNC00NTBkLTg2ZTUtYzYwZjNmOTlkN2E2IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL2F1dGgvcmVhbG1zL2RlbW8iLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvYXV0aC9yZWFsbXMvZGVtbyIsInN1YiI6IjczZDVmMDllLWU2NjctNGIwNi04MGQ3LTE5N2QzNTc0MjZkNCIsInR5cCI6IlJlZnJlc2giLCJhenAiOiJteV9jbGllbnQiLCJzZXNzaW9uX3N0YXRlIjoiYjA1NWExNGUtZjc3ZC00ZWRhLTgxMTUtYTZjY2ZkMWQ3NGEyIiwic2NvcGUiOiJwcm9maWxlIGVtYWlsIiwic2lkIjoiYjA1NWExNGUtZjc3ZC00ZWRhLTgxMTUtYTZjY2ZkMWQ3NGEyIn0.RLVYh5a4yUpYtRmpfF-TTMUkJMQK2wK28MFU1gsaYLU","token_type":"Bearer","not-before-policy":0,"session_state":"b055a14e-f77d-4eda-8115-a6ccfd1d74a2","scope":"profile email"}
+
+		결과 확인
+			1. https://jwt.io/ 사이트 접속
+			2. access_token 의 내용을 붙여넣기
+			-결과값
+			=================================================================================================================
+			{
+				  "exp": 1644522309,
+				  "iat": 1644486309,
+				  "jti": "bc8db9e0-b6fc-49be-b422-f0bd714d6c2b",
+				  "iss": "http://localhost:8080/auth/realms/demo",
+				  "aud": "account",
+				  "sub": "73d5f09e-e667-4b06-80d7-197d357426d4",
+				  "typ": "Bearer",
+				  "azp": "my_client",
+				  "session_state": "b055a14e-f77d-4eda-8115-a6ccfd1d74a2",
+				  "acr": "1",
+				  "allowed-origins": [
+					"http://localhost:8080"
+				  ],
+				  "realm_access": {
+					"roles": [
+					  "offline_access",
+					  "uma_authorization",
+					  "default-roles-demo"
+					]
+				  },
+				  "resource_access": {
+					"my_client": {
+					  "roles": [
+						"ROLE_USER"
+					  ]
+					},
+					"account": {
+					  "roles": [
+						"manage-account",
+						"manage-account-links",
+						"view-profile"
+					  ]
+					}
+				  },
+				  "scope": "profile email",
+				  "sid": "b055a14e-f77d-4eda-8115-a6ccfd1d74a2",
+				  "email_verified": false,
+				  "name": "kim sungchul",
+				  "preferred_username": "sungchul",
+				  "given_name": "kim",
+				  "family_name": "sungchul",
+				  "email": "kimsc1218@gmail.com"
+				}
+
+
+			=================================================================================================================
+
