@@ -2,7 +2,7 @@
 
 	참고 링크 : 
 		https://edwin.baculsoft.com/2021/03/how-to-encrypt-and-decrypt-password-on-keycloak-or-red-hat-sso/
-
+		https://github.com/edwin/keycloak-password-encryptor
 
 # 프로젝트 생성
 	1. File -> New -> Project -> Maven
@@ -124,13 +124,13 @@
 
 	1. 암호화 미적용 
 		=================================================================================================================
-		curl -X POST "http://localhost:8080/auth/realms/demo/protocol/openid-connect/token" ^
-		--header "Content-Type:application/x-www-form-urlencoded" ^
-		--data-urlencode "grant_type=password" ^
-		--data-urlencode "client_id=my_client" ^
-		--data-urlencode "client_secret=XafEZWyEQDgd0rmn86rO4H7K674l5zM9" ^
-		--data-urlencode "username=sungchul" ^
-		--data-urlencode "password=1"
+curl -X POST "http://localhost:8080/auth/realms/demo/protocol/openid-connect/token" ^
+--header "Content-Type:application/x-www-form-urlencoded" ^
+--data-urlencode "grant_type=password" ^
+--data-urlencode "client_id=my_client" ^
+--data-urlencode "client_secret=XafEZWyEQDgd0rmn86rO4H7K674l5zM9" ^
+--data-urlencode "username=sungchul" ^
+--data-urlencode "password=1"
 		=================================================================================================================
 
 		결과 : {"error":"invalid_request","error_description":"User Not Found"}
@@ -138,13 +138,13 @@
 	2. 암호화 적용
 
 		=================================================================================================================
-		curl -X POST "http://localhost:8080/auth/realms/demo/protocol/openid-connect/token" ^
-		--header "Content-Type:application/x-www-form-urlencoded" ^
-		--data-urlencode "grant_type=password" ^
-		--data-urlencode "client_id=my_client" ^
-		--data-urlencode "client_secret=XafEZWyEQDgd0rmn86rO4H7K674l5zM9" ^
-		--data-urlencode "username=sungchul" ^
-		--data-urlencode "password=AA=="
+curl -X POST "http://localhost:8080/auth/realms/demo/protocol/openid-connect/token" ^
+--header "Content-Type:application/x-www-form-urlencoded" ^
+--data-urlencode "grant_type=password" ^
+--data-urlencode "client_id=my_client" ^
+--data-urlencode "client_secret=XafEZWyEQDgd0rmn86rO4H7K674l5zM9" ^
+--data-urlencode "username=sungchul" ^
+--data-urlencode "password=MQ=="
 		=================================================================================================================
 
 		결과 : 
