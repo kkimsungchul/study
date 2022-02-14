@@ -13,7 +13,8 @@
 	필요한 플러그인 : Deploy to container
 	
 	해당 사이트에서 검색하면 나오는 hpi 파일을 다운로드함
-
+	또는 아래의 사이트에서 다운로드
+	http://updates.jenkins-ci.org/download/plugins/
 
 # 내려받은 hpi 파일을 jenkins plugins 폴더에 추가
 	경로 : C:\ProgramData\Jenkins\.jenkins\plugins
