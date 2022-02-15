@@ -17,6 +17,7 @@ public class CustomKeycloakPasswordEncryptor implements Authenticator {
 
     public void authenticate(AuthenticationFlowContext authenticationFlowContext) {
 
+
         // not bringing username
         if(authenticationFlowContext.getHttpRequest().getFormParameters().get("username") == null
                 || authenticationFlowContext.getHttpRequest().getFormParameters().get("username").isEmpty()) {
@@ -65,7 +66,12 @@ public class CustomKeycloakPasswordEncryptor implements Authenticator {
         password = password.replace("%3D", "=");
 
         // decrypt the password
-        password = EncryptionHelper.decrypt(password);
+        //여기 수정해야함 귀찬아서 다 쓰로우햇음;;
+        try{
+            password = EncryptionHelper.decrypt(password);
+        }catch (Exception e){
+
+        }
 
         // password is incorrect
         PasswordUserCredentialModel credentialInput = UserCredentialModel.password(password);

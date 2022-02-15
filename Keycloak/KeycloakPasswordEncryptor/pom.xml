@@ -26,25 +26,25 @@
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-core</artifactId>
             <version>${keycloak.version}</version>
-            <scope>provided</scope>
+
         </dependency>
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-server-spi</artifactId>
             <version>${keycloak.version}</version>
-            <scope>provided</scope>
+
         </dependency>
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-server-spi-private</artifactId>
             <version>${keycloak.version}</version>
-            <scope>provided</scope>
+
         </dependency>
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-services</artifactId>
             <version>${keycloak.version}</version>
-            <scope>provided</scope>
+
         </dependency>
 
         <!--        unit testing -->
@@ -54,6 +54,13 @@
             <version>5.1.0</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.15</version>
+        </dependency>
+
     </dependencies>
 
 

@@ -1,0 +1,52 @@
+<html>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.min.js" ></script>
+<script src="./aes.js"></script>
+<script src="./pbkdf2.js"></script>
+<script>
+
+    var enc_iv = '736563757275735f5f736167756e6a61';
+    var enc_salt = '68616e61736f6674';
+    var enc_passPhrase = '1234';
+    var enc_keySize = 128;
+    var enc_iterationCount = 100;
+
+    $(document).ready(function() {
+
+        $("#btnLogin").click(function () {
+
+            //var tmpData = $("#userId").val() + "|" + $("#userPw").val();
+            //var tmpData = document.getElementById("userId") +"|"+document.getElementById("userPw")
+			var tmpData = $("#userPw").val();
+			var key128Bits100Iterations = CryptoJS.PBKDF2(enc_passPhrase, CryptoJS.enc.Hex.parse(enc_salt), { keySize: enc_keySize/32, iterations: enc_iterationCount });
+            var encData = CryptoJS.AES.encrypt(tmpData, key128Bits100Iterations, { iv: CryptoJS.enc.Hex.parse(enc_iv) });
+            $("#encData").val(encData);
+			console.log("click ok ");
+			console.log($("#encData").val());
+
+        });
+
+    });
+</script>
+  <head>
+    <title>환영합니다</title>
+  </head>
+  <body>
+
+  <div id="div01">
+
+      <form action="aesResult.do" id="frm" name="frm" method="post" >
+          <input type="hidden" id="encData" name="encData" value="">
+          <table>
+              <tr><th>아이디 </th><td><input type="text" name="userId" id="userId"></td></tr>
+              <tr><th>비밀번호</th><td><input type="password" name ="userPw" id="userPw">
+              <tr><th colspan="2"><input type="button" id="btnLogin" name="btnLogin" value="로그인" class="button"></th></tr>
+          </table>
+      </form>
+
+
+
+
+  </div>
+
+  </body>
+</html>
