@@ -73,20 +73,24 @@
 		//String loginId = insertProjectVo.getCreatedBy();
 	    String loginId = "91296885";
 	    //long projectId = newInsertProjectVo.getId();
-	    long projectId = (long)695;
+	    long projectId = (long)839;
 		NewInsertJenkinsVO jenkins = newInsertProjectVo.getJenkins();
 		
 		List<NewInsertJenkinsVO> insertJenkinsFolderList = jenkins.getFolders();
 		List<NewInsertJenkinsVO> insertJenkinsJobList = jenkins.getJobs();
-		
-		
-		
-
 		String uri = jenkinsUrl;
-		createJenkinsFolder(insertJenkinsFolderList,uri , projectId, true);
-		createJenkinsJob(insertJenkinsJobList,uri , projectId, true);
-		
-		isSuccess = true;
+
+		//젠킨스folder , job 생성
+		try {
+			createJenkinsFolder(insertJenkinsFolderList,uri , projectId, true);
+			createJenkinsJob(insertJenkinsJobList,uri , projectId, true);
+			isSuccess = true;	
+		//오류발생시 생성한 folder , job 롤백하도록 플래그 지정
+		}catch (Exception e) {
+			System.out.println("###### 오류발생");
+			isSuccess = false;	
+		}
+		deleteAndRollbackJenkins(projectId,loginId,"3",isSuccess);
 		return isSuccess;
 	}
 	
@@ -117,7 +121,7 @@
     		    //폴더 생성
     			//String uri = jenkinsUrl + "/createItem?name=" + folderName +"&mode=com.cloudbees.hudson.plugins.folder.Folder";
     			String tempUri = uri+"/createItem?name=" + insertJenkinsFolderList.get(i).getJenkinsFolderName() + "&mode=com.cloudbees.hudson.plugins.folder.Folder";
-    			
+    			String createUri = uri + "/job/" + insertJenkinsFolderList.get(i).getJenkinsFolderName();
     			try {
     	            ResponseEntity<String> responseResult = callJenkinsRestApi("POST", tempUri, null);
     	            
@@ -125,45 +129,61 @@
     	                LOGGER.info("Jenkins REST API : Folder create success! , HttpStatus.OK");
     	                result.put("status", DbMessageManager.getMessage("I0001", "ko"));
     	                result.put("msg", "");
-    	                //최상위일 경우에만 DB에 저장
-    	                if(topFlag) {
-    	                	insertJenkinsFolderList.get(i).setCreatedBy(loginId);
-    	                	insertJenkinsFolderList.get(i).setLastModifiedBy(loginId);
-    	                	insertJenkinsFolderList.get(i).setProjectId(projectId);
+
+    	                insertJenkinsFolderList.get(i).setCreatedBy(loginId);
+	                	insertJenkinsFolderList.get(i).setLastModifiedBy(loginId);
+	                	insertJenkinsFolderList.get(i).setProjectId(projectId);    	                
+	                	ProjectTempVO projectTempVO = new ProjectTempVO(projectId,loginId,"3",createUri,"crt");
+	                	//최상위일 경우에만 DB에 저장
+	                	if(topFlag) {
     	                	newJenkinsMapper.insertJenkins(insertJenkinsFolderList.get(i));	
+    	                	projectTempVO.setTableIdUper(insertJenkinsFolderList.get(i).getJenkinsFolderName());
     	                }
+    	    			insertJenkinsFolderList.get(i).setUrl(createUri);
+    	    			
+    	    			newJenkinsMapper.insertJenkinsTemp(projectTempVO);
     	            } else {
     	                // ssl 오류에 대해서는 무시한다 (정상으로 처리)
     	                if (responseResult.getStatusCode() == HttpStatus.FOUND) {
     	                	LOGGER.info("Jenkins REST API : Folder create success! , HttpStatus.FOUND");
     	                    result.put("status", DbMessageManager.getMessage("I0001", "ko"));
     	                    result.put("msg", "");
+
+    	                	insertJenkinsFolderList.get(i).setCreatedBy(loginId);
+    	                	insertJenkinsFolderList.get(i).setLastModifiedBy(loginId);
+    	                	insertJenkinsFolderList.get(i).setProjectId(projectId);
+    	                	ProjectTempVO projectTempVO = new ProjectTempVO(projectId,loginId,"3",createUri,"crt");
         	                //최상위일 경우에만 DB에 저장
-        	                if(topFlag) {
-        	                	insertJenkinsFolderList.get(i).setCreatedBy(loginId);
-        	                	insertJenkinsFolderList.get(i).setLastModifiedBy(loginId);
-        	                	insertJenkinsFolderList.get(i).setProjectId(projectId);
+    	                	if(topFlag) {
         	                	newJenkinsMapper.insertJenkins(insertJenkinsFolderList.get(i));	
+        	                	projectTempVO.setTableIdUper(insertJenkinsFolderList.get(i).getJenkinsFolderName());
         	                }
+        	    			insertJenkinsFolderList.get(i).setUrl(createUri);
+        	    			newJenkinsMapper.insertJenkinsTemp(projectTempVO);        	                
+        	                
     	                } else {
     	                    LOGGER.error("Jenkins REST API is fail, Return code : " + responseResult.getStatusCodeValue());
+    	                    result.put("status", DbMessageManager.getMessage("I0002", "ko"));
+    	                    result.put("msg", DbMessageManager.getMessage("E0114", "Jenkins REST API error", "ko"));
     	                    throw new ApiException(responseResult.getStatusCode(), "E0015");
     	                }
     	            }
 
     	        } catch(HttpClientErrorException ce) {
+                    //result.put("status", DbMessageManager.getMessage("I0002", "ko"));
+                    //result.put("msg", DbMessageManager.getMessage("E0114", "Jenkins REST API error", "ko"));
     	            throw HttpErrorExceptionDetail.getApiException(ce, "Jenkins REST API error", uri);
     	        } catch (HttpServerErrorException se) {
+    	        	//result.put("status", DbMessageManager.getMessage("I0002", "ko"));
+                    //result.put("msg", DbMessageManager.getMessage("E0114", "Jenkins REST API error", "ko"));
     	            throw HttpErrorExceptionDetail.getApiException(se, "Jenkins REST API error", uri);
     	        }
     			
     			if(insertJenkinsFolderList.get(i).getJobs().size()>0) {
-    				String createJobUri = uri + "/job/" + insertJenkinsFolderList.get(i).getJenkinsFolderName() +"/";
-    				createJenkinsJob(insertJenkinsFolderList.get(i).getJobs() , createJobUri , projectId ,false);
+    				createJenkinsJob(insertJenkinsFolderList.get(i).getJobs() , createUri , projectId ,false);
     			}
     			if(insertJenkinsFolderList.get(i).getFolders().size()>0) {
-    				String createFolderUri = uri + "/job/" + insertJenkinsFolderList.get(i).getJenkinsFolderName() +"/";
-    				createJenkinsFolder(insertJenkinsFolderList.get(i).getFolders() , createFolderUri , projectId , false);
+    				createJenkinsFolder(insertJenkinsFolderList.get(i).getFolders() , createUri , projectId , false);
     			}
     			
     			
@@ -207,7 +227,7 @@
     		    //잡생성
     			//String uri = jenkinsUrl + "/job/" + folderName +"/createItem?name=" + jobName + "&mode=copy&from=" + copyJobName;
     			String tempUri = uri+"/createItem?name=" + insertJenkinsJobList.get(i).getJenkinsJobName() + "&mode=copy&from=" + templateJobName;
-    			
+    			String createUri = uri + "/job/" + insertJenkinsJobList.get(i).getJenkinsJobName();
     			try 
     	        {
     	            // resources의 jenkinsJobConfig.xml 파일을 읽어 온다
@@ -216,18 +236,21 @@
     	            
     	            if (responseResult.getStatusCode() == HttpStatus.OK || responseResult.getStatusCode() == HttpStatus.FOUND) {
     	                LOGGER.info("Jenkins REST API : Job create success!");
-
+	                	insertJenkinsJobList.get(i).setCreatedBy(loginId);
+    	                insertJenkinsJobList.get(i).setLastModifiedBy(loginId);
+    	                insertJenkinsJobList.get(i).setProjectId(projectId);
+    	                insertJenkinsJobList.get(i).setUrl(createUri);
+    	                ProjectTempVO projectTempVO = new ProjectTempVO(projectId,loginId,"3",createUri,"crt");
     	                //최상위일 경우에만 DB에 저장
     	                if(topFlag) {
-    	                	insertJenkinsJobList.get(i).setCreatedBy(loginId);
-        	                insertJenkinsJobList.get(i).setLastModifiedBy(loginId);
-        	                insertJenkinsJobList.get(i).setProjectId(projectId);
     	                	newJenkinsMapper.insertJenkins(insertJenkinsJobList.get(i));	
+    	                	projectTempVO.setTableIdUper(insertJenkinsJobList.get(i).getJenkinsJobName());
     	                }
     	                
     	                result.put("status", DbMessageManager.getMessage("I0001", "ko"));
     	                result.put("msg", "");
     	                
+    	                newJenkinsMapper.insertJenkinsTemp(projectTempVO);
     	            } else {
     	                LOGGER.error("Jenkins REST API is fail, Return code : " + responseResult.getStatusCodeValue());
     	                throw new ApiException(responseResult.getStatusCode(), "E0015");
@@ -235,10 +258,16 @@
 
     	        } catch(IOException ie) {
     	            // 파일 읽기 에러
-    	            throw new ApiException("E0017", "Jenkins REST API error : " + "Job config File");
+    	        	result.put("status", DbMessageManager.getMessage("I0002", "ko"));
+                    result.put("msg", DbMessageManager.getMessage("E0017", "Jenkins REST API error", "ko"));
+    	        	throw new ApiException("E0017", "Jenkins REST API error : " + "Job config File");
     	        } catch(HttpClientErrorException ce) {
+    	        	result.put("status", DbMessageManager.getMessage("I0002", "ko"));
+                    result.put("msg", DbMessageManager.getMessage("E0114", "Jenkins REST API error", "ko"));
     	            throw HttpErrorExceptionDetail.getApiException(ce, "Jenkins REST API error", tempUri);
     	        } catch (HttpServerErrorException se) {
+    	        	result.put("status", DbMessageManager.getMessage("I0002", "ko"));
+                    result.put("msg", DbMessageManager.getMessage("E0114", "Jenkins REST API error", "ko"));
     	            throw HttpErrorExceptionDetail.getApiException(se, "Jenkins REST API error", tempUri);
     	        } 
     		}
@@ -250,6 +279,61 @@
     }
 	====================================================================================================	
 	
+	
+	
+	롤백하는 메소드,
+	생성이나 수정시에 오류가 발생하면 이전에 작업한 내용들을 전부다 원상복구 하도록 함
+	데이터는 project_temp 테이블에서 가져오고 있으며
+	project_temp 테이블의 데이터는 생성 또는 수정시에 DB에 적재하도록 하고있음
+	==================================================================================================================================================
+	/**
+     * temp 테이블삭제 및 오류 발생 시 tool 에서 jenkins 원상복구, DB에서 jenkins 삭제
+     * @param projectId
+     * @param loginId
+     * @param toolType
+     * @param errorFlag 오류 발생여부 true : 오류미발생 , false : 오류발생
+     */
+    public void deleteAndRollbackJenkins(long projectId , String loginId , String toolType, Boolean errorFlag) {
+    	Map<String, String> result = new HashMap<String, String>();
+    	ProjectTempVO projectTempVO = new ProjectTempVO(projectId,loginId,toolType);
+    	String url="";
+    	
+    	if(!errorFlag) {
+        	List<ProjectTempVO> deleteJenkinsTempList= newJenkinsMapper.selectJenkinsTemp(projectTempVO);
+    		for(ProjectTempVO tempVO : deleteJenkinsTempList) {
+    			
+    			if(tempVO.getStatus().equals("crt")) {
+    				url = tempVO.getToolPath()+"/doDelete";
+    				if(tempVO.getTableIdUper()!=null) {
+        				System.out.println("### tempVO.getTableIdUper() : " + tempVO.getTableIdUper());
+        				newJenkinsMapper.deleteJenkins(tempVO);
+        			}
+    			}else if(tempVO.getStatus().equals("del")) {
+    				url = tempVO.getToolPath();
+    			}
+    	        try {
+    	        	
+    	            ResponseEntity<String> responseResult = callJenkinsRestApiForXml("POST",url , null);
+    	            LOGGER.info("Jenkins Delete : " + responseResult.getStatusCode());
+//    	            result.put("status", DbMessageManager.getMessage("I0001", "ko"));
+//    	            result.put("msg", "");
+    	        } catch(HttpClientErrorException ce) {
+    	        	DbMessageManager.getMessage("E0114", new Object[]{"이미 삭제한 Jenkins Folder 또는 Job",url}, "ko");
+//                  result.put("status", DbMessageManager.getMessage("I0002", "ko"));
+//                  result.put("msg", DbMessageManager.getMessage("E0114", new Object[]{"이미 삭제한 Jenkins Folder 또는 Job",deleteURL}, "ko"));    	        
+    	        } catch (HttpServerErrorException se) {
+    	        	DbMessageManager.getMessage("E0114", new Object[]{"이미 삭제한 Jenkins Folder 또는 Job",url}, "ko");
+//                    result.put("status", DbMessageManager.getMessage("I0002", "ko"));
+//                    result.put("msg", DbMessageManager.getMessage("E0114", new Object[]{"이미 삭제한 Jenkins Folder 또는 Job",deleteURL}, "ko"));
+    	        }
+        		
+        	}	
+    	}
+    	newJenkinsMapper.deleteJenkinsTemp(projectTempVO);
+    }
+	
+	
+	==================================================================================================================================================
 	
 # VO
 	새로 생성하였음, DB구조가 변경되어서 그에 맞도록 수정하였으며, job과 folder을 하나의 vo로 사용함
@@ -481,11 +565,156 @@
 
 	
 	====================================================================================================
+	
+	ProjectTempVO, DB에 작업한 내용을 적재할때 사용할 VO
+	==================================================================================================================================================
+	public class ProjectTempVO {
+
+		private Long projectId;
+		private String createdBy;
+		private String toolType;
+		private String toolPath;
+		private String tableIdUper;
+		private String status;
+		
+		public ProjectTempVO() {
+			
+		}
+		
+		public ProjectTempVO(Long projectId , String createdBy, String toolType) {
+			this.projectId = projectId;
+			this.createdBy = createdBy;
+			this.toolType = toolType;
+		}
+		
+		public ProjectTempVO(Long projectId , String createdBy, String toolType,String toolPath) {
+			this.projectId = projectId;
+			this.createdBy = createdBy;
+			this.toolType = toolType;
+			this.toolPath = toolPath;
+		}
+		public ProjectTempVO(Long projectId , String createdBy, String toolType,String toolPath,String status) {
+			this.projectId = projectId;
+			this.createdBy = createdBy;
+			this.toolType = toolType;
+			this.toolPath = toolPath;
+			this.status = status;
+		}
+		
+		public ProjectTempVO(Long projectId , String createdBy, String toolType,String toolPath,String tableIdUper, String status) {
+			this.projectId = projectId;
+			this.createdBy = createdBy;
+			this.toolType = toolType;
+			this.toolPath = toolPath;
+			this.tableIdUper = tableIdUper;
+			this.status = status;
+		}
+		
+		public Long getProjectId() {
+			return projectId;
+		}
+
+
+		public void setProjectId(Long projectId) {
+			this.projectId = projectId;
+		}
+
+
+		public String getCreatedBy() {
+			return createdBy;
+		}
+
+
+		public void setCreatedBy(String createdBy) {
+			this.createdBy = createdBy;
+		}
+
+
+		public String getToolType() {
+			return toolType;
+		}
+
+
+		public void setToolType(String toolType) {
+			this.toolType = toolType;
+		}
+
+
+		public String getToolPath() {
+			return toolPath;
+		}
+
+
+		public void setToolPath(String toolPath) {
+			this.toolPath = toolPath;
+		}
+
+
+		public String getTableIdUper() {
+			return tableIdUper;
+		}
+
+
+		public void setTableIdUper(String tableIdUper) {
+			this.tableIdUper = tableIdUper;
+		}
+		
+
+		public String getStatus() {
+			return status;
+		}
+
+		public void setStatus(String status) {
+			this.status = status;
+		}
+
+		@Override
+		public String toString() {
+			return "ProjectTempVO [projectId=" + projectId + ", createdBy=" + createdBy + ", toolType=" + toolType
+					+ ", toolPath=" + toolPath + ", tableIdUper=" + tableIdUper + ", status=" + status + "]";
+		}
+
+
+		
+		
+	}	
+	
+	
+	==================================================================================================================================================
+	
 # 맵퍼 (JAVA)
 
 	job과 folder 은 같은 테이블을 사용하고있고, 서로 필드만 다르기에 하나의 메소드로 mapper를 호출하도록 작성
+	insertJenkins : DB에 젠킨스 추가
+	deleteJenkins : DB에서 젠킨스 삭제
+	insertValidJenkinsCheck : DB에서 젠킨스 중복 체크
+	insertJenkinsTemp : 생성 및 수정된 내용을 project_Temp 테이블에 임시 적재
+	deleteJenkinsTemp : project_Temp 테이블에 임시 적재된 데이터 삭제한
+	selectJenkinsTemp : 오류발생 시 롤백시킬 enkins 목록을 project_Temp 에서 조회해옴
 	====================================================================================================
-	public Long insertJenkins(NewInsertJenkinsVO vo);
+
+	import java.util.HashMap;
+	import java.util.List;
+	import org.apache.ibatis.annotations.Mapper;
+
+	@Mapper
+	public interface NewJenkinsMapper{
+
+		public Long insertJenkins(NewInsertJenkinsVO vo);
+
+		public int deleteJenkins(ProjectTempVO projectTempVO);
+		
+		public int insertValidJenkinsCheck(NewInsertJenkinsVO vo);
+		
+		public int insertJenkinsTemp(ProjectTempVO projectTempVO);
+		
+		public int deleteJenkinsTemp(ProjectTempVO projectTempVO);
+		
+		public List<ProjectTempVO> selectJenkinsTemp(ProjectTempVO projectTempVO);
+		
+	}
+
+	
 	====================================================================================================
 	
 # 맵퍼 (XML)
@@ -505,4 +734,45 @@
 		</if>
     </insert>
 	
+	
+    <delete id="deleteJenkins" parameterType="ProjectTempVO">
+    	DELETE FROM jenkins_mn_job
+    	WHERE jenkins_folder_name = #{tableIdUper} 
+    	OR jenkins_job_name = #{tableIdUper}
+    </delete>
+    
+	<insert id="insertJenkinsTemp" parameterType="ProjectTempVO">
+        INSERT INTO project_temp
+        (
+            project_id
+            ,created_by
+            ,tool_type
+            ,tool_path
+            ,table_id_uper
+            ,status
+        )
+        VALUES
+        (
+            #{projectId}
+            ,#{createdBy}
+            ,3
+            ,#{toolPath}
+            ,#{tableIdUper}
+            ,#{status}
+        )
+    </insert>
+    
+    <delete id="deleteJenkinsTemp" parameterType="ProjectTempVO">
+    	DELETE FROM project_temp 
+    	WHERE project_id = #{projectId}
+    	AND created_by = #{createdBy}
+    	AND tool_type = #{toolType}    
+    </delete>
+    
+    <select id="selectJenkinsTemp" parameterType="ProjectTempVO" resultType="ProjectTempVO">
+    	SELECT * FROM project_temp 
+    	WHERE project_id = #{projectId}
+    	AND created_by = #{createdBy}
+    	AND tool_type = #{toolType}       	
+    </select>	
 	====================================================================================================
