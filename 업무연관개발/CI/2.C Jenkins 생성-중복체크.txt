@@ -15,6 +15,7 @@
 	
 	
 	
+	
 
 
 # 1. 최상단 중복 체크
@@ -76,12 +77,21 @@
 			compare = insertJenkinsFolderList.get(i).getJenkinsFolderName();
 			for(int j=0;j<insertJenkinsFolderList.size();j++) {
 				if(i!=j) {
-					if(insertJenkinsFolderList.get(j).getJenkinsFolderName().equals(compare)) {
+					if(insertJenkinsFolderList.get(j).getJenkinsFolderName().equalsIgnoreCase(compare)) {
 						result.put("msg", DbMessageManager.getMessage("E0016", "Jenkins 폴더명", "ko"));
 						return result;	
 					}
 				}
 			}
+			//같은 뎁스에 중복된 Job명이 있는지 확인
+			for(int k=0;k<insertJenkinsJobList.size();k++) {
+				if(compare.equalsIgnoreCase(insertJenkinsJobList.get(k).getJenkinsJobName())) {
+					result.put("msg", DbMessageManager.getMessage("E0016", "Jenkins 폴더명과 JOB 명", "ko"));
+					return result;	
+				}
+			}
+			
+			
 		}
 		
 		for(int i=0;i<insertJenkinsJobList.size();i++) {
@@ -94,7 +104,7 @@
 			compare = insertJenkinsJobList.get(i).getJenkinsJobName();
 			for(int j=0;j<insertJenkinsJobList.size();j++) {
 				if(i!=j) {
-					if(insertJenkinsJobList.get(j).getJenkinsJobName().equals(compare)) {
+					if(insertJenkinsJobList.get(j).getJenkinsJobName().equalsIgnoreCase(compare)) {
 						result.put("msg", DbMessageManager.getMessage("E0016", "Jenkins job명", "ko"));
 						return result;	
 					}
@@ -125,13 +135,13 @@
      * @param uri
      * @return Map<String, Object>
      */
-    public Map<String, Object> insertJenkinsToolValidationCheck(List<NewInsertJenkinsVO> insertJenkinsFolderList,String uri){
+    public Map<String, Object> insertJenkinsToolValidationCheck(List<NewInsertJenkinsVO> insertJenkinsFolderList,String paramURL){
 		Matcher match;
 		Map<String, Object> result = new HashMap<String, Object>();
 		String regexJenkins  = "^([A-Za-z0-9ㄱ-힣]{1})[a-zA-Z0-9ㄱ-힣-_(),.\\s]{0,84}$";
-		
-		if(uri==null) {
-			uri = jenkinsUrl;
+		String url = paramURL;
+		if(paramURL==null) {
+			url = jenkinsUrl;
 		}
 		
 		//List<NewInsertJenkinsVO> insertJenkinsFolderList = insertJenkinsFolderList
@@ -149,14 +159,26 @@
 		        
 				for(int j=0;j<insertJenkinsFolderList.size();j++) {
 					if(i!=j && insertJenkinsFolderList.get(j).getDivision()==1) {
-						if(insertJenkinsFolderList.get(j).getJenkinsFolderName().equals(folderName)) {
+						if(insertJenkinsFolderList.get(j).getJenkinsFolderName().equalsIgnoreCase(folderName)) {
 							result.put("msg", DbMessageManager.getMessage("E0016", "Jenkins 폴더명", "ko"));
 							return result;	
 						}
 					}
+					
+					//바로 하위 뎁스에 중복된 Job명이 있는지 확인
+					List<NewInsertJenkinsVO> compareFolderList = insertJenkinsFolderList.get(i).getFolders();
+					List<NewInsertJenkinsVO> compareJobList = insertJenkinsFolderList.get(i).getJobs();
+					for(int k=0;k<compareFolderList.size();k++) {
+						for(int l=0;l<compareJobList.size();l++) {
+							if(compareFolderList.get(k).getJenkinsFolderName().equalsIgnoreCase(compareJobList.get(l).getJenkinsJobName())) {
+								result.put("msg", DbMessageManager.getMessage("E0016", "Jenkins 폴더명과 JOB 명", "ko"));
+								return result;	
+							}
+						}
+					}
 				}
 		        
-		        if(existFolderOrJob(uri, insertJenkinsFolderList.get(i).getJenkinsFolderName())) {
+		        if(existFolderOrJob(url, insertJenkinsFolderList.get(i).getJenkinsFolderName())) {
 					result.put("msg", DbMessageManager.getMessage("E0016", "Jenkins 폴더명", "ko"));
 					return result;	
 		        }
@@ -164,7 +186,7 @@
 		        //하위폴더 체크
 		        if(insertJenkinsFolderList.get(i).getFolders().size()>0) {
 
-		        	result = insertJenkinsToolValidationCheck(insertJenkinsFolderList.get(i).getFolders(),uri+ "/job/" + insertJenkinsFolderList.get(i).getJenkinsFolderName());
+		        	result = insertJenkinsToolValidationCheck(insertJenkinsFolderList.get(i).getFolders(),url+ "/job/" + insertJenkinsFolderList.get(i).getJenkinsFolderName());
 		        	
 					if(!result.isEmpty()) {
 						return result;
@@ -173,7 +195,7 @@
 		        //하위 잡 체크
 		        if(insertJenkinsFolderList.get(i).getJobs().size()>0) {
 
-		        	result = insertJenkinsToolValidationCheck(insertJenkinsFolderList.get(i).getJobs(),uri+ "/job/" + insertJenkinsFolderList.get(i).getJenkinsFolderName());
+		        	result = insertJenkinsToolValidationCheck(insertJenkinsFolderList.get(i).getJobs(),url+ "/job/" + insertJenkinsFolderList.get(i).getJenkinsFolderName());
 
 					if(!result.isEmpty()) {
 						return result;
@@ -189,17 +211,15 @@
 					result.put("msg", DbMessageManager.getMessage("E0125", new Object[]{"Jenkins job명", "특수문자로 시작할 수 없으며 한글,영문대소문자,숫자,특수문자 -_().,","1","85"}, "ko"));
 					return result;  
 				}
-				
-		        
 				for(int j=0;j<insertJenkinsFolderList.size();j++) {
 					if(i!=j && insertJenkinsFolderList.get(j).getDivision()==2) {
-						if(insertJenkinsFolderList.get(j).getJenkinsJobName().equals(jobName)) {
+						if(insertJenkinsFolderList.get(j).getJenkinsJobName().equalsIgnoreCase(jobName)) {
 							result.put("msg", DbMessageManager.getMessage("E0016", "Jenkins job명", "ko"));
 							return result;	
 						}
 					}
 				}
-				if(existFolderOrJob(uri, insertJenkinsFolderList.get(i).getJenkinsJobName())) {
+				if(existFolderOrJob(url, insertJenkinsFolderList.get(i).getJenkinsJobName())) {
 					result.put("msg", DbMessageManager.getMessage("E0016", "Jenkins job명", "ko"));
 					return result;	
 				}
