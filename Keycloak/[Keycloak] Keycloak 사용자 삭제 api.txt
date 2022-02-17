@@ -1,0 +1,65 @@
+[keycloak - 사용자 삭제 API 사용]
+
+# 관리자 토큰 발급
+	URL : <keycloak URL> /auth/realms/master/protocol/openid-connect/token
+		이부분에서 앞부분의 URL만 변경하면됨
+		ex) http://localhost:8080/auth/realms/master/protocol/openid-connect/token
+
+	발급 URL 정보 : 
+
+		curl -X POST "http://localhost:8080/auth/realms/master/protocol/openid-connect/token" ^
+		--header "Content-Type:application/x-www-form-urlencoded" ^
+		--data-urlencode "grant_type=password" ^
+		--data-urlencode "client_id=admin-cli" ^
+		--data-urlencode "username=kimsc1218" ^
+		--data-urlencode "password=admin"
+
+
+# 키클락 사용자 정보 조회 (GET)
+	사용자 정보 시에는 발급받은 관리자 토큰을 헤더야 포함해야 함
+		Authorization : bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJOUkd5em4tN3RZZU9Rc05pZ3VUVUJfTEc4TV9nVmI3ZG9kSlJTOFZIem5RIn0.eyJleHAiOjE2NDUwOTAyMjAsImlhdCI6MTY0NTA4NjYyMCwianRpIjoiZTRiZjZjMzItZWZhNy00YWViLThlNzYtODc4ZGEwZWFhNzMyIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL2F1dGgvcmVhbG1zL21hc3RlciIsInN1YiI6IjVjOGY1YjI1LTM3YjItNGQ1NC04ZWNmLTA5MWUyMTM2YTg1YyIsInR5cCI6IkJlYXJlciIsImF6cCI6ImFkbWluLWNsaSIsInNlc3Npb25fc3RhdGUiOiJmODRmZTQzMi0yN2JkLTRlYjItOGQ0OC1mZTkyNGZmNzBmOTgiLCJhY3IiOiIxIiwic2NvcGUiOiJwcm9maWxlIGVtYWlsIiwic2lkIjoiZjg0ZmU0MzItMjdiZC00ZWIyLThkNDgtZmU5MjRmZjcwZjk4IiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJraW1zYzEyMTgifQ.pu8sln6V7WuCHKiFpolKaisRE1N1N_REk50NVnVDjFKkwRHjckL8dJxbqIn77mKtYGnid_5ouCWryEs5z0zsGiGgEa8jN_3x8EFeYyqeyThQIZmyIC0YBHFz56aIyWuWpyntHR3YOVeYbHGlr8NNMHEJaRSH4wzNStSn2yBI9CnKQhXCpdM8iNLBbRLotOOwcpV1FM93jmo4pZijTBQ7uWIBA6HqZhEhF_FLWqKEZaZ3DU1MeCmQIW_OByGgN37Z8FQOJkGU8sG9yRpAyh5xx1nQwoPa-ZdAzMPVm9I5VxeUqcebIrsdtsF9dOvYLwHsWXHWOkrCpcdOIjads3Yj3A
+
+	
+	URL : <keycloak URL>/auth/admin/realms/<조회할 realms>/users/?username=<사용자이름>
+		
+		ex) http://localhost:8080/auth/admin/realms/demo/users/?username=test1
+			HTTP Method : GET
+			realms : demo 
+			username : test1
+	정보 조회시 아래와 같이 값이 리턴되며 삭제할때 여기서 ID값을 사용함
+	=================================================================================================================
+	[
+		{
+			"id": "9f709bb1-8a81-4174-b163-7f65db0d1e43",
+			"createdTimestamp": 1645079410407,
+			"username": "test1",
+			"enabled": true,
+			"totp": false,
+			"emailVerified": false,
+			"disableableCredentialTypes": [],
+			"requiredActions": [],
+			"notBefore": 0,
+			"access": {
+				"manageGroupMembership": true,
+				"view": true,
+				"mapRoles": true,
+				"impersonate": true,
+				"manage": true
+			}
+		}
+	]
+
+
+	=================================================================================================================
+
+# 키클락 사용자 삭제 (DELETE)
+	
+	삭제시에는 발급받은 관리자 토큰을 헤더야 포함해야 함
+		Authorization : bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJOUkd5em4tN3RZZU9Rc05pZ3VUVUJfTEc4TV9nVmI3ZG9kSlJTOFZIem5RIn0.eyJleHAiOjE2NDUwOTAyMjAsImlhdCI6MTY0NTA4NjYyMCwianRpIjoiZTRiZjZjMzItZWZhNy00YWViLThlNzYtODc4ZGEwZWFhNzMyIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL2F1dGgvcmVhbG1zL21hc3RlciIsInN1YiI6IjVjOGY1YjI1LTM3YjItNGQ1NC04ZWNmLTA5MWUyMTM2YTg1YyIsInR5cCI6IkJlYXJlciIsImF6cCI6ImFkbWluLWNsaSIsInNlc3Npb25fc3RhdGUiOiJmODRmZTQzMi0yN2JkLTRlYjItOGQ0OC1mZTkyNGZmNzBmOTgiLCJhY3IiOiIxIiwic2NvcGUiOiJwcm9maWxlIGVtYWlsIiwic2lkIjoiZjg0ZmU0MzItMjdiZC00ZWIyLThkNDgtZmU5MjRmZjcwZjk4IiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJraW1zYzEyMTgifQ.pu8sln6V7WuCHKiFpolKaisRE1N1N_REk50NVnVDjFKkwRHjckL8dJxbqIn77mKtYGnid_5ouCWryEs5z0zsGiGgEa8jN_3x8EFeYyqeyThQIZmyIC0YBHFz56aIyWuWpyntHR3YOVeYbHGlr8NNMHEJaRSH4wzNStSn2yBI9CnKQhXCpdM8iNLBbRLotOOwcpV1FM93jmo4pZijTBQ7uWIBA6HqZhEhF_FLWqKEZaZ3DU1MeCmQIW_OByGgN37Z8FQOJkGU8sG9yRpAyh5xx1nQwoPa-ZdAzMPVm9I5VxeUqcebIrsdtsF9dOvYLwHsWXHWOkrCpcdOIjads3Yj3A
+
+	URL : <keycloak URL>/auth/admin/realms/<사용자가있는 realms>/users/<사용자ID>
+		ex ) http://localhost:8080/auth/admin/realms/demo/users/3cd15b00-a8c7-46bb-a07d-e29cf89ce144
+			HTTP Method : DELETE
+			realms : demo 
+			username : 3cd15b00-a8c7-46bb-a07d-e29cf89ce144		
+		

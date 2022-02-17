@@ -83,7 +83,7 @@
 
 
 
-	※ Client Authenticator : XafEZWyEQDgd0rmn86rO4H7K674l5zM9
+	※ Client Authenticator : JBFLaz1mgZKPwYNqE9Tfyf0c3b2mnkOl
 		해당 값은 생성하고 나면 Credentials 의 탭에 표시되는 값
 
 # 사용자 생성
@@ -145,7 +145,7 @@ curl -X POST "http://localhost:8080/auth/realms/demo/protocol/openid-connect/tok
 --header "Content-Type:application/x-www-form-urlencoded" ^
 --data-urlencode "grant_type=password" ^
 --data-urlencode "client_id=my_client" ^
---data-urlencode "client_secret=XafEZWyEQDgd0rmn86rO4H7K674l5zM9" ^
+--data-urlencode "client_secret=JBFLaz1mgZKPwYNqE9Tfyf0c3b2mnkOl" ^
 --data-urlencode "username=sungchul" ^
 --data-urlencode "password=admin"
 	
@@ -160,10 +160,19 @@ curl -X POST "http://localhost:8080/auth/realms/demo/protocol/openid-connect/tok
 --header "Content-Type:application/x-www-form-urlencoded" ^
 --data-urlencode "grant_type=password" ^
 --data-urlencode "client_id=my_client" ^
---data-urlencode "client_secret=XafEZWyEQDgd0rmn86rO4H7K674l5zM9" ^
+--data-urlencode "client_secret=JBFLaz1mgZKPwYNqE9Tfyf0c3b2mnkOl" ^
 --data-urlencode "username=admin" ^
 --data-urlencode "password=admin"
 
+
+
+	# 관리자 권한 토큰 요청
+curl -X POST "http://localhost:8080/auth/realms/master/protocol/openid-connect/token" ^
+--header "Content-Type:application/x-www-form-urlencoded" ^
+--data-urlencode "grant_type=password" ^
+--data-urlencode "client_id=admin-cli" ^
+--data-urlencode "username=kimsc1218" ^
+--data-urlencode "password=admin"
 
 # 새로운 사용자로 로그인
 	
@@ -176,6 +185,9 @@ curl -X POST "http://localhost:8080/auth/realms/demo/protocol/openid-connect/tok
 		aaaa1111
 
 	4. 로그인 완료
+
+
+
 
 
 
