@@ -7,12 +7,12 @@
 
 	발급 URL 정보 : 
 
-		curl -X POST "http://localhost:8080/auth/realms/master/protocol/openid-connect/token" ^
-		--header "Content-Type:application/x-www-form-urlencoded" ^
-		--data-urlencode "grant_type=password" ^
-		--data-urlencode "client_id=admin-cli" ^
-		--data-urlencode "username=kimsc1218" ^
-		--data-urlencode "password=admin"
+curl -X POST "http://localhost:8080/auth/realms/master/protocol/openid-connect/token" ^
+--header "Content-Type:application/x-www-form-urlencoded" ^
+--data-urlencode "grant_type=password" ^
+--data-urlencode "client_id=admin-cli" ^
+--data-urlencode "username=kimsc1218" ^
+--data-urlencode "password=admin"
 
 
 # 키클락 사용자 정보 조회 (GET)
