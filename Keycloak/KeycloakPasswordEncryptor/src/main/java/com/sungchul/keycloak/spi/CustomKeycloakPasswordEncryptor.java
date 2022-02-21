@@ -67,11 +67,13 @@ public class CustomKeycloakPasswordEncryptor implements Authenticator {
 
         // decrypt the password
         //여기 수정해야함 귀찬아서 다 쓰로우햇음;;
+        System.out.println("############### password : "  + password);
         try{
             password = EncryptionHelper.decrypt(password);
         }catch (Exception e){
 
         }
+        System.out.println("############### password : "  + password);
 
         // password is incorrect
         PasswordUserCredentialModel credentialInput = UserCredentialModel.password(password);

@@ -2,16 +2,8 @@ package com.sungchul.keycloak.spi.helper;
 
 
 
-import com.sungchul.keycloak.spi.CustomKeycloakPasswordEncryptor;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.Hex;
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.SecretKeySpec;
-import java.security.spec.KeySpec;
+import java.util.Base64;
+
 
 
 /**
@@ -19,47 +11,59 @@ import java.security.spec.KeySpec;
  */
 public class EncryptionHelper {
 
+    private static final String KEY = "12345678";
 
-    public static String encrypt(String salt, String iv, String passphrase, String text, int iterationCount, int keySize) throws Exception {
-        ClassLoader moduleClassLoader = Thread.currentThread().getContextClassLoader();
-        Thread.currentThread().setContextClassLoader(EncryptionHelper.class.getClassLoader());
-        //add here the code where apache configuration2 is used, that is where configuration is built
-        Thread.currentThread().setContextClassLoader(moduleClassLoader);
-        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-        KeySpec spec = new PBEKeySpec(passphrase.toCharArray(), Hex.decodeHex(salt.toCharArray()), iterationCount, keySize);
-        SecretKey key = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(Hex.decodeHex(iv.toCharArray())));
-        byte[] results = cipher.doFinal(text.getBytes("UTF-8"));
-        return new String((Base64.encodeBase64(results)));
+    /**
+     * sample decryption, do not use it for production
+     *
+     * @param password
+     * @return decrypted password
+     */
+    public static final String decrypt(String password) {
+        try {
+            //return xorMessage(new String(Base64.getDecoder().decode(password.getBytes())));
+            return new String(Base64.getDecoder().decode(password.getBytes()));
+        } catch (Exception ex) {
+            System.err.println(ex.getMessage());
+            return "";
+        }
     }
 
-    public static String encrypt(String text) throws Exception {
-        String iv = "736563757275735f5f736167756e6a61";
-        String salt = "68616e61736f6674";
-        String passPhrase = "1234";
-        return encrypt(salt, iv, passPhrase, text, 100, 128);
+    /**
+     * sample encryption, do not use it for production
+     *
+     * @param password
+     * @return encrypted password
+     */
+    public static final String encrypt(String password) {
+        try {
+            //return Base64.getEncoder().encodeToString(xorMessage(password).getBytes());
+            return Base64.getEncoder().encodeToString(password.getBytes());
+        } catch (Exception ex) {
+            System.err.println(ex.getMessage());
+            return "";
+        }
     }
 
+    private static String xorMessage(String message) {
+        try {
+            if (message == null) return null;
 
-    public static String decrypt(String salt, String iv, String passphrase, String ciphertext, int iterationCount, int keySize) throws Exception {
-        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-        KeySpec spec = new PBEKeySpec(passphrase.toCharArray(), Hex.decodeHex(salt.toCharArray()), iterationCount, keySize);
-        SecretKey key = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(Hex.decodeHex(iv.toCharArray())));
-        byte[] decrypted = cipher.doFinal(Base64.decodeBase64(ciphertext));
-        return new String(decrypted, "UTF-8");
+            char[] keys = KEY.toCharArray();
+            char[] mesg = message.toCharArray();
+
+            int ml = mesg.length;
+            int kl = keys.length;
+            char[] newmsg = new char[ml];
+
+            for (int i = 0; i < ml; i++) {
+                newmsg[i] = (char)(mesg[i] ^ keys[i % kl]);
+            }
+            return new String(newmsg);
+        } catch (Exception e) {
+            return null;
+        }
+
     }
-
-
-    public static String decrypt(String ciphertext) throws Exception {
-        String iv = "736563757275735f5f736167756e6a61";
-        String salt = "68616e61736f6674";
-        String passPhrase = "1234";
-        return decrypt(salt, iv, passPhrase, ciphertext, 100, 128);
-    }
-
-
 
 }

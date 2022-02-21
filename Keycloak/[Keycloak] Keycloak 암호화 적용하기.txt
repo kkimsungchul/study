@@ -107,7 +107,11 @@
 		Authentication 화면에서 "Decrypt Password" 셀렉트 박스를 선택 하면 "Simple Password Encryption" 가 표시됨
 		Requirement 부분에서 "REQUIRED" 선택
 	
-	
+	11. 적용할 client 의 setting 페이지의 제일 하단부분의 "Authentication Flow Overrides" 를 아래와 같이 설정
+		Browser Flow : browser
+		Direct Grant Flow : Decrypt password
+
+
 	11. 사용자 생성
 		이전에 생성해놓은 My_client 에서 사용자를 생성
 			참고링크 : https://github.com/kkimsungchul/study/blob/master/Keycloak/%5BKeycloak%5D%20%EC%84%A4%EC%B9%98%20%EB%B0%8F%20%EC%84%B8%ED%8C%85.txt
