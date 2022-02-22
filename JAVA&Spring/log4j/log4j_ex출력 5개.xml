@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration PUBLIC "-//APACHE//DTD LOG4J 1.2//EN" "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+
+
+
+
+	<!-- 전곳달된 로그를 어디에 출력할 지 결정하는 곳 -->
+	<!-- 콘솔출력, 파일기록,db저장등 -->
+	<!-- Appenders -->
+	<appender name="console" class="org.apache.log4j.ConsoleAppender">
+		<!--<param name="Threshold" value="INFO" /> -->
+		<param name="Target" value="System.out" />
+
+		<!-- layout : 로그를 어떤 형식으로 출력할 지 결정하는 곳 -->
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="[%d] %-5p [%c{11}:%L:%M()] - %m%n" />
+		</layout>
+	</appender>
+
+
+	<!-- 일별 로그파일 출력 -->
+	<appender name="dailyRollingFile" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="encoding" value="UTF-8" />
+		<param name="File" value="C:/logs/SampleSite02/samplesite02.log" />
+		<param name="Append" value="true" />
+		<param name="DatePattern" value="'-'yyyyMMdd'.log'" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<!-- <param name="ConversionPattern" value="%d %5p [%c:%L] %m%n" /> -->
+			<param name="ConversionPattern" value="%d{yy-MM-dd HH:mm:ss.SSS} %5p %C [%M :%L] %m%n" />
+		</layout>
+	</appender>
+
+	<appender name="fileError" class="org.apache.log4j.FileAppender">
+		<param name="encoding" value="UTF-8" />
+		<param name="File" value="C:/logs/SampleSite02/samplesite02_error.log" />
+		<param name="Append" value="true" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{yy-MM-dd HH:mm:ss.SSS} %5p %C [%M :%L] %m%n" />
+		</layout>
+	</appender>
+
+	<appender name="fileWarn" class="org.apache.log4j.FileAppender">
+		<param name="encoding" value="UTF-8" />
+		<param name="File" value="C:/logs/SampleSite02/samplesite02_warn.log" />
+		<param name="Append" value="true" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{yy-MM-dd HH:mm:ss.SSS} %5p %C [%M :%L] %m%n" />
+		</layout>
+	</appender>
+
+	<appender name="fileInfo" class="org.apache.log4j.FileAppender">
+		<param name="encoding" value="UTF-8" />
+		<param name="File" value="C:/logs/SampleSite02/samplesite02_info.log" />
+		<param name="Append" value="true" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{yy-MM-dd HH:mm:ss.SSS} %5p %C [%M :%L] %m%n" />
+		</layout>
+	</appender>
+	<appender name="fileDebug" class="org.apache.log4j.FileAppender">
+		<param name="encoding" value="UTF-8" />
+		<param name="File" value="C:/logs/SampleSite02/samplesite02_debug.log" />
+		<param name="Append" value="true" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{yy-MM-dd HH:mm:ss.SSS} %5p %C [%M :%L] %m%n" />
+		</layout>
+	</appender>
+	<appender name="fileTrace" class="org.apache.log4j.FileAppender">
+		<param name="encoding" value="UTF-8" />
+		<param name="File" value="C:/logs/SampleSite02/samplesite02_Trace.log" />
+		<param name="Append" value="true" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{yy-MM-dd HH:mm:ss.SSS} %5p %C [%M :%L] %m%n" />
+		</layout>
+	</appender>
+
+	<category name="org.springframework">
+		<level value="WARN" />
+		<appender-ref ref="fileWarn" />
+	</category>
+	
+	<category name="org.springframework">
+		<level value="ERROR" />
+		<appender-ref ref="fileError" />
+	</category>
+
+
+	<category name="org.springframework">
+		<level value="INFO" />
+		<appender-ref ref="fileInfo" />
+	</category>
+
+	<category name="org.springframework">
+		<level value="DEBUG" />
+		<appender-ref ref="fileDebug" />
+	</category>
+
+	<category name="org.springframework">
+		<level value="TRACE" />
+		<appender-ref ref="fileTrace" />
+	</category>
+
+
+	<category name="org.apache">
+		<level value="WARN" />
+		<appender-ref ref="fileWarn" />
+	</category>
+
+	<category name="org.apache">
+		<level value="ERROR" />
+		<appender-ref ref="fileError" />
+	</category>
+	<category name="org.apache">
+		<level value="INFO" />
+		<appender-ref ref="fileInfo" />
+	</category>
+
+	<category name="org.apache">
+		<level value="DEBUG" />
+		<appender-ref ref="fileDebug" />
+	</category>
+
+	<category name="org.apache">
+		<level value="TRACE" />
+		<appender-ref ref="fileTrace" />
+	</category>
+
+
+
+
+	<!-- Root Logger -->
+	<root>
+		<!--<priority value="info" /> -->
+		<!-- 레벨은 FATAL,ERROR,WARN,INFO,DEBUG,TRACE 등으로 구분함 -->
+		<level value="debug" />
+		<appender-ref ref="console" />
+		<appender-ref ref="dailyRollingFile" />
+	</root>
+
+</log4j:configuration>

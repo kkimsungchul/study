@@ -112,7 +112,7 @@
 		Direct Grant Flow : Decrypt password
 
 
-	11. 사용자 생성
+	12. 사용자 생성
 		이전에 생성해놓은 My_client 에서 사용자를 생성
 			참고링크 : https://github.com/kkimsungchul/study/blob/master/Keycloak/%5BKeycloak%5D%20%EC%84%A4%EC%B9%98%20%EB%B0%8F%20%EC%84%B8%ED%8C%85.txt
 			※ 이름이랑 비밀번호 설정페이지는 별도임 위의 링크 참고
