@@ -1,0 +1,51 @@
+<!--
+ http://www.imcore.net | hosihito@gmail.com
+ Developer. Kyoungbin Lee
+ 2012.09.07
+
+ AES256 EnCrypt / DeCrypt
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ko" xml:lang="ko">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=euc-kr"/>
+		<script type="text/javascript" src="gibberish-aes.js"></script>
+		<script>
+			// 256bit 암호화를 사용하기 위해서는 32Byte를 충족해야 하기 때문에
+			// Key는 32글짜를 입력하셔야 합니다.
+			var key = "abcdefghijklmnopqrstuvwxyz123456";
+
+			window.onload = function(){
+
+				var ko_encrypt = AES_Encode("한글을 테스트 합니다.");
+				var ko_decrypt = AES_Decode("gOXlygE+qxS+69zN5qC6eKJvMiEoDQtdoJb3zjT8f/E=");
+
+				var us_encrypt = AES_Encode("Test English...");
+				var us_decrypt = AES_Decode("rvs4H8x4Q8sblGG1jkOHFQ==");
+				
+				document.getElementById("ko_encrypt").innerHTML = ko_encrypt;
+				document.getElementById("ko_decrypt").innerHTML = ko_decrypt;
+
+				document.getElementById("us_encrypt").innerHTML = us_encrypt;
+				document.getElementById("us_decrypt").innerHTML = us_decrypt;
+			}
+			function AES_Encode(plain_text)
+			{
+				GibberishAES.size(256);	
+				return GibberishAES.aesEncrypt(plain_text, key);
+			}
+
+			function AES_Decode(base64_text)
+			{
+				GibberishAES.size(256);	
+				return GibberishAES.aesDecrypt(base64_text, key);
+			}
+		</script>
+	</head>
+	<body>
+		<p id="ko_encrypt"></p>
+		<p id="ko_decrypt"></p>
+		<p id="us_encrypt"></p>
+		<p id="us_decrypt"></p>
+	</body>
+</html>

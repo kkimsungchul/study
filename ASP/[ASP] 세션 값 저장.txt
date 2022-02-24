@@ -1,0 +1,14 @@
+[ ASP 세션에 값 저장 삭제 ]
+
+
+
+# 값 저장
+
+	Session("searchStrBoardValue")=searchStrBoardValue
+
+# 값 삭제 
+
+
+	Session.Contents.Remove("searchStrBoardValue")
+
+		
