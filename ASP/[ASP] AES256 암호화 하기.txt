@@ -1,6 +1,6 @@
 [ ASP 에서 AES256 암호화 하기 ]
 	
-	필요파일 경로 : C:\Users\SECURUS-GRAM\Desktop\개발 공부\ASP\[ASP] js파일로 AES256 암호화
+	필요파일 경로 : C:\Users\USER\Desktop\kimsc\0.깃허브- 개발공부\ASP\[ASP] js파일로 AES256 암호화
 
 # 클라이언트 측에서 암호화
 
