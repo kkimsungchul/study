@@ -1,0 +1,42 @@
+[ ClickJacking Filter (클릭재킹 필터) 사용 ]
+
+
+
+# 1. 조치할 프로젝트 내의 JAVA 디렉토리에 하단의 파일을 추가
+	* 패키지를 생성하고 넣어준다. (securus\filter 또는 securus )
+	ClickjackFilter.java
+	
+	ex)
+		sampleSite 라는 프로젝트에 해당 필터 추가
+		경로 : SampleSite03\src\main\java\securus\filter
+
+
+# 2. web.xml 파일에 필터 추가
+	* class 의 경로는 프로젝트 상황에 맞게 맞춰주면 됨
+	* URL 맵핑은 모든URL 에 대해서 맵핑함
+	* mode 는 총 3개가 있음 ( SAMEORIGIN , DENY , ALLOW-FROM )
+		X-Frame-Options 확장헤더에 사용되는 값
+			DENY : 해당 페이지를 frame에 표시할 수 없게 한다
+			SAMEORIGIN : 해당 페이지와 동일한 orgin에 해당하는 frame만 표시 한다
+			ALLOW-FROM uri : 해당 페이지는 지정된 orgin에 해당하는 frame만 표시 한다
+	* mode 를 변경시에는 ClickjackFilter.java 파일에서도 수정을 해줘야함
+
+	=================================================================================================================
+    <filter>
+        <filter-name>ClickjackFilterSameOrigin</filter-name>
+        <filter-class>securus.filter.ClickjackFilter</filter-class>
+        <init-param>
+            <param-name>mode</param-name>
+            <param-value>ALLOW-FROM</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>ClickjackFilterSameOrigin</filter-name>
+        <url-pattern>*.do</url-pattern>
+    </filter-mapping>
+
+
+	=================================================================================================================
+
+
+

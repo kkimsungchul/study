@@ -1,0 +1,74 @@
+#네이버에서 만든 xss 필터
+
+
+# 적용방법 
+	
+
+	1-1.같은 폴더에 있는 
+		lucy-xss-servlet-filter-rule.xml 을 LUCY-XSS-Filter 를 사용할 프로젝트의 리소스 폴더에 넣어준다 (xss 필터 관련 설정)
+		프로젝트명\src\main\resources\
+	
+	1-2. 리소스 폴더에 넣지 않고 다른위치에 넣을때 (resources 경로에 넣지 않을 경우)
+		XssEscapeFilterConfig.class에서 DEFAULT_FILTER_RULE_FILENAME 를 수정
+
+
+
+	2-1.pom.xml 에 하단의 내용 추가  (라이브러리 다운로드)
+		<dependency>
+        	<groupId>com.navercorp.lucy</groupId>
+       		<artifactId>lucy-xss-servlet</artifactId>
+       		<version>2.0.0</version>
+	  	</dependency>
+
+	2-2. 또는 jar 파일을 직접 다운받아서 추가한다.
+		lucy-xss-servlet-2.0.0.jar
+		lucy-xss-1.6.3.jar
+
+		D:\data_00\업무.2016.시큐러스\30.비즈니스\01.보안컨설팅-웹취약점 분석 및 진단\작업.참고.시큐어코딩.공통모듈샘플\lucy-xss-filter\lucy-xss-servlet\2.0.0
+		
+
+
+
+	3-1.web.xml 에 필터를 추가한다
+
+		<filter>
+			<filter-name>xssEscapeServletFilter</filter-name>
+			<filter-class>com.navercorp.lucy.security.xss.servletfilter.XssEscapeServletFilter</filter-class>
+		</filter>
+		<filter-mapping>
+			<filter-name>xssEscapeServletFilter</filter-name>
+			<url-pattern>/*</url-pattern>
+		</filter-mapping>
+
+
+	4-1.특정 URL에서 XSS필터를 적용하지 않을때
+	lucy-xss-servlet-filter-rule.xml 파일에서 하단의 내용을 수정한다
+
+		<url-rule-set>
+			<!-- url disable이 true이면 지정한 url 내의 모든 파라메터는 필터링 되지 않는다. -->
+			<url-rule>
+				<url disable="true">/해당URL 적용</url>
+			</url-rule>
+		</url-rule-set>
+
+
+
+
+
+	*인텔리j에서는 
+	lucy-xss-servlet-filter-rule.xml 파일에
+	상단에 있는  <config xmlns="http://www.navercorp.com/lucy-xss-servlet">에서 	
+	URI is not registered 이라는 에러가 뜬다 
+	이럴경우에 file->setting->Schemas and DTDs 에
+	http://www.navercorp.com/lucy-xss-servlet 을 추가해 주자
+	--간편하게는 알트+컨트롤+s 누르면 셋팅이 들어가진다 여기서 Schemas and DTDs찾아가서 위와 같이 하주면된다
+
+	
+
+	
+관련링크  : 
+	간단 사용법 : http://doctorson0309.tistory.com/194
+	필터 설정법 : https://m.blog.naver.com/PostView.nhn?blogId=lovej804&logNo=220627822392&proxyReferer=https%3A%2F%2Fwww.google.co.kr%2F
+	
+	사용법 : https://github.com/naver/lucy-xss-filter/blob/master/docs/manual/kr/01.%20summary/1.3%20selection%20criterion.md
+	퀵가이드 : https://github.com/naver/lucy-xss-servlet-filter

@@ -1,0 +1,45 @@
+[ SQL Injection 필터 사용방법 ]
+	https://m.mkexdev.net/427
+	※ 해당필터는 XSS필터와 거의 유사함, 필터링 하는 값만 다름
+
+
+# 1. 조치할 프로젝트 내의 JAVA 디렉토리에 하단의 파일을 추가
+	* 패키지를 생성하고 넣어준다. (securus\filter 또는 securus )
+	RequestWrapperSQL.java
+	SqlFilter.java	
+	
+	ex)
+		sampleSite 라는 프로젝트에 해당 필터 추가
+		경로 : SampleSite03\src\main\java\securus\filter
+		
+
+
+
+# 2. web.xml 파일에 필터 추가
+	* class 의 경로는 프로젝트 상황에 맞게 맞춰주면 됨
+	* URL 맵핑은 모든URL 에 대해서 맵핑함
+
+	=================================================================================================================
+    <filter>
+        <filter-name>XssFilter</filter-name>
+        <filter-class>securus.filter.XssFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>XssFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+	=================================================================================================================	
+
+
+
+# 3. 실행파일 재 배포
+
+
+
+
+=================================================================================================================
+=================================================================================================================
+
+
+
+
