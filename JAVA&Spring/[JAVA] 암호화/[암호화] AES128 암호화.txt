@@ -1,0 +1,417 @@
+[ AES128 암호화 알고리즘 적용 ]
+
+	* 라이브러리 commons-codec 은 최소 1.4 버전이상이여야 함
+		1.4 미만버전의 경우에는 Base64.decodeBase64 메소드의 매개 변수타입이 타입이 다름
+		commons-codec-1.4.jar
+
+	* 클라이언트 (사용자) - 서버 간의 사용자 정보 전송시에 암호화를 하여 데이터를 전송하기 위해 사용
+	* 암호화를 하지않으면 중간에 패킷에 ID / PW 정보가 그대로 노출됨
+	
+	※ IV , Salt 값은 외부에 노출이 되더라도, 매번 새로 발급해서 사용할 수 있게 구성
+
+		
+		https://developer.android.com/reference/javax/crypto/SecretKeyFactory
+
+
+	※ 암호화 적용 시 아래와 같은 에러들이 나오면, 자바의 security 쪽의 라이브러리를 변경해 줘야 함
+
+		파일명 : 
+			local_policy.jar
+			US_export_policy.jar
+
+		java.security.NoSuchAlgorithmException: Algorithm PBKDF2WithHmacSHA1 not available
+
+		class java.security.NoSuchAlgorithmException
+		javax.servlet.ServletException: Algorithm PBKDF2WithHmacSHA1 not available
+
+		경로 : 
+			Java\jdk1.5.0_17\jre\lib\security
+				* 경로는 운영체제 또는 설치 방법에 따라 상이할 수 있으나, security 디렉토리 인건 똑같음
+			
+				
+
+
+[ 실 적용 소스 및 적용 방법 ]
+
+
+jquery , javascript 둘중 하나만사용해도 상관없도 둘다 사용해도 상관없음
+소스는 아래 참고
+=================================================================================================================
+    var enc_iv = '${hashtable.enc_iv}';
+    var enc_salt = '${hashtable.enc_salt}';
+    var enc_passPhrase = '${hashtable.enc_passPhrase}';
+    var enc_keySize = 128;
+    var enc_iterationCount = 100;
+
+    //제이쿼리 사용하여 전송
+    $(document).ready(function() {
+
+        $("#btnLogin").click(function () {
+
+            var tmpData = $("#userId").val() + "|" + $("#userPw").val();
+            var key128Bits100Iterations = CryptoJS.PBKDF2(enc_passPhrase, CryptoJS.enc.Hex.parse(enc_salt), { keySize: enc_keySize/32, iterations: enc_iterationCount });
+            var encData = CryptoJS.AES.encrypt(tmpData, key128Bits100Iterations, { iv: CryptoJS.enc.Hex.parse(enc_iv) });
+            $("#encData").val(encData);
+            console.log("click ok ");
+
+            $("#frm").submit();
+        });
+
+    });
+
+    //순수 자바스크립트만 사용하여 전송
+    function login() {
+        var f = document.frm;
+        var tmpData = f.userId.value + "|" + f.userPw.value;
+        var key128Bits100Iterations = CryptoJS.PBKDF2(enc_passPhrase, CryptoJS.enc.Hex.parse(enc_salt), { keySize: enc_keySize/32, iterations: enc_iterationCount });
+        var encData = CryptoJS.AES.encrypt(tmpData, key128Bits100Iterations, { iv: CryptoJS.enc.Hex.parse(enc_iv) });
+        f.encData.value=encData;
+        f.action = "aesResult.do";
+        f.submit();
+    }
+
+
+=================================================================================================================
+
+
+CASE 1. 로그인 페이지 do 사용
+
+	* 로그인 페이지 호출시 .do 등을 통해서 컨트롤러에 접근 후 이동하는 경우
+
+
+
+# 로그인 프로세스 순서
+	
+	- aesTest 메소드 (로그인페이지 호출)
+		1. 로그인 페이지 호출
+		2. iv , Salt 값을 생성하여 화면단으로 전송
+
+	- 로그인 페이지 (로그인 화면단)
+		3. 사용자 ID / PW 입력 후 로그인 버튼 클릭
+		4. 서버에서 전송받은 iv , Salt 값으로 사용자 정보 암호화
+
+	- aesResult 메소드 (로그인처리)
+		5. 암호화된 사용자 정보를 복호화
+		6. 복호화된 정보로 로그인 로직 실행
+
+
+
+# aesTest 메소드
+
+
+
+
+	1. 시큐어랜덤 클래스를 사용하여 난수 생성
+		* salt 값은 16자리의 난수
+		* iv 값은 32자리의 난수
+	2. 생성된 난수를 hashTable에 담아서 세션에 저장 후 로그인 페이지로 이동
+
+	=================================================================================================================
+    public ModelAndView aesTest (ModelAndView mav, HttpServletRequest request){
+
+        HttpSession session = request.getSession();
+
+
+        long secureRandomLong_salt=0;
+        long secureRandomLong_iv_1=0;
+        long secureRandomLong_iv_2=0;
+        try {
+            SecureRandom secureRandom = SecureRandom.getInstance("SHA1PRNG");
+            secureRandom.setSeed(secureRandom.generateSeed(128));
+            secureRandomLong_salt= secureRandom.nextLong();
+            secureRandomLong_iv_1= secureRandom.nextLong();
+            secureRandomLong_iv_2= secureRandom.nextLong();
+            while(secureRandomLong_salt<1160000000000000000L) {
+                secureRandomLong_salt= secureRandom.nextLong();
+            }
+            while(secureRandomLong_iv_1<1160000000000000000L) {
+                secureRandomLong_iv_1= secureRandom.nextLong();
+            }
+            while(secureRandomLong_iv_2<1160000000000000000L) {
+                secureRandomLong_iv_2= secureRandom.nextLong();
+            }
+        } catch (NoSuchAlgorithmException e) {
+            System.out.println("난수 발생 에러");
+        }
+
+
+        String sessionId = session.getId();
+        Hashtable<String,String> hashtable = new Hashtable<String,String>();
+
+        String enc_salt=(String)Long.toHexString(secureRandomLong_salt);
+        String enc_iv = (String)Long.toHexString(secureRandomLong_iv_1)+(String)Long.toHexString(secureRandomLong_iv_2);
+        String enc_passPhrase = "1234";
+
+
+        hashtable.put("enc_iv",enc_iv);
+        hashtable.put("enc_salt",enc_salt);
+        hashtable.put("enc_passPhrase",enc_passPhrase);
+        hashtable.put("sessionId",sessionId);
+        session.setAttribute("hashtable",hashtable);
+
+        mav.setViewName("aesTest/aesTest.jsp");
+        return mav;
+    }
+
+	=================================================================================================================
+
+
+
+# 로그인 페이지
+
+
+	1. 서버에서 받아온 iv , salt passPhrase 값을 자바스크립트 변수를 선언하고 넣음
+	2. 사용자가 ID / PW 입력 후 로그인 버튼을 클릭하면 ID 와 PW 를 |구분자를 넣어서 하나의 변수로 만는다
+		ex) id : kimsc1218
+			pw : aaaaaaaaa
+			encData = kimsc1218|aaaaaaaaa
+	3. encData 를 ASE128로 암호화 한다.
+	4. 암호화 된 값을 서버로 전송한다.
+
+
+	* aes.js , pbkdf2.js 두개의 라이브러리가 선언되어있어야 함
+	=================================================================================================================
+	<script src="/js/jquery-3.3.1.min.js"></script>
+	<script src="/js/aes.js"></script>
+	<script src="/js/pbkdf2.js"></script>
+
+	<script>
+
+		var enc_iv = '${hashtable.enc_iv}';
+		var enc_salt = '${hashtable.enc_salt}';
+		var enc_passPhrase = '${hashtable.enc_passPhrase}';
+		var enc_keySize = 128;
+		var enc_iterationCount = 100;
+
+		$(document).ready(function() {
+
+			$("#btnLogin").click(function () {
+
+				var tmpData = $("#userId").val() + "|" + $("#userPw").val();
+				var key128Bits100Iterations = CryptoJS.PBKDF2(enc_passPhrase, CryptoJS.enc.Hex.parse(enc_salt), { keySize: enc_keySize/32, iterations: enc_iterationCount });
+				var encData = CryptoJS.AES.encrypt(tmpData, key128Bits100Iterations, { iv: CryptoJS.enc.Hex.parse(enc_iv) });
+				$("#encData").val(encData);
+				console.log("click ok ");
+
+				$("#frm").submit();
+			});
+
+		});
+	</script>
+
+	=================================================================================================================
+
+
+
+# aesResult 메소드
+
+
+	1. 사용자에게 넘겨받은 encData 를 복호화 한다.
+	2. 복호화 후 | 를 기준으로 아이디와 패스워드를 분리한다.
+	3. 분리가 끝난 후 해당 ID / PW 로 로그인 로직을 실행한다
+	=================================================================================================================
+    @RequestMapping(value="aesResult.do")
+    public void aesResult(HttpServletRequest req)throws Exception{
+        HttpSession session = req.getSession();
+        String userId = "";
+        String userPw = "";
+
+        String encData = req.getParameter("encData");
+
+        System.out.println("encData : " + encData);
+
+        Hashtable<String,String>hashtable = (Hashtable)session.getAttribute("hashtable");
+
+        String enc_iv = hashtable.get("enc_iv");
+        String enc_salt = hashtable.get("enc_salt");
+        String enc_passPhrase = hashtable.get("enc_passPhrase");
+
+        String decrypted = CryptoJSCipherAES128.decrypt(enc_salt, enc_iv, enc_passPhrase, encData, 100, 128);
+
+        // 아이디&비밀번호 분리
+        String[] data = StringUtil.parseSplit(decrypted, "|");
+        if( (data[0] != null && !data[0].equals("")) && (data[1] != null && !data[1].equals("")) ) {
+
+            userId = data[0];
+            userPw = data[1];
+
+			//로그인 로직 실행
+
+
+        }
+
+    }
+
+
+	=================================================================================================================
+
+
+
+
+
+
+
+
+
+
+
+CASE 2. 로그인 페이지 do 미사용
+
+	* 로그인 페이지 호출시 컨트롤러를 거치지 않고 바로 login.jsp 파일을 호출하여 사용되는경우
+
+
+	- 로그인페이지 호출
+		1. 로그인 페이지 호출
+		2. iv , Salt 값을 생성
+		3. 사용자 ID / PW 입력 후 로그인 버튼 클릭
+		4. 로그인페이지 호출되자마자 만들어 놓은  iv , Salt 값으로 사용자 정보 암호화
+
+
+
+	- aesResult 메소드 (로그인처리)
+		5. 암호화된 사용자 정보를 복호화
+		6. 복호화된 정보로 로그인 로직 실행
+
+
+# 로그인 페이지
+	* 컨트롤러에서 생성하지 않고 jsp 파일에서 <% %> 안에 자바코드를 넣어서 생성함
+
+	=================================================================================================================
+		<%@ page import="java.security.SecureRandom" %>
+		<%@ page import="java.security.NoSuchAlgorithmException" %>
+		<%@ page import="java.util.Hashtable" %><%--
+		  Created by IntelliJ IDEA.
+		  User: kimsc
+		  Date: 2018-04-12
+		  Time: 오후 5:37
+		  To change this template use File | Settings | File Templates.
+		--%>
+		<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+		<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"  %>
+
+		<html>
+		<script src="/js/jquery-3.3.1.min.js"></script>
+		<script src="/js/aes.js"></script>
+		<script src="/js/pbkdf2.js"></script>
+		<%
+
+			session = request.getSession();
+
+
+			long secureRandomLong_salt=0;
+			long secureRandomLong_iv_1=0;
+			long secureRandomLong_iv_2=0;
+			try {
+				SecureRandom secureRandom = SecureRandom.getInstance("SHA1PRNG");
+				secureRandom.setSeed(secureRandom.generateSeed(128));
+				secureRandomLong_salt= secureRandom.nextLong();
+				secureRandomLong_iv_1= secureRandom.nextLong();
+				secureRandomLong_iv_2= secureRandom.nextLong();
+				while(secureRandomLong_salt<1160000000000000000L) {
+					secureRandomLong_salt= secureRandom.nextLong();
+				}
+				while(secureRandomLong_iv_1<1160000000000000000L) {
+					secureRandomLong_iv_1= secureRandom.nextLong();
+				}
+				while(secureRandomLong_iv_2<1160000000000000000L) {
+					secureRandomLong_iv_2= secureRandom.nextLong();
+				}
+			} catch (NoSuchAlgorithmException e) {
+				System.out.println("난수 발생 에러");
+			}
+
+
+
+			Hashtable<String,String> hashtable = new Hashtable<String,String>();
+
+			String enc_salt=(String)Long.toHexString(secureRandomLong_salt);
+			String enc_iv = (String)Long.toHexString(secureRandomLong_iv_1)+(String)Long.toHexString(secureRandomLong_iv_2);
+			String enc_passPhrase = "1234";
+
+			System.out.println("enc_salt : " + enc_salt);
+			System.out.println("enc_iv : " + enc_iv);
+			System.out.println("enc_passPhrase : " + enc_passPhrase);
+
+			hashtable.put("enc_iv",enc_iv);
+			hashtable.put("enc_salt",enc_salt);
+			hashtable.put("enc_passPhrase",enc_passPhrase);
+			session.setAttribute("hashtable",hashtable);
+
+			%>
+
+
+
+		<script>
+
+			var enc_iv = '${hashtable.enc_iv}';
+			var enc_salt = '${hashtable.enc_salt}';
+			var enc_passPhrase = '${hashtable.enc_passPhrase}';
+			var enc_keySize = 128;
+			var enc_iterationCount = 100;
+
+			$(document).ready(function() {
+
+				$("#btnLogin").click(function () {
+
+					var tmpData = $("#userId").val() + "|" + $("#userPw").val();
+					var key128Bits100Iterations = CryptoJS.PBKDF2(enc_passPhrase, CryptoJS.enc.Hex.parse(enc_salt), { keySize: enc_keySize/32, iterations: enc_iterationCount });
+					var encData = CryptoJS.AES.encrypt(tmpData, key128Bits100Iterations, { iv: CryptoJS.enc.Hex.parse(enc_iv) });
+					$("#encData").val(encData);
+					console.log("click ok ");
+
+					$("#frm").submit();
+				});
+
+			});
+		</script>
+
+
+
+	=================================================================================================================
+
+
+
+
+
+# aesResult 메소드
+
+
+	1. 사용자에게 넘겨받은 encData 를 복호화 한다.
+	2. 복호화 후 | 를 기준으로 아이디와 패스워드를 분리한다.
+	3. 분리가 끝난 후 해당 ID / PW 로 로그인 로직을 실행한다
+	=================================================================================================================
+    @RequestMapping(value="aesResult.do")
+    public void aesResult(HttpServletRequest req)throws Exception{
+        HttpSession session = req.getSession();
+        String userId = "";
+        String userPw = "";
+
+        String encData = req.getParameter("encData");
+
+        System.out.println("encData : " + encData);
+
+        Hashtable<String,String>hashtable = (Hashtable)session.getAttribute("hashtable");
+
+        String enc_iv = hashtable.get("enc_iv");
+        String enc_salt = hashtable.get("enc_salt");
+        String enc_passPhrase = hashtable.get("enc_passPhrase");
+
+        String decrypted = CryptoJSCipherAES128.decrypt(enc_salt, enc_iv, enc_passPhrase, encData, 100, 128);
+
+        // 아이디&비밀번호 분리
+        String[] data = StringUtil.parseSplit(decrypted, "|");
+        if( (data[0] != null && !data[0].equals("")) && (data[1] != null && !data[1].equals("")) ) {
+
+            userId = data[0];
+            userPw = data[1];
+
+			//로그인 로직 실행
+
+
+        }
+
+    }
+
+
+	=================================================================================================================
+

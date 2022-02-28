@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration PUBLIC "-//APACHE//DTD LOG4J 1.2//EN" "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+
+    <!-- 전곳달된 로그를 어디에 출력할 지 결정하는  곳-->
+    <!-- 콘솔출력, 파일기록,db저장등 -->
+    <!-- Appenders -->
+    <appender name="console" class="org.apache.log4j.ConsoleAppender">
+        <!--<param name="Threshold" value="INFO" /> -->
+        <param name="Target" value="System.out"/>
+
+        <!-- layout : 로그를 어떤 형식으로 출력할 지 결정하는 곳 -->
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="[%d] %-5p [%c{11}:%L:%M()] - %m%n"/>
+        </layout>
+    </appender>
+
+
+<!--
+    &lt;!&ndash; 일별 로그파일 출력  &ndash;&gt;
+    <appender name="dailyRollingFile" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="encoding" value="UTF-8"/>
+        <param name="File" value="C:/logs/SampleSite03/samplesite03.log"/>
+        <param name="Append" value="true"/>
+        <param name="DatePattern" value="'-'yyyyMMdd'.log'"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            &lt;!&ndash; <param name="ConversionPattern" value="%d %5p [%c:%L] %m%n" /> &ndash;&gt;
+            <param name="ConversionPattern" value="%d{yy-MM-dd HH:mm:ss.SSS} %5p %C [%M :%L] %m%n"/>
+        </layout>
+    </appender>
+-->
+
+    <!-- logger 출력할 메시지를 Appender에 전달하는 곳 -->
+    <!-- Application Loggers -->
+
+
+    <!-- Root Logger -->
+    <root>
+        <!--<priority value="info" /> -->
+        <!-- 레벨은 FATAL,ERROR,WARN,INFO,DEBUG,TRACE 등으로 구분함 -->
+        <level value="INFO"/>
+        <appender-ref ref="console"/>
+<!--        <appender-ref ref="dailyRollingFile"/>-->
+    </root>
+
+</log4j:configuration>
