@@ -45,25 +45,26 @@ public class EncryptionHelper {
         }
     }
 
-    private static String xorMessage(String message) {
-        try {
-            if (message == null) return null;
-
-            char[] keys = KEY.toCharArray();
-            char[] mesg = message.toCharArray();
-
-            int ml = mesg.length;
-            int kl = keys.length;
-            char[] newmsg = new char[ml];
-
-            for (int i = 0; i < ml; i++) {
-                newmsg[i] = (char)(mesg[i] ^ keys[i % kl]);
-            }
-            return new String(newmsg);
-        } catch (Exception e) {
-            return null;
-        }
-
-    }
+    //상단에 선언한 KEY 만큼 시프트해서 복호화
+//    private static String xorMessage(String message) {
+//        try {
+//            if (message == null) return null;
+//
+//            char[] keys = KEY.toCharArray();
+//            char[] mesg = message.toCharArray();
+//
+//            int ml = mesg.length;
+//            int kl = keys.length;
+//            char[] newmsg = new char[ml];
+//
+//            for (int i = 0; i < ml; i++) {
+//                newmsg[i] = (char)(mesg[i] ^ keys[i % kl]);
+//            }
+//            return new String(newmsg);
+//        } catch (Exception e) {
+//            return null;
+//        }
+//
+//    }
 
 }

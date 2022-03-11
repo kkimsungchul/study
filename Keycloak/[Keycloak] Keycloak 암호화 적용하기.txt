@@ -110,6 +110,13 @@
 	11. 적용할 client 의 setting 페이지의 제일 하단부분의 "Authentication Flow Overrides" 를 아래와 같이 설정
 		Browser Flow : browser
 		Direct Grant Flow : Decrypt password
+		
+		메뉴위치 : 
+			Configure 
+			-> Clients 
+			-> my_client (내가 생성 및 적용할 클라이언트)
+			-> settings
+			-> Authentication Flow Overrides
 
 
 	12. 사용자 생성
