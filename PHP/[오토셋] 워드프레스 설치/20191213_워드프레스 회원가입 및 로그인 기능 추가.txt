@@ -1,0 +1,77 @@
+[ 워드프레스 회원가입 및 로그인 ]
+
+	로그인페이지 : http://localhost/login 
+					http://localhost/wp-login.php
+	ID : admin
+	PW : securus
+
+	
+
+
+
+# 플러그인 설치
+
+	해당 기능들을 사용하기 위해서는 플러그인 설치가 필요함
+		
+	* WP-Members 설치
+
+	* Theme My Login 설치
+
+
+
+
+
+# Theme My Login 플러그인
+
+	플러그인 설치 완료 후 좌측탭 제일 하단에 " Theme My Login " 클릭
+
+	해당 페이지 진입시 제일 하단부분에 링크들을 복사
+
+	로그인 :   http://localhost/login/
+
+	회원가입 : http://localhost/register/
+
+
+
+# WP-Members 설정
+	
+	플러그인 설치 후 좌측 메뉴에서
+	"설정" -> WP-Members 클릭
+
+	1. 옵션 탭 
+		제일 하단에 "페이지" 부분을 수정
+
+		Login Page : 아래에서 사용자 정의URL 사용 체크 후 
+			http://localhost/wordpress/login/ 입력
+
+		회원가입 페이지 : 아래에서 사용자 정의 URL 사용 체크 후 
+			http://localhost/wordpress/register/ 입력
+
+	2. 필드 탭
+	
+		password , confirm Password 두개체크한 후에 "Save Settings" 을 선택 후 "적용"
+	
+	그외에 탭은 수정하지 않음
+
+
+
+# 사용자 등록
+	
+	* 회원가입 페이지에서 진행하려고 했으나 인증 메일이 발송되지 않아서 실패
+
+
+	1. 좌측 메뉴탭에서 "사용자" 클릭
+	2. 표시되는 화면에서 "사용자 추가하기" 클릭
+	3. 사용자명, 이메일 암호 를 입력 후 추가
+
+
+# 로그인
+
+	로그인 페이지에서 아이디와 비밀번호로 로그인
+		http://localhost/wordpress/login/
+
+
+
+
+
+
