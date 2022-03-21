@@ -17,6 +17,16 @@ public class CustomKeycloakPasswordEncryptor implements Authenticator {
 
     public void authenticate(AuthenticationFlowContext authenticationFlowContext) {
 
+        //IP 테스트 작성 시작
+        if(null!=authenticationFlowContext.getHttpRequest().getFormParameters().getFirst("userip")){
+            String userip = authenticationFlowContext.getHttpRequest().getFormParameters().getFirst("userip").trim();
+            System.out.println("##### userip ");
+            System.out.println(userip);
+            System.out.println("###############");
+        }
+        //테스트작성 종료
+
+
 
         // not bringing username
         if(authenticationFlowContext.getHttpRequest().getFormParameters().get("username") == null

@@ -1,0 +1,107 @@
+[ keycloak - 로그인 로직 커스터마이징 ]
+
+	키클락 사용시 특정 IP에서만 로그인이 가능하도록 해달라는 요구사항이 있었음
+	그래서 작성함
+
+	* 사용자의 IP는 화면단에서 넘겨받음 (클라이언트에서 javascript 라이브러리로 가져오도록 할것)
+	* 사용자의 IP는 서버에 넘어와서 비교를 함
+
+# 키클락 모듈 설정
+	※ 기존의 암호화모듈과 같은 "Authenticator" 클래스를 구현해야하므로,
+	기존 암호화 모듈에서 아래의 내용만 수정함.
+	참고파일 : 
+		[Keycloak] Keycloak 암호화 적용하기.txt
+
+	=================================================================================================================
+
+	public class CustomKeycloakPasswordEncryptor implements Authenticator {
+
+		public void authenticate(AuthenticationFlowContext authenticationFlowContext) {
+
+			//IP 테스트 작성 시작
+			if(null!=authenticationFlowContext.getHttpRequest().getFormParameters().getFirst("userip")){
+				String userip = authenticationFlowContext.getHttpRequest().getFormParameters().getFirst("userip").trim();
+				System.out.println("##### userip ");
+				System.out.println(userip);
+				System.out.println("###############");
+			}
+			//테스트작성 종료
+
+	=================================================================================================================
+
+
+
+# 로그인 페이지 수정
+
+	경로 : C:\Users\USER\Desktop\kimsc\개발\keycloak-16.1.1\keycloak-16.1.1\themes\base\login	 
+	파일명 : login.ftl
+
+	로그인 페이지에서 사용자의 IP주소를 넘겨줘야하니, form 을 수정해야함
+	form 안에 "userip" 로 input을 추가함, IP주소는  임의로 지정하였음
+
+	=================================================================================================================
+            <form id="kc-form-login" onsubmit="login.disabled = true; return true;" action="${url.loginAction}" method="post">
+				<input type="hidden" name="userip" ip="userip" value="192.168.0.100">
+
+	=================================================================================================================
+
+
+# 라이브러리 배포
+	경로 : C:\Users\USER\Desktop\kimsc\개발\keycloak-16.1.1\keycloak-16.1.1\standalone\deployments
+	위의 경로에 키클락 모듈을 업로드함
+
+
+# 키클락 세팅
+
+	- 인증(authentication)부분 설정
+
+		1. 키클락 관리자로 로그인
+			URL : http://localhost:8080/auth/
+			ID : kimsc1218
+			PW : admin
+
+		2. 로그인 후 Demo realms을 선택
+			http://localhost:8080/auth/admin/master/console/#/realms/demo
+		
+		3. 좌측의 authentication 메뉴 진입
+			http://localhost:8080/auth/admin/master/console/#/realms/demo/authentication/flows
+
+		4. flows 에서 "browser" 를 카피하여 편한 이름으로 생성
+			Copy of browser and Decrypt Password
+		
+		5. Browser - Conditional OTP 삭제
+
+		6. "Copy Of Browser And Decrypt Password Forms " 이름의 auth Type 에서 Actions 을 클릭하여
+			"Add Execution" 클릭 후 "Simple Password Encryption" 를 선택 한 후 OK
+
+		7. REQUIRED 선택
+
+	- 클라이언트(clients) 설정
+
+	1. 클라이언트 페이지에서 "Account-console" 선택
+		http://localhost:8080/auth/admin/master/console/#/realms/demo/clients
+
+	2. settings 탭의 제일 하단 " Authentication Flow Overrides"에서 Browser Flow 와 Direct Grant Flow 를
+		아까 생성한 "Copy Of Browser And Decrypt Password Forms"로 변경 
+	
+	
+# 로그인 시도
+
+	URL : http://localhost:8080/auth/realms/demo/account/#/
+	위의URL에 접속하여 ID / PW 를 입력해서 로그인 시도
+
+	IP는 잘찍힘.
+	다만 로그인로직쪽에서 오류가 발생하는데, 이부분은 키클락 세팅부분에서 오류가 발생하는것 같음
+
+
+# CMD로 로그인 테스트
+
+
+curl -X POST "http://localhost:8080/auth/realms/demo/protocol/openid-connect/token" ^
+--header "Content-Type:application/x-www-form-urlencoded" ^
+--data-urlencode "grant_type=password" ^
+--data-urlencode "client_id=my_client" ^
+--data-urlencode "client_secret=JBFLaz1mgZKPwYNqE9Tfyf0c3b2mnkOl" ^
+--data-urlencode "userip=192.168.0.222" ^
+--data-urlencode "username=sungchul" ^
+--data-urlencode "password=MQ=="
