@@ -31,9 +31,9 @@
 
 
 
-# 로그인 페이지 수정
+# 로그인 페이지 수정 (기존 테마 수정)
 
-	경로 : C:\Users\USER\Desktop\kimsc\개발\keycloak-16.1.1\keycloak-16.1.1\themes\base\login	 
+	경로 : C:\Users\USER\Desktop\kimsc\개발\keycloak-16.1.1\keycloak-16.1.1\themes\base\login
 	파일명 : login.ftl
 
 	로그인 페이지에서 사용자의 IP주소를 넘겨줘야하니, form 을 수정해야함
@@ -44,6 +44,26 @@
 				<input type="hidden" name="userip" ip="userip" value="192.168.0.100">
 
 	=================================================================================================================
+
+# 로그인 페이지 수정 (새로운 테마로 적용)
+
+	※ 키클락 설정에서도 로그인 테마를 수정 할 수 있는 부분이 있음
+		기존파일을 수정하지않고, 새로운 테마로 사용할 경우 
+		http://localhost:8080/auth/admin/master/console/#/realms/demo/theme-settings
+		
+	
+	- 키클락 테마 페이지에 파일 생성
+		경로 : C:\Users\USER\Desktop\kimsc\개발\keycloak-16.1.1\keycloak-16.1.1\themes
+		폴더명 : custom
+
+		경로 : C:\Users\USER\Desktop\kimsc\개발\keycloak-16.1.1\keycloak-16.1.1\themes\custom
+		폴더명 : account , admin , email , login
+
+		1. 테마를 변경하려는 realms를 선택
+		2. Realm Settings 페이지에서 theme 선택
+		3. 해당페이지에서 테마들을 custom 으로 변경
+		
+
 
 
 # 라이브러리 배포
