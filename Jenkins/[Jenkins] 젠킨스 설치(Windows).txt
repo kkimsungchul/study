@@ -6,7 +6,7 @@
 
 # Jenkins 다운로드
 	
-	1. https://www.jenkins.io/download/ 젒속
+	1. https://www.jenkins.io/download/ 접속
 	2. windows 버전 다운로드
 
 # Jenkins 설치
@@ -19,12 +19,12 @@
 	
 	3. 서비스 구동 계정은 Run service as LocalSystem (not recommended) 선택
 
-	4. 접속포트는 9090
+	4. 접속포트는 7070
 	
 	
 # Jenkins 설치 후 설정
 	
-	1. 설치 완료 후 localhost:9090 접속
+	1. 설치 완료 후 localhost:7070 접속
 	
 	2. 접속하면 Administrator Password 를 입력하는 화면이 나옴.
 		해당 암호는 화면에 표시되는 경로의 파일을 열어보면 적혀 있음
@@ -32,10 +32,10 @@
 	3. Customize Jenkins 에서는 Install suggested plugins 선택
 		
 	4. 플로그인 설치가 완료되면
-		계쩡명 , 암호, 암호확인, 이름 , 이메일 주소 입력
+		계정명 , 암호, 암호확인, 이름 , 이메일 주소 입력
 		admin ,admin ,admin, kimsungchul , kimsc1218@gmail.com
 	
-	5. Jenkins URL 부분에서는 http://localhost:9090 입력 후 Save and Finish 클릭
+	5. Jenkins URL 부분에서는 http://localhost:7070 입력 후 Save and Finish 클릭
 
 
 

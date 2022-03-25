@@ -16,6 +16,7 @@ public class Main {
         int count = 0;
         StringBuffer stringBuffer = new StringBuffer();
         String line = null;
+        String killUser;
         //채팅에 참여한 사용자 목록
         String memberName;
         ArrayList<String> memberList = new ArrayList<String>();
@@ -43,9 +44,6 @@ public class Main {
                     memberCount=0;
                 }
             }
-
-
-
             for(int i=0;i<memberList.size();i++){
                 talkCountMap.put(memberList.get(i),0);
             }
@@ -81,8 +79,8 @@ public class Main {
             //System.out.println(stringBuffer);
             //System.out.println("### 아 : " + countA);
             System.out.println("### 총 채팅 횟수 : " + totalLine);
-            System.out.println("### 대화를 한 사용자 목록: " + memberList);
             System.out.println("### 대화를 한 사용자 수: " + memberList.size());
+            System.out.println("### 대화를 한 사용자 목록: " + memberList);
         } catch (FileNotFoundException e) {
            e.printStackTrace();
         } catch (IOException e) {
