@@ -45,8 +45,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/t.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="479">
-              <caret line="4127" column="53" selection-start-line="4127" selection-start-column="53" selection-end-line="4127" selection-end-column="53" />
+            <state relative-caret-position="760">
+              <caret line="5215" column="23" selection-start-line="5215" selection-start-column="23" selection-end-line="5215" selection-end-column="23" />
             </state>
           </provider>
         </entry>
@@ -93,10 +93,9 @@
       </MavenImportingSettings>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="474" />
-    <option name="y" value="368" />
-    <option name="width" value="1275" />
+  <component name="ProjectFrameBounds" extendedState="7">
+    <option name="x" value="169" />
+    <option name="width" value="1698" />
     <option name="height" value="1047" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -105,7 +104,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -117,6 +115,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="PackagesPane" />
       <pane id="Scope" />
     </panes>
   </component>
@@ -124,7 +123,7 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1648188148078" />
-    <property name="last_opened_file_path" value="C:/IntellijProject/User_Management_System" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="project.structure.last.edited" value="Project" />
@@ -175,16 +174,18 @@
       <workItem from="1648428740947" duration="4482000" />
       <workItem from="1648456209874" duration="1601000" />
       <workItem from="1648512832697" duration="217000" />
+      <workItem from="1648604955824" duration="29000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="19061000" />
+    <option name="totallyTimeSpent" value="19090000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <frame x="684" y="67" width="1275" height="1047" extended-state="0" />
+    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49841774" visible="true" weight="0.17430703" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49841774" visible="true" weight="0.27160493" />
       <window_info id="Structure" order="1" sideWeight="0.50158226" side_tool="true" weight="0.24938272" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -262,8 +263,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/t.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="479">
-          <caret line="4127" column="53" selection-start-line="4127" selection-start-column="53" selection-end-line="4127" selection-end-column="53" />
+        <state relative-caret-position="760">
+          <caret line="5215" column="23" selection-start-line="5215" selection-start-column="23" selection-end-line="5215" selection-end-column="23" />
         </state>
       </provider>
     </entry>
