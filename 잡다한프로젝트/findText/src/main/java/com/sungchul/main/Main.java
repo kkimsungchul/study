@@ -118,7 +118,7 @@ public class Main {
             //System.out.println(stringBuffer);
             //System.out.println("### 아 : " + countA);
             System.out.println("### 총 채팅 횟수 : " + totalLine);
-            System.out.println("### 1위부터 5위까지의 채팅 지분율 : " + jibun);
+            System.out.println("### 1위부터 5위까지의 채팅 지분율 : " + jibun +"%");
             System.out.println("### 대화를 한 사용자 수: " + memberList.size());
             System.out.println("### 대화를 한 사용자 목록: " + memberList);
         } catch (FileNotFoundException e) {

@@ -21,11 +21,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/sungchul/main/Main.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1520">
-              <caret line="83" column="35" selection-start-line="83" selection-start-column="35" selection-end-line="83" selection-end-column="35" />
+            <state relative-caret-position="38">
+              <caret line="44" column="21" lean-forward="true" selection-start-line="44" selection-start-column="21" selection-end-line="44" selection-end-column="21" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -42,11 +42,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/t.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="760">
-              <caret line="5215" column="23" selection-start-line="5215" selection-start-column="23" selection-end-line="5215" selection-end-column="23" />
+            <state relative-caret-position="1193">
+              <caret line="6951" column="21" selection-start-line="6951" selection-start-column="21" selection-end-line="6951" selection-end-column="21" />
             </state>
           </provider>
         </entry>
@@ -81,8 +81,8 @@
       <list>
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/README.MD" />
-        <option value="$PROJECT_DIR$/src/main/java/com/sungchul/main/Main.java" />
         <option value="$PROJECT_DIR$/t.txt" />
+        <option value="$PROJECT_DIR$/src/main/java/com/sungchul/main/Main.java" />
       </list>
     </option>
   </component>
@@ -93,10 +93,11 @@
       </MavenImportingSettings>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
-    <option name="x" value="169" />
+  <component name="ProjectFrameBounds">
+    <option name="x" value="100" />
+    <option name="y" value="20" />
     <option name="width" value="1698" />
-    <option name="height" value="1047" />
+    <option name="height" value="1044" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -104,6 +105,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -115,7 +117,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
       <pane id="Scope" />
     </panes>
   </component>
@@ -175,17 +176,17 @@
       <workItem from="1648456209874" duration="1601000" />
       <workItem from="1648512832697" duration="217000" />
       <workItem from="1648604955824" duration="29000" />
+      <workItem from="1648687828875" duration="863000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="19090000" />
+    <option name="totallyTimeSpent" value="19953000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="684" y="67" width="1275" height="1047" extended-state="0" />
-    <editor active="true" />
+    <frame x="100" y="20" width="1698" height="1044" extended-state="0" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49841774" visible="true" weight="0.27160493" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49841774" visible="true" weight="0.2747253" />
       <window_info id="Structure" order="1" sideWeight="0.50158226" side_tool="true" weight="0.24938272" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -194,7 +195,7 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.3943662" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.8463227" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39978093" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -237,23 +238,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pom.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="171">
-          <caret line="9" selection-start-line="9" selection-end-line="9" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/sungchul/main/Main.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1520">
-          <caret line="83" column="35" selection-start-line="83" selection-start-column="35" selection-end-line="83" selection-end-column="35" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://C:/Program Files/Java/jdk1.8.0_192/src.zip!/java/util/Comparator.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1273">
@@ -263,8 +247,25 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/t.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="760">
-          <caret line="5215" column="23" selection-start-line="5215" selection-start-column="23" selection-end-line="5215" selection-end-column="23" />
+        <state relative-caret-position="1193">
+          <caret line="6951" column="21" selection-start-line="6951" selection-start-column="21" selection-end-line="6951" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="171">
+          <caret line="9" selection-start-line="9" selection-end-line="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/sungchul/main/Main.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="38">
+          <caret line="44" column="21" lean-forward="true" selection-start-line="44" selection-start-column="21" selection-end-line="44" selection-end-column="21" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
