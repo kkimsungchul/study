@@ -4,13 +4,13 @@
 
 
 # 1. 조치할 프로젝트 내의 JAVA 디렉토리에 하단의 파일을 추가
-	* 패키지를 생성하고 넣어준다. (securus\filter 또는 securus )
+	* 패키지를 생성하고 넣어준다.
 	RequestWrapperSQL.java
 	SqlFilter.java	
 	
 	ex)
 		sampleSite 라는 프로젝트에 해당 필터 추가
-		경로 : SampleSite03\src\main\java\securus\filter
+		경로 : SampleSite03\src\main\java\filter
 		
 
 
@@ -22,7 +22,7 @@
 	=================================================================================================================
     <filter>
         <filter-name>XssFilter</filter-name>
-        <filter-class>securus.filter.XssFilter</filter-class>
+        <filter-class>filter.XssFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>XssFilter</filter-name>

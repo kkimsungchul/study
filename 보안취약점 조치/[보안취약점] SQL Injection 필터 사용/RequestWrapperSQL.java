@@ -1,4 +1,4 @@
-package securus.filter;
+package filter;
 
 
 import javax.servlet.http.HttpServletRequest;

@@ -19,7 +19,7 @@
 	=================================================================================================================
     <filter>
         <filter-name>XssFilter</filter-name>
-        <filter-class>securus.filter.XssFilter</filter-class>
+        <filter-class>filter.XssFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>XssFilter</filter-name>
