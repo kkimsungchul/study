@@ -31,8 +31,25 @@
 	String macroWord = "windows,c,m,d,enter,i,p,shift,c,o,n,shift,f,i,g,enter";
 	
 	==================================================================================================================================================
-	
-	
-	
-	
 
+
+	
+	
+	
+# 마우스 클릭 이벤트
+
+	
+	======================================================================================================
+        try{
+            Robot robot = new Robot();
+            robot.mouseMove(605, 85);
+            robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);//좌클릭 다운
+            robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);//좌클릭 업
+            robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);//좌클릭 다운
+            robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);//좌클릭 업
+
+        }catch(Exception e) {
+            System.out.println("실패");
+            e.printStackTrace();
+        }
+	======================================================================================================
