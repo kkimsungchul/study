@@ -1,0 +1,62 @@
+[ Javascript - setInterval 함수 사용하기 ]
+
+	화면단에서 몇초마다, 일정 간격으로 실행하고싶은 함수가 있을경우 setInterval 를 통해서 할수 있음
+	사용방법은
+	setInterval(함수명,지연시간) 이며, 지연시간은 ms단위임 (1000 = 1초)
+	setInterval안에 들어가는 함수명은 move_px() 를 입력하는게 아닌 move_px 명만 입력해야하며,
+	내장함수로 작성을 해도 됨
+	
+	멈추는 방법은 clearInterval(setInterval변수명)으로하며,
+	setInterval을 변수에 담아놓은 뒤, 정지시킬때 clearInterval(setInterval변수명)로 호출하면 정지가 됨
+
+	=================================================================================================================
+	<html>
+	<head><title></title>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script>
+
+		var px=0;
+		var interval;
+		$( document ).ready(function() {
+			move_restart()
+		});
+		function move_px(){
+			$("#aa1").css("margin-left",px+"px");
+			px = px+10;
+
+			if(px>500){
+				px=0;
+			}
+		}
+
+		//setInterval 함수를 정지시킴
+		function move_stop(){
+			clearInterval(interval);
+		}
+
+		//setInterval 함수를 사용하여서 0.2초마다 move_px 함수를 호출하도록 설정
+		function move_restart(){
+			interval = setInterval(move_px,200);
+		}
+
+
+	</script>
+
+
+	</head>
+
+	<body>
+
+	<h1 id="aa1" style="color:red;margin-left:10px;">안녕하세요</h1>
+	<br><br>
+
+	<button onclick=move_stop()>정지</button> <button onclick=move_restart()> 재시작</button>
+
+	</body>
+
+	</html>
+
+
+
+	=================================================================================================================
