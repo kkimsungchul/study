@@ -1,0 +1,30 @@
+[ Tomcat - 왜냐하면 만료된...]
+
+	오류메시지 : 
+		왜냐하면 만료된 캐시 엔트리들을 없애버린 이후에도 여유 공간이 충분하지 않기 때문입니다. 캐시의 최대 크기를 증가시키는 것을 고려해 보십시오.
+	톰캣을 구동하는데 위의 메시지가 주르르르르륵 출력됨
+	한줄도하니고 수십줄이 출력되며, 이럴때는 context.xml파일에 아래와 같이 한줄을 추가하면 오류가 사라짐
+
+
+	경로 : C:\apache-tomcat-9.0.54\conf
+	파일명 : context.xml
+
+		<Resources cachingAllowd="true" cacheMaxSize="100000" />
+
+	* 수정 전
+	=================================================================================================================
+		<WatchedResource>WEB-INF/web.xml</WatchedResource>
+		<WatchedResource>WEB-INF/tomcat-web.xml</WatchedResource>
+		<WatchedResource>${catalina.base}/conf/web.xml</WatchedResource>
+
+	=================================================================================================================
+
+	* 수정 후
+	=================================================================================================================
+
+		<WatchedResource>WEB-INF/web.xml</WatchedResource>
+		<WatchedResource>WEB-INF/tomcat-web.xml</WatchedResource>
+		<WatchedResource>${catalina.base}/conf/web.xml</WatchedResource>
+		<Resources cachingAllowd="true" cacheMaxSize="100000" />
+
+	=================================================================================================================
