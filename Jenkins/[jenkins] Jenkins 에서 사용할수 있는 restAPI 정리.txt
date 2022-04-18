@@ -20,22 +20,23 @@
 
 	- Job 빌드 결과 조회 - 마지막 성공 빌드
 		[GET] http:// [jenkins url] / jenkins / job / JOBNAME / lastStableBuild / api / json
+		[GET] http:// [jenkins url] / jenkins / job / JOBNAME / lastBuild / api / json
 
 	- Jenkins Plugin 결과 조회
 		[GET] http:// [jenkins url] / jenkins / job / JOBNAME / lastStableBuild / cobertura / api / json
 		[GET] http:// [jenkins url] / jenkins / job / JOBNAME / lastStableBuild / checkstlyaresult / api / json
 		[GET] http:// [jenkins url] / jenkins / job / JOBNAME / lastStableBuild / testReport / api / json
-
+	
 
 	※ 출처: https://tomining.tistory.com/148 [마이너의 일상]
 
 
 	- job 삭제
+		[GET] http:// [jenkins url] / jenkins / job / JOBNAME / doDelete
 
-	http:// [jenkins url] / jenkins / job / JOBNAME / doDelete
-
-
-
+	- job 빌드 로그
+		[GET] http:// [jenkins url] / jenkins / job / JOBNAME / lastBuild / lotText / progressiveText
+		[GET] http:// [jenkins url] / jenkins / job / JOBNAME / [build number] / lotText / progressiveText
 
 # Blue ocean API
 	https://github.com/jenkinsci/blueocean-plugin/tree/master/blueocean-rest
