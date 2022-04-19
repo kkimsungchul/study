@@ -1,0 +1,156 @@
+[Spring Boot - Swagger 3.0 버전 사용 ] 
+	
+
+
+# 사용 이유	
+	
+	이전에 2.9.2 버전의 스웨거를 잘 사용하고 있어서, 새로운 스프링 프로젝트를 생성하고서
+	똑같이 2.9.2 버전의 스웨거를 적용하고 실행을 하니 아래의 오류메시지가 출력되었다.
+	=================================================================================================================
+	org.springframework.context.ApplicationContextException: Failed to start bean 'documentationPluginsBootstrapper'; nested exception is java.lang.NullPointerException
+		at org.springframework.context.support.DefaultLifecycleProcessor.doStart(DefaultLifecycleProcessor.java:181) ~[spring-context-5.3.18.jar:5.3.18]
+		at org.springframework.context.support.DefaultLifecycleProcessor.access$200(DefaultLifecycleProcessor.java:54) ~[spring-context-5.3.18.jar:5.3.18]
+		at org.springframework.context.support.DefaultLifecycleProcessor$LifecycleGroup.start(DefaultLifecycleProcessor.java:356) ~[spring-context-5.3.18.jar:5.3.18]
+		at java.lang.Iterable.forEach(Iterable.java:75) ~[na:1.8.0_192]
+	=================================================================================================================
+
+
+	이전에 사용하던 스프링부트의 버전은 2.5.6 버전이였고, 스웨거 2.9.2와 호환관련된 문제는 없었는데,
+	이번에 사용하려고 생성한 스프링부트의 버전은 2.6.6
+	2.6 버전이상에서는 스웨거 2.9.2 버전과 호환이 안된다는 내용이다.
+		
+		※ 참고링크
+			https://jackyee.tistory.com/24
+			https://velog.io/@mbsik6082/Spring-Boot-2.6.2%EC%97%90-Swagger-%EC%A0%81%EC%9A%A9-%EC%8B%9C-%EC%98%A4%EB%A5%98
+	
+	뭐 굳이 스프링 부트 버전을 낮출 필요도 없고,, 새로 프로젝트를 만든거니 스웨거 버전을 올리기로 해서 3.0 버전 적용 방법도 작성해놓기로 했다.
+
+
+
+#  참고 링크 
+	https://bcp0109.tistory.com/326
+	
+
+# gradle 에 라이브러리 추가
+
+	이전에는 springfox-swagger2 , springfox-swagger-ui 두개를 추가하지않고, 아래의 하나만 추가하게되면 모든 라이브러리가 포함되어 있다
+	=================================================================================================================
+
+	implementation 'io.springfox:springfox-boot-starter:3.0.0'
+
+	=================================================================================================================	
+
+
+
+
+# 스웨거 설정파일 추가
+
+
+	=================================================================================================================
+
+	package com.sungchul.etc.config;
+
+	import org.springframework.context.annotation.Bean;
+	import org.springframework.context.annotation.Configuration;
+	import springfox.documentation.builders.ApiInfoBuilder;
+	import springfox.documentation.builders.PathSelectors;
+	import springfox.documentation.builders.RequestHandlerSelectors;
+	import springfox.documentation.service.ApiInfo;
+	import springfox.documentation.service.Tag;
+	import springfox.documentation.spi.DocumentationType;
+	import springfox.documentation.spring.web.plugins.Docket;
+
+	@Configuration
+	public class SwaggerConfig {
+
+		@Bean
+		public Docket api() {
+			return new Docket(DocumentationType.OAS_30)
+					.tags(
+							new Tag("FindTextController","FindText Manage Controller")
+					)
+					.useDefaultResponseMessages(false)
+					.select()
+					.apis(RequestHandlerSelectors.basePackage("com.sungchul.etc"))
+					.paths(PathSelectors.any())
+					.build()
+					.apiInfo(apiInfo());
+		}
+
+		private ApiInfo apiInfo() {
+			return new ApiInfoBuilder()
+					.title("Sungchul ETC Swagger")
+					.description("etc swagger config")
+					.version("1.0")
+					.build();
+		}
+	}
+
+
+
+	=================================================================================================================
+
+
+#  오류 발생
+	참고링크 : https://www.inflearn.com/questions/230160
+	
+	오류내용
+	=================================================================================================================
+	org.springframework.context.ApplicationContextException: Failed to start bean 'documentationPluginsBootstrapper'; nested exception is java.lang.NullPointerException
+	=================================================================================================================
+
+	위에 발생한 오류 내용과 똑같은 오류가 발생함.
+
+	이부분은 버전으로 해결 가능한게 아닌것으로 보여 구글링해본 결과 위의 참고링크에서 해답을 찾음
+
+
+	=================================================================================================================
+	Spring boot 2.6버전 이후에 spring.mvc.pathmatch.matching-strategy 값이 
+	ant_apth_matcher에서 path_pattern_parser로 변경되면서 몇몇 라이브러리(swagger포함)에 오류가 발생한다고 함. 
+	application.yml 에 아래 설정을 추가하면 오류가 발생 안함
+	=================================================================================================================
+
+# application.yml 파일 수정
+	
+
+	아래와 내용을 추가
+	=================================================================================================================
+	spring:
+	  mvc:
+		pathmatch:
+		  matching-strategy: ant_path_matcher
+	=================================================================================================================
+
+# 접속
+
+	http://localhost/swagger-ui/index.html
+
+
+
+
+
+
+	
+
+
+	
+
+
+
+
+
+
+springboot : 2.6.2
+
+swagger : 3.0.0
+
+ 
+
+
+
+ 
+
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher

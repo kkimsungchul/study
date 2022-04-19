@@ -63,3 +63,21 @@
 	
 
 
+=================================================================================================================
+
+[ 오류발생 ]
+
+
+# 오류메시지
+		org.gradle.internal.exceptions.LocationAwareException: org.gradle.api.tasks.SourceSet.getCompileConfigurationName()Ljava/lang/String;
+
+
+# 조치방법
+	그래들 버전이 호환되지않아서 발생하는 오류로 아래와같이 버전을 변경하자
+
+	기존 : 
+		distributionUrl=https\://services.gradle.org/distributions/gradle-7.4.1-bin.zip
+
+	변경 후 : 
+		distributionUrl=https\://services.gradle.org/distributions/gradle-6.8.3-all.zip
+	
