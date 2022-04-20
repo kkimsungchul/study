@@ -38,6 +38,8 @@
 		[GET] http:// [jenkins url] / jenkins / job / JOBNAME / lastBuild / lotText / progressiveText
 		[GET] http:// [jenkins url] / jenkins / job / JOBNAME / [build number] / lotText / progressiveText
 
+
+
 # Blue ocean API
 	https://github.com/jenkinsci/blueocean-plugin/tree/master/blueocean-rest
 
