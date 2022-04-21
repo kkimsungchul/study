@@ -1,0 +1,51 @@
+[ Spring boot - RestAPI 방식으로 파일 업로드 ]
+	
+	Spring Boot 2.6.6 버전에서는 아래와 같이 두개의 오류가 남..
+	
+	1. org.springframework.web.multipart.MultipartException: Current request is not a multipart request
+	2. Nullpoint Exception
+
+	걍 왜나는지 모르겠음.. 버전을 2.5.6 으로 낮추고 스웨거도 2.9.2를 사용하면 오류가 발생하지 않음..
+
+
+
+# 컨트롤러 작성
+
+	=================================================================================================================
+	@Slf4j
+	@RestController
+	@Api(tags = "FindTextController")
+	@RequestMapping("/test")
+	public class TestController {
+
+		@PostMapping(value="uploadFile")
+		public ResponseEntity<String> uploadFile(MultipartFile file) throws IllegalStateException, IOException {
+			log.info("file org name = {}", "파일 ㄱㄱ");
+			if( !file.isEmpty() ) {
+				log.info("file org name = {}", file.getOriginalFilename());
+				log.info("file content type = {}", file.getContentType());
+
+				//application.yml 파일에 기재한 location 경로에 파일저장
+				file.transferTo(new File(file.getOriginalFilename()));
+			}
+
+			return new ResponseEntity<>("", HttpStatus.OK);
+		}
+	}
+
+
+	=================================================================================================================
+	
+
+# application.yml 파일 작성
+	enabled true 로 지정하고, 파일 업로드 경로를 지정
+
+	=================================================================================================================
+	spring : 
+	  servlet:
+		multipart:
+		  enabled : true
+		  max-file-size: 10MB
+		  max-request-size: 10MB
+		  location: C:\\IntellijProject\\sungchul_ETC\\file
+	=================================================================================================================
