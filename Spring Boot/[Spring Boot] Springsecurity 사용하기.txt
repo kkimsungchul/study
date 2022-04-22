@@ -74,9 +74,10 @@
 					 //.antMatchers("/").permitAll()
 					//스웨거에는 바로 접속할수 있도록 아래의 URL에서 예외처리
 					.antMatchers("/", "/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**").permitAll()
-					.antMatchers("/user").hasRole("USER")
+					.antMatchers("/user").hasRole("USER") //해당 룰이 있어야 접근 가능
 					.antMatchers("/manager").hasRole("MANAGER")
 					.antMatchers("/admin" , "/test" , "/test/**").hasRole("ADMIN")
+					.antMatchers("/findText").authenticated() //인증이 있어야 접근 가능
 					.anyRequest().authenticated()
 					.and()
 					.formLogin();

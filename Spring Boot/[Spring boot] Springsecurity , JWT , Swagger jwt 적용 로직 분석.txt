@@ -1,5 +1,8 @@
 [Spring boot - Springsecurity , JWT , Swagger jwt 적용 로직 분석 ]
 
+# 소스파일 경로
+	https://github.com/kkimsungchul/study/tree/master/Spring%20Boot/SpringSecurity
+
 
 # 해당 파일 작성 사유
 	구글링으로 참고한 여러 소스들을 가져다 사용했음
@@ -8,8 +11,40 @@
 
 
 
+
+
 # 작성한 클래스들 목록 및 설명
-	
+
+	SpringSecurity
+		csrf
+			CSRFController.java
+		
+		jwt
+			config
+				JwtAuthenticationEntryPoint.java
+				JwtRequestFilter.java
+				JwtUserDetailsService.java
+
+			controller
+				JwtAuthenticationController.java
+
+			util
+				JwtTokenUtil.java
+
+			vo
+				JwtRequest.java
+				JwtResponse.java
+
+		security
+			CustomUserDetailsService.java
+			SecurityConfig.java
+			UserContext.java
+			WebSecurityConfig.java
+		
+
+		SwaggerConfig.java
+
+
 
 [ SpringSecurity  적용 ]
 		
@@ -23,6 +58,9 @@
 			비밀번호 암호화를 할 수 있도록 암호화 객체를 제공해줌
 			또한 인증없이 접근이 가능한 URL을 설정 할 수 있으며,
 			특정URL에는 특정 권한을 가지고 있는 사용자만이 접근 할 수 있도록 설정할 수 있음
+
+			※ WebSecurityConfig.java 파일을 작성하면서 위에 내용들을 전부다 주석처리하였음
+			※ 위의 내용은 WebSecurityConfig.java 파일에 포함되어있음
 
 		
 		# UserContext.java
@@ -109,7 +147,15 @@
 					private JwtRequestFilter jwtRequestFilter;
 					=================================================================================================================
 
+		-application.yml 파일
+			@value로 꺼내서 사용할 값을 기재
+			=================================================================================================================
 
+			spring :
+			  jwt:
+				secret : jwtsecretkey
+
+			=================================================================================================================
  
 [ Swagger 에 JWT 적용 ]
 		
