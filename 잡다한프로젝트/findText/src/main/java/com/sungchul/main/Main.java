@@ -140,9 +140,6 @@ public class Main {
     }
 
     public static double getPercent(double totalLine , double talkCount){
-
-
-
         return Math.round(talkCount/totalLine*1000000)/10000.0;
     }
 }
