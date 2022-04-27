@@ -2,6 +2,8 @@
 
 # 소스파일 경로
 	https://github.com/kkimsungchul/study/tree/master/Spring%20Boot/SpringSecurity
+	https://github.com/kkimsungchul/sungchul_ETC/tree/main/src/main/java/com/sungchul/etc/config
+
 
 
 # 해당 파일 작성 사유

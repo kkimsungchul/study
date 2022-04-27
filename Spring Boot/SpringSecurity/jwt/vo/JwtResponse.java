@@ -1,4 +1,4 @@
-package com.sungchul.stock.config.jwt.config;
+package com.sungchul.etc.config.jwt.vo;
 
 import java.io.Serializable;
 

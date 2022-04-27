@@ -1,6 +1,7 @@
-package com.sungchul.stock.config.security;
+package com.sungchul.etc.config.security;
 
-import com.sungchul.stock.user.vo.UserVO;
+
+import com.sungchul.etc.user.vo.UserVO;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
@@ -14,9 +15,10 @@ public class UserContext extends User {
     //다만 토큰에서 가져올때는 userDetails.getUsername() 로 가져옴. 이걸 바꾸려고 하면 UserDetails 인터페이스를 구현해야함
     public UserContext(UserVO userVO, Collection<? extends GrantedAuthority> authorities) {
         super(userVO.getUserId(), userVO.getPassword(), authorities);
+        //비밀번호는 공백으로 처리
+        userVO.setPassword("");
         this.userVO = userVO;
     }
-
     public UserVO getUserVO() {
         return userVO;
     }

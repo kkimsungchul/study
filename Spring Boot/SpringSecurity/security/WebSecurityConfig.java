@@ -1,7 +1,8 @@
-package com.sungchul.stock.config.security;
+package com.sungchul.etc.config.security;
 
-import com.sungchul.stock.config.jwt.config.JwtAuthenticationEntryPoint;
-import com.sungchul.stock.config.jwt.config.JwtRequestFilter;
+
+import com.sungchul.etc.config.jwt.config.JwtAuthenticationEntryPoint;
+import com.sungchul.etc.config.jwt.config.JwtRequestFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,4 +1,4 @@
-//package com.sungchul.stock.config.security;
+//package com.sungchul.etc.config.security;
 //
 //import lombok.extern.slf4j.Slf4j;
 //import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +11,6 @@
 //import org.springframework.security.core.userdetails.UserDetailsService;
 //import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 //import org.springframework.security.crypto.password.PasswordEncoder;
-//import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 //
 //@Configuration
 //@EnableWebSecurity
@@ -48,17 +47,11 @@
 //                //.antMatchers("/").permitAll()
 //                //스웨거에는 바로 접속할수 있도록 아래의 URL에서 예외처리
 //                .antMatchers("/", "/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**").permitAll()
-//
-//                .antMatchers("/user").hasRole("USER")
-//                .antMatchers("/manager").hasRole("MANAGER")
-//                .antMatchers("/admin" , "/test" , "/test/**","/user" , "/user/**").hasRole("ADMIN")
-//                .anyRequest().authenticated()
+//                .antMatchers("/findText/**").authenticated()
+//                //.antMatchers("/admin" , "/test" , "/test/**").hasRole("ADMIN")
+//                //.anyRequest().authenticated()
 //                .and()
 //                .formLogin();
-//
-//        http.csrf()
-//                .requireCsrfProtectionMatcher(new CsrfRequireMatcher())
-//                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
 //    }
 //
 //

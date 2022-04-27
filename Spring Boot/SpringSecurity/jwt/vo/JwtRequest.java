@@ -1,4 +1,4 @@
-package com.sungchul.stock.config.jwt.vo;
+package com.sungchul.etc.config.jwt.vo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
@@ -18,7 +18,7 @@ public class JwtRequest implements Serializable {
 
 
 
-    @ApiModelProperty(name = "user_id", value = "관리자ID", notes = "필수", example = "admin")
+    @ApiModelProperty(name = "user_id", value = "ID", notes = "필수", example = "admin")
     @JsonProperty("user_id")
     private String userId;
 
