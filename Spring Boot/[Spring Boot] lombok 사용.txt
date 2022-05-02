@@ -88,7 +88,7 @@
 
 		Preference -> Build, Execution, Depolyment -> Compiler -> Annotation Processors 에 있는 설정인데
 
-	2. 2. Lombok 설치
+	2. Lombok 설치
 
 		두번째는 lombok을 gradle에 설정만 하는게 아니라 직접 설치를 해야한다는 결과들이 많이 나온다.
 
@@ -99,3 +99,9 @@
 
 		밑져야 본전이라는 생각에 이젠 반쯤 자포자기한 심정으로 바꿔주고... gradle refresh 해주고,,, 또 죄없는 intelliJ만 껐다가 켰지만 역시나 해결되지 않았다.
 
+	
+	4.VM Options 추가
+		Build , Excution, Deployment -> compiler -> ActionScript & Flex Compiler 
+		VM Options 에 javaagent:lombok.jar 추가
+		https://stackoverflow.com/questions/24006937/lombok-annotations-do-not-compile-under-intellij-idea/30125507#30125507
+		https://stackoverflow.com/questions/9424364/cant-compile-project-when-im-using-lombok-under-intellij-idea
