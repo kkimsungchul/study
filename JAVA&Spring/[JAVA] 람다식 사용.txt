@@ -19,10 +19,269 @@
 	- 람다를 무분별하게 사용하면 함수가 중복생성되어 코드가 지저분해질 수 있음
 	- 재귀로 만들경우에는 부적합함
 
-
-
 	
 
+# JAVA 에서 제공하는 함수형 인터페이스
 	
+	- Supplier<T>
+		매개변수 없이 반환값 만을 갖는 함수형 인터페이스
+		Supplier은 T get()을 추상메소드로 가지고 있음.
 
-# 	 
+		=================================================================================================================
+		@FunctionalInterface
+		public interface Supplier<T> {
+
+			/**
+			 * Gets a result.
+			 *
+			 * @return a result
+			 */
+			T get();
+		}
+		=================================================================================================================
+
+	- Consumer<T>
+		객체 T를 매개변수로 받아서 사용하며, 반환값이 없는 함수형 인터페이스
+		Consumer는 void accept(T t)를 추상메소드로 가지고 있음.
+		또한 andThen이라는 함수를 제공하는데, 하나의 함수가 끝난 후 다음 Consumer를 연속으로 이용 할 수 있음.
+		accept 로 처음 Consumer를 처리 후 andThen 으로 이어서 처리를 할 수 있음.
+
+		=================================================================================================================
+		@FunctionalInterface
+		public interface Consumer<T> {
+
+			/**
+			 * Performs this operation on the given argument.
+			 *
+			 * @param t the input argument
+			 */
+			void accept(T t);
+
+			/**
+			 * Returns a composed {@code Consumer} that performs, in sequence, this
+			 * operation followed by the {@code after} operation. If performing either
+			 * operation throws an exception, it is relayed to the caller of the
+			 * composed operation.  If performing this operation throws an exception,
+			 * the {@code after} operation will not be performed.
+			 *
+			 * @param after the operation to perform after this operation
+			 * @return a composed {@code Consumer} that performs in sequence this
+			 * operation followed by the {@code after} operation
+			 * @throws NullPointerException if {@code after} is null
+			 */
+			default Consumer<T> andThen(Consumer<? super T> after) {
+				Objects.requireNonNull(after);
+				return (T t) -> { accept(t); after.accept(t); };
+			}
+		}
+		=================================================================================================================
+
+
+	- Function<T,R>
+		Function은 객체 T를 매개변수로 받아서 처리한 후 R로 반환하는 함수형 인터페이스
+		Function은 R apply(T t)를 추상메소드로 가지고 있음.
+		Consumer 와 같이 andThen 을 제공하며, 추가적으로 compose 함수도 제공하고 있음.
+		andThen과의 다른점은 첫번째 함수가 실행된 이후에 다음함수를 실행하도록 연결해지만
+		compose는 첫번째 함수 실행 이전에 먼저 함수를 실행한다는 차이가 있음.
+		identity 함수가 존재하며, 이는 자기자신을 반환하는 static 함수
+
+		=================================================================================================================
+		@FunctionalInterface
+		public interface Function<T, R> {
+
+			/**
+			 * Applies this function to the given argument.
+			 *
+			 * @param t the function argument
+			 * @return the function result
+			 */
+			R apply(T t);
+
+			/**
+			 * Returns a composed function that first applies the {@code before}
+			 * function to its input, and then applies this function to the result.
+			 * If evaluation of either function throws an exception, it is relayed to
+			 * the caller of the composed function.
+			 *
+			 * @param <V> the type of input to the {@code before} function, and to the
+			 *           composed function
+			 * @param before the function to apply before this function is applied
+			 * @return a composed function that first applies the {@code before}
+			 * function and then applies this function
+			 * @throws NullPointerException if before is null
+			 *
+			 * @see #andThen(Function)
+			 */
+			default <V> Function<V, R> compose(Function<? super V, ? extends T> before) {
+				Objects.requireNonNull(before);
+				return (V v) -> apply(before.apply(v));
+			}
+
+			/**
+			 * Returns a composed function that first applies this function to
+			 * its input, and then applies the {@code after} function to the result.
+			 * If evaluation of either function throws an exception, it is relayed to
+			 * the caller of the composed function.
+			 *
+			 * @param <V> the type of output of the {@code after} function, and of the
+			 *           composed function
+			 * @param after the function to apply after this function is applied
+			 * @return a composed function that first applies this function and then
+			 * applies the {@code after} function
+			 * @throws NullPointerException if after is null
+			 *
+			 * @see #compose(Function)
+			 */
+			default <V> Function<T, V> andThen(Function<? super R, ? extends V> after) {
+				Objects.requireNonNull(after);
+				return (T t) -> after.apply(apply(t));
+			}
+
+			/**
+			 * Returns a function that always returns its input argument.
+			 *
+			 * @param <T> the type of the input and output objects to the function
+			 * @return a function that always returns its input argument
+			 */
+			static <T> Function<T, T> identity() {
+				return t -> t;
+			}
+		}
+
+		=================================================================================================================
+
+
+	- Predicate<T>
+		객체 T를 매개변수로 받아 처리한 후 Boolean타입을 반환함
+		Boolean test(T t) 를 추상메소드로 가지고 있음
+		=================================================================================================================
+		@FunctionalInterface
+		public interface Predicate<T> {
+
+			/**
+			 * Evaluates this predicate on the given argument.
+			 *
+			 * @param t the input argument
+			 * @return {@code true} if the input argument matches the predicate,
+			 * otherwise {@code false}
+			 */
+			boolean test(T t);
+
+			/**
+			 * Returns a composed predicate that represents a short-circuiting logical
+			 * AND of this predicate and another.  When evaluating the composed
+			 * predicate, if this predicate is {@code false}, then the {@code other}
+			 * predicate is not evaluated.
+			 *
+			 * <p>Any exceptions thrown during evaluation of either predicate are relayed
+			 * to the caller; if evaluation of this predicate throws an exception, the
+			 * {@code other} predicate will not be evaluated.
+			 *
+			 * @param other a predicate that will be logically-ANDed with this
+			 *              predicate
+			 * @return a composed predicate that represents the short-circuiting logical
+			 * AND of this predicate and the {@code other} predicate
+			 * @throws NullPointerException if other is null
+			 */
+			default Predicate<T> and(Predicate<? super T> other) {
+				Objects.requireNonNull(other);
+				return (t) -> test(t) && other.test(t);
+			}
+
+			/**
+			 * Returns a predicate that represents the logical negation of this
+			 * predicate.
+			 *
+			 * @return a predicate that represents the logical negation of this
+			 * predicate
+			 */
+			default Predicate<T> negate() {
+				return (t) -> !test(t);
+			}
+
+			/**
+			 * Returns a composed predicate that represents a short-circuiting logical
+			 * OR of this predicate and another.  When evaluating the composed
+			 * predicate, if this predicate is {@code true}, then the {@code other}
+			 * predicate is not evaluated.
+			 *
+			 * <p>Any exceptions thrown during evaluation of either predicate are relayed
+			 * to the caller; if evaluation of this predicate throws an exception, the
+			 * {@code other} predicate will not be evaluated.
+			 *
+			 * @param other a predicate that will be logically-ORed with this
+			 *              predicate
+			 * @return a composed predicate that represents the short-circuiting logical
+			 * OR of this predicate and the {@code other} predicate
+			 * @throws NullPointerException if other is null
+			 */
+			default Predicate<T> or(Predicate<? super T> other) {
+				Objects.requireNonNull(other);
+				return (t) -> test(t) || other.test(t);
+			}
+
+			/**
+			 * Returns a predicate that tests if two arguments are equal according
+			 * to {@link Objects#equals(Object, Object)}.
+			 *
+			 * @param <T> the type of arguments to the predicate
+			 * @param targetRef the object reference with which to compare for equality,
+			 *               which may be {@code null}
+			 * @return a predicate that tests if two arguments are equal according
+			 * to {@link Objects#equals(Object, Object)}
+			 */
+			static <T> Predicate<T> isEqual(Object targetRef) {
+				return (null == targetRef)
+						? Objects::isNull
+						: object -> targetRef.equals(object);
+			}
+		}
+		=================================================================================================================
+
+
+# 테스트 소스
+
+=================================================================================================================
+
+package com.sungchul;
+
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+
+public class LambdaTestClass {
+    public static void main(String[] args) {
+
+        //lambda
+        LambdaFunction lambdaFunction = (int a, int b) -> a > b ? a : b;
+        System.out.println(lambdaFunction.max(10, 15));
+
+        //Supplier
+        Supplier<String> stringSupplier = () -> "Test~~";
+        System.out.println(stringSupplier.get());
+
+        //Consumer
+        Consumer<String> consumer = (str) -> System.out.println(str.split(" ")[0]);
+        consumer.andThen(System.out::println).accept("Hello World");
+
+        //function
+        Function<String, Integer> function = str -> str.length();
+        System.out.println(function.apply("Hello World"));
+
+        //predicate
+        Predicate<String> predicate = (str) -> str.equals("Hello World");
+        System.out.println(predicate.test("Hello World"));
+
+    }
+}
+
+
+@FunctionalInterface
+interface LambdaFunction {
+    int max(int a, int b);
+
+}
+
+
+=================================================================================================================
