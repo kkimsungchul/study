@@ -1,0 +1,44 @@
+[ JAVA - Stream 사용하기 - 결과 ]
+	https://mangkyu.tistory.com/114
+
+
+
+# Max(최대값) , Min(최소값) , Sum(합계) , Average(평균) , Count(갯수)
+	Stream의 요소들의 최대값,최소값등을 구할 수 있음
+	max , min , average 는 비어있는 값을 측정 할 수 없으므로 Optional 클래스를 사용함
+	
+	=================================================================================================================
+	//Min 최소값
+	OptionalInt min = IntStream.of(3,5,6,7,8,3,2,1).min();
+	System.out.print("최소값 : ");
+	System.out.println(min);
+
+	//Max 최대값
+	int max = IntStream.of().max().orElse(0);
+	System.out.print("최대값 : ");
+	System.out.println(max);
+
+	//Average 평균값
+	System.out.print("평균값 : ");
+	IntStream.of(1,2,3,4,5,6,7,8,9,10).average().ifPresent(System.out::println);
+
+
+	//sum 총합
+	long sum = IntStream.of(1,2,3,4,5,6,7,8).sum();
+	System.out.print("총합 : ");
+	System.out.println(sum);
+
+
+	//count 갯수
+	long count = IntStream.of(1,2,3,4,5,6,7,8).count();
+	System.out.print("갯수 : ");
+	System.out.println(count);
+	=================================================================================================================
+
+	
+
+# collect - 데이터 수집
+
+	Stream의 요소들을 List, Set , Map 등의 다른 종류의 결과로 생성하고 싶을 경우에 collect 함수를 사용
+	
+
