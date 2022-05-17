@@ -1,0 +1,55 @@
+[ jenkins 원격 빌드 유발 ]
+
+	# 사용자 API Token 생성
+		1. 젠킨스 로그인
+		2. 우측 상단에 뜨는 로그인 사용자명 클릭
+		3. 좌측에 설정 클릭
+		4. 우측 화면의 API TOKEN 에서  ADD NEW TOKEN 클릭
+		5. 발행된 토큰을 복사하여 저장
+			※ 새로고침 또는 다시들어오면 토큰이 안보임
+		
+		
+		메인화면에서 아래의 단계대로 실행
+		-> Manage Jenkins 
+		-> Manager User
+		-> 유저명 클릭
+		-> Configure
+		-> Add new Token 
+		-> Generate
+		-> API Token
+			※ 나는 이렇게 하면 ADD NEW TOKEN 버튼이 활성화가 안되서 위의 방법으로 했음
+		
+
+	
+		jenkint kimsc1218 api token : 11d376523445b369ecbdfa3e6cfc30760e		
+	
+	# Credential 생성
+		Dashboard 
+		-> Credentials 
+		-> System 
+		-> Global credentials (unrestricted) 
+		-> Add Credentials
+			Kind : Username with password 선택
+			Scope : Global 선택
+			Username : 깃 사용자명
+			Password : 깃 비밀번호
+			ID : job 에서 사용할 ID
+			Description : 설명
+				
+	# 빌드 원격 유발
+		https://velog.io/@king/Jenkins-Job-%EC%8B%A4%ED%96%89%EC%9D%84-%EC%9B%90%EA%B2%A9%EC%9C%BC%EB%A1%9C-%EC%9C%A0%EB%B0%9C%ED%95%98%EA%B8%B0-nuk5jjenyk
+		
+		새로운 Item (New Item) 클릭
+		-> Freestyle Project 생성
+		-> 빌드 유발(Build Triggers)에서 Trigger builds remotely(e.g., from script) 클릭 (빌드를 원격으로 유발 (예: 스크립트 사용))
+		-> Authentication Token 에다가는 호출할 때 사용할 토큰명 입력
+			ex) startJob
+		
+		
+	# 호출
+		$ curl -X post http://<username>:<API Token>@<JENKINS_URL>/jenkins/job/<JENKINS_JOB_NAME>/build?token=<Authentication Token명>
+		 
+		ex)
+			$ curl -i -X POST https://kimsc1218:11d376523445b369ecbdfa3e6cfc30760e@kscJenkins.com/job/폴더명/job/잡명/build?token=startJob
+			
+			
