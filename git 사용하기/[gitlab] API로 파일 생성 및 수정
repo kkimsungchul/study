@@ -1,0 +1,147 @@
+[gitlab - API로 파일 생성 및 수정 ]
+
+[ Create new file in repository - git 원격지에서 파일 생성 , 커밋 ]
+
+	git api document 
+		https://docs.gitlab.com/ee/api/repository_files.html#create-new-file-in-repository
+
+
+
+
+
+# API에 사용하는 데이터
+
+	id					integer or string	yes		The ID or URL-encoded path of the project owned by the authenticated user.
+		- 프로젝트 ID
+	
+	file_path			string				yes		URL-encoded full path to new file. For example: lib%2Fclass%2Erb.
+		- 파일경로/파일명 으로 작성하면되고, 최상단일 경우에는 파일명만 작성
+	branch				string				yes		Name of the new branch to create. The commit is added to this branch.
+		- 브런치명, 없는 브런치일 경우 신규생성됨
+	start_branch		string				no		Name of the base branch to create the new branch from.
+	encoding			string				no		Change encoding to base64. Default is text.
+	author_email		string				no		The commit author’s email address.
+	author_name			string				no		The commit author’s name.
+	content				string				yes		The file’s content.
+		- 파일안에 들어갈 내용 기재
+	commit_message		string				yes		The commit message.
+		- 커밋 메시지
+	execute_filemode	boolean				no		Enables or disables the execute flag on the file. Can be true or false.
+
+
+# dataType
+	Content-Type : application/json
+
+# header
+	PRIVATE-TOKEN : b5YwwNGd_PneL1VDA6yz
+	
+
+# data
+	
+	- API문서에 기재
+		{
+			"branch": "master", 
+			"author_email": "author@example.com", 
+			"author_name": "Firstname Lastname",
+			"content": "some content", 
+			"commit_message": "create a new file"
+		}
+
+	- 최소 필수 데이터
+		{
+			branch : "브런치명"
+			content : "파일안에 기재할 내용"
+			commit_message : "커밋 메시지"
+		}
+
+	ex)
+		{
+			"branch": "master",
+			"content": "생성할 파일 안에 기재할 내용", 
+			"commit_message": "파일업로드"
+		}
+
+
+# url 
+	POST giturl/projects/:id/repository/files/:file_path
+	ex)
+		https://gitlaburl/api/v4/projects/1740/repository/files/Jenkinsfile
+	
+
+# 성공
+	{
+		"file_path": "Jenkinsfile",
+		"branch": "master"
+	}
+
+# 이미 파일 존재
+	{
+		"message": "A file with this name already exists"
+	}
+		
+
+
+
+[ Update existing file in repository - git 원격지에서 파일 수정]
+	https://docs.gitlab.com/ee/api/repository_files.html#update-existing-file-in-repository
+
+# API에 사용하는 데이터
+	id					integer or string	yes		The ID or URL-encoded path of the project owned by the authenticated user
+	file_path			string				yes		URL-encoded full path to new file. For example: lib%2Fclass%2Erb.
+	branch				string				yes		Name of the new branch to create. The commit is added to this branch.
+	start_branch		string				no		Name of the base branch to create the new branch from.
+	encoding			string				no		Change encoding to base64. Default is text.
+	author_email		string				no		The commit author’s email address.
+	author_name			string				no		The commit author’s name.
+	content				string				yes		The file’s content.
+	commit_message		string				yes		The commit message.
+	last_commit_id		string				no		Last known file commit ID.
+	execute_filemode	boolean				no		Enables or disables the execute flag on the file. Can be true or false.
+	
+
+# dataType
+	Content-Type : application/json
+
+# header
+	PRIVATE-TOKEN : b5YwwNGd_PneL1VDA6yz	
+	
+
+
+# data
+	- API문서에 기재
+		{
+			"branch": "master", 
+			"author_email": "author@example.com", 
+			"author_name": "Firstname Lastname",
+			"content": "some content", 
+			"commit_message": "update file"
+		}	
+	
+	- 최소 필수 데이터
+		{
+			branch : "브런치명"
+			content : "파일안에 기재할 내용"
+			commit_message : "커밋 메시지"
+		}
+
+	ex)
+		{
+			"branch": "master",
+			"content": "수정할 파일의 내용", 
+			"commit_message": "기존 파일 수정"
+		}
+
+
+
+
+
+# url 
+	PUT /projects/:id/repository/files/:file_path
+	ex)
+		https://gitlaburl/api/v4/projects/1740/repository/files/Jenkinsfile
+	
+# 성공
+	{
+		"file_path": "Jenkinsfile",
+		"branch": "master"
+	}
