@@ -1,0 +1,101 @@
+[ Jenkins - pipeline job update api ]
+	jenkins 에서 pipeline 로 생성한 job 을 수정 해야 할 일이 생김.
+	API문서를 찾아본 결과 job을 수정하는 APi는 없음
+	API정리한 곳은 아래의 링크 참고
+		https://github.com/kkimsungchul/study/blob/master/Jenkins/[jenkins] Jenkins 에서 사용할수 있는 restAPI 정리.txt
+
+	그래서.. 직접 API 를 만들어봄
+
+# 작업 방법
+	1. Jenkins에서 pipeline job 을 생성
+	2. 수정 페이지에서 데이터 수정
+	3. 수정 시 서버로 넘어가는 데이터를 분석
+
+
+# 젠킨스 수정 URL 정보
+	header : 
+		Authorization : jenkins ID 와 Jenkins API TOKEN 으로 만든 토큰
+			만드는 방법은 id:token 으로 묶어서 base64 로 인코딩
+			ex)
+				91296885:11d376523445b369ecbdfa3e6cfc30760e
+				
+			적용시에는 앞에 Basic 을 붙여줘야함, 
+			Authorization = Basic OTEyOTY4ODU6MTFkMzc2NTIzNDQ1YjM2OWVjYmRmYTNlNmNmYzMwNzYwZQ==
+				※ 해당 키값을 서버에서 만들어서 사용해야 할 경우 java HttpHeaders 클래스의 setBasicAuth 메소드를 통해서 자동으로 발급함
+				※ id:pw 로는 안됨 무조건 토큰으로 해야 함
+			
+		
+	
+	URL : https://[jenkinsURL]/job/[폴더명]/job/[JOB명]/configSubmit
+	method : post
+	data-type : form
+	
+	data 필드 :
+		description : 프로젝트 설명
+		json : pipeline 에 들어갈 스크립트 내용
+	
+	data ex)
+		description = f3f3f3f3f3
+		json = 
+			{"description": "f3f3f3f3f3","definition":{
+			"script":"pipeline {\n\tagent any\n\t\tstages {\n\t\t\tstage('Deploy') {\n\t\t\t\tsteps {\n\t\t\t\t\tsh \"ls -al\"\n\t\t\t}\n\t\t}\n\t}\n}",
+			"sandbox":true,
+			"stapler-class":"org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition",
+			"$class":"org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition"
+			}}	
+
+		※ 위와같이 form 데이터 형식으로 넘기며, json 필드에 값으로 json 데이터를 넣어주되,
+			script 에서다가는 파이프라인에서 사용할 데이터를 넣어주면 됨
+			script 수정 시 sandbox , stapler-class , $class 값은 필수임
+
+
+
+# 수정 실행
+	POST 방식으로 위의 URL "https://kscjenkins.co.kr/job/update_test_folder/job/remote_updateTest/configSubmit" 에 헤더에는 인증키값, 
+	데이터에는 form 방식으로 넣어서 전송
+
+
+
+# 실제 넘어가는 데이터
+	아래의 데이터는 실제로 submit 실행 시 넘어가는 데이터인데, 이게 다 필요하지 않은거 같아서 테스트 하다가 위의 데이터만으로 수정되는 것을 발견한 것임.
+	뭐 추가적으로 더 수정할 경우 아래의 데이터를 넣어주면 될듯
+
+	description: cdddd
+	stapler-class-bag: true
+	stapler-class: org.jenkinsci.plugins.matrixauth.inheritance.InheritParentStrategy
+	$class: org.jenkinsci.plugins.matrixauth.inheritance.InheritParentStrategy
+	stapler-class: org.jenkinsci.plugins.matrixauth.inheritance.InheritGlobalStrategy
+	$class: org.jenkinsci.plugins.matrixauth.inheritance.InheritGlobalStrategy
+	stapler-class: org.jenkinsci.plugins.matrixauth.inheritance.NonInheritingStrategy
+	$class: org.jenkinsci.plugins.matrixauth.inheritance.NonInheritingStrategy
+	_.projectUrlStr: 
+	_.displayName: 
+	hint: MAX_SURVIVABILITY
+	_.buildCount: 1
+	_.count: 1
+	_.durationName: second
+	_.daysToKeepStr: 
+	_.numToKeepStr: 
+	_.artifactDaysToKeepStr: 
+	_.artifactNumToKeepStr: 
+	stapler-class: hudson.tasks.LogRotator
+	$class: hudson.tasks.LogRotator
+	stapler-class-bag: true
+	_.upstreamProjects: 
+	ReverseBuildTrigger.threshold: SUCCESS
+	_.spec: 
+	_.scmpoll_spec: 
+	quiet_period: 5
+	authToken: 
+	_.displayNameOrNull: 
+	_.script: ababababababababababababab
+	_.sandbox: on
+	stapler-class: org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition
+	$class: org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition
+	stapler-class: org.jenkinsci.plugins.workflow.cps.CpsScmFlowDefinition
+	$class: org.jenkinsci.plugins.workflow.cps.CpsScmFlowDefinition
+	core:apply: 
+	Jenkins-Crumb: 1526af24621dca6a8ceb72013e12d29319a49e4b9c294a412f4e8edadd4d8466
+	json: {"description": "cdddd", "properties": {"stapler-class-bag": "true", "hudson-security-AuthorizationMatrixProperty": {}, "org-jenkinsci-plugins-workflow-job-properties-DisableConcurrentBuildsJobProperty": {"specified": false}, "org-jenkinsci-plugins-workflow-job-properties-DisableResumeJobProperty": {"specified": false}, "com-coravy-hudson-plugins-github-GithubProjectProperty": {}, "org-jenkinsci-plugins-workflow-job-properties-DurabilityHintJobProperty": {"specified": false, "hint": "MAX_SURVIVABILITY"}, "org-jenkinsci-plugins-pipeline-modeldefinition-properties-PreserveStashesJobProperty": {"specified": false, "buildCount": "1"}, "jenkins-branch-RateLimitBranchProperty$JobPropertyImpl": {}, "jenkins-model-BuildDiscarderProperty": {"specified": false, "": "0", "strategy": {"daysToKeepStr": "", "numToKeepStr": "", "artifactDaysToKeepStr": "", "artifactNumToKeepStr": "", "stapler-class": "hudson.tasks.LogRotator", "$class": "hudson.tasks.LogRotator"}}, "hudson-model-ParametersDefinitionProperty": {"specified": false}, "org-jenkinsci-plugins-workflow-job-properties-PipelineTriggersJobProperty": {"triggers": {"stapler-class-bag": "true"}}}, "disable": false, "hasCustomQuietPeriod": false, "quiet_period": "5", "displayNameOrNull": "", "": "0", "definition": {"script": "ababababababababababababab", "": ["try sample Pipeline...", "\u0001\u0001"], "sandbox": true, "stapler-class": "org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition", "$class": "org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition"}, "core:apply": "", "Jenkins-Crumb": "1526af24621dca6a8ceb72013e12d29319a49e4b9c294a412f4e8edadd4d8466"}
+	Submit: 저장
+		
