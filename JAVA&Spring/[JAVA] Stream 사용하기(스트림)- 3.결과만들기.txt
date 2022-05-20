@@ -41,4 +41,48 @@
 
 	Stream의 요소들을 List, Set , Map 등의 다른 종류의 결과로 생성하고 싶을 경우에 collect 함수를 사용
 	
+	
+# collect - Collectors.toList() 결과를 List로 반환
+	
+	=================================================================================================================
+        //value 값만 뽑아서 리스트 생성
+        List<String> resultValueList = test01List.stream()
+                .map(TestVO1::getValue)
+                .collect(Collectors.toList());
+        System.out.println(resultValueList);
+        //seq 값만 뽑아서 리스트 생성
+        List<Integer> resultSeqList = test01List.stream()
+                .map(TestVO1::getSeq)
+                .collect(Collectors.toList());
+        System.out.println(resultSeqList);
+	=================================================================================================================
+
+
+# collect - Collectors.joining() stream 에서 작업한 결과를 하나의 String 으로 붙일때 사용
+
+	아래와 같이 3개의 인자를 사용 할 수 있음
+	delimiter : 각 요소 중간에 들어가 요소를 구분시켜주는 구분자
+	prefix : 결과 맨 앞에 붙는 문자
+	suffix : 결과 맨 뒤에 붙는 문자
+
+	=================================================================================================================
+        //결과값을 하나의 스트링으로 생성
+        String listToString01 = test01List.stream()
+                .map(TestVO1::getValue)
+                .collect(Collectors.joining());
+        System.out.println(listToString01);
+
+        //결과값을 하나의 스트링으로 생성하면서, 중간에 공백을 추가함
+        String listToString02 = test01List.stream()
+                .map(TestVO1::getValue)
+                .collect(Collectors.joining(" "));
+        System.out.println(listToString02);
+
+        //결과값을 하나의 스트링으로 생성하면서, 중간에 콤마와 시작과 끝지점에  ( ) 를 추가함
+        String listToString03 = test01List.stream()
+                .map(TestVO1::getValue)
+                .collect(Collectors.joining("," , "(" , ")"));
+        System.out.println(listToString03);
+
+	=================================================================================================================
 
