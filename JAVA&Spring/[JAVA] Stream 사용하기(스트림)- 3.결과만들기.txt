@@ -86,3 +86,70 @@
 
 	=================================================================================================================
 
+# collect - Collectors.averagingInt(), Collectors.summingInt(), Collectors.summarizingInt()
+	Stream 에서 작업한 결과의 평균, 총합을 구함
+
+	=================================================================================================================
+        Double average1 = test01List.stream()
+                .collect(Collectors.averagingInt(TestVO1::getSeq));
+        System.out.println("### average1 : " + average1);
+
+        Integer sum1 = test01List.stream()
+                .collect(Collectors.summingInt(TestVO1::getSeq));
+        System.out.println("### sum1 : " + sum1);
+	=================================================================================================================
+
+
+# collect - Collectors.groupingBy()
+	Stream 에서 작업한 결과를 특정 그룹으로 묶을 때 사용
+	결과는 Map 으로 반환받게 됨
+	groupingBy 는 함수형 인터페이스 Function을 필요로 함
+	
+	=================================================================================================================
+        //seq가 같은 값인 VO끼리 묶음
+        Map<Integer , List<TestVO1>> collectorMap = test03List.stream()
+                .collect(Collectors.groupingBy(TestVO1::getSeq));
+        System.out.println("### collectorMap");
+        System.out.println(collectorMap);
+	=================================================================================================================
+
+
+
+# collect - Collectors.partitioningBy()
+	함수형 인터페이스 Predicate 를 받아 Boolean key 값으로 partitioning 함
+	아래코드는 seq가 5보다 큰것과 작은 것을 나눈것임
+	=================================================================================================================
+        Map<Boolean , List<TestVO1>> collectorMap2 = test03List.stream()
+                .collect(Collectors.partitioningBy(p -> p.getSeq() >5));
+        System.out.println("### collectorMap2");
+        System.out.println(collectorMap2);
+	=================================================================================================================
+
+
+# match - 조건검사
+	anyMatch: 1개의 요소라도 해당 조건을 만족하는가
+	allMatch: 모든 요소가 해당 조건을 만족하는가
+	nonMatch: 모든 요소가 해당 조건을 만족하지 않는가
+	=================================================================================================================
+        List<String> names = Arrays.asList("Hi", "Hellow", "Kimsungchul");
+        boolean anyMatch = names.stream().anyMatch(name -> name.contains("H"));
+        boolean allMatch = names.stream().allMatch(name -> name.length() > 3);
+        boolean noneMatch = names.stream().noneMatch(name -> name.endsWith("s"));
+        System.out.println("### anyMatch : " + anyMatch);
+        System.out.println("### allMatch : " + allMatch);
+        System.out.println("### noneMatch : " + noneMatch);
+	=================================================================================================================
+
+# forEach - 특정 연산 수행
+
+	Stream 의 요소들로 특정 연산을 수행 할 떄 사용 할 수 있으며
+	비슷한 함수로는 peek()가 있음
+	peek는 중간연산으로 실제 요소에 영향을 주지 않으나 forEach는 최종연산으로 실제 요소에 영향을 줄 수 있음
+
+	=================================================================================================================
+		 List<String> names = Arrays.asList("Hi", "Hellow", "Kimsungchul");
+		strList.stream().forEach(System.out::println);	
+	=================================================================================================================
+
+
+	
