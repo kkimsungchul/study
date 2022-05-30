@@ -1,0 +1,57 @@
+[ Keycloak - EventListenerProvider 구현 (로그인 이벤트리스너 구현 ) ]
+
+# 참고 사이트 
+	https://github.com/zonaut/keycloak-extensions/tree/master/spi-event-listener
+	※ 현재 사용하고 있는 JDK 버전은 1.8버전이며, 해당 소스는 JDK11버전임
+	※ JDK 버전을 올리지 않는이상 해당 소스파일은 사용할 수 없으며 참고용도로만 사용하였음
+
+	https://github.com/zonaut/keycloak-extensions/tree/master/spi-event-listener
+
+# 로그인URL
+
+	http://localhost:8080/auth/realms/loginfailtest/account
+
+# 로그인 페이지 수정 (기존 테마 수정)
+	https://sung-studynote.tistory.com/18
+	경로 : C:\Users\USER\Desktop\kimsc\개발\keycloak-16.1.1\keycloak-16.1.1\themes\base\login
+	파일명 : login.ftl
+
+
+# 작업 소스
+
+	https://github.com/kkimsungchul/study/tree/master/Keycloak/login-event-listener-prd
+
+
+# 적용 방법
+
+	1. realm 생성
+	
+		1-1. http://localhost:8080/auth/admin/ 로그인 
+		
+		1-2. http://localhost:8080/auth/admin/master/console/#/create/realm URL 접속
+			또는 좌측 상단의 마스터위에 마우스를 올리면 파란색 박스의 "Add realm" 클릭
+		
+		1-3. Name : loginfailtest 를 넣고 Create 버튼 클릭
+	
+	 2. 해당 realm 으로 변경 (loginfailtest)
+
+	 3. 좌측메뉴에서
+		Manage -> Events 클릭
+		http://localhost:8080/auth/admin/master/console/#/realms/loginfailtest/events
+
+	4. events 에서Config 클릭
+		http://localhost:8080/auth/admin/master/console/#/realms/loginfailtest/events-settings
+
+	5. Events Config -> Event Listeners 에서 "login_event_listener" 를 추가
+	
+	6. save
+
+
+
+
+
+		
+		
+
+
+
