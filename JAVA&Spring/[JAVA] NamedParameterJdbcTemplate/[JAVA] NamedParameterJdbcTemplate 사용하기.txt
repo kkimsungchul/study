@@ -1,0 +1,19 @@
+[ JAVA - NamedParameterJdbcTemplate 사용하기 ]
+
+	참고URL : 
+		https://velog.io/@lacomaco/Spring-Jdbc-Template-%EC%8B%A4%EC%8A%B5-%EC%A0%95%EB%A6%AC
+		https://rkaalstu.tistory.com/43
+	
+	개발 소스 : 
+		https://github.com/kkimsungchul/sungchul_ETC/tree/main/src/main/java/com/sungchul/etc/sql
+	
+
+# 사용 방법
+	SQL문을 NamedParameterJdbcTemplate 클래스에서 제공해주는 "queryForList" , "update" 메소드를 통해서 구현함
+
+	DB 연결은 JDBC를 통해서 이미 연결을 해놓았기 때문에 자동으로됐음
+	DB 연결부분이 필요하다면 JDBC 부분의 설정을 보면 됨
+		https://github.com/kkimsungchul/sungchul_ETC/blob/main/src/main/java/com/sungchul/etc/config/MyBatisConfig.java
+		https://github.com/kkimsungchul/sungchul_ETC/blob/main/src/main/resources/application.yml
+	
+
