@@ -5,11 +5,10 @@
 	* 스프링시큐리티 적용
 		https://dkyou.tistory.com/15?category=877213
 
+		
+
 
 # gradle 에 라이브러리 추가
-	※ 참고로 라이브러리 추가만 해도 로그인 페이지가 바로 바뀌어버림
-	※ 사용하지 않을거라면 추가하지않던지, 추가하고나서 로그인 페이지 설정을 변경해야함
-
 
     //Springsecurity
     implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -80,6 +79,8 @@
 					.antMatchers("/findText").authenticated() //인증이 있어야 접근 가능
 					.anyRequest().authenticated()
 					.and()
+					//아래의 옵션을 적용하면 Springsecurity 의 기본 로그인 페이지를 사용함 
+					//url : http://localhost:8080/login
 					.formLogin();
 		}
 
