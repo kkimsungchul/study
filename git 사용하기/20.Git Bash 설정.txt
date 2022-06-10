@@ -58,7 +58,7 @@
 	# Staging을 실제 Local Repository로 저장 
 		$ git commit -m "First Commit to existed local project" 
 
-	# Remote Repository로 Push를 위 한 URL설정 및 확인 
+	# Remote Repository로 Push를 위한 원격 브런치 URL설정 및 확인 
 		$ git remote add origin https://github.com/kkimsungchul/if_buy.git
 		$ git remote -v 
 
@@ -69,3 +69,43 @@
 
 
 
+# 원격에서 프로젝트 가져오기
+
+	# 원격 브런치 연결
+		$ git remote [로컬저장소] [브런치URL]
+			git remote origin https://github.com/kkimsungchul/study.git
+		
+	# 체크아웃 
+		$ git check [브랜치명]
+			git checkout master
+		
+	# did not match any file(s) known to git 오류 발생
+		아래의 명령어를 입력
+		$ git remote update
+		$ git fetch 
+	
+	# 현재 브런치 확인 - 로컬
+		git branch -a
+	
+	# 현재 브런치 확인 - 원격
+		git branch -r
+
+
+# 깃 브런치 이름 변경
+	$ git init
+
+	$ git remote origin https://github.com/kkimsungchul/study.git
+	
+	$ git remote -v
+
+	$ git remote update
+
+	$ git checkout master
+
+	$ git branch -a
+
+	$ git branch -m [기존이름] [변경할이름]
+
+		$ git branch -m	master main
+	
+	$ git push origin :master
