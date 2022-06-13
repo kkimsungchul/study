@@ -16,7 +16,7 @@
 		Optional.ofNullable(data) : 데이터가 없을 경우 빈 객체 생성
 		Optional.of(data) : 반드시 데이터가 있어야 하며, 없을 경우 NPE 발생
 		get() : 데이터를 가져오며, 없을경우 null 을 가져옴
-		ofElse() : 가져오려는 데이터가 없을 경우 지정한 값을 가져옴
+		orElse() : 가져오려는 데이터가 없을 경우 지정한 값을 가져옴
 		Supplier<T> 인터페이스를 활용하여 orElseGet()메소드 사용
 		Supplier<T> 인터페이스를 활용하여 orElseThrow()메소드 사용 (데이터가 없는 경우 지정한 예외 발생)
 	
