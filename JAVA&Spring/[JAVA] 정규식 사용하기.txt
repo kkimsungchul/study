@@ -11,6 +11,10 @@
 
 	정규식 테스트 https://regexper.com/
 	
+	
+	2022.06.17 정규식으로 특정 패턴의 문자열을 추출할때 사용, 정리해야함
+	: https://boilerplate.tistory.com/53
+	
 
 # 정규식 해석
 	String regexProjectSlug = "^[a-zA-Z0-9\\-]{5,10}*$";
