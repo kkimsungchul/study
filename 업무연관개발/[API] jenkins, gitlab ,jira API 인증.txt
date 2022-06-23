@@ -1,0 +1,23 @@
+[API - jenkins, gitlab ,jira API 인증 방법]
+
+# 깃랩
+	header 
+		key : PRIVATE-TOKEN
+		value : 깃랩에서 발급받은 토큰 값
+
+# 젠킨스
+	header
+		key : Authorization
+		value : Basic + base64(id:token)
+			id:token 으로 합쳐서 base64로 인코딩 후
+			basic 를 붙여서 전송
+			ex )Basic OTEyODQ3ODM6MTE4ZDBmYjNlYTBmMmFkYmNkNzAwODZlYjBmNzU2ZjVjMA==
+
+# 지라
+	header
+		key : AUTHORIZATION
+		value : Basic + base64(id:token)
+			id:token 으로 합쳐서 base64로 인코딩 후
+			basic 를 붙여서 전송
+			ex )Basic OTEyODQ3ODM6MTE4ZDBmYjNlYTBmMmFkYmNkNzAwODZlYjBmNzU2ZjVjMA==
+
