@@ -1,0 +1,139 @@
+[ Spring Boot - RestControllerAdvice 사용하기 ]
+
+참고 URL : 
+	https://velog.io/@banjjoknim/RestControllerAdvice
+	https://mangkyu.tistory.com/204
+	https://mangkyu.tistory.com/205
+	
+	
+	
+
+# 구현소스
+
+	=================================================================================================================
+
+	package com.sungchul.etc.common;
+	import java.io.IOException;
+	import java.io.PrintWriter;
+	import java.io.StringWriter;
+
+	import javax.servlet.http.HttpServletRequest;
+
+	import org.apache.ibatis.exceptions.PersistenceException;
+	import org.apache.ibatis.exceptions.TooManyResultsException;
+	import org.slf4j.Logger;
+	import org.slf4j.LoggerFactory;
+	import org.springframework.core.Ordered;
+	import org.springframework.core.annotation.Order;
+	import org.springframework.http.HttpStatus;
+	import org.springframework.http.ResponseEntity;
+	import org.springframework.security.access.AccessDeniedException;
+	import org.springframework.web.bind.annotation.ExceptionHandler;
+	import org.springframework.web.bind.annotation.RestController;
+	import org.springframework.web.bind.annotation.RestControllerAdvice;
+	import org.springframework.web.client.HttpClientErrorException;
+
+
+	@Order(Ordered.HIGHEST_PRECEDENCE)
+	@RestControllerAdvice(annotations = RestController.class)
+	public class ApiExceptionHandler
+	{
+		private static final Logger logger = LoggerFactory.getLogger(ApiExceptionHandler.class);
+
+		@ExceptionHandler(value = { ApiException.class })
+		public ResponseEntity<ResponseAPI> exceptionHandler(HttpServletRequest request, final ApiException e)
+		{
+			ResponseAPI responseAPI = new ResponseAPI();
+			e.printStackTrace();
+			logger.info(request.toString());
+			return new ResponseEntity(responseAPI , HttpStatus.OK);
+		}
+
+		@ExceptionHandler(value = { PersistenceException.class })
+		public ResponseEntity<ResponseAPI> exceptionHandler(HttpServletRequest request, final PersistenceException e)
+		{
+			String errorMessage = null;
+			ResponseAPI responseAPI = new ResponseAPI();
+			try
+			{
+				StringWriter sw = new StringWriter();
+				PrintWriter pw = new PrintWriter(sw);
+				e.printStackTrace(pw);
+				errorMessage = sw.toString();
+				sw.close();
+				pw.close();
+			}catch(IOException e1)
+			{
+				logger.error("ApiExceptionHandler exceptionHandler ERROR: ", e);
+			}
+
+			logger.info(request.toString());
+			e.printStackTrace();
+
+			//E0005 - Mybatis(org.apache.ibatis.exceptions.PersistenceException)의 printStackTrace 내용으로 메시지 대체함.
+
+			e.printStackTrace();
+			logger.info(request.toString());
+			return new ResponseEntity(responseAPI , HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+		@ExceptionHandler(value = { TooManyResultsException.class })
+		public ResponseEntity<ResponseAPI> exceptionHandler(HttpServletRequest request, final TooManyResultsException e)
+		{
+			ResponseAPI responseAPI = new ResponseAPI();
+			String errorMessage = null;
+
+			try
+			{
+				StringWriter sw = new StringWriter();
+				PrintWriter pw = new PrintWriter(sw);
+				e.printStackTrace(pw);
+				errorMessage = sw.toString();
+				sw.close();
+				pw.close();
+			}catch(IOException e1)
+			{
+				logger.error("ApiExceptionHandler exceptionHandler ERROR: ", e);
+			}
+
+			logger.info(request.toString());
+			e.printStackTrace();
+
+
+			return new ResponseEntity(responseAPI , HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+		@ExceptionHandler(value = { HttpClientErrorException.class })
+		public ResponseEntity<ResponseAPI> exceptionHandler(HttpServletRequest request, final HttpClientErrorException e)
+		{
+			ResponseAPI responseAPI = new ResponseAPI();
+			logger.info(request.toString());
+			e.printStackTrace();
+			String errorMessage = e.getStatusText();
+
+			return new ResponseEntity(responseAPI , HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+
+
+		@ExceptionHandler(value = { AccessDeniedException.class })
+		public ResponseEntity<ResponseAPI> exceptionHandler(HttpServletRequest request, final AccessDeniedException e)
+		{
+			ResponseAPI responseAPI = new ResponseAPI();
+			logger.info(request.toString());
+			e.printStackTrace();
+
+			return new ResponseEntity(responseAPI , HttpStatus.UNAUTHORIZED);
+		}
+
+		@ExceptionHandler(value = { Exception.class })
+		public ResponseEntity<ResponseAPI> exceptionHandler(HttpServletRequest request, final Exception e)
+		{
+			ResponseAPI responseAPI = new ResponseAPI();
+
+			//e.printStackTrace();
+			logger.info(request.toString());
+			return new ResponseEntity(responseAPI , HttpStatus.INTERNAL_SERVER_ERROR);
+		 }
+	}
+	=================================================================================================================
