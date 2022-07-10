@@ -1,0 +1,68 @@
+[ AWS - EC2 사용하기 ]
+
+참고 링크 
+	https://velog.io/@inyong_pang/AWS-EC2-%EC%8B%9C%EC%9E%91%ED%95%98%EA%B8%B0-3ck513o2af
+	https://pstudio411.tistory.com/entry/%ED%81%B4%EB%9D%BC%EC%9A%B0%EB%94%A9-%EC%BB%B4%ED%93%A8%ED%8C%85-%EC%84%9C%EB%B9%84%EC%8A%A4-EC2-1
+	https://doing7.tistory.com/20?category=854863
+	도커 : 
+		https://longtermsad.tistory.com/57
+	pem <-->ppk 키 변환 : 
+		https://programforlife.tistory.com/9
+		https://kamang-it.tistory.com/205
+
+# 설치
+	1. AWS 접속
+		https://ap-northeast-2.console.aws.amazon.com/console/home?region=ap-northeast-2
+
+	2. 회원가입
+		회원가입 시 신용카드 등록을 하자.
+		1년간 무료이니까 1년후에는 꼭 해지하고..
+
+	3. 로그인 후 EC2 를 검색 EC2 페이지 접속
+		https://ap-northeast-2.console.aws.amazon.com/ec2/v2/home?region=ap-northeast-2#Home:
+
+	4. 화면 중단쯤에 표시되는 "인스턴스 시작" 클릭
+		https://ap-northeast-2.console.aws.amazon.com/ec2/v2/home?region=ap-northeast-2#LaunchInstances:
+
+	5. 필요한 정보 설정
+		이름 : ec2-aws_linux
+		애플리케이션 및 OS이미지 : Amazon Linux 선택
+		인스턴스 유형 : t2_micro 
+			※ 애가 무료임
+		키페어 생성
+			키페어 이름 : ec2-aws_linux
+		스토리지 구성
+			기본으로 설정
+		
+		다 설정 후 인스턴스 시작 클릭
+
+
+	6. 혹시 모르니 결제 관련 내용을 메일로 받기 설정
+		https://us-east-1.console.aws.amazon.com/billing/home#/preferences
+
+# 접속
+	
+	1. 인스턴스 관리 화면에 접속
+		https://ap-northeast-2.console.aws.amazon.com/ec2/v2/home?region=ap-northeast-2#Instances:instanceState=running
+	
+	2. 인스턴스 ID를 클릭
+
+	3. 우측 상단의 연결 클릭
+
+
+# 타임존 변경
+	
+	- 타임존 확인
+		date
+	
+	- 한국시간(KST)으로 타임존 변경
+		sudo rm /etc/localtime
+		sudo ln -s /usr/share/zoneinfo/Asia/Seoul /etc/localtime
+
+
+
+		
+
+
+
+

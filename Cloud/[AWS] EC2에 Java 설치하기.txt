@@ -1,0 +1,56 @@
+[ AWS - JAVA 설치하기 ]
+
+# JAVA 설치
+	https://doing7.tistory.com/30?category=854863
+
+
+	- 설치 가능 버전 확인
+		sudo yum list | grep jdk
+	
+	- 설치
+		sudo yum install -y java-1.8.0-openjdk-devel.x86_64
+	
+	- 설치 확인
+		java -version
+	
+	- 환경 변수 확인
+		echo $JAVA_HOME
+	
+	- 자바 설치 경로 확인
+		readlink -f /usr/bin/javac
+
+		/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.312.b07-1.amzn2.0.2.x86_64/bin/javac
+		
+	- profile 파일 열기
+		sudo vim /etc/profile
+	
+	- profile 파일 수정
+		export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.312.b07-1.amzn2.0.2.x86_64
+		※ 마지막 줄에 추가
+	
+	- profile 적용
+		source /etc/profile
+
+	- 환경 변수 확인
+		echo $JAVA_HOME
+
+# Hello Java 출력해보기
+	
+	- java 파일 생성
+		cd /home/ec2-user
+		vim Hello.java
+	
+	- java 파일 작성
+
+		public class Hello{
+			public static void main(String[] args){
+				System.out.println("Hello Java!!"); 
+			} 
+		}
+
+	
+	- java 컴파일
+		javac Hello.java
+
+	- java 파일 실행
+		java Hello
