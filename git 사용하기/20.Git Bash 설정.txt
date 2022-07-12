@@ -76,7 +76,7 @@
 			git remote origin https://github.com/kkimsungchul/study.git
 		
 	# 체크아웃 
-		$ git check [브랜치명]
+		$ git checkout [브랜치명]
 			git checkout master
 		
 	# did not match any file(s) known to git 오류 발생

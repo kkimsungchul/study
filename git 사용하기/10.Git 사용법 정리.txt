@@ -95,8 +95,8 @@
 
 	4. 우측의 빈칸을 입력
 		원격 : CIIM_Git
-		URL : https://github.com/securusgit1/securus_ciim
-		URL 입력 : https://github.com/securusgit1/securus_ciim
+		URL : https://github.com/kkimsungchul/study
+		URL 입력 : https://github.com/kkimsungchul/study
 
 	5. 빈칸 입력 후 중간쯤의 "추가하고 저장(A)" 클릭 
 
