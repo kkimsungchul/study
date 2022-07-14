@@ -1,0 +1,29 @@
+[ AWS - Docker 설치하기 ]
+
+참고 링크 
+	https://longtermsad.tistory.com/57
+	https://jinjinyang.tistory.com/46
+	
+# 패키지 업데이트
+	sudo yum update -y
+
+
+# Docker 설치
+	sudo amazon-linux-extras install docker
+
+# Docker 시작
+	sudo service docker start
+
+# Docker 중지
+	sudo service docker stop
+
+# sudo 명령어 없이 Docker 명령어를 실핼할 수 있도록 ec2-user 권한 추가
+	sudo usermod -a -G docker ec2-user
+
+# 재접속 후 sudo 없이 docker 명령어가 실행되는지 확인
+	docker info	
+	
+
+	
+
+
