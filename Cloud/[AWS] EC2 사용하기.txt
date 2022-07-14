@@ -60,7 +60,8 @@
 		sudo ln -s /usr/share/zoneinfo/Asia/Seoul /etc/localtime
 
 
-
+# 패키지 업데이트
+	sudo yum update -y
 		
 
 
