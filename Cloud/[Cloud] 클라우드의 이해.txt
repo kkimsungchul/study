@@ -3,7 +3,7 @@
 		https://library.gabia.com/contents/infrahosting/9114/
 		https://blog.codef.io/cloud_service/
 		https://www.redhat.com/ko/topics/cloud-computing/what-are-cloud-services
-
+		https://www.youtube.com/watch?v=0LqxqB9cvUA&list=PLmv2d328i1Q4ZK_7XQYB5SeMqNA4q_Ptq
 # 클라우드 서비스의 개념
 	클라우드 컴퓨팅이란 인터넷 기반의 컴퓨팅을 말함
 	인터넷 상의 가상화된 서버에 프로그램을 두고 필요할때마다 컴퓨터나 스마트폰에 불러와 사용하는 서비스
