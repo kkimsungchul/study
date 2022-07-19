@@ -1,29 +1,29 @@
-[ ½ºÇÁ¸µºÎÆ® - ·¹½ºÆ®ÅÛÇÃ¸´ (RestTemplate) ]
+[ ìŠ¤í”„ë§ë¶€íŠ¸ - ë ˆìŠ¤íŠ¸í…œí”Œë¦¿ (RestTemplate) ]
 
-	´Ù¸¥»çÀÌÆ®¿¡¼­ Á¦°øÇØÁÖ´Â ·¹½ºÆ®Ç®API(restful api)¿¡ Á¢¼ÓÇÏ¿© °ª °¡Á®¿Ã ¶§ »ç¿ëÇÔ.
-	È­¸é´Ü¿¡¼­ ajax ·Î È£ÃâÇØ¼­ »ç¿ëÇØµµ µÇÁö¸¸, ¼­¹ö´Ü¿¡¼­ ¿øÇÏ´Â µ¥ÀÌÅÍ¸¦ Á¤Á¦ÇÑ µÚ¿¡ È­¸é´Ü¿¡ »Ñ·ÁÁÖ±â À§ÇÔ
+	ë‹¤ë¥¸ì‚¬ì´íŠ¸ì—ì„œ ì œê³µí•´ì£¼ëŠ” ë ˆìŠ¤íŠ¸í’€API(restful api)ì— ì ‘ì†í•˜ì—¬ ê°’ ê°€ì ¸ì˜¬ ë•Œ ì‚¬ìš©í•¨.
+	í™”ë©´ë‹¨ì—ì„œ ajax ë¡œ í˜¸ì¶œí•´ì„œ ì‚¬ìš©í•´ë„ ë˜ì§€ë§Œ, ì„œë²„ë‹¨ì—ì„œ ì›í•˜ëŠ” ë°ì´í„°ë¥¼ ì •ì œí•œ ë’¤ì— í™”ë©´ë‹¨ì— ë¿Œë ¤ì£¼ê¸° ìœ„í•¨
 
 
-# Âü°í»çÀÌÆ® 
+# ì°¸ê³ ì‚¬ì´íŠ¸ 
 	https://vmpo.tistory.com/27
 	https://sooin01.tistory.com/entry/RestTemplate-%EC%82%AC%EC%9A%A9%EB%B2%95
 	https://advenoh.tistory.com/46
 	https://velog.io/@soosungp33/%EC%8A%A4%ED%94%84%EB%A7%81-RestTemplate-%EC%A0%95%EB%A6%AC%EC%9A%94%EC%B2%AD-%ED%95%A8
 	https://sjh836.tistory.com/141
 
-	Äõ¸®½ºÆ®¸µ
+	ì¿¼ë¦¬ìŠ¤íŠ¸ë§
 	https://recordsoflife.tistory.com/32
 	https://m.blog.naver.com/PostView.nhn?blogId=mk1126sj&logNo=221032571275&proxyReferer=https:%2F%2Fwww.google.com%2F
 
 
 
 
-	Àü´Ş¹ŞÀº °ª(body)¸¦ Ä³½ºÆÃ ÇÏ´Â ¹æ¹ı
+	ì „ë‹¬ë°›ì€ ê°’(body)ë¥¼ ìºìŠ¤íŒ… í•˜ëŠ” ë°©ë²•
 	https://luvstudy.tistory.com/52
 
-# ¶óÀÌºê·¯¸® Ãß°¡
-	HttpComponentsClientHttpRequestFactory Å¬·¡½º¸¦ »ç¿ëÇÏ·Á°í ÇÑ´Ù¸é ¾Æ·¡ÀÇ ¶óÀÌºê·¯¸®¸¦ Ãß°¡ÇØÁà¾ßÇÔ
-	¸ŞÀÌºì URL : https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
+# ë¼ì´ë¸ŒëŸ¬ë¦¬ ì¶”ê°€
+	HttpComponentsClientHttpRequestFactory í´ë˜ìŠ¤ë¥¼ ì‚¬ìš©í•˜ë ¤ê³  í•œë‹¤ë©´ ì•„ë˜ì˜ ë¼ì´ë¸ŒëŸ¬ë¦¬ë¥¼ ì¶”ê°€í•´ì¤˜ì•¼í•¨
+	ë©”ì´ë¸ URL : https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
 
 	=================================================================================================================
 	implementation('org.apache.httpcomponents:httpclient:4.5')
@@ -31,24 +31,24 @@
 	
 
 
-# ¼­ºñ½º·ÎÁ÷¿¡ ·¹½ºÆ®ÅÛÇÃ¸´ ±¸Çö
-	HttpComponentsClientHttpRequestFactory ¸¦ »ı¼ºÇÏ¿©, ¼¼¼ÇÅ¸ÀÓ¾Æ¿ô ¼³Á¤
+# ì„œë¹„ìŠ¤ë¡œì§ì— ë ˆìŠ¤íŠ¸í…œí”Œë¦¿ êµ¬í˜„
+	HttpComponentsClientHttpRequestFactory ë¥¼ ìƒì„±í•˜ì—¬, ì„¸ì…˜íƒ€ì„ì•„ì›ƒ ì„¤ì •
 
-	RestTemplate À» »ı¼ºÇÒ¶§ HttpComponentsClientHttpRequestFactory ¸¦ º¯¼ö·Î ³Ö¾îÁà¼­ ¼ÂÆÃÇÔ
+	RestTemplate ì„ ìƒì„±í• ë•Œ HttpComponentsClientHttpRequestFactory ë¥¼ ë³€ìˆ˜ë¡œ ë„£ì–´ì¤˜ì„œ ì…‹íŒ…í•¨
 
-	HttpEntity ¿¡´Â È£ÃâÇÒ URL¿¡ º¸³¾ °ªÀ» ³Ö¾îÁÜ(GET ¹æ½ÄÀÌ ¾Æ´Ò°æ¿ì)
+	HttpEntity ì—ëŠ” í˜¸ì¶œí•  URLì— ë³´ë‚¼ ê°’ì„ ë„£ì–´ì¤Œ(GET ë°©ì‹ì´ ì•„ë‹ê²½ìš°)
 
-	url ¿¡´Â È£ÃâÇÒ URL
+	url ì—ëŠ” í˜¸ì¶œí•  URL
 
-	ResponseEntity ¸¦ »ı¼ºÇÒ¶§´Â restTemplateÀÇ exchange ¸Ş¼Òµå¸¦ »ç¿ëÇØ¼­ »ı¼ºÇÔ
-		exchange(È£ÃâURL , ¸Ş¼Òµå(get,postµî) , º¸³¾ °´Ã¼ , ¸®ÅÏ¹ŞÀ» Å¸ÀÔ);
+	ResponseEntity ë¥¼ ìƒì„±í• ë•ŒëŠ” restTemplateì˜ exchange ë©”ì†Œë“œë¥¼ ì‚¬ìš©í•´ì„œ ìƒì„±í•¨
+		exchange(í˜¸ì¶œURL , ë©”ì†Œë“œ(get,postë“±) , ë³´ë‚¼ ê°ì²´ , ë¦¬í„´ë°›ì„ íƒ€ì…);
 		ResponseEntity<List<CoinPriceVO>> res = restTemplate.exchange(url.toString(), HttpMethod.GET, entity, new ParameterizedTypeReference<List<CoinPriceVO>>() {});
-	¸®ÅÏÅ¸ÀÔÀº Object , Map ,VOµîÀ» ³Ö¾îµµ µÇÁö¸¸, VOÀÏ °æ¿ì¿¡´Â À§¿Í°°ÀÌ "new ParameterizedTypeReference<List<CoinPriceVO>>() {}" ¸¦ ³Ö¾îÁà¾ß ÇÔ
-	À§¿Í°°ÀÌ¾È³Ö¾îÁÖ°í CoinPriceVO ¸¦ ³ÖÀ»°æ¿ì Ä³½ºÆÃ ¿À·ù°¡ ¹ß»ıÇÔ,,º¯È¯ÀÌ ¾ÈµÊ
-		¡Ø Âü°í URL : https://luvstudy.tistory.com/52
+	ë¦¬í„´íƒ€ì…ì€ Object , Map ,VOë“±ì„ ë„£ì–´ë„ ë˜ì§€ë§Œ, VOì¼ ê²½ìš°ì—ëŠ” ìœ„ì™€ê°™ì´ "new ParameterizedTypeReference<List<CoinPriceVO>>() {}" ë¥¼ ë„£ì–´ì¤˜ì•¼ í•¨
+	ìœ„ì™€ê°™ì´ì•ˆë„£ì–´ì£¼ê³  CoinPriceVO ë¥¼ ë„£ì„ê²½ìš° ìºìŠ¤íŒ… ì˜¤ë¥˜ê°€ ë°œìƒí•¨,,ë³€í™˜ì´ ì•ˆë¨
+		â€» ì°¸ê³  URL : https://luvstudy.tistory.com/52
 
-	¸®ÅÏ¹ŞÀº res ¸¦ Âï¾îº¸¸é Çì´õºÎÅÍÇØ¼­ ÀÀ´ä°ªµîÀÌ Æ÷ÇÔµÇ¾î ÀÖÀ½,
-	¿©±â¼­ res.getBody() ¸¦ ÀÌ¿ëÇÏ¿© ¿äÃ»¿¡ ´ëÇÑ ÀÀ´ä°ª ¸¸À» °¡Á®¿È
+	ë¦¬í„´ë°›ì€ res ë¥¼ ì°ì–´ë³´ë©´ í—¤ë”ë¶€í„°í•´ì„œ ì‘ë‹µê°’ë“±ì´ í¬í•¨ë˜ì–´ ìˆìŒ,
+	ì—¬ê¸°ì„œ res.getBody() ë¥¼ ì´ìš©í•˜ì—¬ ìš”ì²­ì— ëŒ€í•œ ì‘ë‹µê°’ ë§Œì„ ê°€ì ¸ì˜´
 
 	=================================================================================================================
 
@@ -57,8 +57,8 @@
         String coinName;
         String url;
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        factory.setConnectTimeout(5000); //Å¸ÀÓ¾Æ¿ô ¼³Á¤ 5ÃÊ
-        factory.setReadTimeout(5000);//Å¸ÀÓ¾Æ¿ô ¼³Á¤ 5ÃÊ
+        factory.setConnectTimeout(5000); //íƒ€ì„ì•„ì›ƒ ì„¤ì • 5ì´ˆ
+        factory.setReadTimeout(5000);//íƒ€ì„ì•„ì›ƒ ì„¤ì • 5ì´ˆ
         RestTemplate restTemplate = new RestTemplate(factory);
         HttpHeaders header = new HttpHeaders();
         HttpEntity<?> entity = new HttpEntity<>(header);
@@ -67,11 +67,11 @@
         //url = "https://api.upbit.com/v1/candles/minutes/1?market=KRW-BTC&count=1";
         ResponseEntity<List<CoinPriceVO>> res = restTemplate.exchange(url.toString(), HttpMethod.GET, entity, new ParameterizedTypeReference<List<CoinPriceVO>>() {});
         //log.info("### resList : {}" ,res);
-        //¹Ş¾Æ¿Â °ªÀ» ¸®½ºÆ®·Î º¯È¯
+        //ë°›ì•„ì˜¨ ê°’ì„ ë¦¬ìŠ¤íŠ¸ë¡œ ë³€í™˜
         List<CoinPriceVO> temp= res.getBody();
         //log.info("### temp : {}" ,temp);
 
-        //¸®½ºÆ®¿¡ µé¾îÀÖ´Â °ªÀ» VO·Î º¯È¯
+        //ë¦¬ìŠ¤íŠ¸ì— ë“¤ì–´ìˆëŠ” ê°’ì„ VOë¡œ ë³€í™˜
         CoinPriceVO coinPriceVO = temp.get(0);
         //log.info("### cpv : {}" ,coinPriceVO);
         coinVO.setCoinPriceVO(coinPriceVO);
@@ -82,3 +82,61 @@
 
 
 	=================================================================================================================
+	
+	
+package com.example.demo.common;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.KeyManagementException;
+import java.security.cert.X509Certificate;
+
+import javax.net.ssl.SSLContext;
+
+import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+
+
+@Configuration
+public class RestTemplateConfig {
+    @Bean
+    public RestTemplate getRestTemplate() {
+        return new RestTemplate();
+    }
+
+    //For EPC Test : SSL verify off
+    @Bean
+    public RestTemplate restTemplate()
+            throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
+//        TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
+  
+        //Ignore self-signed certification
+        SSLContext sslContext = org.apache.http.ssl.SSLContexts.custom()
+                .loadTrustMaterial(null, new TrustSelfSignedStrategy())
+                .build();
+
+        //Ignore host name verification
+        SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
+ 
+        CloseableHttpClient httpClient = HttpClients.custom()
+                .setSSLSocketFactory(csf)
+                .build();
+ 
+        HttpComponentsClientHttpRequestFactory requestFactory =
+                new HttpComponentsClientHttpRequestFactory();
+ 
+        requestFactory.setHttpClient(httpClient);
+        RestTemplate restTemplate = new RestTemplate(requestFactory);
+        return restTemplate;
+    }
+}
+	
