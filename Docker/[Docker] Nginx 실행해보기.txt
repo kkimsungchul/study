@@ -1,0 +1,31 @@
+[ Docker - Nginx 테스트 ]
+
+
+1. 웹브라우저에서 아래의 URL 접속
+	http://127.0.0.1:4567/
+	
+	- 사이트에 연결할 수 없음이 표시됨
+
+2. Windows Terminal 실행
+	
+
+3. 도커 실행 상태 확인
+	wsl -l -v
+
+4. 도커 실행중인 컨테이너 확인
+	docker ps
+
+5. docker run 명령어로 nginx 이미지 기반 컨테이너 실행
+
+	docker run -p 4567:80 -d nginx:latest
+
+6. 도커 실행중인 컨테이너 확인
+	docker ps
+
+7. http://127.0.0.1:4567/ 접속 확인
+
+8. 도커 컨테이너 삭제
+	docker rm -f 1e900b8ddd3f
+	
+	※ 컨테이너 아이디는 docker ps 명령어로 가져온 아이디를 적어주면 됨
+	

@@ -1,0 +1,120 @@
+[ Docker - 윈도우 Home 버전에 도커 설치하기 ] 
+
+# WSL(Windows Subsystem for Linux 2) 설치
+	https://www.lainyzine.com/ko/article/how-to-install-wsl2-and-use-linux-on-windows-10/
+
+
+	1. Windows PowerShell을 관리자 권한으로 실행
+
+	2. DISM으로 WSL 관련 기능 활성화
+		- 아래의 명령어 실행
+		dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+	3. DISM 으로 VirtualMachinePlatform 기능 활성화
+		- 아래의 명령어 실행
+		dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+		
+		※ 여기까지 완료 후 재시작
+
+	4. WSL2 Linux 커널 업데이트
+		아래의 커널 업데이트 패키지를 다운받아서 설치
+
+		WSL 공식 가이드 문서
+			https://docs.microsoft.com/ko-kr/windows/wsl/install#step-4---download-the-linux-kernel-update-package
+		
+		WSL2 커널 업데이트 패키지
+			https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi
+		
+
+		※ 오류 발생
+			this update only applies to machines with the windows subsystem for linux
+			참고 URL : 
+				https://goaloflife.tistory.com/192
+			
+			
+	5. Windows PowerShell 에서 사용할 WSL 버전을 2로 변경
+		- 아래의 명령어 실행
+		wsl --set-default-version 2
+
+
+	6. Microsoft Store 앱에서 Ubuntu 설치
+		검색하자마자 젤 처음 나오는 것으로 설치
+
+	7. Ubuntu 설치 완료 후 Ubuntu 실행
+		Installing. this may take few minutes… 메시지가 출력 후 사용자 이름과 패스워드 입력하는 창이 나오면 
+		입력
+		id : kimsc
+		pw : admin
+
+	8. Windows PowerShell 에서 설치된 리눅스 확인
+		wsl -l -v
+
+		=================================================================================================================
+		PS C:\WINDOWS\system32> wsl -l -v
+		  NAME      STATE           VERSION
+		* Ubuntu    Running         2
+		=================================================================================================================
+
+		※ 혹시나 버전이 1로 나온다면 아래의 명령어 실행
+		wsl --set-version Ubuntu 2
+
+	9. 설치된 리눅스 버전 확인
+		- 아래의 명령어 실행
+		wsl cat /etc/lsb-release
+		=================================================================================================================
+		PS C:\WINDOWS\system32> wsl cat /etc/lsb-release
+		DISTRIB_ID=Ubuntu
+		DISTRIB_RELEASE=20.04
+		DISTRIB_CODENAME=focal
+		DISTRIB_DESCRIPTION="Ubuntu 20.04.4 LTS"
+		=================================================================================================================
+
+
+
+
+# Windows Terminal 설치 및 WSL2 사용 설정
+	
+	1. Microsoft Store 앱에서 Windows Terminal 검색 후 설치
+
+	2. 윈도우 시작버튼을 누르고 터미널을 실행
+
+	3. 상단의 탭바에서 아래화살표 클릭 후 위에서 설치한 우분투 선택하면 우분투가 바로 실행됨
+
+
+
+# 도커 설치
+	https://www.lainyzine.com/ko/article/a-complete-guide-to-how-to-install-docker-desktop-on-windows-10/
+
+	
+	1. 아래의 URL에서 Windows 버전 다운로드
+		https://www.docker.com/products/docker-desktop/
+	
+	2. 다운받은 설치 파일 실행
+	
+	3. 설치 완료 후 Close and log out 버튼 클릭
+
+	4. 재시작 완료 후 우측 하단의 트레이 아이콘에서 도커 우 클릭
+		클릭 후 Settings 클릭
+	
+	5. 설정 화면에서 아래의 내용 확인
+		
+		5-1. General 설정에서 "Use the WSL 2 based engine (Windows Home can only run the WSL 2 backend)" 이 체크되어 있는지 확인
+			체크가 안되어 있다면 체크 후 저장
+		
+		5-2. Resource > WSL Integration 메뉴로 이동
+			"Enable Integration with my default WSL distro" 체크가 되어 있는지 확인
+			체크가 안되어 있다면 체크 후 저장		
+		
+		5-3. Resource > WSL Integration 메뉴로 이동
+			하단의 사용하려는 리눅스 버전의 토클을 켜고 저장
+
+	6. windowns Terminal 실행 후 도커 버전 확인
+		docker version
+	
+	7. 실행중인 컨테이너 확인
+		docker ps
+	
+
+
+		
+
+
