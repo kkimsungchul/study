@@ -1,9 +1,10 @@
 [ Docker - 윈도우 Home 버전에 도커 설치하기 ] 
 
 # WSL(Windows Subsystem for Linux 2) 설치
-	https://www.lainyzine.com/ko/article/how-to-install-wsl2-and-use-linux-on-windows-10/
-
-
+	참고링크 : 
+		https://www.lainyzine.com/ko/article/how-to-install-wsl2-and-use-linux-on-windows-10/
+		https://gmyankee.tistory.com/305
+		
 	1. Windows PowerShell을 관리자 권한으로 실행
 
 	2. DISM으로 WSL 관련 기능 활성화

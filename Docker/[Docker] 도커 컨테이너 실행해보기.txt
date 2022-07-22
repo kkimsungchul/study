@@ -1,0 +1,53 @@
+[Docker - 컨테이너 실행해보기 ] 
+	https://zetawiki.com/wiki/%EB%8F%84%EC%BB%A4_%EC%9E%90%EB%B0%94_Hello_World
+	https://snowdeer.github.io/docker/2018/01/03/docker-launch-container-from-image/
+
+	※아래의 모든 스크립트는 윈도우 터미널로 실행함
+
+
+# HelloJava.java 파일 생성
+
+	경로 : C:\Users\USER\Desktop\kimsc
+	파일명 : HelloJava.java
+
+	=================================================================================================================
+	public class HelloJava{
+		
+		public static void main(String[]args){
+			System.out.println("Hello Java");
+		}
+
+
+	}
+	=================================================================================================================
+
+# 경로 이동
+	cd C:\Users\USER\Desktop\kimsc
+
+# Dockerfile 파일 생성
+
+	FROM openjdk:8
+	COPY . /usr/src/myapp
+	WORKDIR /usr/src/myapp
+	RUN javac HelloJava.java
+	CMD ["java", "HelloJava"]
+
+
+# 도커 빌드 실행
+	docker build -t my-java-app .
+
+
+# 도커 이미지 확인
+	docker images my-java-app
+
+
+# 컨테이너 실행
+	 docker run -it my-java-app
+	
+
+# 도커 데스크탑 확인
+	1. 우측 하단의 트레이아이콘에서 도커 더블클릭
+	2. Docker Desktop 실행 확인
+	3. 좌측 메뉴에서 Containers 클릭
+	4. 컨테이너 확인
+
