@@ -4,8 +4,9 @@
 		https://www.youtube.com/watch?v=LXJhA3VWXFA
 		https://www.youtube.com/watch?v=chnCcGCTyBg
 		https://subicura.com/2017/01/19/docker-guide-for-beginners-1.html
-	
-
+		https://jinjinyang.tistory.com/47?category=1011842
+		https://hoon93.tistory.com/48
+				https://velog.io/@markany/%EB%8F%84%EC%BB%A4%EC%97%90-%EB%8C%80%ED%95%9C-%EC%96%B4%EB%96%A4-%EA%B2%83-1.-%EB%8F%84%EC%BB%A4%EB%9E%80-%EB%AC%B4%EC%97%87%EC%9D%B8%EA%B0%80
 # 도커 사용 이전
 	하나의 서버에 여러개의 프로그램을 설치하여 관리하기 힘듬
 	여러개의 프로그램을 설치 하였다 하더라도, 사용하는 라이브러리 버전이 달라서 이슈가 생김
