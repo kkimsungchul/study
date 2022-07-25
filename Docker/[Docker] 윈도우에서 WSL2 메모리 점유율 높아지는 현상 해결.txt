@@ -1,0 +1,12 @@
+[Docker- 윈도우에서 WSL2 메모리 점유율 높아지는 현상 해결하기 ]
+
+1. 파일탐색기를 열어 주소창에 %USERPROFILE% 입력
+
+2. 이동된 프로필 폴더 .viminfo 파일 생성
+
+3. 아래의 내용 을 .viminfo 파일에 추가 후 재기동
+
+[wsl2]
+memory=8GB
+swap=0
+localhostForwarding=true
