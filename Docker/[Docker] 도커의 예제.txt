@@ -1,8 +1,134 @@
+[ Docker - 도커 예제 ]
 
-
-도커 예제
+# 참고 링크 : 
 	https://junlab.tistory.com/216
 	https://sharplee7.tistory.com/74
+	https://subicura.com/2017/01/19/docker-guide-for-beginners-2.html
+	
+
+# 도커 명령어
+	docker run [OPTIONS] IMAGE[:TAG|@DIGEST] [COMMAND] [ARG...]
+
+	-d : detached mode 흔히 말하는 백그라운드 모드
+	-p : 호스트와 컨테이너의 포트를 연결 (포워딩)
+	-v : 호스트와 컨테이너의 디렉토리를 연결 (마운트)
+	-e : 컨테이너 내에서 사용할 환경변수 설정
+	–name : 컨테이너 이름 설정
+	–rm : 프로세스 종료시 컨테이너 자동 제거
+	-it : -i와 -t를 동시에 사용한 것으로 터미널 입력을 위한 옵션
+	–link : 컨테이너 연결 [컨테이너명:별칭]
+
+
+# ubuntu 16.04 container 실행
+
+		=================================================================================================================
+		docker run ubuntu:16.04
+		=================================================================================================================
+
+	- 실제 실행 후 콘솔로그
+		=================================================================================================================
+		PS C:\Users\USER> docker run ubuntu:16.04
+		Unable to find image 'ubuntu:16.04' locally
+		16.04: Pulling from library/ubuntu
+		58690f9b18fc: Pull complete
+		b51569e7c507: Pull complete
+		da8ef40b9eca: Pull complete
+		fb15d46c38dc: Pull complete
+		Digest: sha256:20858ebbc96215d6c3c574f781133ebffdc7c18d98af4f294cc4c04871a6fe61
+		Status: Downloaded newer image for ubuntu:16.04
+		PS C:\Users\USER>
+		=================================================================================================================
+	
+	run명령어를 사용하면 사용할 이미지가 저장되어 있는지 확인하고 없다면 다운로드(pull)를 한 후 컨테이너를 생성(create)하고 시작(start) 함
+
+
+# /bin/bash 명령어를 입력해서 ubuntu 컨테이너 실행
+
+		=================================================================================================================
+		docker run --rm -it ubuntu:16.04 /bin/bash
+		=================================================================================================================
+		
+	- 실제 실행 후 콘솔로그
+		=================================================================================================================
+		PS C:\Users\USER> docker run --rm -it ubuntu:16.04 /bin/bash
+		root@a6430fa87b89:/# ll
+		total 72
+		drwxr-xr-x   1 root root 4096 Jul 27 08:39 ./
+		drwxr-xr-x   1 root root 4096 Jul 27 08:39 ../
+		-rwxr-xr-x   1 root root    0 Jul 27 08:39 .dockerenv*
+		drwxr-xr-x   2 root root 4096 Aug  4  2021 bin/
+		drwxr-xr-x   2 root root 4096 Apr 12  2016 boot/
+		drwxr-xr-x   5 root root  360 Jul 27 08:40 dev/
+		drwxr-xr-x   1 root root 4096 Jul 27 08:39 etc/
+		drwxr-xr-x   2 root root 4096 Apr 12  2016 home/
+		drwxr-xr-x   8 root root 4096 Sep 13  2015 lib/
+		drwxr-xr-x   2 root root 4096 Aug  4  2021 lib64/
+		drwxr-xr-x   2 root root 4096 Aug  4  2021 media/
+		drwxr-xr-x   2 root root 4096 Aug  4  2021 mnt/
+		drwxr-xr-x   2 root root 4096 Aug  4  2021 opt/
+		dr-xr-xr-x 206 root root    0 Jul 27 08:40 proc/
+		drwx------   2 root root 4096 Aug  4  2021 root/
+		drwxr-xr-x   1 root root 4096 Aug  4  2021 run/
+		drwxr-xr-x   1 root root 4096 Aug 31  2021 sbin/
+		drwxr-xr-x   2 root root 4096 Aug  4  2021 srv/
+		dr-xr-xr-x  11 root root    0 Jul 27 08:40 sys/
+		drwxrwxrwt   2 root root 4096 Aug  4  2021 tmp/
+		drwxr-xr-x   1 root root 4096 Aug  4  2021 usr/
+		drwxr-xr-x   1 root root 4096 Aug  4  2021 var/
+		root@a6430fa87b89:/# exit
+		exit
+		PS C:\Users\USER>
+		=================================================================================================================
+	
+	컨테이너 내부에 들어가기 위해 bash 쉘을 실행하고 키보드 입력을 위해 -it 옵션을 줌
+	추가적으로 프로세스가 종료되면 컨테이너가 자동으로 삭제되도록 --rm 옵션도 추가함
+	바로 상단에서 이미지를 다운받았기 때문에 이미지다운로드 없이 바로 실행이 되었고
+	리눅스 명령어가 사용이 가능함 
+		※ 현재 실행하고 있는 명령창은 windows PowerShell 로 우분투 컨테이너가 아닌 상태에선 리눅스 명령어가 실행 안됨
+			=================================================================================================================
+			PS C:\Users\USER> ll
+			ll : 'll' 용어가 cmdlet, 함수, 스크립트 파일 또는 실행할 수 있는 프로그램 이름으로 인식되지 않습니다.
+			 이름이 정확한지 확인하고 경로가 포함된 경우 경로가 올바른지 검증한 다음 다시 시도하십시오.
+			위치 줄:1 문자:1
+			+ ll
+			+ ~~
+				+ CategoryInfo          : ObjectNotFound: (ll:String) [], CommandNotFoundException
+				+ FullyQualifiedErrorId : CommandNotFoundException
+
+			PS C:\Users\USER>
+			=================================================================================================================
+	
+
+# redis container 컨테이너 실행
+	redis는 메모리기반의 다양한 기능을 가진 스토리지임
+	6379 포트로 통신하며 telnet 명령어로 테스트해 볼 수 있음
+	redis 컨테이너는 detached mode(백그라운드 모드)로 실행하기 위해 -d 옵션을 추가하고 -p 옵션을 추가하여 컨테이너의 포트를 호스트의 포트로 연결
+	-d옵션이 없다면 프로세스가 foreground로 실행되어 아무키도 입력할 수 없게 됨
+	
+		=================================================================================================================
+		docker run -d -p 1234:6379 redis
+		=================================================================================================================
+
+	- 실제 실행 후 콘솔로그
+		=================================================================================================================
+		PS C:\Users\USER> telnet localhost 1234
+		set mykey hihihihihihihi
+		+OK
+		get mykey
+		$14
+		hihihihihihihi
+		=================================================================================================================
+		
+		※ 텔넷을 종료하기 위해선 	Ctrl + ']' 를 입력 	그다음 quit 입력후 엔터를치면 됨
+		
+
+	-d 옵션을 주었기 때문에 컨테이너를 실행하자마자 컨테이너의 ID(1e45278bfb0cafc15514872353b2c9aa2508a55ad9eacb846f2191295a91f1ae)를 보여주고 바로 쉘로 돌아옴
+	컨테이너는 종료된 것이 아니라 백그라운드 모드로 동작하고 있고 컨테이너 ID를 이용하여 컨테이너를 제어할 수 있음
+	-p 옵션을 이용하여 호스트의 1234포트를 컨테이너의 6379포트로 연결하였고 localhost의 1234포트로 접속하면 하면 redis를 사용할 수 있음
+
+	테스트 결과 redis에 접속하여 새로운 키를 저장하고 불러오는데 성공
+	실행이 간단한건 물론이고 호스트의 포트만 다르게 하면 하나의 서버에 여러개의 redis 서버를 띄우는 것도 매우 간단함
+
 
 
 
