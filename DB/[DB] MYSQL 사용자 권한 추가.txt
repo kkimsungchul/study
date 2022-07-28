@@ -1,6 +1,9 @@
 [ MYSQL 사용자 권한 추가 ]
 	참고 URL : https://velog.io/@devyang97/MySQL-%EC%82%AC%EC%9A%A9%EC%9E%90-%EC%B6%94%EA%B0%80-%EB%B0%8F-%EA%B6%8C%ED%95%9C-%EC%84%A4%EC%A0%95
 
+	//사용자 추가
+	create user 'sungchul'@'localhost' identified by '비밀번호';
+
 
 	//사용자 생성시 권한까지 부여
 	grant all privileges on *.* to 'sungchul'@'localhost' identified by 'sungchul1234';
@@ -19,3 +22,7 @@
 	//외부에서 접속 가능하게 하기 localhost를 % 로 바꾸면됨, 접근 불가능하게 하려면 반대로 % 를 localhost로
 	UPDATE mysql.user SET Host='%' WHERE Host='localhost' AND User='username';
 	FLUSH PRIVILEGES;
+
+
+	//비밀번호 변경
+	alter user 'root'@'localhost' identified with mysql_native_password by 'my_new_password';

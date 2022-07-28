@@ -1,0 +1,287 @@
+[ Docker - 도커 기본 명령어 ]
+
+# 도커 명령어
+	docker run [OPTIONS] IMAGE[:TAG|@DIGEST] [COMMAND] [ARG...]
+
+	-d : detached mode 흔히 말하는 백그라운드 모드
+	-p : 호스트와 컨테이너의 포트를 연결 (포워딩)
+	-v : 호스트와 컨테이너의 디렉토리를 연결 (마운트)
+	-e : 컨테이너 내에서 사용할 환경변수 설정
+	–name : 컨테이너 이름 설정
+	–rm : 프로세스 종료시 컨테이너 자동 제거
+	-it : -i와 -t를 동시에 사용한 것으로 터미널 입력을 위한 옵션
+	–link : 컨테이너 연결 [컨테이너명:별칭]
+
+
+
+# 컨테이너 목록 확인하기
+
+	- docker ps
+		현재 실행중인 컨테이너 목록을 보여줌
+		어떤 이미지 기반으로만들어졌는데, 어떤 포트와 연결되어 있는지 등 간단한 정보만 표시함
+		
+		
+		=================================================================================================================
+		PS C:\Users\USER> docker ps
+		CONTAINER ID   IMAGE       COMMAND                  CREATED          STATUS          PORTS                               NAMES
+		4621a3761838   wordpress   "docker-entrypoint.s…"   23 minutes ago   Up 23 minutes   0.0.0.0:8080->80/tcp                nostalgic_sutherland
+		3150381eaf20   mysql:5.7   "docker-entrypoint.s…"   4 hours ago      Up 4 hours      0.0.0.0:3306->3306/tcp, 33060/tcp   mysql
+		=================================================================================================================
+
+	- docker ps -a
+		맨 처음 실행했다가 종료된 컨테이너까지 추가로 보임
+		컨테이너는 종료되어도 삭제되지 않고 남아 있고, 종료된 컨테이너는 다시 시작할 수 있음
+		명시적으로 삭제를 하면 제거가 됨
+		=================================================================================================================	
+		PS C:\Users\USER> docker ps -a
+		CONTAINER ID   IMAGE          COMMAND                  CREATED        STATUS                     PORTS                               NAMES
+		4621a3761838   wordpress      "docker-entrypoint.s…"   2 hours ago    Up 2 hours                 0.0.0.0:8080->80/tcp                nostalgic_sutherland
+		3150381eaf20   mysql:5.7      "docker-entrypoint.s…"   5 hours ago    Up 5 hours                 0.0.0.0:3306->3306/tcp, 33060/tcp   mysql
+		1e45278bfb0c   redis          "docker-entrypoint.s…"   22 hours ago   Exited (255) 7 hours ago   0.0.0.0:1234->6379/tcp              elated_sanderson
+		0adb026d197b   ubuntu:16.04   "/bin/bash"              23 hours ago   Exited (0) 23 hours ago                                        flamboyant_galileo
+		3c415425b27e   my-java-app    "java HelloJava"         6 days ago     Exited (0) 2 days ago                                          compassionate_roentgen
+		=================================================================================================================
+
+
+	- docker stop [OPTIONS] CONTAINER [CONTAINER...]
+		컨테이너 중지
+		도커 ID 는 docker ps 로 가져와서 확인		
+		=================================================================================================================
+		PS C:\Users\USER> docker ps
+			CONTAINER ID   IMAGE       COMMAND                  CREATED       STATUS       PORTS                               NAMES
+			4621a3761838   wordpress   "docker-entrypoint.s…"   2 hours ago   Up 2 hours   0.0.0.0:8080->80/tcp                nostalgic_sutherland
+			3150381eaf20   mysql:5.7   "docker-entrypoint.s…"   5 hours ago   Up 5 hours   0.0.0.0:3306->3306/tcp, 33060/tcp   mysql
+		PS C:\Users\USER> docker stop 3150381eaf20
+			3150381eaf20
+		PS C:\Users\USER> docker ps
+			CONTAINER ID   IMAGE       COMMAND                  CREATED       STATUS       PORTS                  NAMES
+			4621a3761838   wordpress   "docker-entrypoint.s…"   2 hours ago   Up 2 hours   0.0.0.0:8080->80/tcp   nostalgic_sutherland
+		PS C:\Users\USER> docker ps -a
+			CONTAINER ID   IMAGE          COMMAND                  CREATED        STATUS                     PORTS                    NAMES
+			4621a3761838   wordpress      "docker-entrypoint.s…"   2 hours ago    Up 2 hours                 0.0.0.0:8080->80/tcp     nostalgic_sutherland
+			3150381eaf20   mysql:5.7      "docker-entrypoint.s…"   5 hours ago    Exited (0) 3 minutes ago                            mysql
+			1e45278bfb0c   redis          "docker-entrypoint.s…"   22 hours ago   Exited (255) 7 hours ago   0.0.0.0:1234->6379/tcp   elated_sanderson
+			0adb026d197b   ubuntu:16.04   "/bin/bash"              23 hours ago   Exited (0) 23 hours ago                             flamboyant_galileo
+			3c415425b27e   my-java-app    "java HelloJava"         6 days ago     Exited (0) 2 days ago                               compassionate_roentgen
+		=================================================================================================================
+		
+		도커ID의 전체길이는 64자리이지만 명령어의 인자로 전달할때는 전부다 입력하지 않아도 됨
+		앞부분이 겹치지 않는다면 1-2 자만 입력해도 됨
+
+
+	- docker rm [OPTIONS] CONTAINER [CONTAINER...]
+		컨테이너 제거
+		my-java-app 컨테이너를 삭제해봄
+		=================================================================================================================
+		PS C:\Users\USER> docker ps -a
+			CONTAINER ID   IMAGE          COMMAND                  CREATED        STATUS                     PORTS                    NAMES
+			4621a3761838   wordpress      "docker-entrypoint.s…"   2 hours ago    Up 2 hours                 0.0.0.0:8080->80/tcp     nostalgic_sutherland
+			3150381eaf20   mysql:5.7      "docker-entrypoint.s…"   5 hours ago    Exited (0) 9 minutes ago                            mysql
+			1e45278bfb0c   redis          "docker-entrypoint.s…"   23 hours ago   Exited (255) 7 hours ago   0.0.0.0:1234->6379/tcp   elated_sanderson
+			0adb026d197b   ubuntu:16.04   "/bin/bash"              23 hours ago   Exited (0) 23 hours ago                             flamboyant_galileo
+			3c415425b27e   my-java-app    "java HelloJava"         6 days ago     Exited (0) 3 days ago                               compassionate_roentgen
+		PS C:\Users\USER> docker rm 3c415425b27e
+			3c415425b27e
+		PS C:\Users\USER> docker ps -a
+			CONTAINER ID   IMAGE          COMMAND                  CREATED        STATUS                     PORTS                    NAMES
+			4621a3761838   wordpress      "docker-entrypoint.s…"   2 hours ago    Up 2 hours                 0.0.0.0:8080->80/tcp     nostalgic_sutherland
+			3150381eaf20   mysql:5.7      "docker-entrypoint.s…"   5 hours ago    Exited (0) 9 minutes ago                            mysql
+			1e45278bfb0c   redis          "docker-entrypoint.s…"   23 hours ago   Exited (255) 7 hours ago   0.0.0.0:1234->6379/tcp   elated_sanderson
+			0adb026d197b   ubuntu:16.04   "/bin/bash"              23 hours ago   Exited (0) 23 hours ago                             flamboyant_galileo
+		PS C:\Users\USER>
+		=================================================================================================================
+
+		
+		아래의 명령어 입력 시 중지된 컨테이너를 전부다 삭제함
+			docker rm -v $(docker ps -a -q -f status=exited)
+		
+
+	- docker images [OPTIONS] [REPOSITORY[:TAG]]
+		이미지 목록 확인하기(images)
+		=================================================================================================================
+		PS C:\Users\USER> docker images
+			REPOSITORY    TAG       IMAGE ID       CREATED         SIZE
+			mysql         5.7       3147495b3a5c   32 hours ago    431MB
+			my-java-app   latest    833373d41927   6 days ago      10.8GB
+			nginx         latest    670dcc86b69d   8 days ago      142MB
+			redis         latest    3edbb69f9a49   9 days ago      117MB
+			wordpress     latest    826140609178   2 weeks ago     609MB
+			ubuntu        16.04     b6f507652425   11 months ago   135MB
+		=================================================================================================================
+
+
+	- docker pull [OPTIONS] NAME[:TAG|@DIGEST]
+		이미지 다운로드 하기
+		run 명령어 사용시 이미지가 없을 떄 자동으로 다운받긴 받아서 pull 을 언제 사용하나 싶은데
+		pull 은 최신버전을 다시 다운받을 떄 사용함
+		=================================================================================================================
+		PS C:\Users\USER> docker pull ubuntu:14.04
+			14.04: Pulling from library/ubuntu
+			2e6e20c8e2e6: Pull complete
+			0551a797c01d: Pull complete
+			512123a864da: Pull complete
+			Digest: sha256:96a36dd3bcd8f149fa9874c4e28c35c01f715b3e5f8f1a8e06b45887619bf43b
+			Status: Downloaded newer image for ubuntu:14.04
+			docker.io/library/ubuntu:14.04
+		=================================================================================================================
+
+	- docker rmi [OPTIONS] IMAGE [IMAGE...]
+		이미지 삭제하기
+		컨테이너가 실행중인 이미지는 삭제 할 수 없음
+		ubuntu 14.04 삭제 진행을 해봤음
+		=================================================================================================================
+		PS C:\Users\USER> docker images
+			REPOSITORY    TAG       IMAGE ID       CREATED         SIZE
+			mysql         5.7       3147495b3a5c   32 hours ago    431MB
+			my-java-app   latest    833373d41927   6 days ago      10.8GB
+			nginx         latest    670dcc86b69d   8 days ago      142MB
+			redis         latest    3edbb69f9a49   9 days ago      117MB
+			wordpress     latest    826140609178   2 weeks ago     609MB
+			ubuntu        16.04     b6f507652425   11 months ago   135MB
+			ubuntu        14.04     13b66b487594   16 months ago   197MB
+		PS C:\Users\USER> docker rmi 13b66b487594
+			Untagged: ubuntu:14.04
+			Untagged: ubuntu@sha256:96a36dd3bcd8f149fa9874c4e28c35c01f715b3e5f8f1a8e06b45887619bf43b
+			Deleted: sha256:13b66b487594a1f2b75396013bc05d29d9f527852d96c5577cc4f187559875d0
+			Deleted: sha256:e08f4f554d8df6b04f441fcdfe207b6314d3c709daa2b1ef66f79bbfb529b8c4
+			Deleted: sha256:c28d0c854fd56736ef4456e3c1c4276a28159751dc13fd1b340bd38d69473f7e
+			Deleted: sha256:f2fa9f4cf8fd0a521d40e34492b522cee3f35004047e617c75fadeb8bfd1e6b7
+		PS C:\Users\USER> docker images
+			REPOSITORY    TAG       IMAGE ID       CREATED         SIZE
+			mysql         5.7       3147495b3a5c   32 hours ago    431MB
+			my-java-app   latest    833373d41927   6 days ago      10.8GB
+			nginx         latest    670dcc86b69d   8 days ago      142MB
+			redis         latest    3edbb69f9a49   9 days ago      117MB
+			wordpress     latest    826140609178   2 weeks ago     609MB
+			ubuntu        16.04     b6f507652425   11 months ago   135MB
+		PS C:\Users\USER>
+		=================================================================================================================
+
+		이미지는 여러개의 레이어로 구성되어 있기 때문에 모든 레이어가 삭제 됨
+	
+	- docker logs [OPTIONS] CONTAINER
+		컨테이너 로그 보기
+		=================================================================================================================
+		PS C:\Users\USER> docker ps -a
+			CONTAINER ID   IMAGE          COMMAND                  CREATED        STATUS                      PORTS                    NAMES
+			4621a3761838   wordpress      "docker-entrypoint.s…"   2 hours ago    Up 2 hours                  0.0.0.0:8080->80/tcp     nostalgic_sutherland
+			3150381eaf20   mysql:5.7      "docker-entrypoint.s…"   6 hours ago    Exited (0) 26 minutes ago                            mysql
+			1e45278bfb0c   redis          "docker-entrypoint.s…"   23 hours ago   Exited (255) 8 hours ago    0.0.0.0:1234->6379/tcp   elated_sanderson
+			0adb026d197b   ubuntu:16.04   "/bin/bash"              23 hours ago   Exited (0) 23 hours ago                              flamboyant_galileo
+		PS C:\Users\USER> docker logs 3150381eaf20
+			2022-07-28 01:58:05+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 5.7.39-1.el7 started.
+			2022-07-28 01:58:05+00:00 [Note] [Entrypoint]: Switching to dedicated user 'mysql'
+			2022-07-28 01:58:05+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 5.7.39-1.el7 started.
+			2022-07-28 01:58:05+00:00 [Note] [Entrypoint]: Initializing database files
+			...............중략.............
+		=================================================================================================================
+
+
+		옵션으로는 -f  , --tail 이 있음
+		-f 는 실시간으로 로그가 적제되는것을 확인
+
+
+
+		--tail [라인수] 는 기재한 라인수만큼 마지막에서 부터 출력
+			ex) docker logs 3150381eaf20 --tail 20 
+			위와 같이 입력하면 mysql 컨테이너의 마지막 로그 20줄만 출력
+			=================================================================================================================
+			PS C:\Users\USER> docker logs 3150381eaf20 --tail 20
+			2022-07-28T07:15:17.340393Z 0 [Note] Shutting down plugin 'INNODB_CMPMEM'
+			2022-07-28T07:15:17.340396Z 0 [Note] Shutting down plugin 'INNODB_CMP_RESET'
+			2022-07-28T07:15:17.340398Z 0 [Note] Shutting down plugin 'INNODB_CMP'
+			2022-07-28T07:15:17.340401Z 0 [Note] Shutting down plugin 'INNODB_LOCK_WAITS'
+			2022-07-28T07:15:17.340403Z 0 [Note] Shutting down plugin 'INNODB_LOCKS'
+			2022-07-28T07:15:17.340406Z 0 [Note] Shutting down plugin 'INNODB_TRX'
+			2022-07-28T07:15:17.340409Z 0 [Note] Shutting down plugin 'InnoDB'
+			2022-07-28T07:15:17.340499Z 0 [Note] InnoDB: FTS optimize thread exiting.
+			2022-07-28T07:15:17.340632Z 0 [Note] InnoDB: Starting shutdown...
+			2022-07-28T07:15:17.441000Z 0 [Note] InnoDB: Dumping buffer pool(s) to /var/lib/mysql/ib_buffer_pool
+			2022-07-28T07:15:17.441643Z 0 [Note] InnoDB: Buffer pool(s) dump completed at 220728  7:15:17
+			2022-07-28T07:15:18.679419Z 0 [Note] InnoDB: Shutdown completed; log sequence number 14012002
+			2022-07-28T07:15:18.680704Z 0 [Note] InnoDB: Removed temporary tablespace data file: "ibtmp1"
+			2022-07-28T07:15:18.680734Z 0 [Note] Shutting down plugin 'MEMORY'
+			2022-07-28T07:15:18.680739Z 0 [Note] Shutting down plugin 'CSV'
+			2022-07-28T07:15:18.680743Z 0 [Note] Shutting down plugin 'sha256_password'
+			2022-07-28T07:15:18.680744Z 0 [Note] Shutting down plugin 'mysql_native_password'
+			2022-07-28T07:15:18.680850Z 0 [Note] Shutting down plugin 'binlog'
+			2022-07-28T07:15:18.681395Z 0 [Note] mysqld: Shutdown complete
+
+			PS C:\Users\USER>
+
+			=================================================================================================================
+
+
+
+		- docker exec [OPTIONS] CONTAINER COMMAND [ARG...]
+			컨테이너 명령어 실행하기
+			run 명령어와의 차이점은 run은 새로 컨테이너를 만들어서 실행하고
+			exec는 실행중인 컨테이너에 명령을 내리는 용도
+			키보드입력을 위해 -it 옵션을 추가하였으며, bash로 들어와서 명령어 사용이 가능함
+			=================================================================================================================
+			PS C:\Users\USER> docker exec -it mysql /bin/bash
+				bash-4.2#
+			=================================================================================================================
+
+
+		- 컨테이너 업데이트
+			새 버전의 이미지를 다운(pull)
+			-> 기존 컨테이너를 중지(stop)
+			-> 기존 컨테이너를 삭제(rm)
+			-> 새 이미지 기반으로 컨테이너 실행 (run) 
+
+		- Docker Compose
+			컨테이너 조합이 많아지고 여러가지 설정이 초가되면 명령어가 복잡해짐
+			도커는 복잡한 설정을 쉽게 관리하기위에 YAML 방식의 설정파일을 이용한 Docker Compose 라는 툴을 제공함
+			기본적으로는 설치가 되어 있어서 추가로 설치하지 않았음
+			아래의 명령어는 설치 확인
+			=================================================================================================================
+			PS C:\Users\USER> docker-compose version
+				Docker Compose version v2.6.1
+			=================================================================================================================
+
+			
+			※ 윈도우여서 파일생성 후 수정이 CMD 로는 힘들어서 직접 경로에 생성하고 실행하기로 함
+
+			
+			워드프레스 생성 YAML 파일
+			경로 : C:\Users\USER\docker_test
+			파일명 : docker-compose.yml
+			=================================================================================================================
+			version: '2'
+
+			services:
+			   db:
+				 image: mysql:5.7
+				 volumes:
+				   - db_data:/var/lib/mysql
+				 restart: always
+				 environment:
+				   MYSQL_ROOT_PASSWORD: wordpress
+				   MYSQL_DATABASE: wordpress
+				   MYSQL_USER: wordpress
+				   MYSQL_PASSWORD: wordpress
+
+			   wordpress:
+				 depends_on:
+				   - db
+				 image: wordpress:latest
+				 volumes:
+				   - wp_data:/var/www/html
+				 ports:
+				   - "8000:80"
+				 restart: always
+				 environment:
+				   WORDPRESS_DB_HOST: db:3306
+				   WORDPRESS_DB_PASSWORD: wordpress
+			volumes:
+				db_data:
+				wp_data:
+			=================================================================================================================
+
+			실행
+			=================================================================================================================
+			docker-compose up
+			=================================================================================================================
+			※ 리눅스 기반으로 작성되어있어서 실행이 안됨, 추후 윈도우 기반으로 변경해야 함
+			
