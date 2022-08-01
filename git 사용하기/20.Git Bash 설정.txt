@@ -109,3 +109,9 @@
 		$ git branch -m	master main
 	
 	$ git push origin :master
+
+
+# 깃 계정 안물어 보게 하기
+
+	git config credential.helper store
+	git config credential.helper store --global

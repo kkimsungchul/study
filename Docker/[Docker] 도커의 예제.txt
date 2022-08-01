@@ -199,12 +199,13 @@
 
 
 		//사용자 권한까지 부여
-		grant all privileges on *.* to '사용자'@'localhost';
+		grant all privileges on *.* to 'sungchul'@'localhost';
 		flush privileges;
 		
 		//외부 접속 가능하게 변경
-		UPDATE mysql.user SET Host='%' WHERE Host='localhost' AND User='username';
+		UPDATE mysql.user SET Host='%' WHERE Host='localhost' AND User='sungchul';
 		FLUSH PRIVILEGES;
+		
 
 		quit
 		=================================================================================================================

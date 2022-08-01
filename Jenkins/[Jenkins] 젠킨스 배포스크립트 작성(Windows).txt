@@ -110,3 +110,18 @@
 		C:/ProgramData/Jenkins/.jenkins/workspace/JenkinsTest/gitTest/build/libs
 	
 	
+
+	※ 오류가 날수 있는 부분에 대해서는 catchError로 감싸주면 된다
+		https://de-vraag.com/ko/66222675
+		ex)
+			======================================================================================================
+			stage('docker_delete') {
+				steps {
+					catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+						bat """
+						docker rmi stock
+						"""
+					}	
+				}
+			}
+			======================================================================================================

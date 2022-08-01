@@ -46,6 +46,16 @@
 		id : kimsc
 		pw : admin
 
+		※ 오류발생
+			WslRegisterDistribution failed with error: 0xc03a001a
+
+			https://goaloflife.tistory.com/193
+			
+			아래의 경로에 가서 해당 파일을 우클릭 후 고급설정에서 "내용을 압축하여 디스크 공간 절약" 체크해재
+			경로 : C:\Users\sung\AppData\Local\Packages
+			파일명 : CanonicalGroupLimited.Ubuntu_79rhkp1fndgsc
+
+
 	8. Windows PowerShell 에서 설치된 리눅스 확인
 		wsl -l -v
 

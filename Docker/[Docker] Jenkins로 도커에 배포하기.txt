@@ -1,0 +1,98 @@
+[ Docker - Jenkins 로 도커에 배포하기 ] 
+
+# dockerfile
+	======================================================================================================
+	FROM openjdk:8-jdk-alpine
+	ARG JAR_FILE=stock-0.0.1-SNAPSHOT.jar
+	COPY ${JAR_FILE} myboot.jar
+	ENTRYPOINT ["java","-jar","/myboot.jar"]
+
+	======================================================================================================
+
+
+# pipeline script
+	
+	Checkout : git에서 소스를 내려받음
+	build : 내려받은 소스를 빌드함
+	jar_move : 빌드한 jar 파일을 상위 디렉토리로 이동
+	docker_stop : 실행중인 컨테이너를 중지
+	docker_delete : 도커 이미지 파일 삭제
+	docker_build : 도커 이미지 빌드
+	images_check : 도커 이미지 생성 확인
+	docker_run : 컨테이너 실행
+		※ 컨테이너 실행 시 -it 명령어 사용하면 오류가 발생하므로 -i 만 사용
+	======================================================================================================
+	pipeline {
+		agent any
+
+		stages {
+			stage('Checkout') {
+				steps {
+					git credentialsId: 'kimsc1218', url: 'https://github.com/kkimsungchul/stock.git', branch: 'master'
+				}
+			}	
+			stage('build') {
+				steps {
+					bat './gradlew.bat clean build'
+				}
+			}
+			stage('jar_move') {
+				steps {
+
+					bat """
+					cd build/libs 
+					move stock-0.0.1-SNAPSHOT.jar ..
+					cd ..
+					move stock-0.0.1-SNAPSHOT.jar ..
+					"""
+					
+				}
+			}
+			stage('docker_stop') {
+				steps {
+					catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+
+						bat """
+						docker stop test
+						"""
+					}					
+				}
+			}
+			stage('docker_delete') {
+				steps {
+					catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+						bat """
+						docker rmi stock
+						"""
+					}	
+				}
+			}
+			stage('docker_build') {
+				steps {
+					bat """
+					docker build -t stock .
+					"""
+					
+				}
+			}
+			stage('images_check') {
+				steps {
+					bat """
+					docker images
+					"""
+					
+				}
+			}	
+			stage('docker_run') {
+				steps {
+					bat """
+					docker run --rm -i -d -p 9090:80 --name test stock
+					"""
+					
+				}
+			}				
+			
+		}
+	}
+	======================================================================================================
+

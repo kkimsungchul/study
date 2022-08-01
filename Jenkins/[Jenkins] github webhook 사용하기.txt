@@ -1,0 +1,99 @@
+[ Jenkins - github webhook 사용하기 ]
+
+
+
+# jenkins 아이템 생성
+	jenkins 아이템을 생성하여서 웹훅을 받을수 있게 설정
+
+	1. GitHub hook trigger for GITScm polling 옵션 체크
+	2. 배포 스크립트 작성
+
+	* pipeline 스크립트
+	======================================================================================================
+	pipeline {
+		agent any
+
+		stages {
+			stage('Checkout') {
+				steps {
+					git credentialsId: 'kimsc1218', url: 'https://github.com/kkimsungchul/stock.git', branch: 'master'
+				}
+			}	
+			stage('build') {
+				steps {
+					bat './gradlew.bat clean build'
+				}
+			}
+			stage('jar_move') {
+				steps {
+
+					bat """
+					cd build/libs 
+					move stock-0.0.1-SNAPSHOT.jar ..
+					cd ..
+					move stock-0.0.1-SNAPSHOT.jar ..
+					"""
+					
+				}
+			}
+			stage('docker_stop') {
+				steps {
+					catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+
+						bat """
+						docker stop test
+						"""
+					}					
+				}
+			}
+			stage('docker_delete') {
+				steps {
+					catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+						bat """
+						docker rmi stock
+						"""
+					}	
+				}
+			}
+			stage('docker_build') {
+				steps {
+					bat """
+					docker build -t stock .
+					"""
+					
+				}
+			}
+			stage('images_check') {
+				steps {
+					bat """
+					docker images
+					"""
+					
+				}
+			}	
+			stage('docker_run') {
+				steps {
+					bat """
+					docker run --rm -i -d -p 9090:80 --name test stock
+					"""
+					
+				}
+			}				
+			
+		}
+	}
+
+
+	======================================================================================================
+
+# github 에서 webhook 설정
+	1. 웹훅을 설정할 github저장소에 들어감
+	2. Settings 클릭
+	3. webhooks 클릭
+	4. Payload URL 입력
+		jenkins 서버의 URL과 뒤에는 /github-webhook/ 를 붙여서 입력하면됨
+		http://sungchul.xxx:7070/github-webhook/
+
+	5. push 를 하면 원격으로 빌드가 됨
+
+	
