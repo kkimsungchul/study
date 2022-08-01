@@ -82,11 +82,20 @@
 					"""
 					
 				}
-			}	
+			}
+			stage('create_docker_network') {
+				steps {
+					catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+						bat """
+						docker network create springboot-mysql-net
+						"""
+					}	
+				}
+			}			
 			stage('docker_run') {
 				steps {
 					bat """
-					docker run --rm -i -d -p 9090:80 --name test stock
+					docker run --rm -i -d -p 9090:80 --network springboot-mysql-net --link mysql:mysql --name test stock
 					"""
 					
 				}
