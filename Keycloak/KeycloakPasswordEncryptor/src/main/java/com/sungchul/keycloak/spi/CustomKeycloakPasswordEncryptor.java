@@ -4,27 +4,29 @@ import com.sungchul.keycloak.spi.helper.EncryptionHelper;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
 import org.keycloak.authentication.Authenticator;
-import org.keycloak.models.KeycloakSession;
-import org.keycloak.models.RealmModel;
-import org.keycloak.models.UserCredentialModel;
-import org.keycloak.models.UserModel;
+import org.keycloak.models.*;
 import org.keycloak.models.credential.PasswordUserCredentialModel;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.Map;
 
 public class CustomKeycloakPasswordEncryptor implements Authenticator {
 
     public void authenticate(AuthenticationFlowContext authenticationFlowContext) {
+        String remoteIPAddress = authenticationFlowContext.getConnection().getRemoteAddr();
+        String getRemoteHost = authenticationFlowContext.getConnection().getRemoteHost();
+        String getLocalAddr = authenticationFlowContext.getConnection().getRemoteAddr();
 
-        //IP 테스트 작성 시작
-        if(null!=authenticationFlowContext.getHttpRequest().getFormParameters().getFirst("userip")){
-            String userip = authenticationFlowContext.getHttpRequest().getFormParameters().getFirst("userip").trim();
-            System.out.println("##### userip ");
-            System.out.println(userip);
-            System.out.println("###############");
-        }
-        //테스트작성 종료
+
+        //String allowedIPAddress = getAllowedIPAddress(authenticationFlowContext);
+        System.out.println("##############################");
+        System.out.println("### remoteIPAddress : " + remoteIPAddress);
+        System.out.println("### getRemoteHost : " + getRemoteHost);
+        System.out.println("### getLocalAddr : " + getLocalAddr);
+//        getAllowedIPAddress(authenticationFlowContext);
+        System.out.println("##############################");
 
 
 
@@ -123,6 +125,15 @@ public class CustomKeycloakPasswordEncryptor implements Authenticator {
     }
 
     public void close() {
+
+    }
+
+    private void getAllowedIPAddress(AuthenticationFlowContext context) {
+        AuthenticatorConfigModel configModel = context.getAuthenticatorConfig();
+        Map<String, String> config = configModel.getConfig();
+        config.forEach((strKey, strValue)->{
+            System.out.println( "### " + strKey +" :"+ strValue );
+        });
 
     }
 }
