@@ -1,6 +1,12 @@
 [ Docker - Jenkins 로 도커에 배포하기 ] 
+	Jenkins와 도커가 설치되어 있다면 아래의 스크립트로 바로 컨테이너 환경을 구성할수 있음
+	git credentialsId 부분만 설정해주면 됨
 
 # dockerfile
+	해당 도커파일은 배포하려는 project 에 포함되어있어야 함
+	
+	경로 : https://github.com/kkimsungchul/stock/blob/master/Dockerfile
+	
 	======================================================================================================
 	FROM openjdk:8-jdk-alpine
 	ARG JAR_FILE=stock-0.0.1-SNAPSHOT.jar
@@ -12,15 +18,21 @@
 
 # pipeline script
 	
-	Checkout : git에서 소스를 내려받음
-	build : 내려받은 소스를 빌드함
-	jar_move : 빌드한 jar 파일을 상위 디렉토리로 이동
-	docker_stop : 실행중인 컨테이너를 중지
-	docker_delete : 도커 이미지 파일 삭제
-	docker_build : 도커 이미지 빌드
-	images_check : 도커 이미지 생성 확인
-	docker_run : 컨테이너 실행
-		※ 컨테이너 실행 시 -it 명령어 사용하면 오류가 발생하므로 -i 만 사용
+	- stages 설명
+		Checkout : git에서 소스를 내려받음
+		build : 내려받은 소스를 빌드함
+		jar_move : 빌드한 jar 파일을 상위 디렉토리로 이동
+		docker_stop : 실행중인 컨테이너를 중지
+		docker_delete : 도커 이미지 파일 삭제
+		docker_build : 도커 이미지 빌드
+		images_check : 도커 이미지 생성 확인
+		docker_run : 컨테이너 실행
+			※ 컨테이너 실행 시 -it 명령어 사용하면 오류가 발생하므로 -i 만 사용
+	
+	- catchError 설명
+		steps 을 진행하다가 오류가 발생하면, 젠킨스의 파이프라인 스크립트는 그뒤로 실행을 하지 않음
+		catchError를 넣으면 오류가 발생할 경우 stage에는 FAILURE로 표시하고서 그 다음단계를 진행함
+
 	======================================================================================================
 	pipeline {
 		agent any
