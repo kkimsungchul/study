@@ -4,6 +4,10 @@
 		
 
 # 도커 네트워크 만들기
+	네트워크 참고 링크 : 
+		https://github.com/kkimsungchul/study/blob/master/Docker/%5BDocker%5D%20%EB%8F%84%EC%BB%A4%20%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC%20%EB%A7%8C%EB%93%A4%EA%B8%B0.txt
+		해당 링크를 확인해보면 도커 네트워크에 대해 설명이 나와있음
+
 	여러개의 컨테이너를 같은 환경에서 띄울수 있게 해줌
 	======================================================================================================
 	docker network create springboot-mysql-net
@@ -51,7 +55,7 @@
 	======================================================================================================
 
 # Mysql 컨테이너 실행
-	참고링크 : https://github.com/kkimsungchul/study/blob/master/Docker/%5BDocker%5D%20%EB%8F%84%EC%BB%A4%EC%9D%98%20%EC%98%88%EC%A0%9C.txt
+	컨테이너 실행 참고링크 : https://github.com/kkimsungchul/study/blob/master/Docker/%5BDocker%5D%20%EB%8F%84%EC%BB%A4%EC%9D%98%20%EC%98%88%EC%A0%9C.txt
 		해당 링크에서 mysql 실행하는부분을 보면 옵션에 대해 설명이 있음
 
 		여기에서는 --network springboot-mysql-net 부분을 추가해서 실행
