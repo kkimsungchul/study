@@ -1,0 +1,185 @@
+[ Docker - 스프링과 Mysql 연결하기 ]
+	참고 링크 : 
+		https://velog.io/@dhk22/Springboot-MySQL-Docker-%EB%8F%84%EC%BB%A4%EB%A5%BC-%EC%9D%B4%EC%9A%A9%ED%95%9C-%EC%BB%A8%ED%85%8C%EC%9D%B4%EB%84%88-%ED%99%98%EA%B2%BD-%EA%B5%AC%EC%84%B1
+		
+
+# 도커 네트워크 만들기
+	여러개의 컨테이너를 같은 환경에서 띄울수 있게 해줌
+	======================================================================================================
+	docker network create springboot-mysql-net
+	======================================================================================================
+	
+
+# 도커 네트워크 환경 확인하기
+
+	======================================================================================================
+	docker network inspect springboot-mysql-net
+	======================================================================================================
+	
+	컨테이너를 실행중이라면 Containers 에 실행중인 컨테이너 데이터가 보임
+	======================================================================================================
+	[
+		{
+			"Name": "springboot-mysql-net",
+			"Id": "5b01e3506555a35263f1e1254b84931127e7bfc30331aca988e39895bb528a30",
+			"Created": "2022-08-01T14:17:53.1567865Z",
+			"Scope": "local",
+			"Driver": "bridge",
+			"EnableIPv6": false,
+			"IPAM": {
+				"Driver": "default",
+				"Options": {},
+				"Config": [
+					{
+						"Subnet": "172.18.0.0/16",
+						"Gateway": "172.18.0.1"
+					}
+				]
+			},
+			"Internal": false,
+			"Attachable": false,
+			"Ingress": false,
+			"ConfigFrom": {
+				"Network": ""
+			},
+			"ConfigOnly": false,
+			"Containers": {},
+			"Options": {},
+			"Labels": {}
+		}
+	]
+	======================================================================================================
+
+# Mysql 컨테이너 실행
+	참고링크 : https://github.com/kkimsungchul/study/blob/master/Docker/%5BDocker%5D%20%EB%8F%84%EC%BB%A4%EC%9D%98%20%EC%98%88%EC%A0%9C.txt
+		해당 링크에서 mysql 실행하는부분을 보면 옵션에 대해 설명이 있음
+
+		여기에서는 --network springboot-mysql-net 부분을 추가해서 실행
+	======================================================================================================
+	docker run -d -p 3306:3306 --network springboot-mysql-net -e MYSQL_ALLOW_EMPTY_PASSWORD=true --name mysql  mysql:5.7
+	======================================================================================================
+
+
+# 스프링 컨테이너 실행
+
+	======================================================================================================
+	docker run --rm -i -d -p 9090:80 --network springboot-mysql-net --link mysql:mysql --name test stock
+	======================================================================================================
+
+# 도커 네트워크 확인
+	======================================================================================================
+	docker network inspect springboot-mysql-net
+	======================================================================================================
+	
+	======================================================================================================
+	[
+		{
+			"Name": "springboot-mysql-net",
+			"Id": "5b01e3506555a35263f1e1254b84931127e7bfc30331aca988e39895bb528a30",
+			"Created": "2022-08-01T14:17:53.1567865Z",
+			"Scope": "local",
+			"Driver": "bridge",
+			"EnableIPv6": false,
+			"IPAM": {
+				"Driver": "default",
+				"Options": {},
+				"Config": [
+					{
+						"Subnet": "172.18.0.0/16",
+						"Gateway": "172.18.0.1"
+					}
+				]
+			},
+			"Internal": false,
+			"Attachable": false,
+			"Ingress": false,
+			"ConfigFrom": {
+				"Network": ""
+			},
+			"ConfigOnly": false,
+			"Containers": {
+				"144ebf25dd0a2e53ee8f9fa150f476016a5f459b9aee1c1c7468811bce97d813": {
+					"Name": "mysql",
+					"EndpointID": "91eb39ba516e2beac27d744f7c1ad71a11958600946f56648d4a4daf8124fa88",
+					"MacAddress": "02:42:ac:12:00:02",
+					"IPv4Address": "172.18.0.2/16",
+					"IPv6Address": ""
+				},
+				"a2788a72705ad69ea904bacccc44fa92dbd94cd333d4b79dc6baafefe313882a": {
+					"Name": "test",
+					"EndpointID": "3488d30431007be1615bbc657950fa6dbb55a71be83be04d4c77156d5cde9430",
+					"MacAddress": "02:42:ac:12:00:03",
+					"IPv4Address": "172.18.0.3/16",
+					"IPv6Address": ""
+				}
+			},
+			"Options": {},
+			"Labels": {}
+		}
+	]
+	======================================================================================================
+
+
+# 스웨거에서 DB에 접속하여 데이터를 가져오는지 확인
+	아래 정보의 메소드 실행
+	URL : http://localhost:9090/swagger-ui.html#/jwt-authentication-controller
+	method : /authenticate
+	======================================================================================================
+	{
+	"jwt": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTY2MDA2NjkxMSwiaWF0IjoxNjYwMDQ4OTExfQ.xnnimfjegx_7w748VWvoiNxvuAANP_8Lpvv0Jgjrc76nKiqlBblkjrOc7VV1J_OtZPVAubM5ZhmUdDt1dn5g1A"
+	}
+	======================================================================================================
+	
+
+# 오류 발생
+
+	- 아래와 같은 오류들이 발생했었음
+		1. Could not create connection to database server. Attempted reconnect 3 times. Giving up.
+
+		2. The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+
+	- 해결 방안
+		DB의 연결하는 설정부분에 IP 를 컨테이너에서 지어준 별칭으로 변경,
+		또는 docker network inspect springboot-mysql-net 명령어를 통해 mysql 의 IP를 넣어주면 됨
+
+		application.yml 파일의 기존 mysql 연결 부분
+		======================================================================================================
+		url: jdbc:log4jdbc:mysql://127.0.0.1:3306/stock?serverTimezone=UTC&characterEncoding=UTF-8
+		======================================================================================================
+
+		수정된 mysql 연결 부분
+		======================================================================================================
+		url: jdbc:log4jdbc:mysql://mysql:3306/stock?serverTimezone=UTC&characterEncoding=UTF-8
+		======================================================================================================
+
+
+
+
+	- 오류 해결 방안 1 (적용X)
+		계속 DB연결이 안되었었으며, 내 로컬PC에서는 127.0.0.1:3306 으로 접속이 잘 됐었음
+		그래서 이것저것 찾아보니.. DB설정을 바꿔야 된다 어쩐다 하는 내용들이 있었음
+		나는 아래와 상관없었지만,, 결국 오류였긴 해서 적어놓긴함
+	
+			https://engineering-skcc.github.io/cloud/tomcat/apache/performancetest/MySqlDBWaitTimeOut/
+			https://velog.io/@wngud4950/Mysql-Exception-Communications-link-failure
+
+		DB에서 아래의 명령어로 타임아웃 확인
+		======================================================================================================
+		show variables like '%timeout';
+		======================================================================================================
+		
+		아래의 명령어로 DB의 타임아웃 변경
+		======================================================================================================
+		set global interactive_timeout = 60;
+		set global wait_timeout = 60;
+		set session interactive_timeout = 60;
+		set session wait_timeout = 60;
+		======================================================================================================
+
+	- 오류 해결 방안 2 (적용X)
+		도커에서 실행할 경우 아래의 옵션이 없으면 오류가 발생할수 있다고 함.
+			https://breakcoding.tistory.com/392
+		DB 연결부분에 useSSL=false ,autoReconnect=true 옵션을 추가
+		======================================================================================================
+		url: jdbc:log4jdbc:mysql://127.0.0.1:3306/stock?serverTimezone=UTC&characterEncoding=UTF-8&useSSL=false&autoReconnect=true
+		======================================================================================================
