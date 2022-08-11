@@ -33,6 +33,9 @@ public class LoginEventListenerProvider implements EventListenerProvider {
 
     @Override
     public void onEvent(Event event){
+
+        System.out.println("### event.getid : " +event.getIpAddress());
+
         if(EventType.LOGIN_ERROR == event.getType()){
 
 
@@ -48,7 +51,6 @@ public class LoginEventListenerProvider implements EventListenerProvider {
 
             try{
                 user = this.session.users().getUserById(realmModel, event.getUserId());
-
                 /*
                  * 사용자가 여러차례 로그인 실패로 인해 임시로 disable된 상태가 되면 통계 수집용 Rest API을 호출
                  */
@@ -66,6 +68,7 @@ public class LoginEventListenerProvider implements EventListenerProvider {
         }else if(EventType.LOGIN == event.getType()){
             log.info("-----------------------------------------------------------");
             log.info("## LOGIN EVENT");
+
             event.getDetails().forEach((key, value) -> System.out.println("### " + key + ": " + value));
 
             RealmModel realmModel = this.model.getRealm(event.getRealmId());
@@ -73,21 +76,23 @@ public class LoginEventListenerProvider implements EventListenerProvider {
             UserModel user = this.session.users().getUserById(realmModel, event.getUserId());
 
 
-            user.setSingleAttribute("test1","zzzzzz");
 
             /*
              * 중복 로그인 세션을 제거하고 마지막 로그인을 시도한 세션 하나만 유지
              */
 //            InMemoryUserAdapter userInMemory = new InMemoryUserAdapter(this.session, realmModel, event.getUserId());
 
-            this.session.sessions().getUserSessionsStream(realmModel, user).forEach(userSession ->
-            {
+            System.out.println("### this.session.sessions().getUserSessionsStream(realmModel, user) : " + this.session.sessions().getUserSessionsStream(realmModel, user).count());
+
+            this.session.sessions().getUserSessionsStream(realmModel, user).forEach(userSession ->{
                 // remove all existing user sessions but the current one (last one wins)
                 // this is HIGHLANDER MODE - there must only be one!
-                if(!userSession.getId().equals(event.getSessionId()))
-                {
+                if(!userSession.getId().equals(event.getSessionId())){
+                    this.session.sessions().removeUserSession(realmModel, userSession);
+                }else{
                     this.session.sessions().removeUserSession(realmModel, userSession);
                 }
+
             });
             log.info("-----------------------------------------------------------");
         }
