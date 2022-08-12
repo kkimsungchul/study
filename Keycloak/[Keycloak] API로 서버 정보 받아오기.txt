@@ -1,0 +1,39 @@
+[ Keycloak - API 로 서버정보 받아오기 ]
+
+
+	API로 키클락에서 사용하는 메모리의 정보를 확인해야 했음
+
+# 호출 정보
+	URL : http://localhost:8080/auth/admin/serverinfo
+	method : get
+	Authorization : Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJOUkd5em4tN3RZZU9Rc05pZ3VUVUJfTEc4TV9nVmI3ZG9kSlJTOFZIem5RIn0.eyJleHAiOjE2NjAxMTUxMjEsImlhdCI6MTY2MDExMTUyMSwiYXV0aF90aW1lIjoxNjYwMTExMTg1LCJqdGkiOiIzOWJkMjI4NC1jM2JiLTRkYzktODUxNS05YWNiMDExOGEyYTMiLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvYXV0aC9yZWFsbXMvbWFzdGVyIiwic3ViIjoiNWM4ZjViMjUtMzdiMi00ZDU0LThlY2YtMDkxZTIxMzZhODVjIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoic2VjdXJpdHktYWRtaW4tY29uc29sZSIsIm5vbmNlIjoiODBkMTc2NjgtYjg4Zi00MjZlLTk2NGEtNmQzNDlhZjgxYjc1Iiwic2Vzc2lvbl9zdGF0ZSI6Ijk4ZjNiODIwLTc5MDUtNDkyNS1hZGIzLTRlZmE1NjBlNTZiNyIsImFjciI6IjAiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwIl0sInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwiLCJzaWQiOiI5OGYzYjgyMC03OTA1LTQ5MjUtYWRiMy00ZWZhNTYwZTU2YjciLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsInByZWZlcnJlZF91c2VybmFtZSI6ImtpbXNjMTIxOCJ9.ouFhfNcAxG29igKYyhVjhuifL-MY3xZKpErR-s3k1AidjUTqbbhca1ERqUZRgZCFzjI3qqUI0RwIFNoIhiNsMl27RQJomSIGYUlaKgYozXTmnkCxqCfweaYosNfmOe_cubi8V8USPIqQ4Jd-ooKm3ebYjpfl9s87_9qCc7DvhUUMxHjLIB1YFTzD2c8rAcJJJSzP7j2hD7q0S9nPg5dI59TUJ_4RaEBtPm7btCAG2NM_sv-7fd3Gu7hG_rJv_pgeGVyKu2zIirFKKH3LvQmGxrx10W8iHr2jbL2oDLaDWhqvny_gXnuudQIi6fpKQzxUMPWr9tvsxXXG7fxCpN-vNw
+
+
+	Response Data
+	{
+		...중략...
+		"memoryInfo": {
+			"total": 477626368,
+			"totalFormated": "455 MB",
+			"used": 169649584,
+			"usedFormated": "161 MB",
+			"free": 307976784,
+			"freePercentage": 64,
+			"freeFormated": "293 MB"
+		},
+
+		...중략...
+	}
+
+# 데이터 설명
+
+	Free Memory (사용가능): 
+			"freePercentage": 74,
+			"freeFormated": "337 MB"
+
+	Used Memory (사용중): 
+			"usedFormated": "117 MB",
+
+	Total Memory : 
+		"totalFormated": "455 MB",
+		
