@@ -1,0 +1,58 @@
+[ SpringBoot - CORS 이슈 해결하기 ]
+
+	Cross-Origin Resource Sharing,CORS 란 다른 출처의 자원을 공유할 수 있도록 설정하는 권한임
+
+
+
+# WebConfig 클래스 생성후 아래의 메소드들 추가
+	기본적인 Default 값은 아래와 같음
+		Allow all origins.
+		Allow "simple" methods GET, HEAD and POST.
+		Allow all headers.
+		Set max age to 1800 seconds (30 minutes).
+
+		
+		- addMapping() 으로 CORS를 적용할 URL 패턴을 정의
+		
+		- allowedOrigins() 자원 공유를 허락할 Origin을 지정할수 있음
+			.allowedOrigins("*"); 로 해서 전부다 줄수 있고 아래처럼 특정 URL만 줄수도 있음
+			.allowedOrigins("http://localhost:8080" , "http://localhost:7070");
+
+		- allowedMethods("POST" , "GET") 를 사용하여 허용할 HTTP method 를 지정할 수 있음
+
+		- maxAge(시간) 원하는 시간만큼 pre-flight 리퀘스트를 캐싱 해둘수 있음
+
+=================================================================================================================
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+
+	@Override
+    public void addCorsMappings(CorsRegistry registry) {
+		registry.addMapping("/**")
+			.allowedOrigins("*")
+			.allowedMethods("POST" , "GET")
+			.maxAge(6000);
+		
+	}
+
+}
+
+=================================================================================================================
+
+
+
+
+
+# 어노테이션으로 사용하기
+	메소드나 클래스명 위에 어노테이션으로 쓰면되며
+	origins, methods, maxAge, allowedHeaders 옵션을 다 줄수 있음
+
+	ex) 
+		@CrossOrigin(origins="*")
+		public class TestController{
+
+
+			
+			@CrossOrigin(origins = "*", allowedHeaders = "*")
+			@GetMapping("/userInfo")
+			public String getUserInfo (){
