@@ -1,8 +1,36 @@
 [ keycloak - 암호화 적용 ]
 
+[RSA 방식의 암호화]
+
+	https://github.com/l10178/keycloak-encryption-provider
+	
+# JAVA 빌드
+	cd password-encryption-provider
+	./gradlew shadowJar	
+
+	빌드 후 "KEYCLOAK_HOME/standalone/deployments/" 경로에 복사
+
+# JS 빌드
+	cd password-encryption-provider-js
+	npm ci && npm run build
+	
+	빌드 후 "KEYCLOAK_HOME/themes/base/login/resources/js/" 경로에 복사
+
+
+# JS 파일 설정
+	"KEYCLOAK_HOME/themes/base/login/theme.properties" 파일에 아래의 내용 추가
+	=================================================================================================================
+	scripts=js/password-encryption-provider.js
+	=================================================================================================================
+
+
+[ AES 암호화 ]
+
 	참고 링크 : 
 		https://edwin.baculsoft.com/2021/03/how-to-encrypt-and-decrypt-password-on-keycloak-or-red-hat-sso/
 		https://github.com/edwin/keycloak-password-encryptor
+
+	
 
 # 프로젝트 생성
 	1. File -> New -> Project -> Maven
