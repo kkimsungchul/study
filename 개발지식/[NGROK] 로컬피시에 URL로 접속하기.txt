@@ -1,2 +1,21 @@
-ngrok 사용
-https://velog.io/@dwa_all/ngrok-%EB%A1%9C%EC%BB%AC-%EA%B0%9C%EB%B0%9C%ED%99%98%EA%B2%BD-%EC%99%B8%EB%B6%80%EC%97%90-%EA%B3%B5%EC%9C%A0%ED%95%98%EA%B8%B0
+[ngrok 사용]
+	참고링크 : 
+		https://velog.io/@dwa_all/ngrok-%EB%A1%9C%EC%BB%AC-%EA%B0%9C%EB%B0%9C%ED%99%98%EA%B2%BD-%EC%99%B8%EB%B6%80%EC%97%90-%EA%B3%B5%EC%9C%A0%ED%95%98%EA%B8%B0
+
+
+
+# 실행 파일 경로 
+	C:\Users\USER\Downloads\ngrok-v3-stable-windows-amd64\ngrok.exe
+	ngrok.exe 파일 실행
+
+
+
+# 외부 에서 접속 하도록 사용
+
+
+	외부와 연결하려고 하는 포트를 아래와 같이 입력
+	ngrok http 8080
+	입력하고나면 아래와 같은 정보가 보이며, 해당 URL로 접속하면 됨
+	=================================================================================================================
+	Forwarding  https://2c4a-2001-2d8-e2ab-a34c-642d-e9db-152c-4d22.jp.ngrok.io -> http://localhost:8080 
+	=================================================================================================================
