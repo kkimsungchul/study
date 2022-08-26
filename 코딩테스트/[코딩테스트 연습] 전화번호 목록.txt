@@ -1,0 +1,357 @@
+전화번호 목록
+문제 설명
+전화번호부에 적힌 전화번호 중, 한 번호가 다른 번호의 접두어인 경우가 있는지 확인하려 합니다.
+전화번호가 다음과 같을 경우, 구조대 전화번호는 영석이의 전화번호의 접두사입니다.
+
+구조대 : 119
+박준영 : 97 674 223
+지영석 : 11 9552 4421
+전화번호부에 적힌 전화번호를 담은 배열 phone_book 이 solution 함수의 매개변수로 주어질 때, 어떤 번호가 다른 번호의 접두어인 경우가 있으면 false를 그렇지 않으면 true를 return 하도록 solution 함수를 작성해주세요.
+
+제한 사항
+phone_book의 길이는 1 이상 1,000,000 이하입니다.
+각 전화번호의 길이는 1 이상 20 이하입니다.
+같은 전화번호가 중복해서 들어있지 않습니다.
+입출력 예제
+phone_book	return
+["119", "97674223", "1195524421"]	false
+["123","456","789"]	true
+["12","123","1235","567","88"]	false
+입출력 예 설명
+입출력 예 #1
+앞에서 설명한 예와 같습니다.
+
+입출력 예 #2
+한 번호가 다른 번호의 접두사인 경우가 없으므로, 답은 true입니다.
+
+입출력 예 #3
+첫 번째 전화번호, “12”가 두 번째 전화번호 “123”의 접두사입니다. 따라서 답은 false입니다.
+
+알림
+
+2021년 3월 4일, 테스트 케이스가 변경되었습니다. 이로 인해 이전에 통과하던 코드가 더 이상 통과하지 않을 수 있습니다.
+
+
+아래걸로 햇음.. 복붙이지 뭐 
+=================================================================================================================
+
+import java.util.*;
+class Solution {
+    public boolean solution(String[] phone_book) {
+        boolean answer = true;
+        HashMap<String, Integer> map = new HashMap<>();
+        for(int i = 0 ; i < phone_book.length ; i++){
+            map.put(phone_book[i],i);
+        }
+            
+
+		//phone_book만큼 for문돔
+        for(int i = 0 ; i < phone_book.length ; i++){
+			
+
+            for(int j = 1 ; j < phone_book[i].length() ; j++ ){
+				//가져온 키값을 잘라서 해당 값을 키로 가지고 있는 애를 찾음
+                if(map.containsKey(phone_book[i].substring(0,j))){
+                    return false; 
+                }  
+            }
+        }
+            
+                
+        return answer;
+    }
+}
+
+
+
+=================================================================================================================
+import java.util.*;
+
+class Solution {
+    public boolean solution(String[] phone_book) {
+        int count=0;
+        boolean answer = true;
+        Iterator iterator;
+        HashSet<String> hashSet = new HashSet<String>(Arrays.asList(phone_book));
+        if(phone_book.length!=hashSet.size()){
+            return false;
+        }
+        String[] arr = hashSet.toArray(new String[0]);
+        
+        for(String num : arr){
+            iterator = hashSet.iterator();	// Iterator 사용
+            while(iterator.hasNext()) {//값이 있으면 true 없으면 false
+                String temp1 = (String)iterator.next();
+                if(num.indexOf(temp1)==0 || temp1.indexOf(num)==0){
+                    count++;
+                    if(count==2){
+                        return false;    
+                    }
+                }
+            }
+            count=0;
+        }
+
+        return answer;
+    }
+}
+
+
+
+=================================================================================================================
+import java.util.*;
+
+class Solution {
+    public boolean solution(String[] phone_book) {
+        
+        boolean answer = true;
+        HashSet<String> hashSet = new HashSet<String>(Arrays.asList(phone_book));
+        if(phone_book.length!=hashSet.size()){
+            return false;
+        }
+        String[] arr = hashSet.toArray(new String[0]);
+        Arrays.sort(arr);
+        for(int i=0;i<arr.length-1;i++){
+            for(int j=i+1;j<arr.length;j++){
+                if(!arr[j].substring(0,1).equals(arr[i].substring(0,1))){
+                    break;
+                }else if(arr[j].indexOf(arr[i])==0 || arr[i].indexOf(arr[j])==0){
+                    return false;
+                }
+                
+            }
+        }
+        return answer;
+    }
+}
+
+
+
+해시셋 -> 배열 후 정렬 사용 효율성3,4 X
+=================================================================================================================
+import java.util.*;
+
+class Solution {
+    public boolean solution(String[] phone_book) {
+        
+        boolean answer = true;
+        TreeSet<String> hashSet = new TreeSet<String>();
+        for(String num : phone_book){
+            if(hashSet.contains(num)){
+                return false;
+            }
+            hashSet.add(num);            
+        }
+        String[] arr = hashSet.toArray(new String[0]);
+        
+        Arrays.sort(arr);
+        for(int i=0;i<arr.length-1;i++){
+
+            for(int j=i+1;j<arr.length;j++){
+                if(!arr[j].substring(0,1).equals(arr[i].substring(0,1))){
+                    break;
+                }else if(arr[j].indexOf(arr[i])==0){
+                    return false;
+                }
+                
+            }
+        }
+        return answer;
+    }
+}
+
+
+
+해시셋 사용, 효율성 3,4 통과X
+=================================================================================================================
+import java.util.*;
+
+class Solution {
+    public boolean solution(String[] phone_book) {
+        Arrays.sort(phone_book);
+        int count=0;
+        HashSet<String> hashSet = new HashSet<String>();
+        Iterator iterator;
+        String temp1;
+        for(String num : phone_book){
+            if(hashSet.contains(num)){
+                //answer=false;
+                return false;
+            }else{
+                iterator = hashSet.iterator();	// Iterator 사용
+                while(iterator.hasNext()) {//값이 있으면 true 없으면 false
+                    temp1= (String)iterator.next();
+                    if(num.indexOf(temp1)==0 || temp1.indexOf(num)==0){
+                        return false;
+                    }
+                }                
+            }
+            hashSet.add(num);    
+        }
+        
+        
+        
+        return true;
+    }
+}
+
+
+
+배열 + 해시셋 사용, 효율성 3,4 통과X
+=================================================================================================================
+import java.util.*;
+
+class Solution {
+    public boolean solution(String[] phone_book) {
+        boolean answer = true;
+        int count=0;
+        HashSet<String> hashSet = new HashSet<String>();
+        for(String num : phone_book){
+            if(hashSet.contains(num)){
+                answer=false;
+                break;
+            }
+            hashSet.add(num);
+
+        }
+        Iterator iterator = hashSet.iterator();	// Iterator 사용
+        while(iterator.hasNext()) {
+            String temp = (String)iterator.next();
+            for(String num : phone_book){
+                if(num.indexOf(temp)==0){
+                    count++;
+                }
+                
+                if(count==2){
+                    answer=false;
+                    break;
+                }
+                
+            }
+            if(!answer){
+                break;
+            }
+            count=0;
+            
+        }
+        
+        return answer;
+    }
+}
+
+
+
+
+
+HashSet 사용, 효율성 3,4통과X , 
+=================================================================================================================
+import java.util.*;
+
+class Solution {
+    public boolean solution(String[] phone_book) {
+        boolean answer = true;
+        int count=0;
+        HashSet<String> hashSet = new HashSet<String>();
+        HashSet<String> hashSet2 = new HashSet<String>();
+        for(String num : phone_book){
+            if(hashSet.contains(num)){
+                answer=false;
+                break;
+            }
+            hashSet.add(num);
+            hashSet2.add(num);
+        }
+        Iterator iterator = hashSet.iterator();	// Iterator 사용
+        while(iterator.hasNext()) {//값이 있으면 true 없으면 false
+            String temp1= (String)iterator.next();
+            Iterator iterator2= hashSet2.iterator();	// Iterator 사용
+            while(iterator2.hasNext()) {//값이 있으면 true 없으면 false
+                String temp2=(String)iterator2.next();
+                if(temp2.indexOf(temp1)==0 || temp1.indexOf(temp2)==0){
+                    count++;
+                    if(count==2){
+                        answer=false;
+                        break;
+                    }
+                }
+            }
+            if(count>=2){
+                answer=false;
+                break;
+            }
+            hashSet2.remove(temp1);
+            count=0;
+        }
+        
+        return answer;
+    }
+}
+
+
+
+
+효율성 3,4 통과 x
+=================================================================================================================
+import java.util.*;
+
+class Solution {
+    public boolean solution(String[] phone_book) {
+        boolean answer = true;
+        
+        for(int i=0;i<phone_book.length;i++){
+            for(int j=i+1;j<phone_book.length;j++){
+                if((phone_book[j].indexOf(phone_book[i])==0 || phone_book[i].indexOf(phone_book[j])==0) && i!=j){
+                    answer = false;
+                    break;
+                }
+            }
+            
+            if(!answer){
+                break;
+            }
+            
+            
+        }
+        return answer;
+    }
+}
+
+
+
+효율성 통과X
+=================================================================================================================
+import java.util.*;
+
+class Solution {
+    public boolean solution(String[] phone_book) {
+        boolean answer = true;
+        
+        
+        //버블정렬로 문자열이 짧은애들이 앞으로 오도록 수정
+        for(int i=1;i<phone_book.length;i++){
+            for(int j=0;j<phone_book.length-i;j++){
+                if(phone_book[j].length()>phone_book[j+1].length()){
+                    String temp = phone_book[j];
+                    phone_book[j] = phone_book[j+1];
+                    phone_book[j+1] = temp;
+                }
+            }
+        }
+        
+        for(int i=0;i<phone_book.length-1;i++){
+            for(int j=i+1;j<phone_book.length;j++){
+                if(phone_book[j].indexOf(phone_book[i])==0){
+                    answer=false;
+                    break;
+                }
+            }
+            if(!answer){
+                break;
+            }
+        }
+        
+        
+        //System.out.println(Arrays.toString(phone_book));
+        return answer;
+    }
+}
