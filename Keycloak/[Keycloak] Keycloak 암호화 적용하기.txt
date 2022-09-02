@@ -3,7 +3,23 @@
 [RSA 방식의 암호화]
 
 	https://github.com/l10178/keycloak-encryption-provider
-	
+
+# 버전 수정
+	build.gradle 파일에서 아래의 내용 수정
+	sourceCompatibility -> 사용하려는 java 버전
+	keycloakVersion -> 사용하려는 keycloak 버전, 10 11 12까지 지원된다고 하나 13버전도 되는거같음
+	=================================================================================================================
+	sourceCompatibility = '11.0'
+	tasks.withType(JavaCompile) {
+		options.encoding = 'UTF-8'
+	}
+
+	ext {
+		keycloakVersion = '12.0.3'
+	}
+	=================================================================================================================
+
+
 # JAVA 빌드
 	cd password-encryption-provider
 	./gradlew shadowJar	
