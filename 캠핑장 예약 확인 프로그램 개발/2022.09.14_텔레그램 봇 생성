@@ -1,0 +1,108 @@
+[ 텔레그램 봇 생성 ]
+https://kshman94.tistory.com/40
+https://junesker.tistory.com/9
+
+
+# 텔레그램 봇 생성
+
+	1. 검색창에 BotFather 검색
+
+	2. 아래의 명령어를 순차적으로 입력
+		
+		=================================================================================================================
+		/newbot sungchul_camping		-- 봇 생성
+		
+		sungchul_camping				-- 봇 선택
+
+		sungchul_camping_bot			-- 봇 호칭
+		=================================================================================================================
+	
+	3. 봇 생성을 하고나면 아래와 같이 토큰이 나옴
+		Use this token to access the HTTP API:
+		5679884325:AAHGkslnv9lMvdI3jPeL2dORoIbUwh8drG0
+
+
+# 채팅방 시작
+
+	텔레그램 채팅방에서 내가 생성한 봇을 검색
+		sungchul_camping_bot
+	
+	방에 들어간 뒤 /start 를 입력하거나 시작 버튼을 클릭
+
+	그다음 아무 채팅이나 쳐놓자
+
+# chat_id 와 chat_id 
+	위에서 발급받은 토큰을 아래와 같이 입력하여서 접속
+	https://api.telegram.org/bot토큰붙여넣기/getUpdates
+		
+
+	https://api.telegram.org/bot5679884325:AAHGkslnv9lMvdI3jPeL2dORoIbUwh8drG0/getUpdates
+
+	토큰을 제대로 입력하면 아래의 응답값이 출력됨
+	=================================================================================================================
+	{"ok":true,"result":[]}
+	=================================================================================================================
+	
+	위에서 채팅방을 시작하고 채팅을 쳐놨으면 아래와 같이 응답값이 옴
+	여기에서 from{ id : 이부분의 ID를 알아놔야함  5633077612
+	================================================================================================================={"ok":true,"result":[{"update_id":562258659,
+	{
+	"ok":true,
+	"result":[
+	{
+	"update_id":562258659,
+	"message":{
+	"message_id":1,
+	"from":{
+	"id":5633077612,
+	"is_bot":false,
+	"first_name":"\uae40",
+	"last_name":"\uc131\ucca0",
+	"language_code":"ko"
+	},
+	"chat":{
+	"id":5633077612,
+	"first_name":"\uae40",
+	"last_name":"\uc131\ucca0",
+	"type":"private"
+	},
+	"date":1663137849,
+	"text":"/start",
+	"entities":[
+	{
+	"offset":0,
+	"length":6,
+	"type":"bot_command"
+	}
+	]
+	}
+	},
+	{
+	"update_id":562258660,
+	"message":{
+	"message_id":2,
+	"from":{
+	"id":5633077612,
+	"is_bot":false,
+	"first_name":"\uae40",
+	"last_name":"\uc131\ucca0",
+	"language_code":"ko"
+	},
+	"chat":{
+	"id":5633077612,
+	"first_name":"\uae40",
+	"last_name":"\uc131\ucca0",
+	"type":"private"
+	},
+	"date":1663137884,
+	"text":"hihi sungchul"
+	}
+	}
+	]
+	}
+	=================================================================================================================
+
+
+
+
+
