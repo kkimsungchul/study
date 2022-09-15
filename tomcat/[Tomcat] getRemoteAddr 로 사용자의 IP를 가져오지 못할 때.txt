@@ -1,0 +1,30 @@
+[ Tomcat - getRemoteAddr 로 사용자의 IP를 가져오지 못할 떄 ]
+
+	공식문서 URL : https://tomcat.apache.org/tomcat-8.5-doc/api/org/apache/catalina/valves/RemoteIpValve.html
+	참고 문서 : https://confluence.atlassian.com/jirakb/how-to-log-the-client-source-ip-in-access-logs-for-jira-data-center-978196913.html
+	
+
+# 증상
+	서버에서 request.getRemoteAddr();를 하게되면
+	Cilent의 IP를 가져오는 것이 아닌 Web(Nginx)나 방화벽의 IP를 가져옴
+	
+# 해결 방안
+	
+	1. requestAttributesEnabled="true" 옵션 추가
+		해당 옵션은 기본적으로 추가되어 있지 않으므로 아래의 부분을 찾아서 추가
+	==================================================================================================================================================
+	<Valve className="org.apache.catalina.valves.AccessLogValve"
+	requestAttributesEnabled="true"
+	pattern="%a %{jira.request.id}r %{jira.request.username}r %t &quot;%m %U%q %H&quot; %s %b %D &quot;%{Referer}i&quot; &quot;%{User-Agent}i&quot; &quot;%{jira.request.assession.id}r&quot;"/>	
+	==================================================================================================================================================
+	
+	2. 톰캣의 server.xml 파일에 아래의 내용 추가
+	==================================================================================================================================================
+	<Valve className="org.apache.catalina.valves.RemoteIpValve" remoteIpHeader="x-forwarded-for" remoteIpProxiesHeader="x-forwarded-by"/>
+	==================================================================================================================================================
+
+
+# 혹시나 안된다면	
+	Nginx 에서 x-forwarded-for 에 사용자의 IP를 추가
+	
+
