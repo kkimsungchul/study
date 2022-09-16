@@ -1,0 +1,396 @@
+                        "date": "2022-10-02",
+                        "displayDate": "10/2",
+                        "dayOfWeek": 7,
+                        "available": true,
+                        "seasonType": "0003",
+                        "seasonName": "준성수기",
+                        "dayTypeName": "공휴일전날",
+
+
+
+                        "date": "2022-10-03",
+                        "displayDate": "10/3",
+                        "dayOfWeek": 1,
+                        "available": true,
+                        "seasonType": "0003",
+                        "seasonName": "준성수기",
+                        "dayTypeName": "주중",
+                        "holidayName": "개천절",
+
+
+
+
+
+https://booking.ddnayo.com/booking-calendar-api/reservation/temp
+세션 아이디 발급
+
+
+channelCode=0030				애는 고정
+accommodationId:13676			애도 고정
+
+stayDays 						몇일 숙박할건지, 1이 기본값
+startDate , checkInDate			입실 날짜 
+roomId							묶을려고 하는 캠핑사이트 고유 ID
+	단독오토 1 : 161476
+	단독오토 2 : 161477
+	단독오토 3 : 161478
+	단독오토 4 : 161479
+	단독오토 5 : 161480
+	단독오토 6 : 161481
+	단독오토 7 : 161482
+	단독오토 8 : 161483
+	단독오토 9 : 161484
+
+
+
+{
+"channelCode":"0030",
+"accommodationId":13676,
+"startDate":"2022-10-06",
+"roomsInfo":[
+{
+"roomId":161484,
+"checkInDate":"2022-10-06",
+"stayDays":1,
+"numOfRoom":1,
+"numOfAdult":2,
+"numOfChild":0,
+"numOfBaby":0
+}
+],
+"others":[
+]
+}
+
+
+
+{
+"channelCode":"0030",
+"accommodationId":13676,
+"startDate":"2022-09-23",
+"roomsInfo":[
+{
+"roomId":161477,
+"checkInDate":"2022-09-23",
+"stayDays":1,
+"numOfRoom":1,
+"numOfAdult":2,
+"numOfChild":0,
+"numOfBaby":0
+}
+],
+"others":[
+]
+}
+
+{
+"channelCode":"0030",
+"accommodationId":13676,
+"startDate":"2022-10-05",
+"roomsInfo":[
+{
+"roomId":161482,
+"checkInDate":"2022-10-05",
+"stayDays":2,
+"numOfRoom":1,
+"numOfAdult":2,
+"numOfChild":0,
+"numOfBaby":0
+}
+],
+"others":[
+]
+}
+
+
+
+=================================================================================================================
+https://booking.ddnayo.com/booking-calendar-api/payment/pg/temporary?_=1663128293156
+
+
+# Request Headers
+:authority: booking.ddnayo.com
+:method: POST
+:path: /booking-calendar-api/payment/pg/temporary?_=1663128293156
+:scheme: https
+accept: application/json, text/plain, */*
+accept-encoding: gzip, deflate, br
+accept-language: ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7
+cache-control: no-cache
+content-length: 944
+content-type: application/json;charset=UTF-8
+cookie: _gid=GA1.2.2091427212.1663117408; _todayPopupClose16883=true; SESSION=NDdjOWRjZjAtMzhlMy00NDg4LThhNjItMWJmODJiZTg5OTEx; ak_bmsc=49050FAD793FDC49A950B6A3B6A6DD69~000000000000000000000000000000~YAAQZOPfrbKYdgmDAQAAzScMOhH5vVe/PssvJ1PgVfmWYOQDCvH5touya58mDUr+1/s8t+u6vp1lWYz7ucRe49Jkzi1ifRGJeKC3dNDcp2XVPqvPmmtfwtmP2bEEgi7X1hz84IBs0VFuuwtyfnJAYbV853ymc0TVaFiKmfX3UM4+pEecaskDW5gEDoJ0OI3aXHzXpVdFGNh04aomPF/Q+CodJcC7GSPBEWsunguSk+xNk6aTYMEi18DUUmc5CUI4lo0204arsGKfmxDgXqSwk9a9L0LEvzf2EZ2SQu4nt35uJ0b2ji91iYT8rlbF4iN5Y1fV3JoxrQNxWbRf/dl0C9MKpfhwZ/9saE+ApLX0epcBX3vIWMaQGUxpCRskjiJcFIpK+s7rNNSe8jI9D7NemywRcwJ9ggF6LW8fhzVHlSN+XpyFiZWxoP37LoogzuSlAtV6cpxtmMCaA+Rs9GGE1aBhQg+I0FBtfaZk9r1GdHieHjtX0RZ5j6ZfUQ==; bm_sv=106BB9B4497BF9E47680D34FA0F1B1D6~YAAQZOPframedgmDAQAAkZcMOhF+Kje50mwan6Rnf6+/HGrDz48PXpTyxvfWagOK2kyhRCrcZ3/OZE0BMpc8IV+iqJW5D3fNjcQDOGka6UV6LtOyMcjVyVWd362Y9rSaOjLC61JYuzefKCxDMWoOQQ9iBDh+K+jg488TkcZLOOh23YTo7cEAfSaAE/SQ74lqE+AMgKnCDEBG1keZhGBRqaDMbMWC7If+FEwRbf5jOGwxiecq+nM9xq8YNEdsNKx3vQ==~1; _ga=GA1.2.179886970.1662078536; _ga_9G818MJC9P=GS1.1.1663126218.5.1.1663126251.0.0.0
+origin: https://booking.ddnayo.com
+pragma: no-cache
+referer: https://booking.ddnayo.com/booking-payment?accommodationId=13676&channelCode=0030&sessionId=47c9dcf0-38e3-4488-8a62-1bf82be89911&checkInDate=2022-09-29&fromTempId=26358731&toTempId=26358731
+sec-ch-ua: "Google Chrome";v="105", "Not)A;Brand";v="8", "Chromium";v="105"
+sec-ch-ua-mobile: ?0
+sec-ch-ua-platform: "Windows"
+sec-fetch-dest: empty
+sec-fetch-mode: cors
+sec-fetch-site: same-origin
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36
+
+
+
+# payload
+
+{
+"accommodationId":"13676",
+"isMobile":false,
+"checkInDate":"2022-09-29",
+"method":"deposit",
+"certificateNo":null,
+"paidPrice":70000,
+"pgId":12,
+"isBenepia":false,
+"isAgent":false,
+"isGrs":false,
+"module":"inicis",
+"isAuthSms":false,
+"isUseDeposit":true,
+"isUseRealBank":false,
+"isUseCard":false,
+"isUseVirtualBank":false,
+"reservationNo":47807714,
+"dueDateDeposit3":360,
+"dueDateDeposit2":360,
+"dueDateDeposit":720,
+"isSelfPg":false,
+"booker":"김성철",
+"birthDate":"911218",
+"phoneNo":"010-6429-0224",
+"emergency":"010-6429-0224",
+"email":"kimsc9112@gmail.com",
+"isPickup":false,
+"pickupLocationCheckIn":null,
+"pickupTimeCheckIn":null,
+"pickupLocationCheckOut":null,
+"pickupTimeCheckOut":null,
+"arrivalTime":"",
+"memo":"",
+"carNo":"17조1428",
+"ci":"",
+"checkedCoupon":false,
+"couponTypeCode":"0000",
+"couponType":"20T",
+"originalPrice":70000,
+"couponPrice":0,
+"channelCode":"0030",
+"sessionId":"47c9dcf0-38e3-4488-8a62-1bf82be89911",
+"fromTempId":"26358731",
+"toTempId":"26358731"
+}
+
+=================================================================================================================
+https://booking.ddnayo.com/booking-calendar-api/payment/pg/temporary?_=1663129690608
+
+
+#header
+:authority: booking.ddnayo.com
+:method: POST
+:path: /booking-calendar-api/payment/pg/temporary?_=1663129690608
+:scheme: https
+accept: application/json, text/plain, */*
+accept-encoding: gzip, deflate, br
+accept-language: ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7
+cache-control: no-cache
+content-length: 931
+content-type: application/json;charset=UTF-8
+cookie: _gid=GA1.2.2091427212.1663117408; _todayPopupClose16883=true; SESSION=NDdjOWRjZjAtMzhlMy00NDg4LThhNjItMWJmODJiZTg5OTEx; ak_bmsc=49050FAD793FDC49A950B6A3B6A6DD69~000000000000000000000000000000~YAAQZOPfrbKYdgmDAQAAzScMOhH5vVe/PssvJ1PgVfmWYOQDCvH5touya58mDUr+1/s8t+u6vp1lWYz7ucRe49Jkzi1ifRGJeKC3dNDcp2XVPqvPmmtfwtmP2bEEgi7X1hz84IBs0VFuuwtyfnJAYbV853ymc0TVaFiKmfX3UM4+pEecaskDW5gEDoJ0OI3aXHzXpVdFGNh04aomPF/Q+CodJcC7GSPBEWsunguSk+xNk6aTYMEi18DUUmc5CUI4lo0204arsGKfmxDgXqSwk9a9L0LEvzf2EZ2SQu4nt35uJ0b2ji91iYT8rlbF4iN5Y1fV3JoxrQNxWbRf/dl0C9MKpfhwZ/9saE+ApLX0epcBX3vIWMaQGUxpCRskjiJcFIpK+s7rNNSe8jI9D7NemywRcwJ9ggF6LW8fhzVHlSN+XpyFiZWxoP37LoogzuSlAtV6cpxtmMCaA+Rs9GGE1aBhQg+I0FBtfaZk9r1GdHieHjtX0RZ5j6ZfUQ==; bm_sv=106BB9B4497BF9E47680D34FA0F1B1D6~YAAQujpvPZivZDSDAQAAkFsuOhFmfpHILR+qKkAmbh2EPDGZk0MQ5hsUBlCYRRPXkBJUqHtg1UykbhDy/GWBd51YHV8Qs/UM4uEve956g25ma7Ff0cd5iYlzR9/sWeJxWY2NpAYnCd187WlF3XSVbjyPvofm+Ntt4QYbyjMvtVwHeWI/mQydLgbDwcvlNNdlUeAcEU0udN1rfpv+yeAygDlFmYOmWPqRbb3SsO5i6WQac8hUn8xWKBAPzclw22fDlw==~1; _ga=GA1.2.179886970.1662078536; _ga_9G818MJC9P=GS1.1.1663128294.6.1.1663128462.0.0.0
+origin: https://booking.ddnayo.com
+pragma: no-cache
+referer: https://booking.ddnayo.com/booking-payment?accommodationId=13676&channelCode=0030&sessionId=47c9dcf0-38e3-4488-8a62-1bf82be89911&checkInDate=2022-10-26&fromTempId=26359052&toTempId=26359052
+sec-ch-ua: "Google Chrome";v="105", "Not)A;Brand";v="8", "Chromium";v="105"
+sec-ch-ua-mobile: ?0
+sec-ch-ua-platform: "Windows"
+sec-fetch-dest: empty
+sec-fetch-mode: cors
+sec-fetch-site: same-origin
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36
+
+
+# payload
+{
+"accommodationId":"13676",
+"isMobile":false,
+"checkInDate":"2022-10-26",
+"method":"deposit",
+"certificateNo":null,
+"paidPrice":70000,
+"pgId":12,
+"isBenepia":false,
+"isAgent":false,
+"isGrs":false,
+"module":"inicis",
+"isAuthSms":false,
+"isUseDeposit":true,
+"isUseRealBank":false,
+"isUseCard":false,
+"isUseVirtualBank":false,
+"reservationNo":47808468,
+"dueDateDeposit3":360,
+"dueDateDeposit2":360,
+"dueDateDeposit":720,
+"isSelfPg":false,
+"booker":"김성철",
+"birthDate":"911218",
+"phoneNo":"010-6429-0224",
+"emergency":"",
+"email":"kimsc9112@gmail.com",
+"isPickup":false,
+"pickupLocationCheckIn":null,
+"pickupTimeCheckIn":null,
+"pickupLocationCheckOut":null,
+"pickupTimeCheckOut":null,
+"arrivalTime":"",
+"memo":"",
+"carNo":"17조1428",
+"ci":"",
+"checkedCoupon":false,
+"couponTypeCode":"0000",
+"couponType":"20T",
+"originalPrice":70000,
+"couponPrice":0,
+"channelCode":"0030",
+"sessionId":"47c9dcf0-38e3-4488-8a62-1bf82be89911",
+"fromTempId":"26359052",
+"toTempId":"26359052"
+}
+
+
+
+=================================================================================================================
+
+아래 URL요청 후 "reservationNo" 번호를 발급받고
+해당 번호를 위에 넣고 예약하면 될듯
+
+https://booking.ddnayo.com/booking-calendar-api/payment/13676/gateway?useCoupon=false&channelCode=0030&_=1663129829324
+
+
+{
+"success":true,
+"data":{
+"accommodationId":13676,
+"accommodationName":"충주호캠핑월드 캠핑장",
+"checkInOutGuide":"",
+"phoneNo":"010-5078-0012",
+"mobilePhoneNo1":"010-5078-0012",
+"mobilePhoneNo2":"",
+"isAms":true,
+"isInputCarNo":true,
+"isInputCarNoReq":false,
+"isNotRequireReservationRequest":false,
+"isAuthSms":false,
+"isUseDeposit":true,
+"isUseRealBank":false,
+"isUseCard":false,
+"isUseVirtualBank":false,
+"isDisableAskBirthDate":false,
+"pgId":6,
+"isGrs":false,
+"isBenepia":false,
+"isPickup":false,
+"isRequiredRoom":true,
+"dueDateDeposit3":360,
+"dueDateDeposit2":360,
+"dueDateDeposit":720,
+"isSelfPg":false,
+"reservationNo":47808928,
+"isAgent":false,
+"module":"kcp",
+"isRequiredEmail":false
+},
+"errorString":"",
+"failed":false
+}
+
+
+https://booking.ddnayo.com/booking-calendar-api/payment/13676/gateway?useCoupon=false&channelCode=0030&_=1663130075788
+
+{
+"success":true,
+"data":{
+"accommodationId":13676,
+"accommodationName":"충주호캠핑월드 캠핑장",
+"checkInOutGuide":"",
+"phoneNo":"010-5078-0012",
+"mobilePhoneNo1":"010-5078-0012",
+"mobilePhoneNo2":"",
+"isAms":true,
+"isInputCarNo":true,
+"isInputCarNoReq":false,
+"isNotRequireReservationRequest":false,
+"isAuthSms":false,
+"isUseDeposit":true,
+"isUseRealBank":false,
+"isUseCard":false,
+"isUseVirtualBank":false,
+"isDisableAskBirthDate":false,
+"pgId":6,
+"isGrs":false,
+"isBenepia":false,
+"isPickup":false,
+"isRequiredRoom":true,
+"dueDateDeposit3":360,
+"dueDateDeposit2":360,
+"dueDateDeposit":720,
+"isSelfPg":false,
+"reservationNo":47809054,
+"isAgent":false,
+"module":"kcp",
+"isRequiredEmail":false
+},
+"errorString":"",
+"failed":false
+}
+
+
+=================================================================================================================
+https://booking.ddnayo.com/booking-calendar-api/payment/13676/cart?sessionId=47c9dcf0-38e3-4488-8a62-1bf82be89911&channelCode=0030&fromTempId=26359324&toTempId=26359324&_=1663130074001
+
+tempId : reservationRoomTempId
+
+
+{
+"success":true,
+"data":{
+"totalPrice":70000,
+"depositAccount":"농협은행 3511208841473 월드애니셀주식회사",
+"checkInDate":"2022-10-28",
+"today":false,
+"roomId":161484,
+"todayIsSaturday":false,
+"dayBeforeAndFriday":false,
+"rooms":[
+{
+"totalDiscount":0,
+"standardOccupancy":2,
+"roomTypeId":96916,
+"roomQuantity":1,
+"roomPrice":70000,
+"roomId":161484,
+"roomName":"단독오토9",
+"roomDiscount":0,
+"reservationRoomTempId":26359324,
+"remainDiscount":0,
+"priceName":"준성수기/금요일",
+"originalRoomPrice":70000,
+"maxOccupancy":2,
+"flowStayDiscount":0,
+"exceedPrice":0,
+"exceedOccupancy":0,
+"date":"2022-10-28",
+"childOccupancy":0,
+"babyOccupancy":0,
+"adultOccupancy":2,
+"accommodationId":13676,
+"couponDiscount":0
+}
+],
+"options":[
+]
+},
+"errorString":"",
+"failed":false
+}

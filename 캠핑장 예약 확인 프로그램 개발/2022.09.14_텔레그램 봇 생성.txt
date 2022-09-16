@@ -3,6 +3,11 @@ https://kshman94.tistory.com/40
 https://junesker.tistory.com/9
 
 
+※ 여러 사람이 사용할때
+	1. 그사람들도 각각 sungchul_camping 방에 들어가서 채팅을 친다.
+	2. "chat_id 찾기" 부분을 실행해서 그 사용자의 방 ID를 찾아낸다
+	3. 코드에 해당 사용자의 ID를 추가해준다
+
 # 텔레그램 봇 생성
 
 	1. 검색창에 BotFather 검색
@@ -25,13 +30,13 @@ https://junesker.tistory.com/9
 # 채팅방 시작
 
 	텔레그램 채팅방에서 내가 생성한 봇을 검색
-		sungchul_camping_bot
+		sungchul_camping
 	
 	방에 들어간 뒤 /start 를 입력하거나 시작 버튼을 클릭
 
 	그다음 아무 채팅이나 쳐놓자
 
-# chat_id 와 chat_id 
+# chat_id 찾기
 	위에서 발급받은 토큰을 아래와 같이 입력하여서 접속
 	https://api.telegram.org/bot토큰붙여넣기/getUpdates
 		

@@ -1,0 +1,65 @@
+[ Springboot - 텔레그램 연동 ]
+
+
+https://elfinlas.github.io/2019/08/15/telegram-spring-boot/
+https://junesker.tistory.com/9
+
+
+
+	sendTelegramMessage 메소드를 호출하면 텔레그램 방으로 메시지가 전송됨
+	채팅방 아이디는 "2022.09.14_텔레그램 봇 생성.txt" 파일을 참고해서 가져옴,
+	내꺼랑 혜니꺼만 해놨음
+	
+	=================================================================================================================
+	package com.sungchul.camping.telegram;
+
+	import org.springframework.stereotype.Service;
+
+	import java.io.BufferedReader;
+	import java.io.InputStreamReader;
+	import java.net.HttpURLConnection;
+	import java.net.URL;
+	import java.util.ArrayList;
+
+
+	@Service("telegramService")
+	public class TelegramService {
+
+
+		/**
+		 * 텔레그램 메시지 발송
+		 * @param message 보낼 메시지
+		 * */
+		public void sendTelegramMessage(String message){
+			String Token = "발급받은 토큰을 여기다 넣어두자~~~~!!!!";
+			ArrayList<String> chatIdList = new ArrayList<>();
+			chatIdList.add("5633077612");       //나
+			chatIdList.add("5592564880");       //혜니
+
+
+			BufferedReader in = null;
+
+			for(String chatId : chatIdList){
+				try {
+					URL obj = new URL("https://api.telegram.org/bot" + Token + "/sendmessage?chat_id=" + chatId + "&text=" + message); // 호출할 url
+					HttpURLConnection con = (HttpURLConnection)obj.openConnection();
+					con.setRequestMethod("GET");
+					in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF-8"));
+					String line;
+
+					while((line = in.readLine()) != null) { // response를 차례대로 출력
+						System.out.println(line);
+					}
+
+				} catch(Exception e) {
+					e.printStackTrace();
+				} finally {
+					if(in != null) try { in.close(); } catch(Exception e) { e.printStackTrace(); }
+				}
+			}
+		}
+	}
+
+
+
+	=================================================================================================================
