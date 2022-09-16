@@ -1,4 +1,9 @@
-                        "date": "2022-10-02",
+https://booking.ddnayo.com/booking-calendar-status?accommodationId=13676&groupId=&isPriceCalendar=true&channelCode=0030
+
+
+						
+						
+						"date": "2022-10-02",
                         "displayDate": "10/2",
                         "dayOfWeek": 7,
                         "available": true,
