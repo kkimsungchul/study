@@ -1,0 +1,21 @@
+[ AWS - 방화벽 포트 오픈 ]
+
+# 열려 있는 모든 포트 확인
+	netstat -nap
+
+# LISTEN 중인 포트 표시
+	netstat -nap | grep LISTEN
+
+
+# 8080포트 확인
+	sudo netstat -nap | grep 8080
+
+# 방화벽 설정 정보 확인
+	sudo iptables -nL
+
+
+# 포트 오픈
+	sudo iptables -I INPUT 1 -p tcp --dport 8080 -j ACCEPT
+
+# 내부에서 외부로도 갈수 있도록 오픈
+	sudo iptables -I OUTPUT 1 -p tcp --dport 8080 -j ACCEPT
