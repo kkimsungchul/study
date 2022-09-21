@@ -1,0 +1,67 @@
+[ Keycloak - authentication - flows 수정 ]
+
+# realm의 특정 클라이언트에만 적용
+
+	1. 설치되어 있는 keycloak 를 실행
+		참고링크 : https://github.com/kkimsungchul/study/blob/master/Keycloak/%5BKeycloak%5D%20%EC%84%A4%EC%B9%98%20%EB%B0%8F%20%EC%84%B8%ED%8C%85.txt
+
+	2. http://localhost:8080/auth/ 접속 후 로그인 
+
+	
+	3. 적용할 realm 을 선택
+		본인은 Demo라는 이름으로 생성한 realm 을 선택함
+	
+	4. 좌측 Configure 탭의 Authentication 클릭
+
+	5. Authentication 화면에서 New 버튼을 클릭
+
+	6. Create Top Level Form 화면에서 아래의 정보를 입력
+		Alias : Decrypt Password
+		Description : Decrypt Password
+		Top Level Flow : generic
+	
+	7. 다시 Authentication 화면으로 돌아와서 셀렉트 박스에서 좀전에 생성한 "Decrypt Password" 선택
+
+	8. Add execution 클릭
+
+	9. Provider 셀렉트 박스에서 "Simple Password Encryption" 선택 후 save
+		Simple Password Encryption 이름은 "CustomKeycloakPasswordEncryptorFactory.java" 파일에서 지정해준 이름
+		해당이름이 표시되지 않는다면 아래의 내용들을 확인할것
+			- 생성한 파일들의 파일명은 제대로 되어 있는가
+			- 생성한 파일들의 경로들은 제대로 되어 있는가
+			- pom.xml 의 라이브러리들이 제대로 추가 되었는가
+			- 오타는 없는가
+			※ 본인은 경로 틀려서 삽질함
+		
+	10. 생성이 완료되면
+		Authentication 화면에서 "Decrypt Password" 셀렉트 박스를 선택 하면 "Simple Password Encryption" 가 표시됨
+		Requirement 부분에서 "REQUIRED" 선택
+	
+	11. 적용할 client 의 setting 페이지의 제일 하단부분의 "Authentication Flow Overrides" 를 아래와 같이 설정
+		Browser Flow : browser
+		Direct Grant Flow : Decrypt password
+		
+		메뉴위치 : 
+			Configure 
+			-> Clients 
+			-> my_client (내가 생성 및 적용할 클라이언트)
+			-> settings
+			-> Authentication Flow Overrides
+
+# realms 의 모든 클라이언트에 적용
+	
+	위의 방법중 10번까지 똑같음
+
+	11. 적용할 realm 을 선택
+
+	12. 좌측 Configure 탭의 Authentication 클릭
+	
+	13. 우측 화면에 뜨는 중상단 탭에서 "bindings" 클릭
+		url : http://localhost:8080/auth/admin/master/console/#/realms/demo/authentication/flow-bindings
+	
+	14. Browser Flow와 Direct Grant Flow 에 적용할 인증 로직 설정
+
+
+
+로컬 로그인 페이지 : 
+	http://localhost:8080/auth/realms/demo/account/
