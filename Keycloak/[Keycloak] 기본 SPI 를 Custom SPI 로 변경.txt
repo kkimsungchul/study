@@ -1,0 +1,49 @@
+[keycloak - 기본 SPI 를 Custom SPI 로 변경 ]
+
+
+# jar 파일 추가
+
+	1. 사용하려는 키클락SPI를 아래의 경로에 복사
+		KEYCLOAK_HOME/standalone/deployments/
+	
+	2. 복사가 완료되면 추가한 내용을 키클락 관리자 페이지에서 확인
+		우측 상단의 ID 클릭
+		-> server Info 
+		-> providers
+		-> 추가한 SPI명 검색
+		
+			http://localhost:8080/auth/admin/master/console/#/server-info/providers			
+
+
+#  password credential provider 추가
+	
+	Keycloak 의 password credential provider는 keycloak-password 가 담당하고 있으므로 SPI 추가만으로는 사용이 안됨
+	
+	1. KEY_CLOAK_HOME/standalone/configuration/standalone.xml 을 편집
+
+	<subsystem xmlns="urn:jboss:domain:keycloak-server:1.1"> tag를 찾아 그 아래에 내용을 추가
+
+		=================================================================================================================
+		<spi name="credential">
+		 
+			<provider name="keycloak-webauthn" enabled="true"/> <!-- keycloak 기본 provider, webauthn 인증 선택 시 적용됨-->
+		 
+			<provider name="keycloak-otp" enabled="true"/> <!-- keycloak 기본 provider , keycloak OTP 처리를 제공하는 SPI -->
+		 
+			<provider name="keycloak-password" enabled="false"/>      <!--  default password credential SPI인 keycloak-password 를 disable -->
+		 
+			<provider name="keycloak-webauthn-passwordless" enabled="true"/> <!-- keycloak 기본 provider, webauthn passwordless  인증 선택 시 적용됨 -->
+		 
+			<provider name="keycloak-encrypted-password" enabled="true"/> <!-- 추가한 keycloak-encrypted-password 를 enable -->
+		 
+		</spi>
+
+		=================================================================================================================
+
+ 	2. 추가한 내용을 키클락 관리자 페이지에서 확인
+		우측 상단의 ID 클릭
+		-> server Info 
+		-> providers
+		-> 추가한 SPI명 검색
+	
+	3. 해당페이지에서 keycloak-password 가 보이지 않으면 설정이 완료된것
