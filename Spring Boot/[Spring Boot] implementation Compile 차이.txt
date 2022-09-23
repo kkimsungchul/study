@@ -1,0 +1,72 @@
+[ SpringBoot - implementation Compile 차이 ]
+
+	참고링크 : 
+				https://writemylife.tistory.com/57
+				https://bluayer.com/13
+				https://bepoz-study-diary.tistory.com/372
+				https://jipang9-greedy-pot.tistory.com/m/16
+
+
+
+# 설명 
+	- implementation 
+		프로젝트에 의해 노출되는 API의 일부가 아닌, 프로젝트의 소스 프로덕션을 컴파일 할 떄, 요구되어지는(필요한) 의존성들을 말한다.  
+		예시로 프로젝트는 내부의 영속성 계층의 구현을 위해 하이버네이트를 사용한다.
+	
+		존 라이브러리 수정시 본 모듈까지만 재빌드
+		본 모듈을 의존하는 모듈은 해당 라이브러리의 api 를 사용할 수 없음
+	 
+
+	- api(compile)
+		implementaion와 비슷하지만 프로젝트에 의해 노출이 된다는 점이 다르다.
+		예시로 프로젝트는  Guave를 사용하며, Guava 클래스 속의 메서드 시그니쳐와 함께 공용 인터페이스를 노출한다.
+	
+		의존 라이브러리 수정시 본 모듈을 의존하는 모듈들도 재빌드
+		본 모듈을 의존하는 모듈들도 해당 라이브러리의 api 를 사용할 수 있음
+
+
+	- compileOnly
+		이름에서 알 수 있듯이 compile 시에만 빌드하고 빌드 결과물에는 포함하지 않는다.
+		runtime 시 필요없는 라이브러리인 경우 (runtime 환경에 이미 라이브러리가 제공되고 있는가 하는 등의 경우)	
+		빌드 사이즈가 줄어듬
+		compileClassPath 에만 추가 
+
+	- runtimeOnly 
+		runtime 시에만 필요한 라이브러리인 경우
+		해당 클래스에서 코드 변경이 일어나도 컴파일을 다시 할 필요가 없음
+		runtimeClassPath에만 추가
+
+	- annotationProcessor
+		annotation processor 명시 (ex:lombok)
+
+	- testImplementation 
+		테스트 코드를 수행할 때만 적용.
+
+
+
+# 예시
+	
+	A <- B <- C
+	A모듈을 위와같이 의존하고 있다고 예시를 듬
+	A를 B가 의존하고 B를 C가 의존하는 형태임 
+
+	- Compile(api) 
+		A 모듈을 수정하게되면 이 모듈을 직접 혹은 간접으로 의존하고 있는 B와 C는 모두 재빌드 되야함
+	
+	- implementation
+		A를 직접 의존하고 있는 B만 재빌드 함
+	
+
+# Implementation의 장점
+	1. 속도가 빠름
+		연결된 dependency가 확 줄어들고, 
+		change가 발생하더라도 recompile을 적게 하니 소요 시간도 적음
+ 
+
+	2. API의 노출이 없어짐
+		Design Pattern에서 흔히 강조하듯, Transparency는 중요하다.
+		필요한 API만 노출하는 것이 중요하고, 또한 User 입장에서도 간편하게 사용할 수 있기 때문에 잘 관리하는 것이 중요함
+		그런데, compile을 사용하게 되면 연결된 모든 모듈의 API가 exposed(노출)된다도 함
+		implementation을 사용하게 되면 이런 일이 없어진다.
+	
+
