@@ -1,0 +1,51 @@
+keycloak 자료조사
+	Redhat에서 개발한 인증 & 인가 오픈소스 솔루션이며, 컨테이너 이미지,  standalone, spring boot 내장 library 등 다양한 형태로 사용 가능한 장점을 가짐.
+
+# 제공 기능
+	SSO
+	소셜 로그인
+	2차 인증(Two factor authentication - ex. Google OTP)
+	LDAP 기반 User Federation
+	OAuth Provider 역할 (Identity Provider)
+
+
+# Shiro 와의 차이점
+	Shiro 는 세션 기반의 인증 방식을 주로 사용함.
+	Keycloak 은 OpenID Connect 프로토콜을 사용하여, Client Application 에 대한 access token 과 id token 을 발급할 수 있으며
+		여러 microservice 들에 대한 인증 & 인가를 하나로 통합할 수 있음
+
+# 용어 정리
+	SSO(Single Sign On)
+		1번의 로그인으로 여러 Application 에 접속할 때, 별도의 로그인 과정 없이 자동으로 인증 가능.
+	OAuth
+		위임 권한 프로토콜이며, 사용자가 별도의 password 입력 없이 타 서비스의 데이터에 접근 가능하도록 한다.
+		주로, 인증보다는 3rd Application 의 API 사용을 위한 인가 메인 목적
+
+# SAML
+	가장 오래된 인증 & 인가 프로토콜
+	웹 사이트에는 적합하지만, 모바일 어플리케이션은 적합하지 않음. (why? saml 은 xml 을 사용하여 response length 가 상당하다고 알려져있음)
+
+# OAuth 와 SAML 프로토콜을 보완한 것이 OIDC(OpenID Connect)
+	OAuth 2.0 은 3rd Patry API 사용 인가가 메인 목적
+	OpenId Connect 는 통합인증, SSO 가 목적
+	OpenId Connect 는 인증 이 메인이며, OIDC 는 access token 뿐만 아니라, id token(jwt 형태, 누가 인증하고 해당 사람의 정보, 발행자가 누구인지...) 까지 사용
+
+
+
+# OpenID Connect vs OAuth 2.0
+	https://www.samsungsds.com/kr/insights/oidc.html
+	https://velog.io/@jakeseo_me/Oauth-2.0%EA%B3%BC-OpenID-Connect-%ED%94%84%EB%A1%9C%ED%86%A0%EC%BD%9C-%EC%A0%95%EB%A6%AC
+
+
+# 참고자료
+	https://tech.socarcorp.kr/security/2019/07/31/keycloak-sso.html
+	https://subji.github.io/posts/2020/07/08/keycloak1
+	https://www.keycloak.org/docs/latest/securing_apps/index.html
+	https://sowells.tistory.com/182
+	https://www.slideshare.net/AbhishekKoserwal1/building-secure-applications-with-keycloak
+	https://www.baeldung.com/spring-boot-keycloak
+	http://infosec.pusan.ac.kr/wp-content/uploads/2018/10/7.-SSO-ID-federation-%EA%B8%B0%EC%88%A0-at-IoT-platform_ver3.pdf
+
+
+
+	
