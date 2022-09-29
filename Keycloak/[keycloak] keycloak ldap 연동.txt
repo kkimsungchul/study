@@ -1,0 +1,49 @@
+[keycloak - LADP 연동 설정 ]
+
+keycloak (ldap user federation)
+	https://www.bantrain.com/detail-setup-for-user-federation-on-keycloak/
+
+keytool -import -alias mykey -file "{directory_path_mykey.cer}/mykeyca.cer" -keystore $JDK_HOME/jre/lib/security/cacerts -storepass changeit
+// list check
+keytool -list -alias mykey -keystore $JDK_HOME/jre/lib/security/cacerts -storepass changeit
+...
+mykey, {인증서 생성날짜}, trustedCertEntry,
+인증서 지문(SHA1): 70:95:74:E8:0B:87:F0:99:55:8A:0E:DF:63:CE:93:C5:0D:97:22:DD
+
+keycloak admin - user federation - ldap 선택 후 아래와 같은 정보 입력
+
+# Required LDAP configuration fields
+	Enabled : On
+	Console Display Name : ldap
+	Import Users : On
+	Edit Mode : READ_ONLY
+	Vendor : Active Directory
+	Username LDAP Attribute : CN
+	RDN LDAP Attribute : CN
+	UUID LDAP Attribute : objectGUID
+	User Object Classes : person, organizationalPerson, user
+	Connection URL : ldaps://myldap.com
+	Users DN : OU=Employee,DC=myldap,DC=mykey,DC=my,DC=net
+	Custom User LDAP Filter : (빈칸)
+	Search Scope : Subtree
+	Bind Type : simple
+	Bind DN : {LDAP 관리자계정 Username}
+	Bind Credential : {LDAP 관리자계정 Password}
+
+
+# Advanced Settings
+	Enable StartTLS : OFF
+	Use Truststore SPI : Only for ldaps
+
+
+# Sync Settings
+	Batch Size : 1000
+	Periodic Full Sync : On
+	Full Sync Period : 3600
+	Periodic Changed Users Sync : On
+	Changed Users Sync Period : 3600
+
+# Cache Settings
+	Cache Policy : NO_CACHE
+
+# /etc/hosts
