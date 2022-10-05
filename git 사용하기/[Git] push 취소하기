@@ -1,0 +1,18 @@
+https://gmlwjd9405.github.io/2018/05/25/git-add-cancle.html
+
+
+# 가장 최근의 커밋 취소
+  git reset HEAD^
+
+# 원하는 시점으로 되돌리기
+  // Reflog(브랜치와 HEAD가 지난 몇 달 동안에 가리켰었던 커밋) 목록 확인
+  $ git reflog 또는 $ git log -g
+  // 원하는 시점으로 워킹 디렉터리를 되돌린다.
+  $ git reset HEAD@{number} 또는 $ git reset [commit id]
+  https://gmlwjd9405.github.io/2018/05/25/git-add-cancle.html
+  
+# 강제로 push
+  $ git push origin [branch name] -f
+  또는
+  $ git push origin +[branch name]
+  https://gmlwjd9405.github.io/2018/05/25/git-add-cancle.html
