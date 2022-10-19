@@ -87,3 +87,99 @@
 			}
 		}		
 		==================================================================================================================================================
+
+
+# Jenkinsfile 로 배포
+
+	======================================================================================================
+	import java.text.SimpleDateFormat
+
+
+	def remote = [:]
+	def download_command = ""
+	def now = ""
+	def file_name = ""
+	def upload_url = ""
+	def tar_command =""
+	def tar_upload_command =""
+	def snapshot_upload_command =""
+
+	pipeline {
+		agent { label 'docker-maven' }
+
+		environment {
+			ARTIFACT_ID = readMavenPom().getArtifactId()
+			VERSION = readMavenPom().getVersion()
+			PACKGING = readMavenPom().getPackaging() 
+			GROUP_ID = readMavenPom().getGroupId()
+			NEXUS_ARTIFACT_URL = 'https://sungchul.xyz/upload/'
+			DELIVERY_FILE_NAME = 'stock'
+			DELIVERY_FILE_EXTENSION = '.tar'        
+		}
+		
+		parameters {
+			credentials(
+				credentialType: 'com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl',
+				defaultValue: '',
+				description: 'The credentials needed to deploy.',
+				name: 'deployCredentialsId',
+				required: true
+			)
+		}
+
+		stages {
+			stage("Pre"){
+				steps {
+					script {
+						def dateFormat = new SimpleDateFormat("yyMMddHHmm")
+						def date = new Date()
+						now = dateFormat.format(date)
+
+						file_name = DELIVERY_FILE_NAME+"-"+now+DELIVERY_FILE_EXTENSION
+						upload_url = NEXUS_ARTIFACT_URL
+						tar_command = 'cd target && tar cvf '+ file_name + ' stock.war '
+						tar_upload_command = "cd target && curl -u ${NEXUS_ID}:${NEXUS_PW} --upload-file "+file_name+" "+upload_url 
+						snapshot_upload_command = "cd target && curl -u ${NEXUS_ID}:${NEXUS_PW} --upload-file stock.war "+upload_url
+						
+						
+						cd_url1 = "curl -X POST https://${CD_ID}:${CD_TOKEN}@jenkinscd.sungchul.xyz/job/sungchulFolder/job/stock/buildWithParameters?token=run"
+						
+					}
+					echo file_name
+					echo upload_url
+				}
+			}    
+		
+			stage("Build") {
+				steps {
+					withMaven(mavenSettingsConfig: 'Maven_config') {
+						sh "echo Build"
+						sh "mvn clean package -Dmaven.test.skip=true"
+					}
+				}
+			}
+			stage("Delivery To Nexus") {
+				steps {
+					
+					sh "pwd"
+					sh  tar_command
+					sh "cd target && ls -al"
+					echo tar_upload_command
+					//sh tar_upload_command
+					echo snapshot_upload_command
+					sh snapshot_upload_command
+					
+				} 
+			}
+			stage("Deploy") {
+				steps {
+					sh cd_url1
+				}
+			}	        
+			
+		}
+	}
+
+
+
+	======================================================================================================
