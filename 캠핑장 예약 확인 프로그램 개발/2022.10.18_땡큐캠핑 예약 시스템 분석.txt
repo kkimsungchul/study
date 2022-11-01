@@ -1,0 +1,66 @@
+[ 땡큐캠핑 예약 시스템 분석 ]
+
+
+# 캠핑장 예약 페이지
+	URL : http://r.camperstory.com/resMain.hbb?reserve_path=RP&campseq=3866
+	campseq 만 원하는 캠핑장 seq로 변경하면 다른 사이트도 파싱 가능
+		ex)http://r.camperstory.com/resMain.hbb?reserve_path=RP&campseq=3443
+
+	
+	※ 꼭 위의 URL로 접속해야 정보 분석이 쉬움, 땡큐캠핑사이트 접속 후 검색하면 자꾸 새탭 새창으로 떠서 힘듬
+
+# 대분류 예약 페이지
+	URL : http://r.camperstory.com/axResMain.hbb
+	Content-Type: application/x-www-form-urlencoded
+	Data : 
+		p_date: 20221018			//조회한 날짜
+		res_dt: 20221025			//예약 시작일
+		res_edt: 20221026			//퇴실일 전날
+		res_edt2: 20221027			//퇴실일
+		ser_res_days: 2				//연속예약일수, 4박5일 예약하면 4, 5박6일 예약하며 5
+		res_able_dt: 20221206		//예약가능한 마지막날
+		old_res_dt: 20221018		//예약가능한 첫째날
+		campseq: 3866				//캠핑장 고유번호
+		campsiteseq:			
+		ser_yn: Y	
+		pCnt: 1
+		mCnt: 2
+		tCnt: 13
+		ViewImgPage: $1$
+		res_max_dt: 6				//최대 예약 가능한 일수
+		res_tp: 
+		sel_res_days: 
+	
+	해당 페이지는 queryString 으로 조회가 가능함
+	http://r.camperstory.com/axResMain.hbb?p_date=20221018&res_dt=20221023&res_edt=20221027&res_edt2=20221028&ser_res_days=5&res_able_dt=20221206&old_res_dt=20221018&campseq=3866&campsiteseq=&ser_yn=Y&pCnt=1&mCnt=2&tCnt=13&ViewImgPage=%241%24&res_max_dt=6&res_tp=&sel_res_days=
+
+
+# 상세 예약 페이지
+	상세 예약페이지는, 대분류 예약페이지에서 파싱한 campsiteseq 가 필요함
+	URL : http://r.camperstory.com/resStep.hbb
+	Content-Type: application/x-www-form-urlencoded
+	Data : 
+		p_date: 20221018
+		res_dt: 20221023
+		res_edt: 20221027
+		res_edt2: 20221028
+		ser_res_days: 5
+		res_able_dt: 20221206
+		old_res_dt: 20221018
+		campseq: 3866
+		campsiteseq: 14544		//선택한 캠핑 사이트 고유번호
+		ser_yn: Y
+		pCnt: 1
+		mCnt: 2
+		tCnt: 13
+		ViewImgPage: $1$
+		res_max_dt: 6
+		res_tp: 
+		sel_res_days: 5
+	
+	해당페이지는 queryString 로 조회가 불가능하며 x-www-form-urlencoded 로 조회해야함
+
+
+
+대분류 예약페이지에서 조회한 정보를 토대로, 상세 예약 페이지에 필요한 데이터를 넣어보내면 필요한 데이터들이 넘어옴
+HTML 로 넘어오기 때문에 jsoup 를 사용하여 파싱함
