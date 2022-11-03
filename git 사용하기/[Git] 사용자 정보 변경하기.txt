@@ -1,0 +1,17 @@
+[Git - 사용자 정보 변경하기]
+
+커밋을 하면 커밋한 사용자의 정보가 커밋 히스토리에 남음
+
+#사용자 이름 확인
+  $git config user.name
+
+# 사용자 이메일 확인
+  $git config user.email
+
+# 사용자 이름 변경
+  $git config --global user.name 변경할 이름
+  ex) git config --global user.name 김성철
+ 
+# 사용자 이메일 변경
+  $git config --global user.email 변경할 이메일
+  ex_ git config --global user.email kimsc1218@gmail.com
