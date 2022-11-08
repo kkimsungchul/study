@@ -1,0 +1,173 @@
+[JAVA - LocalDateTime 클래스 사용하기]
+	http://blog.eomdev.com/java/2016/04/01/%EC%9E%90%EB%B0%948%EC%9D%98-java.time-%ED%8C%A8%ED%82%A4%EC%A7%80.html
+
+# 날짜와 시간 객체 생성
+
+	LocalDate currentDate = LocalDate.now();    // 컴퓨터의 현재 날짜 정보를 저장한 LocalDate 객체를 리턴한다. 결과 : 2016-04-01 
+	LocalDate targetDate = LocalDate.of(int year, int month, int dayOfMonth);   // 파라미터로 주어진 날짜 정보를 저장한 LocalDate 객체를 리턴한다. 결과 : 1986-11-22
+
+
+=================================================================================================================
+리턴 타입	메소드(매개변수)		설명
+int			getYear()				년
+Month		getMonth()				Month 열거 값(JANUARY, FEBRUARY, MARCH ..)
+int			getMonthValue()			월(1, 2, 3 ..)
+int			getDayOfYear()			일년의 몇 번째 일
+int			getDayOfMonth()			월의 몇 번째 일
+DayOfWeek	getDayOfWeek()			요일(MONDAY, TUESDAY, WEDNESDAY..)
+boolean		isLeapYear()			윤년여부
+
+=================================================================================================================
+
+# LocalTime - 시간정보면 필요할 떄 사용
+	LocalTime currentTime = LocalTime.now();    // 컴퓨터의 현재 시간 정보. 결과 : 16:24:02.408 
+	LocalTime targetTime = LocalTime.of(int hour, int minute, int second, int nanoOfSecond); // 파라미터로 주어진 시간 정보를 저장한 LocalTime 객체를 리턴한다. 
+
+
+# 날짜와 시간 정보가 모두 필요할 때
+	LocalDateTime currentDateTime = LocalDateTime.now();    // 컴퓨터의 현재 날짜와 시간 정보. 결과 : 2016-04-01T16:34:24.757
+	LocalDateTime targetDateTime = LocalDateTime.of(int year, int month, int dayOfMonth, int hour, int minute, int second, int nanoOfSecond);
+
+
+# 날짜와 시간 더하기
+	LocalDateTime currentDateTime = LocalDateTime.now();
+	LocalDateTime targetDateTime = currentDateTime
+			.plusYears(long)       // 년도 더하기
+			.minusYears(long)      // 년도 빼기
+			.plusMonths(long)      // 월 더하기 
+			.minusMonths(long)     // 월 빼기
+			.plusDays(long)        // 일 더하기 
+			.minusDays(long)       // 일 빼기
+			.plusWeeks(long)       // 주 더하기
+			.minusWeeks(long);     // 주 빼기
+
+
+
+	LocalDateTime targetDateTime2 = currentDateTime
+			.plusHours(long)       // 시간 더하기
+			.minusHours(long)      // 시간 빼기
+			.plusMinutes(long)     // 분 더하기 
+			.minusMinutes(long)    // 분 빼기
+			.plusSeconds(long)     // 초 더하기 
+			.minusSeconds(long)    // 초 빼기
+			.plusNanos(long)       // 나노초 더하기
+			.minusNanos(long);     // 나노초 빼기
+
+
+# 날짜와 시간 변경하기
+
+	LocalDateTime targetDateTime3 = currentDateTime
+					.withYear(int)          // 년도를 변경
+					.withMonth(int)         // 월 변경
+					.withDayOfMonth(int)    // 월의 일을 변경
+					.withDayOfYear(int);    // 년도의 일을 변경
+					.with(TemporalAdjuster adjuster) // 현재 날짜를 기준으로 상대적인 날짜로 변경
+
+
+# 날짜와 요일등 구하기
+
+	LocalDateTime targetDateTime4 = currentDateTime
+			.with(TemporalAdjusters.firstDayOfYear())       // 이번 년도의 첫 번째 일(1월 1일)
+			.with(TemporalAdjusters.lastDayOfYear())        // 이번 년도의 마지막 일(12월 31일)
+			.with(TemporalAdjusters.firstDayOfNextYear())   // 다음 년도의 첫 번째 일(1월 1일)
+			.with(TemporalAdjusters.firstDayOfMonth())      // 이번 달의 첫 번째 일(1일)
+			.with(TemporalAdjusters.lastDayOfMonth())       // 이번 달의 마지막 일
+			.with(TemporalAdjusters.firstDayOfNextMonth())  // 다음 달의 첫 번째 일(1일)
+			.with(TemporalAdjusters.firstInMonth(DayOfWeek.MONDAY)) // 이번 달의 첫 번째 요일(여기서는 월요일)
+			.with(TemporalAdjusters.lastInMonth(DayOfWeek.FRIDAY))  // 이번 달의 마지막 요일(여기서는 마지막 금요일)
+			.with(TemporalAdjusters.next(DayOfWeek.FRIDAY))       // 다음주 금요일
+			.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY)) // 다음주 금요일(오늘 포함. 오늘이 금요일이라면 오늘 날짜가 표시 된다.)
+			.with(TemporalAdjusters.previous(DayOfWeek.FRIDAY))     // 지난주 금요일
+			.with(TemporalAdjusters.previousOrSame(DayOfWeek.FRIDAY));// 지난주 금요일(오늘 포함)
+
+
+# 날짜 비교 하기
+
+	
+	LocalDateTime startDateTime = LocalDateTime.now();  // 2016-04-01T23:39:57.008
+	LocalDateTime endDateTime = LocalDateTime.of(2016, 4, 1, 23, 59, 59);
+
+	// startDateTime이 endDateTime 보다 이전 날짜 인지 비교
+	startDateTime.isBefore(endDateTime);    // true
+
+	// 동일 날짜인지 비교
+	startDateTime.isEqual(endDateTime); // false
+
+	// startDateTime이 endDateTime 보다 이후 날짜인지
+
+
+# 시간 비교 하기
+
+	LocalTime startTime = LocalTime.now();  // 23:52:35.603
+	LocalTime endTime = LocalTime.of(23, 59, 59);
+
+	// startTime이 endTime 보다 이전 시간 인지 비교
+	startTime.isBefore(endTime);    // true
+
+	// startTime이 endTime 보다 이후 시간 인지 비교
+	startTime.isAfter(endTime); // false
+
+
+# 날짜 차이 계산하기
+
+	LocalDate currentDate = LocalDate.now(); // 2016-04-02
+	LocalDate targetDate = LocalDate.of(2016,5,5);
+
+	Period period = currentDate.until(targetDate);
+
+	period.getYears();      // 0년
+	period.getMonths();     // 1개월
+	period.getDays();       // 3일 차이
+
+
+	
+	LocalDate startDate = LocalDate.now(); // 2016-04-02
+	LocalDate endDate = LocalDate.of(2016,5,5);
+
+	Period period = Period.between(startDate, endDate);
+
+	period.getYears();      // 0년
+	period.getMonths();     // 1개월
+	period.getDays();       // 3일 차이
+
+
+# 시간 차이 계산하기
+	LocalTime startTime = LocalTime.now();  // 00:35:39
+	LocalTime endTime = LocalTime.of(12,59,00);
+
+	startTime.until(endTime, ChronoUnit.HOURS); 
+
+
+
+	LocalTime startTime = LocalTime.now();  // 00:35:39
+	LocalTime endTime = LocalTime.of(12,59,00);
+
+	Duration duration = Duration.between(startTime, endTime);
+	duration.getSeconds();      // 초의 차이
+	duration.getNano();         // 나노초의 차이
+
+
+
+# 전체 시간을 기준으로 차이 계산하기
+
+	날짜 차이 계산하기에서 Period 클래스의 between()메소드를 사용해서 계산하는 경우, getDays()의 결과는 3 이었다. 
+	하지만 실제 1개월 3일 차이이므로 33일이 나오도록 전체 일을 구하는 방법은 ChronoUnit 클래스의 between(Temporal start, Temporal end) 메소드를 사용하면 되고, 
+	리턴 타입은 long 이다.
+
+
+	ChronoUnit.YEARS	전체 년 차이
+	ChronoUnit.MONTHS	전체 월 차이
+	ChronoUnit.WEEKS	전체 주 차이
+	ChronoUnit.DAYS	전체 일 차이
+	ChronoUnit.HOURS	전체 시간 차이
+	ChronoUnit.SECONDS	전체 초 차이
+	ChronoUnit.MILLIS	전체 밀리초 차이
+	ChronoUnit.NANOS	전체 나노초 차이
+
+
+
+# 날짜 포맷팅
+
+	LocalDateTime now = LocalDateTime.now();
+	DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy년 M월 d일 a h시 m분");
+	String nowString = now.format(dateTimeFormatter);   // 결과 : 2016년 4월 2일 오전 1시 4분
