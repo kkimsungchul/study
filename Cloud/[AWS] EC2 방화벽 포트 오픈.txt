@@ -19,3 +19,7 @@
 
 # 내부에서 외부로도 갈수 있도록 오픈
 	sudo iptables -I OUTPUT 1 -p tcp --dport 8080 -j ACCEPT
+
+
+# AWS 보안 탭에서 인바운드 규칙 허용하기
+	
