@@ -1,0 +1,17 @@
+[keycloak - Adapter config 설정 ]
+
+
+# 참고 링크
+	https://www.keycloak.org/docs/latest/securing_apps/index.html#_java_adapter_config - 공식문서
+
+	https://m.blog.naver.com/cmh348/221987284447 - 번역해놓은곳, 파파고임
+
+
+
+
+# disable-trust-manager
+
+	Keycloak 서버에 HTTPS가 필요하고 이 구성 옵션이 true로 설정된 경우 신뢰 저장소를 지정할 필요가 없다. 
+	이 설정은 SSL 인증서의 검증이 불가능하므로 개발 중에만 사용해야 하며 프로덕션에서는 절대 사용해서는 안 된다. 
+	이것은 선택 사항이다. 
+	기본값은 false 이다.
