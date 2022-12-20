@@ -1,0 +1,323 @@
+[ JAVA - OS명령어로 gitlab push 하기 ]
+
+	gitlab에서 특정 코드를 내려받아서 다른 프로젝트에 푸쉬하기.
+	운영체제 명령어를 사용하였으며 리눅스 기반임
+
+
+=================================================================================================================
+    /**
+
+     * GitLab 브랜치 조회
+
+     * 
+
+     * @param gitProjectId
+
+     * @param gitLabPrivateToken
+
+     */
+
+    public List<Map<String, Object>> getGitLabBranchList(String gitProjectId, String gitLabPrivateToken) {
+
+        String uri = gitUrl + "/api/v4/projects/" + gitProjectId + "/repository/branches?per_page=100";
+
+        try {
+
+        	
+        	List<Map<String, Object>> gitLabBranchList = (List<Map<String, Object>>) callGetRestApi(uri, makeHttpHeader(gitLabPrivateToken), null);
+
+            return gitLabBranchList;
+
+            
+        }catch(HttpClientErrorException.NotFound e) {
+
+        	return null;
+
+        }catch(Exception e) {
+
+        	LOGGER.error("#### getGitLabBranchList ERROR " );
+
+        	return null;
+
+        }
+
+    }
+
+    
+    
+    /**
+
+     * GitLab Template 프로젝트의 파일URL 조회
+
+     *
+
+     * @param gitProjectId
+
+     * @return HashMap<String,String>
+
+     */
+
+    public HashMap<String,String> getTemplateFile(long projectId){
+
+    	
+    	List<Map<String, Object>> releasesList = getGitLabProjectReleases(String.valueOf(projectId), null);
+
+    	String downloadCommand ="";
+
+    	String downloadUrl = "";
+
+    	String fileName = "";
+
+    	String moduleName ="";
+
+    	String tagName = "";
+
+    	HashMap<String,String> templateMap = new HashMap<String,String>();
+
+    	//릴리즈가 없을경우
+
+    	if(releasesList==null) {
+
+    		return null;
+
+    	}else if(releasesList.size()>0){
+
+    		moduleName = releasesList.get(0).get("name").toString();
+
+    		tagName = releasesList.get(0).get("tag_name").toString();
+
+    		HashMap<String,Object> assetsMap = (HashMap<String,Object>)releasesList.get(0).get("assets");
+
+    		ArrayList<Map<String,String>> sourceList =  (ArrayList<Map<String,String>>)assetsMap.get("sources");
+
+    		for(Map<String,String> tempMap : sourceList) {
+
+    			if(tempMap.get("format").equalsIgnoreCase("tar.gz")) {
+
+    				downloadUrl = tempMap.get("url");
+
+    				
+    				String temp[] = downloadUrl.split("/");
+
+    				fileName = temp[temp.length-1];
+
+    			}
+
+    		}
+
+    	}
+
+    	//해당 모듈 다운로드 URL
+
+    	downloadCommand = "curl -k --remote-name --header \"PRIVATE-TOKEN:"+gitAdmintoken+"\" \""+downloadUrl+"\"";
+
+    	templateMap.put("downloadCommand",downloadCommand);
+
+    	templateMap.put("fileName", fileName);
+
+    	templateMap.put("moduleName", moduleName);
+
+    	templateMap.put("tagName", tagName);
+
+    	return templateMap;
+
+    }
+
+    
+    /**
+
+     * 생성한 프로젝트에 GitLab Template 추가
+
+     * @param gitProjectId
+
+     */
+
+    public CreateGitLabTemplateVO createGitTemplate(long projectId , Map<String, Object> gitProjectMap , long templateId) {
+
+		//Template 조회
+
+    	HashMap<String,String> templateMap = getTemplateFile(templateId);
+
+		//푸쉬할 프로젝트 정보    	
+
+        long gitProjectId = Long.parseLong(gitProjectMap.get("id").toString());
+
+        String gitProjectName = ((String) gitProjectMap.get("name")).replaceAll(" ", "_");
+
+        String gitUrl = (String) gitProjectMap.get("http_url_to_repo");
+
+		String projectPushUrl ="https://"+gitAdminId+":"+gitAdmintoken+"@" + gitUrl.replaceAll("https://", "");
+
+		
+		
+		String path="/tomcat/module_temp/"+gitProjectId+"_"+gitProjectName;
+
+		String folderName = templateMap.get("fileName").replaceAll(".tar.gz", "");
+
+		String moduleName = templateMap.get("moduleName");
+
+		String tagName = templateMap.get("tagName");
+
+		
+		CreateGitLabTemplateVO createGitLabTemplateVO = new CreateGitLabTemplateVO();
+
+		
+		createGitLabTemplateVO.setProjectId(projectId);
+
+		createGitLabTemplateVO.setGitId(gitProjectId);
+
+		createGitLabTemplateVO.setTemplateId(templateId);
+
+		createGitLabTemplateVO.setTemplateVersion(tagName);
+
+		createGitLabTemplateVO.setTemplatePath(path);
+
+		createGitLabTemplateVO.setCreatedBy(keyCloakSession.getLoginId());
+
+		
+		
+		//프로젝트 폴더 생성
+
+		String makeDirectoryCommand = "mkdir -p "+path;
+
+		LOGGER.info("### makeDirectoryCommand : " + makeDirectoryCommand);
+
+		//ShellCommand.shellCmd(makeDirectoryCommand);
+
+		ShellCommand.execute(makeDirectoryCommand);
+
+
+
+		//모듈 다운로드
+
+		String downloadCommand = "cd "+path+" && " + templateMap.get("downloadCommand");
+
+		LOGGER.info("### downloadCommand : " + downloadCommand);
+
+		//ShellCommand.shellCmd(downloadCommand);
+
+		ShellCommand.execute(downloadCommand);
+
+		
+		//모듈 권한 변경
+
+		String chmodCommand = "cd "+path+" && " + "chmod -R 755 "+templateMap.get("fileName");
+
+		LOGGER.info("### chmodCommand : " + chmodCommand);
+
+		//ShellCommand.shellCmd(downloadCommand);
+
+		ShellCommand.execute(chmodCommand);
+
+		
+		
+		//모듈 압축 해제
+
+		//tar -xzvf auth-20221021-1.tar.gz
+
+		String decompressCommand = "cd "+ path +" && tar -xzvf "+templateMap.get("fileName");
+
+		LOGGER.info("### decompressCommand : " + decompressCommand);
+
+		ShellCommand.execute(decompressCommand);
+
+
+		//git init git 버전 2.28 이상 - start
+
+//		String projectPath =  path +"/"+folderName;
+
+//		String gitInitCommand = "cd "+projectPath+" && git init --initial-branch=main";
+
+//		LOGGER.info("gitInitCommand : " + gitInitCommand);
+
+//		ShellCommand.execute(gitInitCommand);
+
+		//git init git 버전 2.28 이상 -end
+
+		
+		//git init git 버전 2.28 미만 -start
+
+		String projectPath =  path +"/"+folderName;
+
+		String gitInitCommand = "cd "+projectPath+" && git init";
+
+		LOGGER.info("### gitInitCommand : " + gitInitCommand);
+
+		ShellCommand.execute(gitInitCommand);
+
+		String gitHeadCommand = "cd "+projectPath+" && git symbolic-ref HEAD refs/heads/master";
+
+		LOGGER.info("### gitHeadCommand : " + gitHeadCommand);
+
+		ShellCommand.execute(gitHeadCommand);
+
+		//git init git 버전 2.28 미만 -end
+
+		
+		
+		//git config name
+
+		String gitConfigNameCommand = "cd "+projectPath+" && git config user.name \""+keyCloakSession.getUserInfo().getName()+"\"";
+
+		LOGGER.info("### gitConfigNameCommand : " + gitConfigNameCommand);
+
+		ShellCommand.execute(gitConfigNameCommand);
+
+		
+		//git config email
+
+		String gitConfigMailCommand = "cd "+projectPath+" && git config user.email \""+keyCloakSession.getUserInfo().getEmail()+"\"";
+
+		LOGGER.info("### gitConfigMailCommand : " + gitConfigMailCommand);
+
+		ShellCommand.execute(gitConfigMailCommand);
+
+		
+		
+		
+		//git remote
+
+		String gitRemoteCommand = "cd "+projectPath+" && git remote add origin "+projectPushUrl;
+
+		LOGGER.info("### gitRemoteCommand : " + gitRemoteCommand);
+
+		ShellCommand.execute(gitRemoteCommand);
+
+		
+		//git add
+
+		String gitAddCommand = "cd "+projectPath+" && git add .";
+
+		LOGGER.info("### gitAddCommand : " + gitAddCommand);
+
+		ShellCommand.execute(gitAddCommand); 
+
+		
+		//git commit
+
+		String gitCommitCommand = "cd "+projectPath+" && git commit -am '"+moduleName+ " " + tagName +" 템플릿 생성 완료'";
+
+		LOGGER.info("### gitCommitCommand : " + gitCommitCommand);
+
+		ShellCommand.execute(gitCommitCommand); 
+
+		
+		//git push
+
+		String gitPushCommand = "cd "+projectPath+" && git push -u origin master";
+
+		LOGGER.info("### gitPushCommand : " + gitPushCommand);
+
+		ShellCommand.execute(gitPushCommand);
+
+		
+		return createGitLabTemplateVO;
+
+    	
+    	
+    }
+
+
+
+
+=================================================================================================================
