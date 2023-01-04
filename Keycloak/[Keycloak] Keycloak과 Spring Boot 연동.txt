@@ -177,6 +177,9 @@
 
 # application.yml 파일 수정
 
+	아래 작성하는 내용에 대한 정보는
+	keycloak 에서 생성한 clien 의 installation  탭에서 확인이 가능함
+
 	※아래의 부분은 오류가 발생해서 추가한 내용 
 	참고링크 : https://stackoverflow.com/questions/70207564/spring-boot-2-6-regression-how-can-i-fix-keycloak-circular-dependency-in-adapte
 	spring:
