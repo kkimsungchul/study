@@ -65,7 +65,14 @@
 		Vaild Redirect URIs : http://localhost:9999/
 
 	
-
+	# realms 의 Role 설정
+		※ ROLE_USER도 똑같은 방식으로 생성
+		1. 좌측의 Configure 탭의 Roles 클릭
+		2. Add Role 클릭 후 "ROLE_ADMIN" 입력 후 생성
+			ROLE_USER도 똑같은 방식으로 생성
+		3. 생성 후 다시 Roles 탭에서 생성한 ROLE_ADMIN 클릭
+			Composite Roles 를 "ON" 으로 변경
+		4. 변경 후 하단에 생성되는  "Composite Roles" 부분에서 포함될 권한들을 설정
 
 	
 	# my_cilent의  Role 설정
@@ -82,6 +89,12 @@
 			Role Name : ROLE_USER 
 
 
+	# Client Authenticator 확인
+		1. 좌측의 Configure 탭의 Clients 클릭
+
+		2. 우측에 표시되는 탭에서 credentials 클릭
+
+		3. secret 에 표시되는 내용 복사
 
 	※ Client Authenticator : JBFLaz1mgZKPwYNqE9Tfyf0c3b2mnkOl
 		해당 값은 생성하고 나면 Credentials 의 탭에 표시되는 값
@@ -122,6 +135,7 @@
 		Temporary : OFF 로 변경
 		※ off 로 변경하지 않을 경우 처음 로그인 시 비밀번호를 변경하라고 나옴
 
+	
 
 # 사용자의 Role Mapping
 	1. 좌측의 Manage 탭에서 Users 클릭
@@ -137,6 +151,9 @@
 	===
 	관리자 계정은 
 	ROLE_USER , ROLE_ADMIN 둘다 추가
+
+# 사용자 로그인
+	http://localhost:8080/auth/realms/demo/account/#/
 
 
 # 사용자 생성 완료 테스트
@@ -198,3 +215,25 @@ curl -X POST "http://localhost:8080/auth/realms/master/protocol/openid-connect/t
 
 
 
+=================================================================================================================
+=================================================================================================================
+91296885
+!Gnew007
+
+curl -X POST "http://localhost:8080/auth/realms/demo/protocol/openid-connect/token" ^
+--header "Content-Type:application/x-www-form-urlencoded" ^
+--data-urlencode "grant_type=password" ^
+--data-urlencode "client_id=my_client" ^
+--data-urlencode "client_secret=qvkQHSyu9o0y6PuwCKcteVw0YrrK52dU" ^
+--data-urlencode "username=91296885" ^
+--data-urlencode "password=!Gnew007"
+
+
+
+curl -X POST "http://localhost:8080/auth/realms/demo/protocol/openid-connect/token" ^
+--header "Content-Type:application/x-www-form-urlencoded" ^
+--data-urlencode "grant_type=password" ^
+--data-urlencode "client_id=my_client" ^
+--data-urlencode "client_secret=qvkQHSyu9o0y6PuwCKcteVw0YrrK52dU" ^
+--data-urlencode "username=kimsc1218" ^
+--data-urlencode "password=admin"
