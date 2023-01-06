@@ -1,0 +1,118 @@
+[ Keycloak - Keycloak으로 젠킨스 로그인 하기 - 권한 설정 ]
+	https://oingdaddy.tistory.com/245
+	https://oingdaddy.tistory.com/249
+
+	Jenkins 파일 문제생겻을 경우
+		https://oingdaddy.tistory.com/247
+
+# keycloak - jenkins 에서 사용할 권한 설정
+
+	1. realm 에서 Demo 선택
+
+	2. 좌측 탭에서 Clients 클릭
+
+	3. Jenkins_cilent 클릭
+
+	4. 화면에 표시되는 상단탭에서 Roles 클릭
+
+	5. Add Role 버튼 클릭
+
+	6. jenkins_user , jenkins_admin 룰 두개를 각각 추가
+
+# Keycloak - Endpoints 정보 확인
+	
+	1. realm 에서 Demo 선택
+
+	2. 좌측 탭에서 Realm Settings 클릭
+
+	3. General 탭에서 하단의 Endpoints 에 있는 "OpenID Endpoint Configuration" 를 클릭
+
+	4. 클릭하면 이동되는 URL을 보관
+		http://localhost:8080/auth/realms/demo/.well-known/openid-configuration
+
+
+
+# keycloak - jenkins_clients 설정
+	※중요※ 아래의 6번까지의 항목은, Jenkins 설정을 마저 하고 하자
+	AccessType 을 public 에서 confidential 로 지금바꿔버리면 로그인을 못함
+
+	1. Keycloak 접속
+	
+	2. Realm 을 Demo 로 선택
+
+	3. 좌측 탭에서 Clients 선택
+
+	4. 목록에서 jenkins_clients 선택
+
+	5. 아래의 설정 진행
+		- Cilent Protocal 을 openid-connect 
+		
+		- Access Type 를 confidential 
+
+		- Valid Redirect URIs 에 keycloak URL 추가
+			(기존에는 jenkins 만 추가되어 있었음)
+			http://localhost:8080/*
+
+		- Base URL 에 Jenkins URL 추가
+			http://localhost:7070/*
+
+		- Web Origins  에 keycloak URL 추가
+			(기존에는 jenkins 만 추가되어 있었음)
+			http://localhost:8080/
+	
+	=================================================================================================================
+	6. 설정이 완료되면 credentials 탭으로 이동
+	
+	7. 해당 탭에서 발행해주는 Secret 키를 보관
+		i9WQgQRAeWKM9SMe1UgFVz1Gid17qmbM
+
+	=================================================================================================================
+
+	8. Mappers 탭으로 이동
+
+	9. Create 버튼을 클릭
+		Name  : group-membership
+		
+		Mapper Type : Group Membership
+
+		Token Claim Name : group-membership
+		
+		그밑에 옵션들은 전부다 on으로 두고 생성
+
+
+# keycloak - Group 생성
+	
+	1. 좌측탭의 Manage 에서 Groups 클릭
+
+	2. New 클릭후 jenkins_user , jenkins_admin 그룹 생성
+	
+# Keycloak - user에 그룹 매핑
+
+	1. 좌측탭의 Manage 에서 Users 클릭
+	
+	2. 원하는 사용자들을 클릭 후 Group 를 매핑
+
+
+
+# Jenkins - OpenId Connect Authentication 플러그인 설치
+
+	1. Jenkins 접속
+
+	2. 좌측의 Jenkins 관리 클릭
+
+	3. 플러그인 관리 클릭
+
+	4. OpenId Connect Authentication 플러그인 설치
+
+
+# Jenkins - config.xml 파일 백업
+	※ 백업해두자  실수하면 되돌릴수 없다고 한다
+
+	- window 경로
+		C:\ProgramData\Jenkins\.jenkins
+	- linux 경로
+		~/.jenkins/config.xml
+	파일명 : config.xml
+
+# Jenkins - configure Security 설정
+	

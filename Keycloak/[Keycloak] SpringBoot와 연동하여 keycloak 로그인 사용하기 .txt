@@ -2,29 +2,76 @@
 
 https://oingdaddy.tistory.com/196
 
+# 키클락 설정
+	https://github.com/kkimsungchul/study/blob/master/Keycloak/%5BKeycloak%5D%20%EC%84%A4%EC%B9%98%20%EB%B0%8F%20%EC%84%B8%ED%8C%85.txt
+	파일 참고
+	
 
 
+# 프로젝트 생성
+	* maven 사용
+	name : keycloak 
+	
 
-# pom.xml 에 추가
-	spring-boot-starter-security , keycloak-spring-security-adapter 두개의 라이브러리가 필요함
+	아래의 디펜던시 선택 후 생성
+		Spring boot DevTool
+		Lombok
+		Spring Web 
+
+
+# application.properties 변경
+	application.properties  ->  application.yml 로 확장자 변경
+
+
+# Spring security 추가
+	※ 처음에 추가해도 되는데 추가를 안해서 지금 추가했음
+
+	pom.xml 파일에 아래의 내용 추가
 	=================================================================================================================
-		<properties>
-			<java.version>1.8</java.version>
-			<keycloak.version>15.1.1</keycloak.version>
-		</properties>
-
-
-			<dependency>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-starter-security</artifactId>
-			</dependency>
-
-			<dependency>
-				<groupId>org.keycloak</groupId>
-				<artifactId>keycloak-spring-security-adapter</artifactId>
-				<version>${keycloak.version}</version>
-			</dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
 	=================================================================================================================
+
+
+	* 그래들의 경우 아래의 내용추가
+	=================================================================================================================
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	=================================================================================================================
+
+# keycolak.version 추가
+	
+	pom.xml 파일을 열어서 <keycloak.version>15.1.1</keycloak.version> 추가
+	=================================================================================================================
+	<properties>
+		<java.version>1.8</java.version>
+		<keycloak.version>15.1.1</keycloak.version>
+	</properties>
+	=================================================================================================================
+
+# keycolak 라이브러리 추가
+
+	pom.xml 파일을 열어서 keycolak 라이브러리 추가
+	=================================================================================================================
+
+	<dependency>
+		<groupId>org.keycloak</groupId>
+		<artifactId>keycloak-spring-boot-starter</artifactId>
+		<version>${keycloak.version}</version>
+	</dependency>
+	<dependency>
+		<groupId>org.keycloak</groupId>
+		<artifactId>keycloak-spring-security-adapter</artifactId>
+		<version>${keycloak.version}</version>
+	</dependency>
+	=================================================================================================================
+
+	* 그래들의 경우 아래의 내용 추가
+	=================================================================================================================
+	implementation group: 'org.keycloak', name: 'keycloak-spring-boot-starter', version: '9.0.2'
+	=================================================================================================================
+
 
 # keycloak.json 파일 생성
 
@@ -44,8 +91,40 @@ https://oingdaddy.tistory.com/196
 
 	※ json 파일이 아닌 다른방식(yml 이나 properties 파일을 사용할 경우 아래의 링크 참조
 		https://www.programcreek.com/java-api-examples/?api=org.keycloak.adapters.KeycloakDeploymentBuilder
-
 		https://www.programcreek.com/java-api-examples/?code=quarkusio%2Fquarkus%2Fquarkus-master%2Fextensions%2Fkeycloak-authorization%2Fruntime%2Fsrc%2Fmain%2Fjava%2Fio%2Fquarkus%2Fkeycloak%2Fpep%2Fruntime%2FKeycloakPolicyEnforcerAuthorizer.java
+
+
+# application.yml 파일 작성
+	※ 아래에 추가한 내용들은 keycloak.json 에 작성한 내용과 똑같음
+	=================================================================================================================
+	server:
+	  port: 18080
+
+	keycloak:
+	  realm: demo
+	  auth-server-url: http://localhost:8080/auth
+	  ssl-required: external
+	  resource: my_client
+	  credentials:
+		secret: qvkQHSyu9o0y6PuwCKcteVw0YrrK52dU
+	  use-resource-role-mappings: true
+	  bearer-only: true
+
+	logging:
+	  level:
+		root: INFO
+		com.sumgchul.keycloak: DEBUG
+
+
+	spring:
+	  main:
+		allow-circular-references : true
+
+
+
+
+
+	=================================================================================================================
 
 
 # KeycloakSecurityConfig.java 파일 작성
@@ -123,3 +202,163 @@ https://oingdaddy.tistory.com/196
 	}
 
 	=================================================================================================================
+
+# Test 컨트롤러 작성
+	=================================================================================================================
+package com.sungchul.keycloak.controller;
+
+
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sungchul.keycloak.service.RestService;
+import lombok.extern.slf4j.Slf4j;
+
+import org.keycloak.KeycloakSecurityContext;
+import org.keycloak.representations.AccessToken;
+import org.keycloak.representations.AccessToken.Access;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@Slf4j
+@RestController
+@RequestMapping("/test")
+public class TestController {
+
+    @Autowired
+    RestService restService;
+
+    @RequestMapping(value = "/permitAll", method = RequestMethod.GET)
+    public ResponseEntity<String> permitAll() {
+        return ResponseEntity.ok("누구나 접근이 가능합니다.\n");
+    }
+
+    @RequestMapping(value = "/authenticated", method = RequestMethod.GET)
+    public ResponseEntity<String> authenticated(@RequestHeader String Authorization) {
+        log.info(Authorization);
+        return ResponseEntity.ok("로그인한 사람 누구나 가능합니다.\n");
+    }
+
+    @RequestMapping(value = "/user", method = RequestMethod.GET)
+    public ResponseEntity<String> user(@RequestHeader String Authorization) {
+        log.info(Authorization);
+        return ResponseEntity.ok("user 가능합니다.\n");
+    }
+
+    @RequestMapping(value = "/admin", method = RequestMethod.GET)
+    public ResponseEntity<String> admin(@RequestHeader String Authorization) {
+        log.info(Authorization);
+        return ResponseEntity.ok("admin 가능합니다.\n");
+    }
+
+    @RequestMapping(value="/getToken" , method = RequestMethod.GET)
+    public void getToken(){
+        log.info("### get token");
+
+        Map<String,Object> resultMap = new HashMap<>();
+        ObjectMapper objectMapper = new ObjectMapper();
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+        map.add("client_id", "my_client");
+        map.add("client_secret", "qvkQHSyu9o0y6PuwCKcteVw0YrrK52dU");
+        map.add("grant_type", "password");
+        map.add("username", "91296885");
+        map.add("password", "!Gnew007");
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        String authTokenPath = "http://localhost:8080/auth/realms/demo/protocol/openid-connect/token";
+        ResponseEntity<String> result = restService.postRestApi(authTokenPath, headers, map);
+        System.out.println("#######################################################################");
+        System.out.println(result);
+        try{
+            resultMap = objectMapper.readValue(result.getBody() ,Map.class);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        System.out.println("#######################################################################");
+        System.out.println(resultMap.get("access_token"));
+
+    }
+
+
+    @RequestMapping("/userInfo")
+    public ResponseEntity<HashMap<String,Object>> userInfo(){
+        HashMap<String,Object> resultMap = new HashMap<>();
+        KeycloakSecurityContext session = null;
+        try{
+            ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+            session = (KeycloakSecurityContext) servletRequestAttributes.getRequest().getAttribute(KeycloakSecurityContext.class.getName());
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        if(session==null){
+            log.info("### 로그인안됨");
+        }else{
+            AccessToken accessToken = session.getToken();
+
+            if(accessToken==null){
+                log.info("토큰 정보 없음");
+            }else{
+
+                Access access= accessToken.getRealmAccess();
+
+
+                System.out.println("### accessToken getGivenName : " + accessToken.getGivenName());
+                System.out.println("### accessToken getEmail : " + accessToken.getEmail());
+                System.out.println("### accessToken getRealmAccess : " + accessToken.getRealmAccess());
+                List<String> realmRoleList = new ArrayList<>(access.getRoles());
+                System.out.println(realmRoleList);
+
+
+                resultMap.put("accessToken.getGivenName",accessToken.getGivenName());
+                resultMap.put("accessToken.getEmail",accessToken.getEmail());
+                resultMap.put("accessToken.getRealmAccess",accessToken.getRealmAccess());
+                resultMap.put("accessToken.realmRoleList",realmRoleList);
+
+
+            }
+        }
+
+
+        return ResponseEntity.ok(resultMap);
+    }
+
+}
+
+	=================================================================================================================	
+
+
+
+# 테스트
+	1. 스프링 실행
+
+	2. keycloak 실행
+
+	3. http://localhost:18080/test/userInfo 접속
+
+	4. 접속시 로그인이 안되어 있으면 키클락으로 이동
+
+	5. 로그인이 되어 있으면 해당 페이지 접속가능
+
+	6. 해당 페이지 접속시 계정에 대한 정보들이 쭉 출력됨
+
+	※ 계정 정보
+		91296885 / !Gnew007
+		91321621 / !Gnew007
+		91306207 / !Gnew007

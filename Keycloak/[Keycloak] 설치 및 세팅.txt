@@ -63,8 +63,10 @@
 		
 		Access Type : confidential
 		Vaild Redirect URIs : http://localhost:9999/
+		Web Origins  : http://localhost:9999/
+		※ http://localhost:9999/ URL는 매핑 시킬 서비스 URL을 입력하면 됨
 
-	
+
 	# realms 의 Role 설정
 		※ ROLE_USER도 똑같은 방식으로 생성
 		1. 좌측의 Configure 탭의 Roles 클릭
