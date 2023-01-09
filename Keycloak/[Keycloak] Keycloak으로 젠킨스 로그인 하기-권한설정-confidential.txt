@@ -1,0 +1,170 @@
+[ Keycloak - Keycloak으로 젠킨스 로그인 하기 - 권한 설정( access type - confidential) ]
+	https://oingdaddy.tistory.com/249
+	Jenkins 파일 문제생겻을 경우
+		https://oingdaddy.tistory.com/247
+
+	그외 오류 관련 링크
+		https://tech.osci.kr/2020/04/21/k8s%EC%99%80-spinnaker-%EC%97%B0%EB%8F%99%ED%95%98%EA%B8%B0/
+
+
+
+# 중요 참고 사항
+	※ keycloak json 을 이용한 방법과 동시 적용시 젠킨스 로그인이 불가능함, 꼭 하나만 적용
+	이전에 access type 을 confidential 로 젠킨스와 연동했었으면 새로 클라이언트를 생성하고 할것
+
+
+
+
+
+# keycloak - Cilent 생성
+
+	1. 좌측 탭에서 Cilents 클릭
+
+	2. 우측에서 Add 클릭
+
+	3. 아래의 정보로 생성
+		Client ID  : jenkins
+		Client Protocol  : openid-connect
+		Root URL : http://localhost:7070
+		※ jenkins URL 을 넣으면 됨
+
+# keycloak - Cilent 수정
+	
+	- Cilent Protocal 을 openid-connect 
+	
+	- Access Type 를 confidential 
+
+	- Valid Redirect URIs 에 keycloak URL 추가
+		(기존에는 jenkins 만 추가되어 있었음)
+		http://localhost:8080/*
+
+	- Base URL 에 Jenkins URL 추가
+		http://localhost:7070/*
+
+	- Web Origins  에 keycloak URL 추가
+		(기존에는 jenkins 만 추가되어 있었음)
+		http://localhost:8080/*
+
+# keycloak - Credentials 확인
+	1. 좌측탭에서 clients 클릭
+
+	2. 우측탭에서 Credentials 클릭
+	
+	3. Secret 에 표시되는 키값을 확인 후 저장
+		tMkG2yIynihZytqIFIb2iJnHNy2ermgH
+	
+
+# Keycloak - Endpoints 정보 확인
+	
+	1. realm 에서 Demo 선택
+
+	2. 좌측 탭에서 Realm Settings 클릭
+
+	3. General 탭에서 하단의 Endpoints 에 있는 "OpenID Endpoint Configuration" 를 클릭
+
+	4. 클릭하면 이동되는 URL을 보관
+		http://localhost:8080/auth/realms/demo/.well-known/openid-configuration
+
+
+
+
+
+# keycloak - Mappers 설정
+	1. 좌측탭에서 clients 클릭
+
+	2. Mappers 탭으로 이동
+
+	3. Create 버튼을 클릭
+		Name  : group-membership
+		
+		Mapper Type : Group Membership
+
+		Token Claim Name : group-membership
+		
+		그밑에 옵션들은 전부다 on으로 두고 생성
+
+
+
+# Jenkins - Role-based Authorization 플러그인 설치
+	※ 굳이 설치 안해도 됨
+	1. Jenkins 접속
+
+	2. 좌측의 Jenkins 관리 클릭
+
+	3. 플러그인 관리 클릭
+
+	4. Role-based Authorization 플러그인 설치
+
+
+
+# Jenkins - OpenId Connect Authentication 플러그인 설치
+
+	1. Jenkins 접속
+
+	2. 좌측의 Jenkins 관리 클릭
+
+	3. 플러그인 관리 클릭
+
+	4. OpenId Connect Authentication 플러그인 설치
+
+
+# Jenkins - config.xml 파일 백업
+	※ 백업해두자  실수하면 되돌릴수 없다고 한다
+
+	- window 경로
+		C:\ProgramData\Jenkins\.jenkins
+	- linux 경로
+		~/.jenkins/config.xml
+	파일명 : config.xml
+
+
+# Jenkins - Configure Global Security 설정 -1
+	
+	1. Security Realm 항목에서 Login with Openid Connect 선택
+
+	2. 아래의 정보 입력
+		Client id : jenkins
+		Client secret : tMkG2yIynihZytqIFIb2iJnHNy2ermgH
+			※ 해당 값은 keycloak 에서 활성화 비활성화시마다 바뀌니까 확인을 해야함
+
+		Configuration mode : Automatic configuration 선택
+		Well-known configuration endpoint : 
+			http://localhost:8080/auth/realms/demo/.well-known/openid-configuration
+	
+	3. 저장
+
+
+# Jenkins - Configure Global Security 설정 -2
+	
+	1. 아래의 정보를 변경
+		Automatic configuration - > Manual configuration 변경
+	
+	2. 아래의 정보를 입력
+
+		Post logout redirect URL : http://localhost:7070/
+			※ jenkins url
+
+		User name field name : preferred_username
+		Full name field name : preferred_username
+		Groups field name : group-membership
+
+
+
+# Jenkins - 권한 설정
+	이전에 설치한 "Role-based Authorization" 플러그인으로 권한관리를 할수 있지만,
+	내가 원하는거는 관리자를 제외한 사용자는 모든것들을 사용할수 있도록 하는것을 원했음
+	
+
+	1. jenkins 접속
+	
+	2. jenkins 관리 클릭
+
+	3. Configure Global Security 클릭
+
+	4. Authorization 항목에서 "Project-based Matrix Authorization Strategy" 선택
+
+	5. 선택 후 Add user 를 클릭 후 admin 을 추가 한 뒤 모든 권한 체크
+
+	6. 기 등록 되어 있는 "Authenticated Users" 에는 adminster 만 제외한 모든 권한 체크 
+
+	7. save
