@@ -1,0 +1,184 @@
+[ Vue - 프로젝트 생성 ]
+	참고링크 : https://www.youtube.com/watch?v=b0ImUEsqaAA&t=1s
+
+
+	1. Vue 프로젝트 생성할 폴더로 이동
+		
+	2. vue create project01
+		project01 이라는 프로젝트가 생성됨
+	
+
+	3. 아래와 하면이 나오면 Vue3 을 선택
+		? Please pick a preset:
+		> Default ([Vue 3] babel, eslint) 
+		  Default ([Vue 2] babel, eslint) 
+		  Manually select features        
+
+	※ 아래의 방법은 Manually select features 로 생성하는 방법
+	=================================================================================================================
+
+	3. Manually select features  선택
+
+	 (*) Babel											- 구 브라우저용 자바스크립트로 변환해주는 역할
+	 ( ) TypeScript										- 타입스크립트로 vue 사용
+	 ( ) Progressive Web App (PWA) Support				- 모바일 처럼 구현할 수 있도록 해주는 기능
+	 (*) Router											- Vue 에서 메뉴를 구성하고 화면을 구성했을때 화면을 이동할수 있게 해주는 모듈
+	 (*) Vuex											- 모든 vue 컴포넌트내에서 공통으로 접근 가능한 저장소를 만들어서 데이터관리 상태관리
+	 ( ) CSS Pre-processors								
+	 (*) Linter / Formatter								- 문법체크 
+	 ( ) Unit Testing									- 단위테스트 기능 
+	 ( ) E2E Testing									- end to end 테스트기능
+		
+	4. 버전 선택
+		Choose a version of Vue.js that you want to start the project with 
+		> 3.x
+		  2.x
+
+	5. Use history mode for router? (Requires proper server setup for index fallback in production) (Y/n) 
+		Y
+	6.Pick a linter / formatter config: (Use arrow keys)
+		  ESLint with error prevention only
+		  ESLint with error prevention only
+		  ESLint + Airbnb config
+		> ESLint + Standard config
+		  ESLint + Prettier		
+	
+	7. ? Pick additional lint features: (Press <space> to select, <a> to toggle all, <i> to invert selection, and <enter> to proceed)
+			>(*) Lint on save
+			 ( ) Lint and fix on commit
+
+	8. ? Where do you prefer placing config for Babel, ESLint, etc.? (Use arrow keys)	- 설정파일관리
+		  In dedicated config files
+		> In package.json
+
+	9. ? Save this as a preset for future projects? (y/N) - 현재까지 선택한 옵션을 즐겨찾기 저장
+		Y
+		? Save preset as:
+		vue-project
+
+
+
+	# 실제 프로젝트 생성 및 세팅
+		- 프로젝트 생성
+		 vue create chat
+
+
+		- vue.config.js 파일 수정
+
+			아래와 같이   lintOnSave: false 옵션을 추가
+			=================================================================================================================
+			const { defineConfig } = require('@vue/cli-service')
+			module.exports = defineConfig({
+			  transpileDependencies: true,
+			  lintOnSave: false
+
+			})
+			=================================================================================================================
+
+
+		- axios 설치
+			npm install axios --save --legacy-peer-deps
+
+
+
+[ Vue - 프로젝트 구조 ]
+
+# package.json
+	※ 프로젝트에 대한 모든 정보
+
+	script :
+		npm run 으로 실행할 명령어
+		
+		serve : 서버 실행
+		build : 빌드 실행
+	
+
+	dependencies : 
+		외부 모듈(라이브러리) 추가 
+		운영환경에서 배포할때 필요한 모듈
+	
+	devDependencies : 
+		개발할때 사용할 모듈
+	
+	eslintConfig : 
+		
+
+	browerslist : 
+		지원할 브라우저에 대한 내용
+
+# main.js 
+	npm run serve 명렁어 실행 시 제일 먼저 실행되는 파일
+	
+	#app 은 public 폴더의 index.html 파일에 있는 ID가 app인 태그
+
+# router
+	index.js :
+		routes 에 지정한 path 와 App.vue의 router-link 태그에 있는 to와 일치해야함
+
+		
+
+# App.vue
+	
+
+# package-lock.json
+
+
+
+[ 코드 컨벤션(Code Convention) 설정 ]
+
+# prettier 설치
+	1. extestion -> Prettier - Code formatter
+
+	2. ormat on Save 확인
+	vscode 설정에서 format on save를 입력하고 나오는 설정에 체크되어 있는 지 확인한다.
+
+
+	3. Default Formatter 확인
+		간혹 에디터의 default로 설정되어 있는 formatter가 null 이거나 설정이 잘못되어 있는 경우가 있다. 
+		설정이 esbenp.prettier-vscode 로 설정되어 있는 지 확인해야 한다.
+
+
+# .prettierrc 파일 생성
+
+	=================================================================================================================
+	{
+	  "semi": false,
+	  "bracketSpacing": true,
+	  "singleQuote": true,
+	  "useTabs": false,
+	  "trailingComma": "none",
+	  "printWidth": 80
+	}
+	=================================================================================================================
+
+# package.json 파일에 아래의 내용 추가
+
+		eslintConfig 부분에 추가하면 됨
+
+		"rules": {
+		  "space-before-function-paren": "off"
+		}
+
+	=================================================================================================================
+	  "eslintConfig": {
+		"root": true,
+		"env": {
+		  "node": true
+		},
+		"extends": [
+		  "plugin:vue/vue3-essential",
+		  "@vue/standard"
+		],
+		"parserOptions": {
+		  "parser": "@babel/eslint-parser"
+		},
+		"rules": {
+		  "space-before-function-paren": "off"
+		}
+	  },
+
+
+	=================================================================================================================
+
+
+
