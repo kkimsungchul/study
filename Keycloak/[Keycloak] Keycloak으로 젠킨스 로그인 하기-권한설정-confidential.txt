@@ -49,12 +49,14 @@
 		http://localhost:8080/*
 
 # keycloak - Credentials 확인
+	※ 해당값은 설정을 다시할때마다 계속바뀜
+	
 	1. 좌측탭에서 clients 클릭
 
 	2. 우측탭에서 Credentials 클릭
 	
 	3. Secret 에 표시되는 키값을 확인 후 저장
-		tMkG2yIynihZytqIFIb2iJnHNy2ermgH
+		3761841c-a8bb-46ad-b31f-44ad10a4d36d
 	
 
 # Keycloak - Endpoints 정보 확인
@@ -67,6 +69,10 @@
 
 	4. 클릭하면 이동되는 URL을 보관
 		http://localhost:8080/auth/realms/demo/.well-known/openid-configuration
+		
+		
+		sso_dev 렐름
+		http://localhost:8080/auth/realms/sso-dev/.well-known/openid-configuration
 
 
 
@@ -75,9 +81,11 @@
 # keycloak - Mappers 설정
 	1. 좌측탭에서 clients 클릭
 
-	2. Mappers 탭으로 이동
+	2. 생성한 jenkins 클릭
 
-	3. Create 버튼을 클릭
+	3. Mappers 탭으로 이동
+
+	4. Create 버튼을 클릭
 		Name  : group-membership
 		
 		Mapper Type : Group Membership

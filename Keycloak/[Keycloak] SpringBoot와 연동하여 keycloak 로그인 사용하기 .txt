@@ -72,17 +72,47 @@ https://oingdaddy.tistory.com/196
 	implementation group: 'org.keycloak', name: 'keycloak-spring-boot-starter', version: '9.0.2'
 	=================================================================================================================
 
+# keycloak 클라이언트 생성
+	
+	1. keycloak 접속
+
+	2. 좌측탭에서 realm 을 선택 후 Clients 클릭
+
+	3. create 클릭
+
+	4. Client id 에 spring 입력 후 생성 
+
+
+# keycloak 클라이언트 설정
+
+	1. 좌측탭에서 clients 클릭
+
+	2. 생성한 클라이언트 클릭
+
+	3. Access Type 을 confidential 선택
+
+	4. Implicit Flow Enabled 을 on으로 변경
+
+	5. Valid Redirect URIs 과 Web Origins 에 Sprig 의 URL을 입력 후 저장
+		http://localhost:18080/*
+
+
 
 # keycloak.json 파일 생성
+	1. 클라이언트 선택
+
+	2. installation 탭 클릭
+
+	3. Format Option 에서 Keycloak OIDC JSON 선택
 
 	=================================================================================================================
 	{
-	  "realm": "demo",
-	  "auth-server-url": "http://localhost:8080/auth",
+	  "realm": "sso-dev",
+	  "auth-server-url": "http://localhost:8080/auth/",
 	  "ssl-required": "external",
-	  "resource": "my_client",
+	  "resource": "spring",
 	  "credentials": {
-		"secret": "qvkQHSyu9o0y6PuwCKcteVw0YrrK52dU"
+		"secret": "Ilt1pBwxtXDqlHKTYr2toTkysZaHPLK4"
 	  },
 	  "confidential-port": 0
 	}
@@ -101,12 +131,12 @@ https://oingdaddy.tistory.com/196
 	  port: 18080
 
 	keycloak:
-	  realm: demo
+	  realm: sso-dev
 	  auth-server-url: http://localhost:8080/auth
 	  ssl-required: external
-	  resource: my_client
+	  resource: spring
 	  credentials:
-		secret: qvkQHSyu9o0y6PuwCKcteVw0YrrK52dU
+		secret: 15c1f222-4231-4ccc-8f43-a1a6a185582d
 	  use-resource-role-mappings: true
 	  bearer-only: true
 
