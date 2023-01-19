@@ -16,14 +16,32 @@
 					.setName("김성철")
 					.build();
 			System.out.println(userVO);
+
+			MemberVO m = new MemberVO.Builder()
+					.setEmail("메일주소")
+					.setPassword("비밀번호")
+					.setUsername("김성철")
+					.build();
+
+			BoardVO b = new BoardVO.Builder()
+					.setContent("내용")
+					.setTitle("제목")
+					.setSeq(1)
+					.setWriter("작성자")
+					.build();
+			System.out.println("###");
+			System.out.println(b.toString());
 		}
 	}
+
+
+
 
 	=================================================================================================================
 
 
 
-# Builder 패턴을 적용한 UserVO클래스
+# Builder 패턴을 적용한 UserVO
 
 	=================================================================================================================
 	package EffectiveJava.builder_2;
@@ -75,6 +93,9 @@
 	=================================================================================================================
 
 
+
+# Builder 패턴을 적용한 MemberVO
+	
 	=================================================================================================================
 
 
@@ -145,4 +166,76 @@
 			return Objects.hash(username, email, password);
 		}
 	}
+	=================================================================================================================
+
+
+
+# Builder 패턴을 적용한 Board VO
+	=================================================================================================================
+
+	package EffectiveJava.builder_2;
+
+	public class BoardVO {
+
+		private int seq;
+		private String title;
+		private String content;
+		private String writer;
+
+		public BoardVO(Builder builder){
+			this.title = builder.title;
+			this.content = builder.content;
+			this.seq = builder.seq;
+			this.writer = builder.writer;
+		}
+
+		@Override
+		public String toString() {
+			return "BoardVO{" +
+					"seq=" + seq +
+					", title='" + title + '\'' +
+					", content='" + content + '\'' +
+					", writer='" + writer + '\'' +
+					'}';
+		}
+
+		public static class Builder{
+			private int seq;
+			private String title;
+			private String content;
+			private String writer;
+
+			public Builder setSeq(int seq){
+				this.seq = seq;
+				return this;
+			}
+
+			public Builder setTitle(String title){
+				this.title = title;
+				return this;
+			}
+
+			public Builder setContent(String content){
+				this.content = content;
+				return this;
+			}
+
+			public Builder setWriter(String writer){
+				this.writer = writer;
+				return this;
+			}
+
+			public BoardVO build(){
+				return new BoardVO(this);
+			}
+
+
+
+		}
+
+
+
+	}
+
+
 	=================================================================================================================
