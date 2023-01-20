@@ -1,0 +1,194 @@
+[ Vue - Event 사용하기 ]
+	https://www.youtube.com/watch?v=b0ImUEsqaAA
+	
+
+# click 이벤트 
+
+	javascript 에서는 onclick 로 구현을 했지만 vue에서는 @click 로 사용하면 됨
+
+	=================================================================================================================
+	<template>
+	  <div>
+		<button @click="increaseCounter">Add 1</button>
+		<br />
+		<span>{{ counter }}</span>
+	  </div>
+	</template>
+	<script>
+	export default {
+	  components: {},
+	  data() {
+		return {
+		  counter: 0
+		}
+	  },
+
+	  methods: {
+		increaseCounter() {
+		  this.counter += 1
+		}
+	  },
+
+	  setup() {},
+
+	  created() {},
+
+	  mounted() {},
+
+	  unmounted() {}
+	}
+	</script>
+
+
+	=================================================================================================================
+	
+
+# change 이벤트
+	@change 를 사용하여 이벤트를 작성함
+	@change 대신 v-on:change 를 사용해도 됨
+	change에 사용할 애는 methods 에 함수를 작성하면됨
+	젤 상위의 selected 의 값이 변함에 따라 하위에 있는 selected 의 값도 변하도록 함
+	필터는 굳이 함수를 사용하지 않고 바로 적용해도됨
+	
+	데이터바인딩을 통해서 하기때문에 위에 내용들이 전부다 가능함
+	=================================================================================================================
+	<template>
+	  <div>
+		<select @change="changeCity($event)" v-model="selectedCity">
+		  <!--<select v-on:change="changeCity" v-model="selectedCity">-->
+		  <option value="">==도시선택==</option>
+		  <option
+			:value="city.cityCode"
+			:key="city.cityCode"
+			v-for="city in cityList"
+		  >
+			{{ city.title }}
+		  </option>
+		</select>
+
+		<select>
+		  <option
+			:value="selectDong.dongCode"
+			:key="selectDong.dongCode"
+			v-for="selectDong in selectedDongList"
+		  >
+			{{ selectDong.dongTitle }}
+		  </option>
+		</select>
+		<br />
+		<select>
+		  <option
+			:value="selectDong.dongCode"
+			:key="selectDong.dongCode"
+			v-for="selectDong in this.dongList.filter(
+			  (dong) => dong.cityCode === selectedCity
+			)"
+		  >
+			{{ selectDong.dongTitle }}
+		  </option>
+		</select>
+	  </div>
+	</template>
+	<script>
+	export default {
+	  components: {},
+	  data() {
+		return {
+		  cityList: [
+			{ cityCode: '02', title: '서울' },
+			{ cityCode: '031', title: '경기' },
+			{ cityCode: '051', title: '부산' }
+		  ],
+		  dongList: [
+			{ cityCode: '02', dongCode: '1', dongTitle: '서울 1동' },
+			{ cityCode: '02', dongCode: '2', dongTitle: '서울 2동' },
+			{ cityCode: '02', dongCode: '3', dongTitle: '서울 3동' },
+			{ cityCode: '02', dongCode: '4', dongTitle: '서울 4동' },
+			{ cityCode: '031', dongCode: '1', dongTitle: '경기 1동' },
+			{ cityCode: '031', dongCode: '2', dongTitle: '경기 2동' },
+			{ cityCode: '031', dongCode: '3', dongTitle: '경기 3동' },
+			{ cityCode: '031', dongCode: '4', dongTitle: '경기 4동' },
+			{ cityCode: '051', dongCode: '1', dongTitle: '부산 1동' },
+			{ cityCode: '051', dongCode: '2', dongTitle: '부산 2동' },
+			{ cityCode: '051', dongCode: '3', dongTitle: '부산 3동' },
+			{ cityCode: '051', dongCode: '4', dongTitle: '부산 4동' }
+		  ],
+		  selectedDongList: [],
+		  selectedCity: ''
+		}
+	  },
+
+	  methods: {
+		changeCity(event) {
+		  console.log(event.target.tagName)
+		  this.selectedDongList = this.dongList.filter(
+			(dong) => dong.cityCode === this.selectedCity
+		  )
+		}
+	  },
+
+	  setup() {},
+
+	  created() {},
+
+	  mounted() {},
+
+	  unmounted() {}
+	}
+	</script>
+
+	=================================================================================================================
+
+
+# keyup , keydown 이벤트
+
+	@keyup , @keydown 이벤트를 사용하면됨
+	또한 특정 키값을 확인해서 진행할때는 아래와 같이 사용할수 있음
+	@keyup.enter   이와같이 사용하면 엔터키일때만 함수를 실행하도록 할수 있음
+	enter , tab , delete , esc , space , up , down , left , right , ctrl (컨트롤) 등이 다가능함
+	동시에 두개 입력했는지도 확인이 가능함
+		@keyup.enter.ctrl
+	
+	@keyup.stop -> 애는 event.stopPropagation()을 호출하는것과 같음
+	@keyup.prevent -> event.preventDefault() 를 호출하는것과 같음
+	=================================================================================================================
+	<template>
+	  <div>
+		<!-- <input type="search" v-model="searchText" @keyup="checkEnter($event)" /> -->
+		<input type="search" v-model="searchText" @keyup.enter="doSearch" />
+		<button @click="doSearch">조회</button>
+	  </div>
+	</template>
+	<script>
+	export default {
+	  components: {},
+	  data() {
+		return {
+		  searchText: ''
+		}
+	  },
+
+	  methods: {
+		doSearch() {
+		  console.log(this.searchText)
+		},
+
+		checkEnter(event) {
+		  if (event.keyCode === 13) {
+			this.doSearch()
+		  }
+		}
+	  },
+
+	  setup() {},
+
+	  created() {},
+
+	  mounted() {},
+
+	  unmounted() {}
+	}
+	</script>
+
+
+	=================================================================================================================
