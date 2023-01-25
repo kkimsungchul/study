@@ -1,0 +1,246 @@
+[ JAVA - Socket 통신하기 ]
+
+	참고링크 : 
+		https://kadosholy.tistory.com/125
+
+
+
+	데이터 전송의 기본 단위는 바이트(byte)로 문자의 경우 데이터 전송시 문자를 바이트로 변환하고 수신시 문자로 변환이 필요함
+	java 에서는 이 변환을 해주는 클래스로 InputStreamReader 와 OutputStreamWriter 이있음
+
+
+# Server 코드
+
+	=================================================================================================================
+
+	package com.main;
+
+	import java.io.BufferedReader;
+	import java.io.InputStreamReader;
+	import java.io.PrintWriter;
+	import java.net.ServerSocket;
+	import java.net.Socket;
+	import java.util.Scanner;
+
+	public class Main {
+
+		public static void main(String[]args){
+
+			BufferedReader in = null;
+			PrintWriter out = null;
+			ServerSocket serverSocket = null;
+			Socket socket = null;
+			Scanner scanner = new Scanner(System.in);
+
+			try{
+				//서버 소켓 생성
+				serverSocket = new ServerSocket(8000);
+				System.out.println("Server Start , Client connecting waiting");
+
+				//클라이언트 접속 대기
+				socket = serverSocket.accept();
+				System.out.println(" Client connection success");
+
+				//데이터 송수신을 위한 스트림 생성성
+				in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+				out = new PrintWriter(socket.getOutputStream());
+
+				while(true){
+					//입력받은 메시지출력
+					String inputMessage = in.readLine();
+					if("exit".equalsIgnoreCase(inputMessage)){
+						break;
+					}
+
+					System.out.println("From Client : " + inputMessage);
+					System.out.println("Send Message : ");
+
+					//보낼 메시지 입력
+					String outputMessage = scanner.nextLine();
+					out.println(outputMessage);
+					out.flush();
+					if("exit".equalsIgnoreCase(outputMessage)){
+						break;
+					}
+
+				}
+
+
+			}catch (Exception e){
+				e.printStackTrace();
+			} finally {
+				try{
+
+					//통신 종료
+					scanner.close();;
+					socket.close();;
+					serverSocket.close();
+					System.out.println("System shutdown...");
+				}catch (Exception e){
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+
+
+	=================================================================================================================
+
+
+
+
+# Client 코드
+
+
+	=================================================================================================================
+
+	import java.io.BufferedReader;
+	import java.io.InputStreamReader;
+	import java.io.PrintWriter;
+	import java.net.Socket;
+	import java.util.Scanner;
+
+	public class Main {
+
+		public static void main(String[] args) {
+			BufferedReader in = null;
+			PrintWriter out = null;
+
+			Socket socket = null;
+			Scanner scanner = new Scanner(System.in);
+
+			try{
+				socket= new Socket("127.0.0.1",8000);
+
+				in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+				out = new PrintWriter(socket.getOutputStream());
+
+				while(true){
+					System.out.println("Send Message : ");
+					String outputMessage = scanner.nextLine();
+					out.println(outputMessage);
+					out.flush();
+					if("exit".equalsIgnoreCase(outputMessage)){
+						break;
+					}
+
+					String inputMessage = in.readLine();
+					System.out.println("From Server : " + inputMessage);
+					if("exit".equalsIgnoreCase("inputMessage")){
+						break;
+					}
+
+
+
+				}
+
+			}catch (Exception e){
+				e.printStackTrace();
+			}finally {
+				try{
+
+					scanner.close();
+					socket.close();;
+				}catch (Exception e){
+					e.printStackTrace();
+				}
+			}
+
+		}
+	}
+
+
+	=================================================================================================================
+
+
+#################################################################################################################
+
+[ Chat GPT 가 만들어준 코드 ]
+
+
+
+# Server 코드
+
+	=================================================================================================================
+	import java.io.*;
+	import java.net.*;
+
+	public class Server {
+
+		public static void main(String[] args) throws IOException {
+
+			// 포트번호 
+			int portNumber = 12345;
+			
+			// 서버 소켓 생성 
+			ServerSocket serverSocket = new ServerSocket(portNumber);
+			
+			// 클라이언트 접속 대기 
+			Socket clientSocket = serverSocket.accept();
+			
+			// 입력 스트림 
+			BufferedReader in = new BufferedReader(
+				new InputStreamReader(clientSocket.getInputStream()));
+			
+			// 출력 스트림 
+			PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+			
+			// 입력받은 데이터 
+			String inputLine;
+			
+			// 데이터 읽기 
+			while ((inputLine = in.readLine()) != null) {
+				out.println("메시지 수신: " + inputLine);
+			}
+			
+			// 스트림 닫기 
+			in.close();
+			out.close();
+			clientSocket.close();
+			serverSocket.close();
+		}
+	}
+
+
+	=================================================================================================================
+
+
+# Cilent 코드
+
+	=================================================================================================================
+
+	import java.io.*;
+	import java.net.*;
+
+	public class Client {
+
+		public static void main(String[] args) throws IOException {
+
+			// 서버 주소 
+			String serverHostname = "localhost";
+			
+			// 포트번호 
+			int portNumber = 12345;
+			
+			// 소켓 생성 
+			Socket echoSocket = new Socket(serverHostname, portNumber);
+			
+			// 입력 스트림 
+			BufferedReader in = new BufferedReader(
+				new InputStreamReader(echoSocket.getInputStream()));
+			
+			// 출력 스트림 
+			PrintWriter out = new PrintWriter(echoSocket.getOutputStream(), true);
+			
+			// 데이터 전송 
+			out.println("Hello, World!");
+			
+			// 서버로부터 응답 받기 
+			System.out.println("서버 응답: " + in.readLine());
+			
+			// 스트림 닫기 
+			out.close();
+			in.close();
+		   
+	=================================================================================================================
