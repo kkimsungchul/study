@@ -131,7 +131,6 @@
 # Client 코드
 
 	=================================================================================================================
-
 	package com.socket.client;
 
 	import java.io.BufferedReader;
@@ -154,7 +153,7 @@
 				socket = new Socket("localhost",8000);
 				System.out.println("Server connection success");
 
-				String name = "user " + (int)((Math.random())*10);
+				String name = "user " + (int)((Math.random())*100);
 				Thread sendThread = new SendThread(socket,name);
 				sendThread.start();
 
@@ -162,8 +161,9 @@
 				while(in!=null){
 					String inputMessage = in.readLine();
 					if(("[" + name + "] chat room out").equalsIgnoreCase(inputMessage)){
-						System.out.println("From : " + inputMessage);
+						break;
 					}
+					System.out.println("From : " + inputMessage);
 				}
 
 			}catch (Exception e){
@@ -201,12 +201,14 @@
 				out.flush();
 
 				while(true){
+
 					String outputMessage = scanner.nextLine();
 					out.println(outputMessage);
 					out.flush();
 					if("exit".equalsIgnoreCase(outputMessage)){
 						break;
 					}
+					
 				}
 
 			}catch (Exception e){
@@ -216,6 +218,4 @@
 
 
 	}
-
-
 	=================================================================================================================
