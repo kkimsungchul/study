@@ -1,0 +1,29 @@
+[ Vue - If문 사용하기 ] 
+
+# 기본 문법
+	v-if="변수명 === 비교할 값" 으로 되어 있으며
+	HTML태그 안에서 사용하면됨
+	같은 뎁스 안에서 v-else-if 나 v-else 를 사용할수 있음
+	=================================================================================================================
+
+	<button @click="changeTrueAndFalse">값 변경</button>
+	<span v-if="test === true"> 값이 트루입니다 {{ test }} </span>
+    <span v-else-if="test === false"> 값이 펄스입니다 {{ test }} </span>
+	<span v-else> 값이 true 나 false 가 아닙니다 {{ test }} </span>
+
+
+	----- 함수
+
+    changeTrueAndFalse() {
+      if (this.test) {
+        this.test = false
+      } else {
+        this.test = true
+      }
+    }
+	=================================================================================================================
+
+	span 태그가 제일 간단해서 달았으며,
+	다른 HTML에 태그에도 추가하여서 할수 있음
+
+	
