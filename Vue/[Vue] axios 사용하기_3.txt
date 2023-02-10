@@ -1,0 +1,105 @@
+[ Vue - axios 사용하기 ] 
+
+
+# Vue 코드
+	Get 방식으로 데이터를 가져와서 리스트를 출력해줌
+	if문을 사용하도록 하였음
+
+	=================================================================================================================
+	<template>
+	  <div>
+		<button @click="getList(1)">리스트 가져오기_1</button>
+		&nbsp;&nbsp;&nbsp;&nbsp;
+		<button @click="getList(2)">리스트 가져오기_2</button>
+		<br />
+		<br />
+
+		<span :key="i" :class="'sdfdsf' + i" v-for="(nameList, i) in viewList">
+		  <span v-if="i % 2 === 0">
+			{{ nameList + ` 인덱스값 짝수${i}` }}
+			<span v-if="true"></span>
+			<span v-else-if="false"></span>
+		  </span>
+		  <span v-else>
+			{{ nameList + ` 인덱스값 홀수 ${i}` }}
+		  </span>
+		  <br />
+		</span>
+		<br /><br />
+		<button @click="changeTrueAndFalse">값 변경</button>
+		<span v-if="test === true"> 값이 트루입니다 {{ test }} </span>
+		<span v-else> 값이 펄스입니다 {{ test }} </span>
+		<!-- <span :key="i" v-for="(nameList, i) in list_2">{{ nameList }}<br /></span> -->
+	  </div>
+	</template>
+	<script>
+	import axios from 'axios'
+	export default {
+	  components: {},
+	  data() {
+		return {
+		  test: true,
+		  obj: {},
+		  list_1: [],
+		  list_2: [],
+		  viewList: []
+		}
+	  },
+
+	  methods: {
+		async getList(num) {
+		  this.obj = await (
+			await axios.get('http://localhost:8000/test/list')
+		  ).data.data
+		  this.list_1 = this.obj.list_1
+		  this.list_2 = this.obj.list_2
+		  this.viewList = num === 1 ? this.obj.list_2 : this.obj.list_1
+		},
+		changeTrueAndFalse() {
+		  if (this.test) {
+			this.test = false
+		  } else {
+			this.test = true
+		  }
+		}
+	  },
+
+	  setup() {},
+
+	  created() {},
+
+	  mounted() {},
+
+	  unmounted() {}
+	}
+	</script>
+
+
+
+	=================================================================================================================
+
+
+# Java 코드
+
+	=================================================================================================================
+    @GetMapping(value={"/list"})
+    public ResponseEntity<ResponseAPI> test(){
+        ResponseAPI responseAPI = new ResponseAPI();
+        HashMap<String,Object> map = new HashMap<>();
+        ArrayList<String> list_1 = new ArrayList<>();
+        ArrayList<String> list_2 = new ArrayList<>();
+        for(int i=0;i<100;i++){
+            list_1.add("김성철"+i);
+        }
+        for(int i=0;i<100;i++){
+            list_2.add(i+"김성철");
+        }
+
+        map.put("list_1",list_1);
+        map.put("list_2",list_2);
+
+        responseAPI.setData(map);
+        return new ResponseEntity(responseAPI , HttpStatus.OK);
+    }
+
+	=================================================================================================================

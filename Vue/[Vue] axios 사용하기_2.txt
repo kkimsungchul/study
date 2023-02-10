@@ -1,0 +1,96 @@
+[ Vue - axios 사용하기 ] 
+
+
+# Vue 코드
+	Get 방식과 Post 방식으로 호출했음
+
+	=================================================================================================================
+	<template>
+	  <div>
+		<span>POST 테스트</span>
+		<button @click="postData">Post 테스트 버튼</button>
+		<br />
+		<span>GET 테스트</span>
+		<button @click="getData">Get 테스트 버튼</button>
+		<br />
+		<br />
+		{{ resultData.method }}<br />
+		{{ resultData.result }}<br />
+		{{ resultData.input }}<br />
+	  </div>
+	</template>
+	<script>
+	import axios from 'axios'
+	export default {
+	  components: {},
+	  data() {
+		return {
+		  postSendData: {
+			name: '김성철',
+			age: '32',
+			birth: '1991-12-18',
+			phone: '010-1111-1111'
+		  },
+		  getSendData: '아무값',
+		  resultData: {}
+		}
+	  },
+
+	  methods: {
+		async getData() {
+		  this.resultData = await (
+			await axios.get('http://localhost:8000/test/get')
+		  ).data.data
+		  console.log(this.resultData)
+		},
+
+		async postData() {
+		  this.resultData = await (
+			await axios.post('http://localhost:8000/test/post', this.postSendData)
+		  ).data.data
+		  console.log(this.resultData)
+		}
+	  },
+
+	  setup() {},
+
+	  created() {},
+
+	  mounted() {},
+
+	  unmounted() {}
+	}
+	</script>
+
+
+
+	=================================================================================================================
+
+
+# Java 코드
+
+	=================================================================================================================
+	@PostMapping("/post")
+	public ResponseEntity<ResponseAPI> postTest(HashMap<String,Object> map){
+		ResponseAPI responseAPI = new ResponseAPI();
+		System.out.println(map);
+		map.put("result" , "내가 데이터를 추가했다");
+		map.put("method" , "이건 포스트 방식");
+
+		responseAPI.setData(map);
+		return new ResponseEntity(responseAPI , HttpStatus.OK);
+	}
+	@GetMapping(value={"/get" , "/get/{value}"})
+	public ResponseEntity<ResponseAPI> getTest(@PathVariable(required = false) String value){
+		ResponseAPI responseAPI = new ResponseAPI();
+		HashMap<String,Object> map = new HashMap<>();
+		System.out.println(value);
+		map.put("result" , "내가 데이터를 조회했다");
+		map.put("method" , "이건 겟 방식");
+		map.put("input", value);
+		responseAPI.setData(map);
+		return new ResponseEntity(responseAPI , HttpStatus.OK);
+	}
+
+
+	=================================================================================================================
