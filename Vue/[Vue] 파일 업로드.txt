@@ -1,0 +1,146 @@
+[ Vue - 파일 업로드 ]
+	
+	https://handhand.tistory.com/28
+	https://yiunsr.tistory.com/844 - 파일업로드
+# 사용방법
+
+	1. input 의 type 을 file 로 설정
+
+	2. 해당 input 태그에 @change 이벤트에 함수 설정 (handleFileChange)
+
+	3. 파일에서 사용할 변수들 설정
+		
+		resultData : 리턴받을 데이터를 담을 변수
+		file : 파일을 담을 변수
+		fileName : 파일 이름을 담을 변수
+
+	4. handleFileChange 함수 생성
+		해당 함수에서는 선언한 변수들에 파일이름과 파일을 넣어줌
+		=================================================================================================================
+		handleFileChange(e) {
+		  let file = e.target.files[0];
+		  let name = file.name;
+		  this.fileName = file.name;
+		  this.file = file;
+		},
+
+		=================================================================================================================
+	
+	5. button 태그 생성
+
+	6. 생성한 버튼 태그에 @click 이벤트에 함수 설정 (chat)
+
+	7. chat 함수 생성
+
+		내용이 많아보이긴 하지만 밑에 this 부분은 전부다 넘겨받은 데이터를 변수에 넣어주는 부분이고
+		실질적으로 위에서 axios.post 부분을 보면됨
+		await axios.post(전송할 URL , 전송할 데이터 , {전송할 설정}) 으로 해서 보내면 됨
+		파일이라서 헤더에 "Content-Type": "multipart/form-data" 를 추가함
+
+			await axios.post("http://localhost:8000/chat", submitData, {
+			  headers: {
+				"Content-Type": "multipart/form-data",
+			  },
+			})
+		
+
+		=================================================================================================================
+		async chat() {
+		  var submitData = new FormData();
+		  submitData.append("file", this.file);
+		  this.resultData = await (
+			await axios.post("http://localhost:8000/chat", submitData, {
+			  headers: {
+				"Content-Type": "multipart/form-data",
+			  },
+			})
+		  ).data.data;
+
+		  this.memberCount = this.resultData.memberCount;
+		  this.totalLine = this.resultData.totalLine;
+		  this.memberList = this.resultData.memberList;
+		  this.killList = this.resultData.killList;
+		  this.tokeList = this.resultData.tokeList;
+
+		  console.log(this.memberCount);
+		  console.log(this.totalLine);
+		  console.log(this.memberList);
+		  console.log(this.killList);
+		  console.log(this.tokeList);
+		},
+		=================================================================================================================	
+	
+
+
+
+# 소스코드
+
+	=================================================================================================================
+	<template>
+	  <div>
+		<input id="customFile" type="file" @change="handleFileChange" />
+		<button @click="chat">분석</button>
+	  </div>
+	</template>
+	<script>
+	import axios from "axios";
+	export default {
+	  components: {},
+	  data() {
+		return {
+		  resultData: {},
+		  file: "",
+		  file_name: "",
+		  memberCount: 0,
+		  totalLine: 0,
+		  memberList: [],
+		  killList: [],
+		  tokeList: [],
+		};
+	  },
+
+	  methods: {
+		async chat() {
+		  var submitData = new FormData();
+		  submitData.append("file", this.file);
+		  this.resultData = await (
+			await axios.post("http://localhost:8000/chat", submitData, {
+			  headers: {
+				"Content-Type": "multipart/form-data",
+			  },
+			})
+		  ).data.data;
+
+		  this.memberCount = this.resultData.memberCount;
+		  this.totalLine = this.resultData.totalLine;
+		  this.memberList = this.resultData.memberList;
+		  this.killList = this.resultData.killList;
+		  this.tokeList = this.resultData.tokeList;
+
+		  console.log(this.memberCount);
+		  console.log(this.totalLine);
+		  console.log(this.memberList);
+		  console.log(this.killList);
+		  console.log(this.tokeList);
+		},
+
+		handleFileChange(e) {
+		  let file = e.target.files[0];
+		  let name = file.name;
+		  this.file_name = file.name;
+		  this.file = file;
+		},
+	  },
+	  setup() {},
+
+	  created() {},
+
+	  mounted() {},
+
+	  unmounted() {},
+	};
+	</script>
+
+
+
+=================================================================================================================

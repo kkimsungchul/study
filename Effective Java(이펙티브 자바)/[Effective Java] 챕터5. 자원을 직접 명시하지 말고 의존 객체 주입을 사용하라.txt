@@ -1,0 +1,77 @@
+[ Effective Java - 챕터2. 자원을 직접 명시하지 말고 의존 객체 주입을 사용하라 ]
+
+	많은 클래스가 하나 이상의 자원에 의존을 함
+	책에서는 맞춤법 검사기를 예를 들어서 설명하고 있음
+
+	
+	- 정적 유틸리티를 잘못 사용한 예 - 유연하지 않고 테스트 하기 어려움
+		=================================================================================================================
+		public class SpellChecker {
+			//사전 데이터
+			private static final Lexicon dictionary = .....;
+			
+			//객체 생성 방지
+			private SpellChecker(){}
+
+			public static boolean isValid(String word){ .....}
+
+			public static List<String suggestions(String typo){....}
+		}
+		=================================================================================================================
+
+	- 싱글턴을 잘못 사용한 예 - 유연하지 않고 테스트하기 어려움
+		=================================================================================================================
+		public class SpellChecker {
+			//사전 데이터
+			private static final Lexicon dictionary = .....;
+			
+			//객체 생성 방지
+			private SpellChecker(){}
+
+			public static SpellChecker INSTANCE = new SpellChecker(....);
+
+			public static boolean isValid(String word){ .....}
+
+			public static List<String suggestions(String typo){....}
+		}
+		=================================================================================================================
+
+	위의 방법은 하나의 사전만을 가지고 하는 방법이며,
+	여러개의 사전에 대한 대응 및 테스트가 어려움
+
+	그렇다고 객체에 final을 제거하고 나서 다른 사전으로 교체하는 방법도 있지만 어색하고 오류를 내기 쉬우며
+	멀티 스레드 환경에서는 사용할수 없다.
+
+
+	이러한 부분에 적용하기 좋은 패턴이 "의존 객체 주입 패턴" 이 있다
+
+		- 의존 객체 주입 코드
+		=================================================================================================================
+		public class SpellChecker {
+			//사전 데이터
+			private static final Lexicon dictionary;
+			
+			//객체 생성
+			public SpellChecker(Lexicon dictionary){
+				this.dictionary = Objects.requireNonNull(dictionary);
+			}
+
+			public boolean isValid(String word){ .....}
+
+			public List<String suggestions(String typo){....}
+		}
+		=================================================================================================================
+	
+	위의 코드와 같이 SpellChecker 클래스를 수정하여서 의존 객체를 주입하면 자원이 몇개든 의존관계가 어떻든 다 사용할수 있다
+
+	이 패턴의 쓸만한 변형으로 생성자에 자원팩토리를 넘겨주는 방식이 있으며, 이것을 구견한것이 JAVA8에서 Supplier<T> 가 있다.
+
+
+
+# 정리
+
+	클래스가 내부적으로 하나 이상의 자원에 의존하고, 그 자원이 클래스 동작에 영향을 준다면 
+	싱글턴과 정적유틸리티 클래스는 사용하지 않는 것이 좋다.
+	이 자원들을 클래스가 직접 만들게 해서도 안된다.
+	대신 필요한 자원을 생성자에 넘겨주는 의존 객체 주입 기법을 사용하자
+	해당 기법은 클래스의 유연성, 재사용성, 테스트 용이성을 개선해준다.

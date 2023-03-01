@@ -1,0 +1,162 @@
+[ Vue - props 사용하기 ]
+	props는 부모컴포넌트에서 자식 컴포넌트로 데이터를 전달할때 사용되는 단방향 데이터 전달 방식
+
+
+# 사용 방법
+
+	부모 컴포넌트에서 자식 컴포넌트 호출 시 
+	자식 컴포넌트 태그내에 v-bind 나 : 태그를 사용하여 데이터를 전달하고
+	자식컴포넌트에서 props 객체를 통해 데이터를 전달받는 방식
+
+# 기본 형태
+	=================================================================================================================
+	<!--부모 컴포넌트-->
+	<template>
+		<!--첫번째, 두번째 모두 같은 결과-->
+		<!--첫번째 방법-->
+		<자식컴포넌트이름 :props이름="전달데이터"/>
+		<!--두번째 방법-->
+		<자식컴포넌트이름 v-bind:props이름="전달데이터"/>
+	</template>	
+	=================================================================================================================
+
+
+# 샘플 예제 - 부모 컴포넌트
+	아래의 코드에서는 GuGuDanView.vue 를 임포트 하여 자식 컴포넌트를 추가하였고
+	호출 시에 <Gugudan :inputNumber="inputNumber" :getList="getList" /> inputNumber 와 getList 를 props 로 넘겼음
+
+
+	=================================================================================================================
+	<template>
+	  <div>
+		<span :style="style1">구구단</span>
+		<br />
+		<input type="number" v-model="inputNumber" /> &nbsp;
+		<button @click="callGuGuDan(true)">구구단 값 가져오기</button>
+		<button @click="callGuGuDan(false)">구구단 창 닫기</button>
+		<br />
+		<span>
+		  버튼 클릭 시 아래에 새로운 컴포넌트가 호출되면서 구구단이 표시됩니다.
+		</span>
+		<!-- <div
+		  :style="[displayFlag == true ? displayOptionTrue : displayOptionFalse]"
+		> -->
+		<div v-if="displayFlag">
+		  <Gugudan :inputNumber="inputNumber" :getList="getList" />
+		</div>
+		<br />
+	  </div>
+	</template>
+	<script>
+	import axios from 'axios'
+	import Gugudan from './GuGuDanView.vue'
+	import { removeDotSegments } from 'uri-js'
+
+	export default {
+	  components: { Gugudan },
+	  data() {
+		return {
+		  inputNumber: 0,
+		  style1: {
+			color: 'red'
+		  },
+		  displayOptionTrue: {
+			display: 'block'
+		  },
+		  displayOptionFalse: {
+			display: 'none'
+		  },
+		  displayFlag: false,
+		  getList: []
+		}
+	  },
+
+	  methods: {
+		callGuGuDan(flag) {
+		  this.displayFlag = flag
+		  if (flag) {
+			this.fetchData()
+		  }
+		  // if (flag) {
+		  //   setTimeout(() => {
+		  //     this.displayFlag = false
+		  //   }, 0)
+		  //   setTimeout(() => {
+		  //     this.displayFlag = true
+		  //   }, 0)
+		  // }
+		},
+
+		async fetchData() {
+		  this.getList = await (
+			await axios.get('http://localhost:8000/test/test/' + this.inputNumber)
+		  ).data.data.list
+		}
+	  },
+
+	  setup() {},
+
+	  created() {},
+
+	  mounted() {},
+
+	  unmounted() {}
+	}
+	</script>
+
+
+	=================================================================================================================
+
+
+
+# 샘플 예제 - 자식 컴포넌트
+	부모 컴포넌트에서 넘겨준 데이터를 받기위해 props 를 선언하였고,
+	props 에서는 데이터 타입을 지정
+	받은 데이터를 그대로 사용하면 부모 컴포넌트에서 넣어준 값을 사용할 수 있음
+
+	=================================================================================================================
+	<template>
+	  <div>
+		<h1>구구단~</h1>
+		<table border="1">
+		  <tr :key="i" v-for="(gugulist, i) in getList">
+			<td>{{ gugulist }}</td>
+		  </tr>
+		</table>
+		{{ inputNumber }}
+	  </div>
+	</template>
+	<script>
+	import axios from 'axios'
+	export default {
+	  components: {},
+	  props: {
+		inputNumber: Number,
+		getList: Array
+	  },
+	  data() {
+		return {}
+	  },
+
+	  methods: {
+		test: function () {
+		  axios.get('http://localhost:8000/test/test').then(function (response) {
+			console.log(response)
+		  })
+		}
+	  },
+
+	  setup() {},
+
+	  created() {},
+
+	  mounted() {},
+
+	  unmounted() {}
+	}
+	</script>
+
+
+	=================================================================================================================
+
+vue props emit

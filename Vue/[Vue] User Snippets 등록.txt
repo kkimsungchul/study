@@ -1,0 +1,23 @@
+[ vue - User Snippets 등록 ]
+
+	VS Code 에서 자주 사용하는 템플릿을 등록해놓아서 편리하게 사용할수 있도록함
+
+
+1. File -> Preference > User Snippets 이동
+
+2. 검색창에 vue 입력 -> vue(vue) 선택
+
+3. 아래의 코드 입력
+	=================================================================================================================
+	{
+	  "Generate Basic Vue Code": {
+		"prefix": "vue-start",
+		"body": [
+		  "<template>\n\t</template>\n\t<script>\n\texport default {\n\t\tdata() {\n\t\t\treturn {\n\t\t\t}\n\t\t}\n\t}\n</script>"
+		],
+		"description": "Generate Basic Vue Code"
+	  }
+	}
+	=================================================================================================================
+
+4. 생성할 vue 파일에 와서 vue-start 를 입력하면 3번항목에서 입력한 내용이 자동으로 입력됨
