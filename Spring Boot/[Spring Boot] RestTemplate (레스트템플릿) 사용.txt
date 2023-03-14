@@ -87,59 +87,123 @@
 	아래의 소스는 pki 오류를 예방하는 코드, 인증서 오류가 발생해도 무시하고 진행할수 있도록 해줌
 	=================================================================================================================
 
-package com.example.demo.common;
+	package com.example.demo.common;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+	import org.springframework.context.annotation.Bean;
+	import org.springframework.context.annotation.Configuration;
+	import org.springframework.web.client.RestTemplate;
+	import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.KeyManagementException;
-import java.security.cert.X509Certificate;
+	import java.security.KeyStoreException;
+	import java.security.NoSuchAlgorithmException;
+	import java.security.KeyManagementException;
+	import java.security.cert.X509Certificate;
 
-import javax.net.ssl.SSLContext;
+	import javax.net.ssl.SSLContext;
 
-import org.apache.http.conn.ssl.TrustStrategy;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+	import org.apache.http.conn.ssl.TrustStrategy;
+	import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+	import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+	import org.apache.http.conn.ssl.NoopHostnameVerifier;
+	import org.apache.http.impl.client.CloseableHttpClient;
+	import org.apache.http.impl.client.HttpClients;
 
 
-@Configuration
-public class RestTemplateConfig {
-    @Bean
-    public RestTemplate getRestTemplate() {
-        return new RestTemplate();
-    }
+	@Configuration
+	public class RestTemplateConfig {
+		@Bean
+		public RestTemplate getRestTemplate() {
+			return new RestTemplate();
+		}
 
-    //For EPC Test : SSL verify off
-    @Bean
-    public RestTemplate restTemplate()
-            throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
+		//For EPC Test : SSL verify off
+		@Bean
+		public RestTemplate restTemplate()
+				throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
+	        TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
+	  
+			//Ignore self-signed certification
+			SSLContext sslContext = org.apache.http.ssl.SSLContexts.custom()
+					.loadTrustMaterial(null, acceptingTrustStrategy)
+					.build();
+
+			//Ignore host name verification
+			SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
+	 
+			CloseableHttpClient httpClient = HttpClients.custom()
+					.setSSLSocketFactory(csf)
+					.build();
+	 
+			HttpComponentsClientHttpRequestFactory requestFactory =
+					new HttpComponentsClientHttpRequestFactory();
+	 
+			requestFactory.setHttpClient(httpClient);
+			RestTemplate restTemplate = new RestTemplate(requestFactory);
+			return restTemplate;
+		}
+	}
+	=================================================================================================================
+
+
+
+
+
+# 애는 ssl 오류 남
+	=================================================================================================================
+
+	package com.example.demo.common;
+
+	import org.springframework.context.annotation.Bean;
+	import org.springframework.context.annotation.Configuration;
+	import org.springframework.web.client.RestTemplate;
+	import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+
+	import java.security.KeyStoreException;
+	import java.security.NoSuchAlgorithmException;
+	import java.security.KeyManagementException;
+	import java.security.cert.X509Certificate;
+
+	import javax.net.ssl.SSLContext;
+
+	import org.apache.http.conn.ssl.TrustStrategy;
+	import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+	import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+	import org.apache.http.conn.ssl.NoopHostnameVerifier;
+	import org.apache.http.impl.client.CloseableHttpClient;
+	import org.apache.http.impl.client.HttpClients;
+
+
+	@Configuration
+	public class RestTemplateConfig {
+		@Bean
+		public RestTemplate getRestTemplate() {
+			return new RestTemplate();
+		}
+
+		//For EPC Test : SSL verify off
+		@Bean
+		public RestTemplate restTemplate()
+				throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
 //        TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
-  
-        //Ignore self-signed certification
-        SSLContext sslContext = org.apache.http.ssl.SSLContexts.custom()
-                .loadTrustMaterial(null, new TrustSelfSignedStrategy())
-                .build();
+	  
+			//Ignore self-signed certification
+			SSLContext sslContext = org.apache.http.ssl.SSLContexts.custom()
+					.loadTrustMaterial(null, new TrustSelfSignedStrategy())
+					.build();
 
-        //Ignore host name verification
-        SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
- 
-        CloseableHttpClient httpClient = HttpClients.custom()
-                .setSSLSocketFactory(csf)
-                .build();
- 
-        HttpComponentsClientHttpRequestFactory requestFactory =
-                new HttpComponentsClientHttpRequestFactory();
- 
-        requestFactory.setHttpClient(httpClient);
-        RestTemplate restTemplate = new RestTemplate(requestFactory);
-        return restTemplate;
-    }
-}
-	
+			//Ignore host name verification
+			SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
+	 
+			CloseableHttpClient httpClient = HttpClients.custom()
+					.setSSLSocketFactory(csf)
+					.build();
+	 
+			HttpComponentsClientHttpRequestFactory requestFactory =
+					new HttpComponentsClientHttpRequestFactory();
+	 
+			requestFactory.setHttpClient(httpClient);
+			RestTemplate restTemplate = new RestTemplate(requestFactory);
+			return restTemplate;
+		}
+	}
+	=================================================================================================================
