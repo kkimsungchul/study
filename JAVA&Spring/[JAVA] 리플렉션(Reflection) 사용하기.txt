@@ -1,0 +1,318 @@
+[ JAVA - 리플렉션(Reflection) 사용하기 ]
+
+# 참고 링크 : 
+	https://kdg-is.tistory.com/m/entry/JAVA-%EB%A6%AC%ED%94%8C%EB%A0%89%EC%85%98-Reflection%EC%9D%B4%EB%9E%80
+	https://gyrfalcon.tistory.com/entry/Java-Reflection
+
+
+# 설명
+	리플렉션은 구체적인 클래스 타입을 알지 못하더라도 그 클래스의 메서드, 타입, 변수들에 접근할 수 있도록 해주는 자바 API
+	
+	컴파일 시간이 아닌 실행 시간에 동적으로 특정 클래스의 정보를 추출할 수 있는 프로그래밍 기법
+
+# 사용 용도
+	동적으로 클래스를 사용해야할 때 
+	
+	작성 시점에는 어떠한 클래스를 사용해야 할지 모르지만 런타임 시점에서 클래스를 가져와서 실행해야하는 경우 필요
+
+	대표적으로는 Spring 프레임워크의 어노테이션 같은 기능들이 리플렉션을 이용하여 프로그램 실행 도중 동적으로 클래스의 정보를 가져와서 사용
+
+
+# 가져올수 있는 정보
+	Class
+	Constructor
+	Method
+	Field
+
+
+# 사용하게된 이유
+	Server 의 정보를 받아서 DB에 넣어주는 작업을 해야 함
+	파일내용은 아래와 같이 되어 있음
+		파일명 : Server.info
+		=================================================================================================================
+		#serverName
+		sungchul_linux
+		#hostName
+		sungchul_tomcat
+		#serverIP
+		192.168.0.55
+		#serverDisk
+		/data1,99999,88888,1111
+		/data2,55555,2222,1523
+		/data3,44444,1111,12311
+		#serverMemory
+		4096,2900,1196
+		=================================================================================================================
+
+
+	기본적인 작업순서는 아래와 같음
+		1. 파일을 읽어옴
+		2. 읽어온 내용의 라인에서 데이터와 컬럼명을 구분
+		3. 컬럼명에 따라서 각각의 데이터를 VO에 set 해줌
+		4. DB insert 
+	
+	다만 위에서 주의할점은 data는 한줄이 아닌 여러줄이 될수도 있음
+		ex) serverDisk
+
+	위와같은 경우에서 일반적인 작업을 하게되면
+	파일에 기재되어 있는 컬럼명을 읽어와서 IF문으로 해당 컬럼이 맞는지 비교 한 후 
+	각각의 필드에 set을 해주는 메소드를 호출하도록 하면 됨
+		=================================================================================================================
+		if(readLine().equals.("hostName")){
+			vo.setHostName(data);
+		}
+		if(readLine().equals.("serverDisk")){
+			vo.setHostName(data);
+		}
+		=================================================================================================================
+	
+	이와같이 했을 경우에 각각의 필드마다 IF문이 추가되며 코드가 지저분해짐
+
+	각각 set 해주는 부분을 동적으로 할당해서 사용하려고 함
+
+# 기본적인 사용방법
+	
+
+
+	- 클래스 찾기
+	=================================================================================================================
+	Class cls = Class.forName("패키지경로.ReflectionTestVO");
+	=================================================================================================================
+
+	- 메소드 찾기
+		아래의 경우에 매개변수 타입을 넣어주면 됨
+	=================================================================================================================
+	Class cls = Class.forName("패키지경로.ReflectionTestVO");
+	
+	//인자가 있는 경우
+	Method method = cls.getDeclaredMethod("serverName", String.class);
+
+
+	//인자가 없는 경우
+	Method method = cls.getDeclaredMethod("getServerName", null);
+
+	//모든 메소드 가져오기
+	Method methods[] = cls.getDeclaredMethods();
+	for (Method item : methods) {
+		System.out.println("Method : " + item);
+	}
+	=================================================================================================================
+
+	- 메소드 실행
+	=================================================================================================================
+	Class cls = Class.forName("패키지경로.ReflectionTestVO");
+	
+	//인자가 있는 경우
+	Method method = cls.getDeclaredMethod("serverName", String.class);
+	
+	//method.invoke("메소드의 클래스","넣을데이터");
+	method.invoke(reflectionTestVO,temp[0]);		
+	=================================================================================================================
+
+
+
+# 사용방법
+	
+	- ReflectionMain 클래스
+		=================================================================================================================
+		package com.sungchul.reflection;
+
+		import java.io.BufferedReader;
+		import java.io.FileReader;
+
+		public class ReflectionMain {
+			public static void main(String[]args){
+				ReflectionTestVO reflectionTestVO = new ReflectionTestVO();
+
+				try{
+					//server.info 파일을 읽어옴
+					BufferedReader br = new BufferedReader( new FileReader("C:\\IntellijProject\\CodeTest\\src\\com\\sungchul\\reflection\\Server.info"));
+					String line = null;
+					String key="";
+
+					while((line = br.readLine()) != null){
+						//시작문자열이 # 인경우 필드명
+						if(line.startsWith("#")){
+							key = line.replaceAll("#","");
+						}else{
+
+							//해당 값들은 ,로 구분되어 있어서 split 메소드를 사용하기위하여 if를 사용
+							if(key.equals("serverMemory")){
+								String temp[] = line.split(",");
+								reflectionTestVO.getClass()
+										.getMethod(key+"Total",String.class)
+										.invoke(reflectionTestVO,temp[0]);
+
+								reflectionTestVO.getClass()
+										.getMethod(key+"Used",String.class)
+										.invoke(reflectionTestVO,temp[1]);
+
+								reflectionTestVO.getClass()
+										.getMethod(key+"Free",String.class)
+										.invoke(reflectionTestVO,temp[2]);
+							}else{
+								//reflectionTestVO 클래스에서 메소드명이 key안에 있는 값으로 되어 있는 메소드를가져와서 실행함
+								reflectionTestVO.getClass()
+										.getMethod(key,String.class)
+										.invoke(reflectionTestVO,line);
+							}
+						}
+					}
+					for(int i=0;i<reflectionTestVO.getServerDisk().size();i++){
+
+						String temp[] = reflectionTestVO.getServerDisk().get(i).split(",");
+						reflectionTestVO.serverDiskPart(temp[0]);
+						reflectionTestVO.serverDiskTotal(temp[1]);
+						reflectionTestVO.serverDiskUsed(temp[2]);
+						reflectionTestVO.serverDiskFree(temp[3]);
+						//DB 인서트문 실행 대신 출력으로 변경
+						System.out.println(reflectionTestVO);
+					}
+				}catch (Exception e){
+					e.printStackTrace();
+				}
+			}
+		}
+
+		=================================================================================================================
+
+
+	- Server.info 파일
+		=================================================================================================================
+
+		#serverName
+		sungchul_linux
+		#hostName
+		sungchul_tomcat
+		#serverIP
+		192.168.0.55
+		#serverDisk
+		/data1,99999,88888,1111
+		/data2,55555,2222,1523
+		/data3,44444,1111,12311
+		#serverMemory
+		4096,2900,1196
+		=================================================================================================================
+
+
+	- ReflectionTestVO 클래스
+
+		=================================================================================================================
+		package com.sungchul.reflection;
+
+		import java.util.ArrayList;
+		import java.util.List;
+
+		public class ReflectionTestVO {
+
+			private String serverName;
+			private String hostName;
+			private String serverIP;
+			private List<String> serverDisk = new ArrayList<String>();
+			private String serverDiskTotal;
+			private String serverDiskUsed;
+			private String serverDiskFree;
+			private String serverMemoryTotal;
+			private String serverMemoryUsed;
+			private String serverMemoryFree;
+
+			public String getServerName() {
+				return serverName;
+			}
+
+			public void serverName(String serverName) {
+				this.serverName = serverName;
+			}
+
+			public String getHostName() {
+				return hostName;
+			}
+
+			public void hostName(String hostName) {
+				this.hostName = hostName;
+			}
+
+			public String getServerIP() {
+				return serverIP;
+			}
+
+			public void serverIP(String serverIP) {
+				this.serverIP = serverIP;
+			}
+
+			public List<String> getServerDisk() {
+				return serverDisk;
+			}
+
+			public void serverDisk(String serverDisk) {
+				this.serverDisk.add(serverDisk);
+			}
+
+			public String getServerDiskTotal() {
+				return serverDiskTotal;
+			}
+
+			public void serverDiskTotal(String serverDiskTotal) {
+				this.serverDiskTotal = serverDiskTotal;
+			}
+
+			public String getServerDiskUsed() {
+				return serverDiskUsed;
+			}
+
+			public void serverDiskUsed(String serverDiskUsed) {
+				this.serverDiskUsed = serverDiskUsed;
+			}
+
+			public String getServerDiskFree() {
+				return serverDiskFree;
+			}
+
+			public void serverDiskFree(String serverDiskFree) {
+				this.serverDiskFree = serverDiskFree;
+			}
+
+			public String getServerMemoryTotal() {
+				return serverMemoryTotal;
+			}
+
+			public void serverMemoryTotal(String serverMemoryTotal) {
+				this.serverMemoryTotal = serverMemoryTotal;
+			}
+
+			public String getServerMemoryUsed() {
+				return serverMemoryUsed;
+			}
+
+			public void serverMemoryUsed(String serverMemoryUsed) {
+				this.serverMemoryUsed = serverMemoryUsed;
+			}
+
+			public String getServerMemoryFree() {
+				return serverMemoryFree;
+			}
+
+			public void serverMemoryFree(String serverMemoryFree) {
+				this.serverMemoryFree = serverMemoryFree;
+			}
+
+			@Override
+			public String toString() {
+				return "ReflectionMain{" +
+						"serverName='" + serverName + '\'' +
+						", hostName='" + hostName + '\'' +
+						", serverIP='" + serverIP + '\'' +
+						", serverDisk=" + serverDisk +
+						", serverDiskTotal='" + serverDiskTotal + '\'' +
+						", serverDiskUsed='" + serverDiskUsed + '\'' +
+						", serverDiskFree='" + serverDiskFree + '\'' +
+						", serverMemoryTotal='" + serverMemoryTotal + '\'' +
+						", serverMemoryUsed='" + serverMemoryUsed + '\'' +
+						", serverMemoryFree='" + serverMemoryFree + '\'' +
+						'}';
+			}
+		}
+
+
+
+		=================================================================================================================
