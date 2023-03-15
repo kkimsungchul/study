@@ -1,0 +1,40 @@
+https://code-boki.tistory.com/4
+
+atom material icons
+	아이콘 변환
+
+code Glance
+	코드요약 우측에 작게 나옴
+
+Nyan progress Bar
+	귀여운 고양이 로딩바
+
+rainbow brackets
+	괄호를 무지개색으로 구분
+
+.ignore
+	깃 이그노어 설정파일
+camelCase
+	카멜 - 스네이크 변환
+
+DTO generator
+	json 데이터를 DTO로 변환해줌
+
+pojo to json
+	dto를 json으로 변환해줌
+
+material theme ui
+	그냥 이쁜 테마
+
+======================================================================================================
+
+Grep Console
+	콘솔창 색상 변경
+
+codota ai autocomplete
+	-> aiXcoder code completer
+		코드완성 플러그인
+
+
+RestfulHelper
+	서블릿 경로만을 검색할수 잇게 해줌
