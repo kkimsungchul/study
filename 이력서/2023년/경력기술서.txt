@@ -71,7 +71,7 @@
 * 기존시스템에서 검출된 보안취약점 조치 (사용자의 패스워드 암호화 , 예외처리)
 
 
-4-3.KT Dev Space 개발 / 운영
+4-3.KT Dev Space 개발 / 운영 - 지뉴소프트
 설명 : 다양한 개발 툴 (Jira , Gitlab , Jenkins , Sparrow) 을 하나의 시스템에서 관리하는 시스템 입니다.
 개발환경 :Spring Boot , PostgreSQL , Keycloak , Linux
 업무 참여 내용 : 
