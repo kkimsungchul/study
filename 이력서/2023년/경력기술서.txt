@@ -78,3 +78,4 @@
 * RestAPI 를 통한 개발 툴(Jira , Gitlab , Jenkins , Sparrow) 과의 데이터 연동
 * 데이터 연동을 위한 DB 설계
 * 고객의 추가 요구사항에 맞도록 기능 개선 및 고도화 
+* Keycloak의 암호화(RSA) 모듈 개발 진행
