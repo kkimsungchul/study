@@ -23,18 +23,16 @@ DTO generator
 pojo to json
 	dto를 json으로 변환해줌
 
-material theme ui
-	그냥 이쁜 테마
+material theme ui - 안씀
+	그냥 이쁜 테마 
 
+One Dark theme
 ======================================================================================================
 
 Grep Console
 	콘솔창 색상 변경
 
-codota ai autocomplete
-	-> aiXcoder code completer
-		코드완성 플러그인
-
 
 RestfulHelper
 	서블릿 경로만을 검색할수 잇게 해줌
+
