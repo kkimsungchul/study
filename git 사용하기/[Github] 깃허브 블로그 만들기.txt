@@ -1,0 +1,159 @@
+[ Github - 깃허브 블로그 만들기 ]
+
+# jekyll 설치
+	https://jekyllrb-ko.github.io/docs/installation/windows/
+	https://velog.io/@kimsoyeong/github.io-jekyll
+	※ 난 windows 여서 gem install jekyll bundler 명령어를 못씀
+
+# Ruby 설치 사이트 
+	jekyll을 설치하려면 Ruby가 있어야함
+
+	https://rubyinstaller.org/downloads/
+	※ Ruby+Devkit 3.1.3-1 (x86) 버전을 설치함
+	※ jekyll 가 32bit 라고함
+	※ 오래동안 설치 창이 안뜰수도 있음 마음을 가다듬고 기다림
+	※ 집 데스크탑은 32bit를 했는데, 노트북에는 64bit 설치 예정
+
+# Ruby 설치 진행
+	아무런 옵션도 건들지 않고 default 로 설치
+
+# jekyll 설치
+	1. 시작버튼 클릭 후 Start Command Prompt with Ruby 실행
+	2. gem install jekyll 명령어 입력
+
+	3. 아래 두개의 명령어로 설치 확인
+		ruby -v 
+		jekyll -v
+		======================================================================================================
+		C:\Users\sung>ruby -v
+		ruby 3.1.3p185 (2022-11-24 revision 1a6b16756e) [i386-mingw32]
+
+		C:\Users\sung>jekyll -v
+		jekyll 4.3.2
+		======================================================================================================
+
+	※ 설치가 끝나고 나면 Git Bash를 사용하여서 명령어를 그대로 쓸수 있으니 취향에 따라서
+	"Start Command Prompt with Ruby" 나 "Git Bash" 를 사용
+
+
+# 참고 사이트
+	https://zeddios.tistory.com/1222
+
+
+# 테마 사이트
+	https://jekyllthemes.io
+	http://jekyllthemes.org/
+
+
+# 적용할 테마 타입
+	데모 : 
+		https://jekyllthemes.io/theme/startbootstrap-clean-blog-jekyll
+	Github : 
+		https://startbootstrap.github.io/startbootstrap-clean-blog-jekyll/
+	
+
+# 적용방법 - jekyll 설치 및 push
+
+	1. 신규 저장소 생성
+		저장소 생성시 저장소의 이름은 깃허브계정명.github.io 로 지정
+			ex) kkimsungchul.github.io
+		깃허브 계정명으로 브런치명을 하지 않으면 별도로 slug를 붙여줘야 함
+			ex ) 브런치명 study
+				-> kkimsungchul.github.io/study
+	
+	2. 해당저장소를 로컬에 클론
+	
+	3. 클론한 저장소의 경로에서 아래의 명령어 입력
+		jekyll new ./ -f
+		
+		- 오류발생
+			처음에는 jekyll new ./ 명령어를 사용하였음,
+			해당 오류는 현재 디렉토리가 비어있지 않기 때문에 발생한 오류로, -f 옵션을 주고 다시 명령어를 입력하면됨
+			======================================================================================================
+			sung@sung-PC MINGW64 ~/Desktop/개발/kkimsungchul.github.io (main)
+			$ jekyll new ./
+					  Conflict: C:/Users/sung/Desktop/개발/kkimsungchul.github.io exists and is not empty.
+								Ensure C:/Users/sung/Desktop/개발/kkimsungchul.github.io is empty or else try again with `--force` to proceed and overwrite any files.
+			======================================================================================================
+			※ 참고 사이트 : https://cjy-tech.github.io/make-blog-with-jekyll-and-github_pages/
+			
+
+	4. 아래의 명령어 입력하여 로컬서버에서 jekyll 실행
+		bundle exec jekyll serve
+	
+	5. 로컬서버 접속 확인
+		http://localhost:4000/
+		※ 로컬 서버 종료는 컨트롤+C
+
+	6. Github에 push
+		3번항목의 명령어를 입력하면 로컬저장소에 많은 파일들이 생성됨
+		해당 내용들을 그대로 Github에 Push 하면됨
+		
+		git add .
+		git commit -m "github blog init"
+		git push
+
+
+
+	7. 깃허브 블로그 접속 확인
+		https://kkimsungchul.github.io
+
+		※ 테마 적용이 바로되는것이 아니니 push를 하고 1분이 지난뒤 확인
+
+
+# 적용방법 - 테마
+	적용 테마 URL : https://github.com/StartBootstrap/startbootstrap-clean-blog-jekyll
+	※ 바로 Fork 를 해서 사용해도 되고 해당 내용들을 그대로 다운받아서 적용해도 됨
+	※ Fork 로 사용하기엔 이미 Ruby 를 설치한것도 있고 해서 소스를 그대로 내려받아서 push 하는방법으로 적용
+		Fork로 하면 굳이 로컬에 Ruby 와 Jekyll를 설치하지 않아도 되지만
+		아직 익숙치 않아서 지속적인 테스트를 진행하면서 하려면 로컬에 설치하는게 좋음
+
+	1. 적용할 테마의 github로 이동
+		https://github.com/StartBootstrap/startbootstrap-clean-blog-jekyll
+	
+	2. 해당 코드 내려받기
+		https://github.com/StartBootstrap/startbootstrap-clean-blog-jekyll/archive/refs/heads/master.zip
+	
+	3. 내려받은 코드를 압축 푼 후 로컬 저장소에 이동
+		붙여넣기 시 중복된 파일은 덮어쓰기 사용
+
+	4. Gitbash 에서 bundle install 명령어 입력
+
+	5. 로컬서버에서 jekyll 실행
+		bundle exec jekyll serve
+	
+	6. 로컬서버 접속 확인
+		http://127.0.0.1:4000/startbootstrap-clean-blog-jekyll/
+		※ 로컬 서버 종료는 컨트롤+C
+
+# _config.yml 파일 수정
+
+
+	1. 로컬 저장소에 내려받은 파일중 "_config.yml" 파일을 열어서 아래의 내용 수정
+		======================================================================================================
+		title:              성철이의 개발공부
+		email:              kimsc1218@gmail.com
+		description:        개발을 진행하며 습득한 내용을 정리하는 블로그
+		author:             김성철
+		baseurl:            "/"
+		url:                "https://kkimsungchul.github.io/"
+
+		# Social Profiles
+		twitter_username:   
+		github_username:    kkimsungchul
+		facebook_username:  
+		instagram_username:  
+		linkedin_username:
+		====================================================================================
+
+
+	2. 로컬서버에서 jekyll 실행
+		bundle exec jekyll serve
+	
+	3. 수정이 완료 후 아래의 페이지로 다시 접속
+		http://127.0.0.1:4000/
+	
+	4. Github에 push
+		git add .
+		git commit -m "github blog change theme"
+		git push
