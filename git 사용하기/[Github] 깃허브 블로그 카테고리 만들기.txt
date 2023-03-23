@@ -1,0 +1,111 @@
+
+# 참고 링크 
+	https://hoisharka.github.io/jekyll/2017/12/03/jekyll-category-002/
+	https://blog.naver.com/PostView.nhn?isHttpsRedirect=true&blogId=tty4032&logNo=221495829172
+	https://devyurim.github.io/development%20environment/github%20blog/2018/08/07/blog-6.html
+
+# 카테고리 데이터 확인
+
+	카테고리에 대한 모든 데이터는
+	{{site.categories}} 안에 들어있음
+	해당 내용을 출력하면 아래와 같이 표시됨
+	======================================================================================================
+	{"Template"=>[#
+	, #], "Git"=>[#], "SpringBoot"=>[#, #]}
+	======================================================================================================
+
+
+
+	해당 내용들은 내가 포스틀 작성할때 위에 넣어준 카테고리들임
+
+	======================================================================================================
+	ex1)
+		---
+		layout: post
+		title: "HTML 템플릿 파일입니다. 여기에 제목을 넣어주세요."
+		subtitle: "부제목을 입력해주세요"
+		date: 2000-01-01 00:00:00 -0400
+		background: '/img/posts/06.jpg'
+		categories: Template
+		---
+
+	ex2)
+		---
+		layout: post
+		title: "JSONObject 를 VO로 변경하기"
+		subtitle: "JSONObject 를 VO로 변경하기"
+		date: 2023-03-22 00:00:00 -0400
+		background: '/img/posts/06.jpg'
+		categories: SpringBoot
+		---
+
+	======================================================================================================
+
+
+# categories 페이지 만들기
+	1. 최상위 경로에 categories 폴더 생성
+
+	2. 폴더 생성 후 index.html 파일 생성
+		======================================================================================================
+		---
+		layout: page
+		title: Categories
+		permalink: /category/
+		type: page
+		---
+
+		<div class="page clearfix">
+		  <div class="left">
+			<h1>{{page.title}}</h1>
+			<hr>
+			<ul>
+			  {% for category in site.categories %}
+				<h2 id="{{category | first}}">{{category | first}}</h2>
+				{% for posts in category %}
+				  {% for post in posts %}
+					{% if post.url %}
+					<li style="font-size: 15px;margin-left: 2em;">
+					  <a class="title" href="{{ post.url | prepend: site.url }}">
+					  <time>
+					  {{ post.date | date:"%F" }}
+					  </time>
+					  &nbsp; {{ post.title }}</a>
+					</li>
+					{% endif %}
+				  {% endfor %}
+				{% endfor %}
+			  {% endfor %}
+			</ul>
+		  </div>
+		</div>
+		======================================================================================================
+
+
+# 좌측에 표시할 카테고리 네비게이션 만들기
+	1. _includes 폴더에 categories.html 파일 생성
+
+	2. 아래의 내용 추가
+	======================================================================================================
+<div class="page clearfix">
+  <div class="left">
+    <h1>{{page.title}}</h1>
+    <hr>
+    <ul>
+      {% for category in site.categories %}
+        <h2 id="{{category | first}}">{{category | first}}</h2>
+        {% for posts in category %}
+          {% for post in posts %}
+            {% if post.url %}
+            <li style=" font-size: 15px; margin-left: 2em; ">
+              <a class="title" href="{{ post.url | prepend: site.url }}">
+              &nbsp; {{ post.title }}</a>
+            </li>
+            {% endif %}
+          {% endfor %}
+        {% endfor %}
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+	======================================================================================================
+	
