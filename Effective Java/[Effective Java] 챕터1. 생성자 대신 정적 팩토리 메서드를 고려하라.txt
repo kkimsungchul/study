@@ -1,0 +1,302 @@
+[ Effective Java - 챕터1. 생성자 대신 정적 팩토리 메서드를 고려하라 ]
+	https://hudi.blog/effective-java-static-factory-method/
+	※ 아래에서 예기하는 정적 팩토리 메소드는 다지안 패턴에서의 팩토리 메소드와는 다르며, 디자인 패턴중에는 이와 일치하는 패턴은 없다.
+
+
+
+	클라이언트가 클래스의 인스턴스를 얻는 전통적인 수단은 public 생성자다.
+	여기에 추가로 클래스는 생성자와 별도로 정적 팩터리 메서드(static factory method)를 제공할 수 있다.
+	그 클래스의 인스턴스를 반환하는 단순한 정적 메서드다.
+	다음 코드는 boolean 기본 타입의 박싱 클래스인 Boolean에서 발췌한 간단한 예다.
+	이 메소드는 기본 타입인 boolean 값을 받아 Boolean 객체 참조로 변환해 준다
+
+		=================================================================================================================
+		public static Boolean valueOf(boolean b){
+			return b? Boolean.TRUE : Boolean.FALSE;
+		}
+		=================================================================================================================
+
+	클래스는 클라이언트에 public 생성자 대신 정적 팩터리 메소드를 제공할 수 있다.
+	이 방식에는 장점과 단점이 모두 존재한다.
+	먼저 정적 팩터리 메소드가 생성자보다 좋은 장점 다섯가지를 보자
+
+
+# 장점 1. 이름을 가질 수 있다.
+	생성자에 넘기는 매개변수와 생성자 자체만으로는 반환될 객체의 특성을 제대로 설명하지 못한다.
+	반면 정적 팩토리 메소드는 이름만 잘 지으면 반횐될 객체의 특성을 쉽게 묘사할 수 있다.
+	예컨대 생성자인 BigInteger(int , int ,Random)과 정적 팩토리 메소드인 BinInteger.ProbablePrime 중 어느 쪽이 "값이 소수인 BigInteger를 반환한다" 는 의미를 더 잘 표현했는지 보자
+	하나의 시그니처로는 생성자를 하나만 만들 수 있다.
+	입력 매개변수들의 순서를 다르게 한 생성자를 새로 추가하는 식으로 이 제한을 피해볼 수도 있지만, 좋지 않은 발상이다.
+	이름을 가질 수 있는 정적 팩토리 메소드에는 이런 제약이 없다.
+	한 클래스에 시그니처가 같은 생성자가 여러 개 필요할 것 같으면, 생성자를 정적 팩토리 메소드로 바꾸고 각각의 차이를 잘 드러내는 이름을 지어주자
+
+		- 잘못된 예
+		=================================================================================================================
+		public class Person{
+			private String name;
+			private int age;
+			private String address;
+
+			public Person(String name , int age){
+				this.name = name;
+				this.age = age;
+			}
+
+			/*아래의 코드는 오류를 발생함, 위의 생성자와 구분을 할수 없음*/
+			public Person(String address , int age){
+				this.address = address;
+				this.age = age;
+			}
+
+			/*아래의 코드로는 매개변수 순서를 다르게 해서 작성하여 작동은 하지만,,,,,알아보기엔 좀...*/
+			public Person(int age , String address){
+				this.address = address;
+				this.age = age;
+			}
+
+		}
+
+		
+		Person p1 = new Person("김성철",33);
+		Person p2 = new Person(33,"경기도 용인시");
+
+
+		=================================================================================================================
+
+		- 올바른 사용 방법
+		=================================================================================================================
+		public class Person{
+			private String name;
+			private int age;
+			private String address;
+
+			private Person(String name , int age , String address){
+				this.name = name;
+				this.age = age;
+				this.address = address;
+			}
+			
+			static Person createByName(String name,int age){
+				return new Person(name,age,null);
+			}
+
+			static Person createByAddress(String address , int age){
+				return new Person(null,age,address);
+			}
+
+		}
+
+		
+		Person p1 = Person.createByNameAndAge("김성철",33);
+		Person p2 = Person.createByAddressAndAge("경기도 용인시",33);
+
+
+		=================================================================================================================
+
+
+	위와 같이 작성하면 생성자를 오버로딩 한거보다 좀더 직관적으로 알수 있다
+
+
+#장점 2. 호출될 때마다 인스턴스를 새로 생성하지는 않아도 된다. (인스턴스 통제 클래스)
+	
+	불변 클래스는 인스턴스를 미리 만들어 놓거나 새로 생성한 인스턴스를 캐싱하여 재활용하는 식으로 불필요한 객체 생성을 피할 수 있다.
+	대표적인 예인 Boolean.valueOf(boolean) 메소드는 객체를 아예 생성하지 않는다.
+
+	new 키워드를 사용하면 객체는 무조건 새로 생성되지만 자주 생성될 것 같은 인스턴스는 클래스 내부에 미리 생성해 놓은 다음 반환한다면 코드를 최적화할 수 있다.
+		- java.lang.integer 클래스의 valueOf의 구현코드
+		=================================================================================================================
+		public static Integer valueOf(int i) {
+			if (i >= IntegerCache.low && i <= IntegerCache.high)
+				return IntegerCache.cache[i + (-IntegerCache.low)];
+			return new Integer(i);
+		}
+		=================================================================================================================
+
+	전달된 i가 캐싱된 숫자의 범위내에 있다면 객체를 새로 생성하지 않고, 미리 생성된 객체를 반환한다.
+	그렇지 않을 경우에만 new 키워드를 사용하여 객체를 생성한다.
+	플라이웨이트 패턴(Flwweight pattern) 도 이와 비슷한 기법이다.
+
+	반복되는 요청에 같은 객체를 반환하는 식으로 정적 팩토리 방식의 클래스는 언제 어느 인스턴스를 살아 있게 할지를 철저히 통제할 수 있다.
+	이런 클래스를 인스턴스 통제(instance-controlled) 클래스라 한다.
+	
+	인스턴스를 통제하면 클래스를 싱글턴으로 만들수도 있고, 인스턴스화 불가로 만들수도 있다. 
+	또한 불변 값 클래스에서 동치인 인스턴스가 단 하나뿐임을 보장할 수 있다( a == b 일 때만, a.equals(b) )
+	인스턴스통제는 플라이웨이트 패턴의 근간이 되며, 열거타입은 인스턴스가 하나만 만들어짐을 보장한다.
+
+
+#장점 3. 반환 나팁의 하위 타입 객체를 반환할 수 있는 능력이 있다.
+	이 능력은 반환할 객체의 클래스를 자유럽게 선택할 수 있게 하는 엄청난 유연성을 선물한다.
+	
+	API를 만들때 이 유연성을 응용하면 구현 클래스를 공개하지 않고도 그 객체를 반환할 수 있어 API를 작게 유지할 수 있다.
+	이는 인터페이스를 정적 팰토리 메소드의 반환 타입으로 사용하는 인터페이스 기반 프레임워크를 만드는 핵심 기술이기도 하다.
+
+	생성자를 사용하면 생성되는 객체의 클래스가 하나로 고정된다.
+	하지만 정적 팩토리메소드를 사용하면, 반환할 객체의 클래스를 자유롭게 선택할 수 있는 유연성을 갖을 수 있게 된다.
+	
+	
+		- 반환할 객체를 다르게한 예제
+		=================================================================================================================
+		public class Person{
+			private String name;
+			private int age;
+			private String address;
+
+			public Person(String name , int age , String address){
+				this.name = name;
+				this.age = age;
+				this.address = address;
+			}
+
+			public static Person youngPerson(String name,int age){
+				return new YoungPerson(name,age);
+			}
+
+			public static Person oldPerson(String name,int age){
+				return new OldPerson(name,age);
+			}
+		}
+		
+		class YoungPerson extends Person{
+
+			public YoungPerson(String name,int age){
+				super(name,age,null);
+			}
+
+
+		}
+
+		class OldPerson extends Person{
+
+			public OldPerson(String name,int age) {
+				super(name,age,null);
+			}
+		}
+
+
+		#################################################################################################################
+
+		Person p3 = Person.youngPerson("어린이",10);
+		Person p4 = Person.oldPerson("노인",80);
+		System.out.println(p3.getClass().toString() + " " +p3);
+		System.out.println(p4.getClass().toString() + " " +p4);
+
+
+		#################################################################################################################
+
+		class EffectiveJava.staticfactory.YoungPerson Person{name='어린이', age=10, address='null'}
+		class EffectiveJava.staticfactory.OldPerson Person{name='노인', age=80, address='null'}
+
+
+		=================================================================================================================
+
+
+
+#장점 4. 입력 매개변수에 따라 매번 다른 클래스의 객체를 반환할 수 있다.
+	반환 타입의 하위 타입이기만 하면 어떤 클래스의 객체를 반환하든 상관 없다.
+	심지어 다음 릴리스에서는 또 다른 클래스의 객체를 반환해도 된다.
+	클라이언트는 팩토리가 건네주는 객체가 어느 클래스의 인스턴스인지 알 수도 없고 알 필요도 없다.
+	해당 클래스의 하위 클래스이기만 하면 된다
+
+	
+	- java.util.EnumSet 의 정적 팩토리 메서드
+	=================================================================================================================
+	public static <E extends Enum<E>> EnumSet<E> noneOf(Class<E> elementType) {
+		Enum<?>[] universe = getUniverse(elementType);
+		if (universe == null)
+			throw new ClassCastException(elementType + " not an enum");
+
+		if (universe.length <= 64)
+			return new RegularEnumSet<>(elementType, universe);
+		else
+			return new JumboEnumSet<>(elementType, universe);
+	}
+
+
+	=================================================================================================================
+
+
+	- 매개변수에 따른 다른 클래스 반환 예시
+		나이가 20살보다 어리면 YoungPerson 클래스 반환, 20살부터는 OldPerson 클래스 반환
+		=================================================================================================================
+		static Person createByAge(int age){
+
+			if(age<20){
+				return youngPerson(null,age);
+			}else{
+				return oldPerson(null,age);
+			}
+		}
+
+		#################################################################################################################
+		Person p5 = Person.createByAge(15);
+		Person p6 = Person.createByAge(50);
+		System.out.println(p5.getClass().toString() + " " +p5);
+		System.out.println(p6.getClass().toString() + " " +p6);
+
+		#################################################################################################################
+		class EffectiveJava.staticfactory.YoungPerson Person{name='null', age=15, address='null'}
+		class EffectiveJava.staticfactory.OldPerson Person{name='null', age=50, address='null'}
+		=================================================================================================================
+
+
+
+#장점 5. 정적 팩토리 메소드를 작성하는 시점에는 반환할 객체의 클래스가 존재하지 않아도 된다.
+	대표적인 서비스 제공자 프레임워크로는 JDBC(Java Database Connectivity)가 있다.
+	서비스 제공자 프레임워크에서의 제공자(provider)는 서비스의 구현체다.
+	그리고 이 구현체들을 클라이언트에 제공하는 역할을 프레임워크가 통제하여, 클라이언트를 구현체로부터 분리해준다.
+
+
+
+#단점 1. 상속을 하려면 public 이나 protected 생성자가 필요하니 정적 팰토리 메소드만 제공하면 하위 클래스를 만들 수 없다.
+	앞서 이야기한 컬렉션 프레임워크의 유틸리티 구현 클래스들은 상속할 수 없다는 이야기다.
+	어찌 보면 이 제약은 상속보다 컴포지션을 사용하도록 유도하고 불변 타입으로 만들려면 이 제약을 지켜야 한다는 점에서 오히려 장점으로 받아들일수 있다.
+
+	인스턴스 통제 클래스를 구현하기 위해서는 사용자가 new 키워드를 사용하여 임의로 객체를 생성함을 막아야한다. 
+	이를 위해 생성자의 접근 제어자를 private 로 설정해야하는데, 생성자가 private 인 클래스는 상속을 할 수 없다. 즉, 부모 클래스가 될 수 없다.
+
+
+# 단점 2. 정적 팩토리 메소드는 프로그래머가 찾기 어렵다.
+	생성자처럼 API 설명에 명확히 드러나지 않으니 사용자는 정적 팩토리 메소드 방식 클래스를 인스턴스화할 방법을 알아내야 한다.
+	이런점을 보완하기 위해 API문서를 잘 써놓고 메소드 이름도 널리 알려진 규약을 따라 짓는 식으로 문제를 완화해야 한다.
+
+
+
+
+
+# 정적 팩터리 메서드 네이밍 규칙
+	- from
+		매개변수를 하나 받아서 해당 타입의 인스턴스를 반환하는 형 변환 메서드
+		ex) Date d = Date.from(instant);
+	- of
+		여러 매개변수를 받아 적합한 타입의 인스턴스를 반환하는 집계 메서드
+		ex) Set<Rank> faceCards = EnumSet.of(JACK, QUEEN, KING);
+
+	- valueOf
+		from 과 of 의 더 자세한 버전
+		ex) BigInteger prime = BigInteger.valueOf(Integer.MAX_VALUE);
+
+	- instance 혹은 getInstance
+		(매개변수를 받는다면) 매개변수로 명시한 인스턴스를 반환하지만, 같은 인스턴스임을 보장하지는 않는다.
+		ex) StackWalker luke = StackWalker.getInstance(options);
+
+	- create 혹은 newInstance
+		instance 혹은 getInstance 와 비슷하지만, 매번 새로운 인스턴스를 생성하여 반환함을 보장한다.
+		ex) Object newArray = Array.newInstance(classObject, arrayLen);
+
+	- getType
+		getInstance 와 같으나, 현재 클래스가 아닌 다른 클래스의 인스턴스를 생성할 때 사용한다. Type 은 팩터리 메서드가 반환할 객체의 타입을 적는다.
+		ex) FileStore fs = Files.getFileStore(path);
+
+	- newType
+		createInstance 와 같으나, 현재 클래스가 아닌 다른 클래스의 인스턴스를 생성할 때 사용한다. Type 은 팩터리 메서드가 반환할 객체의 타입을 적는다.
+		ex) BufferedReader br = Files.newBufferedReader(path);
+
+	- type
+		getType 과 newType 의 간결한 버전
+		ex) List<Complaint> litany = Collections.list(legacyLitany);
+
+
+
+# 정리
+	정적 팩토리 메소드와 public 생성자는 각자의 쓰임새가 있으니 상대적인 장단점을 이해하고 사용하는 것이 좋다.
+	그렇다고 하더라도 정적 팩토리 를 사용하는게 유리한 경우가 더 많으므로 무작정 public 생성자를 제공하던 습관이 있다면 고치자.
