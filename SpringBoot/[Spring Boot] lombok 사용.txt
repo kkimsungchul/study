@@ -1,13 +1,13 @@
-[ Ω∫«¡∏µ ∫Œ∆Æ - lombok ªÁøÎ]
+[ Ïä§ÌîÑÎßÅ Î∂ÄÌä∏ - lombok ÏÇ¨Ïö©]
 
-# ªÁøÎ ¿Ã¿Ø
-	getter , setter , tostring µÓ¿ª ∏∏µÈ¡ˆ æ æ∆µµ µ 
-	ø©∑Ø∞°¡ˆ ±‚¥…¿Ã ¿÷¿∏≥™ «ˆ¿Á¥¬ ¿ßø°¿« ±‚¥…∏∏ ªÁøÎ«‘
+# ÏÇ¨Ïö© Ïù¥Ïú†
+	getter , setter , tostring Îì±ÏùÑ ÎßåÎì§ÏßÄ ÏïäÏïÑÎèÑ Îê®
+	Ïó¨Îü¨Í∞ÄÏßÄ Í∏∞Îä•Ïù¥ ÏûàÏúºÎÇò ÌòÑÏû¨Îäî ÏúÑÏóêÏùò Í∏∞Îä•Îßå ÏÇ¨Ïö©Ìï®
 
 
-# ±◊∑°µÈø° ∑“∫œ √ﬂ∞°
+# Í∑∏ÎûòÎì§Ïóê Î°¨Î∂Å Ï∂îÍ∞Ä
 
-	build.gradle ∆ƒ¿œ¿ª ø≠æÓº≠ dependenciesø° æ∆∑°¿« ≥ªøÎ¿ª √ﬂ∞°
+	build.gradle ÌååÏùºÏùÑ Ïó¥Ïñ¥ÏÑú dependenciesÏóê ÏïÑÎûòÏùò ÎÇ¥Ïö©ÏùÑ Ï∂îÍ∞Ä
 
 		compileOnly 'org.projectlombok:lombok:1.18.20'
 		annotationProcessor 'org.projectlombok:lombok:1.18.20'
@@ -15,7 +15,7 @@
 		testCompileOnly 'org.projectlombok:lombok:1.18.20'
 		testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
 	
-	°ÿ √ﬂ∞° øπΩ√
+	‚Äª Ï∂îÍ∞Ä ÏòàÏãú
 	=====================================================================================================================================================
 
 		dependencies {
@@ -23,7 +23,7 @@
 			implementation 'org.springframework.boot:spring-boot-starter-web-services'
 			testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-			// lombok¿ª ¿ß«ÿ √ﬂ∞°!!!!!
+			// lombokÏùÑ ÏúÑÌï¥ Ï∂îÍ∞Ä!!!!!
 			compileOnly 'org.projectlombok:lombok:1.18.20'
 			annotationProcessor 'org.projectlombok:lombok:1.18.20'
 
@@ -34,74 +34,74 @@
 
 	=====================================================================================================================================================
 
-# ¿Œ≈⁄∏ÆJ «√∑Ø±◊¿Œ √ﬂ∞°
+# Ïù∏ÌÖîÎ¶¨J ÌîåÎü¨Í∑∏Ïù∏ Ï∂îÍ∞Ä
 	
-	1. ƒ¡∆Æ∑— + æÀ∆Æ + S µøΩ√ø° ¿‘∑¬ ( ¿Œ≈⁄∏ÆJ º≥¡§√¢)
-	2. ¡¬√¯ø°º≠ Plugins º±≈√
-	3. ∞Àªˆ√¢ø° Lombok ∞Àªˆ
-	4. º≥ƒ° »ƒ ¿Œ≈⁄∏ÆJ ¿ÁΩ√¿€
+	1. Ïª®Ìä∏Î°§ + ÏïåÌä∏ + S ÎèôÏãúÏóê ÏûÖÎ†• ( Ïù∏ÌÖîÎ¶¨J ÏÑ§Ï†ïÏ∞Ω)
+	2. Ï¢åÏ∏°ÏóêÏÑú Plugins ÏÑ†ÌÉù
+	3. Í≤ÄÏÉâÏ∞ΩÏóê Lombok Í≤ÄÏÉâ
+	4. ÏÑ§Ïπò ÌõÑ Ïù∏ÌÖîÎ¶¨J Ïû¨ÏãúÏûë
 
 	
-# ªÁøÎ«œ±‚
+# ÏÇ¨Ïö©ÌïòÍ∏∞
 
-	1. ª˝º∫«— VO¿« ≈¨∑°Ω∫∏Ì ªÛ¥‹ø° @Data ∏¶ º±æ
-	2.import ¥¬ import lombok.Data;
+	1. ÏÉùÏÑ±Ìïú VOÏùò ÌÅ¥ÎûòÏä§Î™Ö ÏÉÅÎã®Ïóê @Data Î•º ÏÑ†Ïñ∏
+	2.import Îäî import lombok.Data;
 	
 	=====================================================================================================================================================
 		@Data
 		public class UserVO {
 
-			private String dept_name;            //¿•ø°º≠ πﬁæ∆ø¬ ∫Œº≠∏Ì
+			private String dept_name;            //ÏõπÏóêÏÑú Î∞õÏïÑÏò® Î∂ÄÏÑúÎ™Ö
 
 
 	=====================================================================================================================================================
 
-	* «ÿ¥Á ∂Û¿Ã∫Í∑Ø∏Æ ªÁøÎΩ√ getter , setter , toString ¿ª ∏∏µÈ « ø‰∞° æ¯¿Ω
+	* Ìï¥Îãπ ÎùºÏù¥Î∏åÎü¨Î¶¨ ÏÇ¨Ïö©Ïãú getter , setter , toString ÏùÑ ÎßåÎì§ ÌïÑÏöîÍ∞Ä ÏóÜÏùå
 
 
 
 
-# Builder ªÁøÎ
+# Builder ÏÇ¨Ïö©
 	
-	∫∏≈Î º¬ «ÿº≠ ¿€º∫«“∂ß
+	Î≥¥ÌÜµ ÏÖã Ìï¥ÏÑú ÏûëÏÑ±Ìï†Îïå
 	Class class = new Class();
-	class.setName("∞™");
-	class.setAge("∞™");
-	¿Ã∑∏∞‘ «œ¥¬µ•,
-	∫Ù¥ı∏¶ ªÁøÎ«œ∏È
+	class.setName("Í∞í");
+	class.setAge("Í∞í");
+	Ïù¥Î†áÍ≤å ÌïòÎäîÎç∞,
+	ÎπåÎçîÎ•º ÏÇ¨Ïö©ÌïòÎ©¥
 
 	Class class = Class.builder()
 		.name(name)
 		.age(age)
 		.build();
 	
-	¿ßøÕ∞∞¿Ã ªÁøÎ¿Ã ∞°¥…«‘.
+	ÏúÑÏôÄÍ∞ôÏù¥ ÏÇ¨Ïö©Ïù¥ Í∞ÄÎä•Ìï®.
 
 
-# ∑“∫œ æ»µ…ãö
+# Î°¨Î∂Å ÏïàÎê†ÎñÑ
 
 	https://m.blog.naver.com/light-star/221969272088
 
 	1. Enable annotation processing
 
-		¿Œ≈Õ≥› ∞Àªˆ«œ∏È ¡¶¿œ ∏π¿Ã «œ∂Û∞Ì «œ¥¬ ∞Õ¿Ã πŸ∑Œ ¿Ã "Enable annotation processing"¿Ã¥Ÿ.
+		Ïù∏ÌÑ∞ÎÑ∑ Í≤ÄÏÉâÌïòÎ©¥ Ï†úÏùº ÎßéÏù¥ ÌïòÎùºÍ≥† ÌïòÎäî Í≤ÉÏù¥ Î∞îÎ°ú Ïù¥ "Enable annotation processing"Ïù¥Îã§.
 
-		Preference -> Build, Execution, Depolyment -> Compiler -> Annotation Processors ø° ¿÷¥¬ º≥¡§¿Œµ•
+		Preference -> Build, Execution, Depolyment -> Compiler -> Annotation Processors Ïóê ÏûàÎäî ÏÑ§Ï†ïÏù∏Îç∞
 
-	2. Lombok º≥ƒ°
+	2. Lombok ÏÑ§Ïπò
 
-		µŒπ¯¬∞¥¬ lombok¿ª gradleø° º≥¡§∏∏ «œ¥¬∞‘ æ∆¥œ∂Û ¡˜¡¢ º≥ƒ°∏¶ «ÿæﬂ«—¥Ÿ¥¬ ∞·∞˙µÈ¿Ã ∏π¿Ã ≥™ø¬¥Ÿ.
+		ÎëêÎ≤àÏß∏Îäî lombokÏùÑ gradleÏóê ÏÑ§Ï†ïÎßå ÌïòÎäîÍ≤å ÏïÑÎãàÎùº ÏßÅÏ†ë ÏÑ§ÏπòÎ•º Ìï¥ÏïºÌïúÎã§Îäî Í≤∞Í≥ºÎì§Ïù¥ ÎßéÏù¥ ÎÇòÏò®Îã§.
 
-		±◊∑±µ• ≥≠ ¿Ã∞Õµµ ¿ÃπÃ º≥ƒ° «ﬂæ˙¿Ω... ±◊∑°µµ »§Ω√ ∏Ù∂Ûº≠ uninstall -> install -> intelliJ ≤∞¥Ÿƒ—±‚ ∏¶ «ÿ∫√¡ˆ∏∏ ø™Ω√≥™ πÆ¡¶¥¬ «ÿ∞·µ«¡ˆ æ æ“¥Ÿ..
+		Í∑∏Îü∞Îç∞ ÎÇú Ïù¥Í≤ÉÎèÑ Ïù¥ÎØ∏ ÏÑ§Ïπò ÌñàÏóàÏùå... Í∑∏ÎûòÎèÑ ÌòπÏãú Î™∞ÎùºÏÑú uninstall -> install -> intelliJ ÍªêÎã§ÏºúÍ∏∞ Î•º Ìï¥Î¥§ÏßÄÎßå Ïó≠ÏãúÎÇò Î¨∏Ï†úÎäî Ìï¥Í≤∞ÎêòÏßÄ ÏïäÏïòÎã§..
 
-	3. build.gradleø°º≠ lombok πˆ¿¸ ∏ÌΩ√«ÿ ¡÷±‚
-		∂« √£æ∆∫∏¥œ±Ó ≥™ø¬∞‘ ¿˙∑∏∞‘ lombokø∑ø° πˆ¿¸¿ª ∏ÌΩ√«ÿ ¡‡æﬂ«—¥Ÿ¥¬ ∞≈ø¥¥Ÿ.
+	3. build.gradleÏóêÏÑú lombok Î≤ÑÏ†Ñ Î™ÖÏãúÌï¥ Ï£ºÍ∏∞
+		Îòê Ï∞æÏïÑÎ≥¥ÎãàÍπå ÎÇòÏò®Í≤å Ï†ÄÎ†áÍ≤å lombokÏòÜÏóê Î≤ÑÏ†ÑÏùÑ Î™ÖÏãúÌï¥ Ï§òÏïºÌïúÎã§Îäî Í±∞ÏòÄÎã§.
 
-		πÿ¡Ææﬂ ∫ª¿¸¿Ã∂Û¥¬ ª˝∞¢ø° ¿Ã¡® π›¬Î ¿⁄∆˜¿⁄±‚«— Ω…¡§¿∏∑Œ πŸ≤„¡÷∞Ì... gradle refresh «ÿ¡÷∞Ì,,, ∂« ¡Àæ¯¥¬ intelliJ∏∏ ≤∞¥Ÿ∞° ƒ◊¡ˆ∏∏ ø™Ω√≥™ «ÿ∞·µ«¡ˆ æ æ“¥Ÿ.
+		Î∞ëÏ†∏Ïïº Î≥∏Ï†ÑÏù¥ÎùºÎäî ÏÉùÍ∞ÅÏóê Ïù¥Ï†† Î∞òÏØ§ ÏûêÌè¨ÏûêÍ∏∞Ìïú Ïã¨Ï†ïÏúºÎ°ú Î∞îÍøîÏ£ºÍ≥†... gradle refresh Ìï¥Ï£ºÍ≥†,,, Îòê Ï£ÑÏóÜÎäî intelliJÎßå ÍªêÎã§Í∞Ä Ïº∞ÏßÄÎßå Ïó≠ÏãúÎÇò Ìï¥Í≤∞ÎêòÏßÄ ÏïäÏïòÎã§.
 
 	
-	4.VM Options √ﬂ∞°
+	4.VM Options Ï∂îÍ∞Ä
 		Build , Excution, Deployment -> compiler -> ActionScript & Flex Compiler 
-		VM Options ø° javaagent:lombok.jar √ﬂ∞°
+		VM Options Ïóê javaagent:lombok.jar Ï∂îÍ∞Ä
 		https://stackoverflow.com/questions/24006937/lombok-annotations-do-not-compile-under-intellij-idea/30125507#30125507
 		https://stackoverflow.com/questions/9424364/cant-compile-project-when-im-using-lombok-under-intellij-idea

@@ -1,9 +1,9 @@
-[ ½ºÇÁ¸µ ºÎÆ® - ÀÎÅÍ¼ÁÅÍ »ç¿ëÇÏ±â ]
+[ ìŠ¤í”„ë§ ë¶€íŠ¸ - ì¸í„°ì…‰í„° ì‚¬ìš©í•˜ê¸° ]
 	https://eastglow.github.io/back-end/2019/08/01/Spring-Interceptor-%EC%82%AC%EC%9A%A9-%EC%8B%9C-%EC%9D%98%EC%A1%B4%EC%84%B1-%EC%A3%BC%EC%9E%85%EC%9D%B4-%EC%95%88%EB%90%98%EB%8A%94-%EA%B2%BD%EC%9A%B0.html
 
 
-# ÀÎÅÍ¼ÁÅÍ Å¬·¡½º¸¦ »ý¼º
-	HandlerInterceptor ¸¦ ±¸Çö
+# ì¸í„°ì…‰í„° í´ëž˜ìŠ¤ë¥¼ ìƒì„±
+	HandlerInterceptor ë¥¼ êµ¬í˜„
 
 	=====================================================================================================================================================
 
@@ -62,10 +62,10 @@
 
 
 
-# config Å¬·¡½º¸¦ »ý¼ºÇÏ¿© ÀÎÅÍÆäÀÌ½º¸¦ »ç¿ëÇÏµµ·Ï ¼öÁ¤
-	addPathPatterns() ¸¦ ÅëÇØ¼­ ÆÐÅÏÀ» Ãß°¡ÇÒ ¼ö ÀÖÀ½
-	excludePathPatterns() ¸¦ ÅëÇØ¼­ ¿¹¿Ü ÆÐÅÏÀ» Ãß°¡ÇÒ ¼ö ÀÖÀ½
-	excludePathPatterns´Â ½ºÆ®¸µ°ú ¸®½ºÆ®¸¦ ³ÖÀ» ¼ö ÀÖÀ½, ¸®½ºÆ®ÀÇ °æ¿ì¿¡´Â ¸®½ºÆ® ¾È¿¡ ÀÖ´Â ¸ñ·ÏÀÌ ÀüºÎ´Ù ¿¹¿ÜÃ³¸®µÊ
+# config í´ëž˜ìŠ¤ë¥¼ ìƒì„±í•˜ì—¬ ì¸í„°íŽ˜ì´ìŠ¤ë¥¼ ì‚¬ìš©í•˜ë„ë¡ ìˆ˜ì •
+	addPathPatterns() ë¥¼ í†µí•´ì„œ íŒ¨í„´ì„ ì¶”ê°€í•  ìˆ˜ ìžˆìŒ
+	excludePathPatterns() ë¥¼ í†µí•´ì„œ ì˜ˆì™¸ íŒ¨í„´ì„ ì¶”ê°€í•  ìˆ˜ ìžˆìŒ
+	excludePathPatternsëŠ” ìŠ¤íŠ¸ë§ê³¼ ë¦¬ìŠ¤íŠ¸ë¥¼ ë„£ì„ ìˆ˜ ìžˆìŒ, ë¦¬ìŠ¤íŠ¸ì˜ ê²½ìš°ì—ëŠ” ë¦¬ìŠ¤íŠ¸ ì•ˆì— ìžˆëŠ” ëª©ë¡ì´ ì „ë¶€ë‹¤ ì˜ˆì™¸ì²˜ë¦¬ë¨
 
 	=====================================================================================================================================================
 
@@ -99,18 +99,18 @@
 
 
 
-# Service °¡ È£ÃâÀÌ ¾ÈµÇ´Â°æ¿ì
+# Service ê°€ í˜¸ì¶œì´ ì•ˆë˜ëŠ”ê²½ìš°
 	
-	À§ÀÇ ·ÎÁ÷°ú °°ÀÌ @Component¸¦ »ç¿ëÇÏ°í ÀÎÅÍ¼ÁÅÍ¿¡¼­ "LoginCheckInterceptor loginCheckInterceptor" ·Î »ç¿ëÇÏ¸é ÀßµÇÁö¸¸
-	new LoginCheckInterceptor ¸¦ ÇØ¼­ »ç¿ëÇÒ °æ¿ì ¾ÈµÉ¼ö°¡ ÀÖÀ½
+	ìœ„ì˜ ë¡œì§ê³¼ ê°™ì´ @Componentë¥¼ ì‚¬ìš©í•˜ê³  ì¸í„°ì…‰í„°ì—ì„œ "LoginCheckInterceptor loginCheckInterceptor" ë¡œ ì‚¬ìš©í•˜ë©´ ìž˜ë˜ì§€ë§Œ
+	new LoginCheckInterceptor ë¥¼ í•´ì„œ ì‚¬ìš©í•  ê²½ìš° ì•ˆë ìˆ˜ê°€ ìžˆìŒ
 
 
-	±×·²¶§¿¡´Â ¾Æ·¡¿Í °°ÀÌ @Bean ¾î³ëÅ×ÀÌ¼ÇÀ» »ç¿ëÇÏ°í, ÀÎÅÍ¼ÁÅÍÅ¬·¡½º À§¿¡ @Component ¾î³ëÅ×ÀÌ¼ÇÀ» Áö¿öÁÖ¸é µÊ
-	registry.addInterceptor(loginCheckInterceptor) ÀÌºÎºÐÀ» ¾Æ·¡¿Í°°ÀÌ »ç¿ëÇÏ¸é ½ºÇÁ¸µ¿¡¼­ °ü¸®¸¦ ÇÏÁö¸øÇØ ¼­ºñ½º·¹ÀÌ¾î¸¦ ºÒ·¯¿ÀÁö ¸øÇÔ
+	ê·¸ëŸ´ë•Œì—ëŠ” ì•„ëž˜ì™€ ê°™ì´ @Bean ì–´ë…¸í…Œì´ì…˜ì„ ì‚¬ìš©í•˜ê³ , ì¸í„°ì…‰í„°í´ëž˜ìŠ¤ ìœ„ì— @Component ì–´ë…¸í…Œì´ì…˜ì„ ì§€ì›Œì£¼ë©´ ë¨
+	registry.addInterceptor(loginCheckInterceptor) ì´ë¶€ë¶„ì„ ì•„ëž˜ì™€ê°™ì´ ì‚¬ìš©í•˜ë©´ ìŠ¤í”„ë§ì—ì„œ ê´€ë¦¬ë¥¼ í•˜ì§€ëª»í•´ ì„œë¹„ìŠ¤ë ˆì´ì–´ë¥¼ ë¶ˆëŸ¬ì˜¤ì§€ ëª»í•¨
 	registry.addInterceptor(new LoginCheckInterceptor())
 
-	@Bean ¾î³ëÅ×ÀÌ¼ÇÀ» »ç¿ëÇÏ¿©¼­ LoginCheckInterceptor ¸¦ »ý¼ºÇØÁÖ´Â ¸Þ¼Òµå¸¦ ¸¸µé°í,
-	»ó´ÜºÎ¿¡¼­ Àü¿ªº¯¼ö·Î ¼±¾ðÇÑ ºÎºÐÀ» »èÁ¦ ( 	LoginCheckInterceptor loginCheckInterceptor; ) ÀÌºÎºÐ
+	@Bean ì–´ë…¸í…Œì´ì…˜ì„ ì‚¬ìš©í•˜ì—¬ì„œ LoginCheckInterceptor ë¥¼ ìƒì„±í•´ì£¼ëŠ” ë©”ì†Œë“œë¥¼ ë§Œë“¤ê³ ,
+	ìƒë‹¨ë¶€ì—ì„œ ì „ì—­ë³€ìˆ˜ë¡œ ì„ ì–¸í•œ ë¶€ë¶„ì„ ì‚­ì œ ( 	LoginCheckInterceptor loginCheckInterceptor; ) ì´ë¶€ë¶„
 
 	=================================================================================================================
 	package com.securus.ciim.configuration;
@@ -147,7 +147,7 @@
 
 
 
-	À§ÀÇ ¼Ò½º¿Í ¶È°°Áö¸¸ @Component ¾î³ëÅ×ÀÌ¼ÇÀ» Áö¿ò
+	ìœ„ì˜ ì†ŒìŠ¤ì™€ ë˜‘ê°™ì§€ë§Œ @Component ì–´ë…¸í…Œì´ì…˜ì„ ì§€ì›€
 	=====================================================================================================================================================
 
 	package com.securus.ciim.main.interceptor;
@@ -202,9 +202,9 @@
 	=====================================================================================================================================================
 
 
-# ¸®ÅÏ°ªÀ» È­¸é´ÜÀ¸·Î »óÅÂ°ªÀ» µ¹·ÁÁà¾ß ÇÏ´Â °æ¿ì
+# ë¦¬í„´ê°’ì„ í™”ë©´ë‹¨ìœ¼ë¡œ ìƒíƒœê°’ì„ ëŒë ¤ì¤˜ì•¼ í•˜ëŠ” ê²½ìš°
 
-	preHandle ¸Þ¼Òµå¿¡¼­ response °´Ã¼¿¡ »óÅÂ°ªÀ» ´ã¾ÆÁÖ¸é µÊ
+	preHandle ë©”ì†Œë“œì—ì„œ response ê°ì²´ì— ìƒíƒœê°’ì„ ë‹´ì•„ì£¼ë©´ ë¨
 
 	=====================================================================================================================================================
 
@@ -243,11 +243,11 @@
 			}
 			log.info("### LoginCheckInterceptor loginCheck : {}",loginCheck );
 
-			//È­¸é´Ü¿¡ °ª ¸®ÅÏ
-			//response.sendError(»óÅÂÄÚµå,"Àü´ÞÇÒ ¹®ÀÚ¿­");
-			response.sendError(200,"·Î±×ÀÎÃ¼Å©");
+			//í™”ë©´ë‹¨ì— ê°’ ë¦¬í„´
+			//response.sendError(ìƒíƒœì½”ë“œ,"ì „ë‹¬í•  ë¬¸ìžì—´");
+			response.sendError(200,"ë¡œê·¸ì¸ì²´í¬");
 
-			//È­¸é´Ü¿¡ °ª ¸®ÅÏ Á¾·á
+			//í™”ë©´ë‹¨ì— ê°’ ë¦¬í„´ ì¢…ë£Œ
 			return loginCheck;
 		}
 
@@ -265,3 +265,4 @@
 
 
 	=====================================================================================================================================================
+                                                                                                                                      

@@ -1,0 +1,143 @@
+[ JAVA - CSV 파일 읽기 ]
+
+
+	=================================================================================================================
+	import java.io.BufferedReader;
+	import java.io.FileReader;
+	import java.io.IOException;
+
+	public class CsvReader {
+
+	  public static void main(String[] args) throws IOException {
+		String csvFilePath = "data.csv";
+		BufferedReader br = null;
+		String line = "";
+		String csvSplitBy = ",";
+
+		try {
+		  br = new BufferedReader(new FileReader(csvFilePath));
+		  while ((line = br.readLine()) != null) {
+			String[] data = line.split(csvSplitBy);
+			for (String datum : data) {
+			  System.out.print(datum + "\t");
+			}
+			System.out.println();
+		  }
+		} catch (IOException e) {
+		  e.printStackTrace();
+		} finally {
+		  if (br != null) {
+			try {
+			  br.close();
+			} catch (IOException e) {
+			  e.printStackTrace();
+			}
+		  }
+		}
+	  }
+
+	}
+	=================================================================================================================
+
+
+	위 코드에서는 BufferedReader를 사용하여 CSV 파일을 읽어들이고, 각 줄마다 콤마로 분리된 값을 읽어내며, 이를 탭으로 구분하여 출력합니다.
+
+	위 코드에서는 데이터가 각각 한 줄에 하나씩 있을 것으로 가정합니다. 만약 CSV 파일의 첫 번째 줄이 헤더인 경우, 첫 번째 줄을 읽은 뒤에 나머지 줄을 읽을 때 데이터로 처리하면 됩니다.
+
+# 내가 원하는 양식대로 변경
+
+	특정 문자를 가지고 있는 행과 해당 행에서의 데이터를 잘라서 출력함
+	=================================================================================================================
+	package com.sungchul.main;
+
+	import java.io.BufferedReader;
+	import java.io.FileReader;
+	import java.io.IOException;
+
+	public class CsvReader {
+		public static void main(String[] args) throws IOException {
+			String csvFilePath = "temp.csv";
+			BufferedReader br = null;
+			String line = "";
+			String csvSplitBy = ",";
+			try {
+				br = new BufferedReader(new FileReader(csvFilePath));
+				while ((line = br.readLine()) != null) {
+					if(line.indexOf("Credentialed checks")>0){
+						String[] data = line.split(csvSplitBy);
+						System.out.println(data[4] + " " +data[12].substring( data[12].indexOf("Credentialed checks") , data[12].indexOf("Patch management checks")));
+					}
+					//System.out.println(data[4] + " " +data[12].indexOf("Credentialed"));
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				if (br != null) {
+					try {
+						br.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+
+	}
+	=================================================================================================================
+
+
+# 파이썬으로 변환한 내용
+	=================================================================================================================
+	csv_file_path = "temp.csv"
+	with open(csv_file_path, "r") as f:
+		for line in f:
+			if "Credentialed checks" in line:
+				data = line.split(",")
+				print(data[4], data[12][data[12].index("Credentialed checks"):data[12].index("Patch management checks")])
+	=================================================================================================================
+
+# CSV 파일 내용
+data_1,data_2,data_3,data_4,IP,data_6,data_7,data_8,data_9,data_10,data_11,data_12,data_13,,,,,,
+1,2,3,4,172.22.49.36,6,7,8,aaababab1,cdcdcdcdc1,efefefefe1,hihihihihi1,optmize the checks Credentialed checks : yes Patch management checks : adfasdfasdf ,,,,,,
+asdfas,gsfdhdfghfghdfgh,dfghdfghdfgh,rqwet,qwetqr,qwe,qwerq,asd,sdfasdf,ewqrqw,asdfas,fafasdv,fafa,,fa,fa,fa,a,fa
+1,2,3,4,172.22.49.37,6,7,8,aaababab2,cdcdcdcdc2,efefefefe2,hihihihihi2,optmize the checks Credentialed checks : no Patch management checks : adfasdfasdf,,,,,,
+1,2,3,4,172.22.49.38,6,7,8,aaababab3,cdcdcdcdc3,efefefefe3,hihihihihi3,optmize the checks Credentialed checks : yes Patch management checks : adfasdfasdf,,,,,,
+1,2,3,4,172.22.49.39,6,7,8,aaababab4,cdcdcdcdc4,efefefefe4,hihihihihi4,optmize the checks Credentialed checks : no Patch management checks : adfasdfasdf,,,,,,
+1,2,3,4,172.22.49.40,6,7,8,aaababab5,cdcdcdcdc5,efefefefe5,hihihihihi5,optmize the checks Credentialed checks : yes Patch management checks : adfasdfasdf,,,,,,
+1,2,3,4,172.22.49.41,6,7,8,aaababab6,cdcdcdcdc6,efefefefe6,hihihihihi6,optmize the checks Credentialed checks : no Patch management checks : adfasdfasdf,,,,,,
+1,2,3,4,172.22.49.62,6,7,8,aaababab27,cdcdcdcdc27,efefefefe27,hihihihihi27,optmize the checks Credentialed checks : yes Patch management checks : adfasdfasdf,,,,,,
+1,2,3,4,172.22.49.63,6,7,8,aaababab28,cdcdcdcdc28,efefefefe28,hihihihihi28,optmize the checks Credentialed checks : no Patch management checks : adfasdfasdf,,,,,,
+1,2,3,4,172.22.49.64,6,7,8,aaababab29,cdcdcdcdc29,efefefefe29,hihihihihi29,optmize the checks Credentialed checks : yes Patch management checks : adfasdfasdf,,,,,,
+1,2,3,4,172.22.49.65,6,7,8,aaababab30,cdcdcdcdc30,efefefefe30,hihihihihi30,optmize the checks Credentialed checks : no Patch management checks : adfasdfasdf,,,,,,
+1,2,3,4,172.22.49.66,6,7,8,aaababab31,cdcdcdcdc31,efefefefe31,hihihihihi31,optmize the checks Credentialed checks : yes Patch management checks : adfasdfasdf,,,,,,
+1,2,3,4,172.22.49.67,6,7,8,aaababab32,cdcdcdcdc32,efefefefe32,hihihihihi32,optmize the checks Credentialed checks : no Patch management checks : adfasdfasdf,,,,,,
+1,2,3,4,172.22.49.68,6,7,8,aaababab33,cdcdcdcdc33,efefefefe33,hihihihihi33,optmize the checks Credentialed checks : yes Patch management checks : adfasdfasdf,,,,,,
+asdfas,gsfdhdfghfghdfgh,dfghdfghdfgh,rqwet,qwetqr,qwe,qwerq,asd,sdfasdf,ewqrqw,asdfas,fafasdv,fafa,,fa,fa,fa,a,fa
+1,2,3,4,172.22.49.69,6,7,8,aaababab34,cdcdcdcdc34,efefefefe34,hihihihihi34,optmize the checks Credentialed checks : no Patch management checks : adfasdfasdf,,,,,,
+1,2,3,4,172.22.49.70,6,7,8,aaababab35,cdcdcdcdc35,efefefefe35,hihihihihi35,optmize the checks Credentialed checks : yes Patch management checks : adfasdfasdf,,,,,,
+1,2,3,4,172.22.49.71,6,7,8,aaababab36,cdcdcdcdc36,efefefefe36,hihihihihi36,optmize the checks Credentialed checks : no Patch management checks : adfasdfasdf,,,,,,
+1,2,3,4,172.22.49.72,6,7,8,aaababab37,cdcdcdcdc37,efefefefe37,hihihihihi37,optmize the checks Credentialed checks : yes Patch management checks : adfasdfasdf,,,,,,
+1,2,3,4,172.22.49.73,6,7,8,aaababab38,cdcdcdcdc38,efefefefe38,hihihihihi38,optmize the checks Credentialed checks : no Patch management checks : adfasdfasdf,,,,,,
+1,2,3,4,172.22.49.74,6,7,8,aaababab39,cdcdcdcdc39,efefefefe39,hihihihihi39,optmize the checks Credentialed checks : yes Patch management checks : adfasdfasdf,,,,,,
+1,2,3,4,172.22.49.75,6,7,8,aaababab40,cdcdcdcdc40,efefefefe40,hihihihihi40,optmize the checks Credentialed checks : no Patch management checks : adfasdfasdf,,,,,,
+1,2,3,4,172.22.49.76,6,7,8,aaababab41,cdcdcdcdc41,efefefefe41,hihihihihi41,optmize the checks Credentialed checks : yes Patch management checks : adfasdfasdf,,,,,,
+1,2,3,4,172.22.49.77,6,7,8,aaababab42,cdcdcdcdc42,efefefefe42,hihihihihi42,optmize the checks Credentialed checks : no Patch management checks : adfasdfasdf,,,,,,
+1,2,3,4,172.22.49.112,6,7,8,aaababab77,cdcdcdcdc77,efefefefe77,hihihihihi77,optmize the checks Credentialed checks : yes Patch management checks : adfasdfasdf,,,,,,
+1,2,3,4,172.22.49.113,6,7,8,aaababab78,cdcdcdcdc78,efefefefe78,hihihihihi78,optmize the checks Credentialed checks : no Patch management checks : adfasdfasdf,,,,,,
+1,2,3,4,172.22.49.114,6,7,8,aaababab79,cdcdcdcdc79,efefefefe79,hihihihihi79,optmize the checks Credentialed checks : yes Patch management checks : adfasdfasdf,,,,,,
+1,2,3,4,172.22.49.115,6,7,8,aaababab80,cdcdcdcdc80,efefefefe80,hihihihihi80,optmize the checks Credentialed checks : no Patch management checks : adfasdfasdf,,,,,,
+1,2,3,4,172.22.49.116,6,7,8,aaababab81,cdcdcdcdc81,efefefefe81,hihihihihi81,optmize the checks Credentialed checks : yes Patch management checks : adfasdfasdf,,,,,,
+1,2,3,4,172.22.49.194,6,7,8,aaababab159,cdcdcdcdc159,efefefefe159,hihihihihi159,optmize the checks Credentialed checks : yes Patch management checks : adfasdfasdf,,,,,,
+1,2,3,4,172.22.49.195,6,7,8,aaababab160,cdcdcdcdc160,efefefefe160,hihihihihi160,optmize the checks Credentialed checks : no Patch management checks : adfasdfasdf,,,,,,
+1,2,3,4,172.22.49.196,6,7,8,aaababab161,cdcdcdcdc161,efefefefe161,hihihihihi161,optmize the checks Credentialed checks : yes Patch management checks : adfasdfasdf,,,,,,
+1,2,3,4,172.22.49.197,6,7,8,aaababab162,cdcdcdcdc162,efefefefe162,hihihihihi162,optmize the checks Credentialed checks : no Patch management checks : adfasdfasdf,,,,,,
+1,2,3,4,172.22.49.198,6,7,8,aaababab163,cdcdcdcdc163,efefefefe163,hihihihihi163,optmize the checks Credentialed checks : yes Patch management checks : adfasdfasdf,,,,,,
+1,2,3,4,172.22.49.199,6,7,8,aaababab164,cdcdcdcdc164,efefefefe164,hihihihihi164,optmize the checks Credentialed checks : no Patch management checks : adfasdfasdf,,,,,,
+asdfas,gsfdhdfghfghdfgh,dfghdfghdfgh,rqwet,qwetqr,qwe,qwerq,asd,sdfasdf,ewqrqw,asdfas,fafasdv,fafa,,fa,fa,fa,a,fa
+1,2,3,4,172.22.49.201,6,7,8,aaababab166,cdcdcdcdc166,efefefefe166,hihihihihi166,optmize the checks Credentialed checks : no Patch management checks : adfasdfasdf,,,,,,
+1,2,3,4,172.22.49.202,6,7,8,aaababab167,cdcdcdcdc167,efefefefe167,hihihihihi167,optmize the checks Credentialed checks : yes Patch management checks : adfasdfasdf,,,,,,
+1,2,3,4,172.22.49.203,6,7,8,aaababab168,cdcdcdcdc168,efefefefe168,hihihihihi168,optmize the checks Credentialed checks : no Patch management checks : adfasdfasdf,,,,,,
+asdfas,gsfdhdfghfghdfgh,dfghdfghdfgh,rqwet,qwetqr,qwe,qwerq,asd,sdfasdf,ewqrqw,asdfas,fafasdv,fafa,,fa,fa,fa,a,fa
+1,2,3,4,172.22.49.205,6,7,8,aaababab170,cdcdcdcdc170,efefefefe170,hihihihihi170,optmize the checks Credentialed checks : no Patch management checks : adfasdfasdf,,,,,,
+1,2,3,4,172.22.49.206,6,7,8,aaababab171,cdcdcdcdc171,efefefefe171,hihihihihi171,optmize the checks Credentialed checks : yes Patch management checks : adfasdfasdf,,,,,,
+1,2,3,4,172.22.49.207,6,7,8,aaababab172,cdcdcdcdc172,efefefefe172,hihihihihi172,optmize the checks Credentialed checks : no Patch management checks : adfasdfasdf,,,,,,

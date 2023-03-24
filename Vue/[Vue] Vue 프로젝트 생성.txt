@@ -1,4 +1,5 @@
 [ Vue - 프로젝트 생성 ]
+{% raw %}
 	참고링크 : https://www.youtube.com/watch?v=b0ImUEsqaAA&t=1s
 
 
@@ -182,3 +183,4 @@
 
 
 
+{% endraw %}

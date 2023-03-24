@@ -1,16 +1,16 @@
-[ ajax ·Î map Å¸ÀÔ ÁÖ°í¹Ş±â ] 
+[ ajax ë¡œ map íƒ€ì… ì£¼ê³ ë°›ê¸° ] 
 
 
 
-[ ÄÁÆ®·Ñ·¯ -> È­¸é´Ü ]
+[ ì»¨íŠ¸ë¡¤ëŸ¬ -> í™”ë©´ë‹¨ ]
 	
-# È­¸é¿¡¼­ º¸³»ÁØ µ¥ÀÌÅÍ¸¦ °¡°øÇÏ°í mapÅ¸ÀÔÀ¸·Î ¸®ÅÏÇÒ ¶§
+# í™”ë©´ì—ì„œ ë³´ë‚´ì¤€ ë°ì´í„°ë¥¼ ê°€ê³µí•˜ê³  mapíƒ€ì…ìœ¼ë¡œ ë¦¬í„´í•  ë•Œ
 
-	¸®ÅÏÅ¸ÀÔÀº HashMap<String,Object> ·Î ÇÑ´Ù.
-	* HashMap<String,String> µî º¯¼öÅ¸ÀÔÀÌ ¿ÀºêÁ§Æ®°¡ ¾Æ´Ñ°æ¿ì¿¡´Â È­¸é´Ü¿¡¼­ 500¿¡·¯°¡ ¹ß»ıÇÔ
+	ë¦¬í„´íƒ€ì…ì€ HashMap<String,Object> ë¡œ í•œë‹¤.
+	* HashMap<String,String> ë“± ë³€ìˆ˜íƒ€ì…ì´ ì˜¤ë¸Œì íŠ¸ê°€ ì•„ë‹Œê²½ìš°ì—ëŠ” í™”ë©´ë‹¨ì—ì„œ 500ì—ëŸ¬ê°€ ë°œìƒí•¨
 
 =================================================================================================================
-    /*½ºÄÉÁì ¸®½ºÆ® Ãß°¡*/
+    /*ìŠ¤ì¼€ì¥´ ë¦¬ìŠ¤íŠ¸ ì¶”ê°€*/
     @ResponseBody
     @RequestMapping(value="connection/insertSystemSchedule.do",method = RequestMethod.POST, produces = "application/json; charset=utf8")
     public HashMap<String,Object> insertSystemSchedule(HttpServletRequest request){
@@ -18,15 +18,15 @@
 =================================================================================================================
 
 
-# º¸³»ÁØ mapÀ» È­¸é¿¡¼­ ¹ŞÀ»¶§
-	¹Ø¿¡ºÎºĞÀÎ success: function (data) { ÀÌºÎºĞ¿¡¼­
-	data¿¡´Â ¸®ÅÏ¹ŞÀº µ¥ÀÌÅÍ°¡ µé¾îÀÖÀ¸¹Ç·Î
-	ÀÚ¹Ù¿¡¼­´Â map.get("Å°°ª") ÀÌ·¸°Ô ¸Ê¿¡¼­ ²¨³»›§´Ù¸é ajax¿¡¼­ ¸®ÅÏ¹ŞÀº°ÍÀ» ²¨³»¾²·Á¸é
-	data.Å°°ª À¸·Î ²¨³»¾²¸é µÈ´Ù
+# ë³´ë‚´ì¤€ mapì„ í™”ë©´ì—ì„œ ë°›ì„ë•Œ
+	ë°‘ì—ë¶€ë¶„ì¸ success: function (data) { ì´ë¶€ë¶„ì—ì„œ
+	dataì—ëŠ” ë¦¬í„´ë°›ì€ ë°ì´í„°ê°€ ë“¤ì–´ìˆìœ¼ë¯€ë¡œ
+	ìë°”ì—ì„œëŠ” map.get("í‚¤ê°’") ì´ë ‡ê²Œ ë§µì—ì„œ êº¼ë‚´ì»ë‹¤ë©´ ajaxì—ì„œ ë¦¬í„´ë°›ì€ê²ƒì„ êº¼ë‚´ì“°ë ¤ë©´
+	data.í‚¤ê°’ ìœ¼ë¡œ êº¼ë‚´ì“°ë©´ ëœë‹¤
 
 	ex) 
-		scheduleMap.put("schedule_time",scheduleTime); À¸·Î ÀÚ¹Ù¿¡¼­ ³Ö¾îÁáÀ¸¸é
-		ajax¿¡¼­´Â data.schedule_time À¸·Î ²¨³»¼­ ¾²¸éµÊ
+		scheduleMap.put("schedule_time",scheduleTime); ìœ¼ë¡œ ìë°”ì—ì„œ ë„£ì–´ì¤¬ìœ¼ë©´
+		ajaxì—ì„œëŠ” data.schedule_time ìœ¼ë¡œ êº¼ë‚´ì„œ ì“°ë©´ë¨
 
 
 =================================================================================================================
@@ -34,14 +34,14 @@
             url: "connection/insertSystemSchedule.do",
             type: "POST",
             dataType: "json",
-            contentType: "application/x-www-form-urlencoded; charset=UTF-8", // ÀÎÄÚµù ¼³Á¤
+            contentType: "application/x-www-form-urlencoded; charset=UTF-8", // ì¸ì½”ë”© ì„¤ì •
             data: {
                 entity_code: selectEntityCode,
                 schedule_time: timeValue,
                 select_schedule : selectSchedule,
             },
             success: function (data) {
-				data.Å°°ª
+				data.í‚¤ê°’
 			}
 =================================================================================================================
 

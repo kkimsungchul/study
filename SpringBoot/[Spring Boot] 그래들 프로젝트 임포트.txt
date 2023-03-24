@@ -1,34 +1,34 @@
-[ ½ºÇÁ¸µºÎÆ® - ±×·¡µé ÇÁ·ÎÁ§Æ® ÀÓÆ÷Æ® ]
+[ ìŠ¤í”„ë§ë¶€íŠ¸ - ê·¸ë˜ë“¤ í”„ë¡œì íŠ¸ ì„í¬íŠ¸ ]
 
-# ÀÓÆ÷Æ® ÇÏ±â
-	ÆÄÀÏ -> ¿ÀÇÂ -> ÇÁ·ÎÁ§Æ®¸í Å¬¸¯
+# ì„í¬íŠ¸ í•˜ê¸°
+	íŒŒì¼ -> ì˜¤í”ˆ -> í”„ë¡œì íŠ¸ëª… í´ë¦­
 
 
-# ¿À·ù¹ß»ı
+# ì˜¤ë¥˜ë°œìƒ
 	Warning:Unable to make the module: if_buy, related gradle configuration was not found. Please, re-import the Gradle project and try again.
 
-	±×·¡µé ÇÁ·ÎÁ§Æ® ÀÓÆ÷Æ® ÇÒ‹š ¹ß»ıÇÏ´Â¿¡·¯
+	ê·¸ë˜ë“¤ í”„ë¡œì íŠ¸ ì„í¬íŠ¸ í• ë–„ ë°œìƒí•˜ëŠ”ì—ëŸ¬
 
 
-- ÇØ°á¹æ¾È 1
-	1. IntelliJ ¸Ş´º¿¡¼­ [View - Tool Windows - Gradle] Å¬¸¯
+- í•´ê²°ë°©ì•ˆ 1
+	1. IntelliJ ë©”ë‰´ì—ì„œ [View - Tool Windows - Gradle] í´ë¦­
 
-	2. ºäÃ¢ÀÌ ¶ß¸é refreshsh all gradle project Å¬¸¯ (»õ·Î°íÄ§¸ğ¾ç)
+	2. ë·°ì°½ì´ ëœ¨ë©´ refreshsh all gradle project í´ë¦­ (ìƒˆë¡œê³ ì¹¨ëª¨ì–‘)
 
-- ÇØ°á¹æ¾È 2
-	¹öÀüÀÌ ¾È¸ÂÀ½
-	»ç¹«½Ç¿¡¼­´Â 6.8.3 ¹öÀüÀ» »ç¿ëÇß´Âµ¥, Áı¿¡¼­´Â ¾ÈµÇ´Â°ÅÀÌ ºôµå°¡ ¾È´ï
+- í•´ê²°ë°©ì•ˆ 2
+	ë²„ì „ì´ ì•ˆë§ìŒ
+	ì‚¬ë¬´ì‹¤ì—ì„œëŠ” 6.8.3 ë²„ì „ì„ ì‚¬ìš©í–ˆëŠ”ë°, ì§‘ì—ì„œëŠ” ì•ˆë˜ëŠ”ê±°ì´ ë¹Œë“œê°€ ì•ˆëŒ
 
-	±×·¡¼­ ¼³Á¤ÆÄÀÏÀÇ ¹öÀüÀ» ³·ÃèÀ½
+	ê·¸ë˜ì„œ ì„¤ì •íŒŒì¼ì˜ ë²„ì „ì„ ë‚®ì·„ìŒ
 
-	ÆÄÀÏ°æ·Î : if_buy\gradle\wrapper\gradle-wrapper.properties
-	ÆÄÀÏ¸í : gradle-wrapper.properties
+	íŒŒì¼ê²½ë¡œ : if_buy\gradle\wrapper\gradle-wrapper.properties
+	íŒŒì¼ëª… : gradle-wrapper.properties
 
-	±âÁ¸ ¹öÀü
+	ê¸°ì¡´ ë²„ì „
 	=================================================================================================================
 	distributionUrl=https\://services.gradle.org/distributions/gradle-6.8.3-all.zip
 
-	º¯°æ ÈÄ ¹öÀü
+	ë³€ê²½ í›„ ë²„ì „
 	=================================================================================================================
 	distributionUrl=https\://services.gradle.org/distributions/gradle-5.6.4-all.zip
 

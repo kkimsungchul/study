@@ -1,10 +1,10 @@
-[ Å¬¸¯ÇÑ À§Ä¡ ÀÌº¥Æ® ]
+[ í´ë¦­í•œ ìœ„ì¹˜ ì´ë²¤íŠ¸ ]
 
 
-# ÀüÃ¼ ÆäÀÌÁö¿¡¼­ ÁÂÇ¥ °¡Á®¿À±â
+# ì „ì²´ íŽ˜ì´ì§€ì—ì„œ ì¢Œí‘œ ê°€ì ¸ì˜¤ê¸°
 
-	ÀÚ¹Ù½ºÅ©¸³Æ®¿¡¼­ ¸¶¿ì½º·Î Å¬¸¯ÇÑ À§Ä¡¸¦ Ã£¾Æ¾ß ÇÒ ¶§°¡ ÀÖÀ½
-	¾Æ·¡¿Í °°ÀÌ »ç¿ëÇÏ¸é ÇØ´ç ÆäÀÌÁö³»¿¡¼­ÀÇ ÁÂÇ¥¸¦ °¡Á® ¿Ã ¼ö ÀÖÀ½
+	ìžë°”ìŠ¤í¬ë¦½íŠ¸ì—ì„œ ë§ˆìš°ìŠ¤ë¡œ í´ë¦­í•œ ìœ„ì¹˜ë¥¼ ì°¾ì•„ì•¼ í•  ë•Œê°€ ìžˆìŒ
+	ì•„ëž˜ì™€ ê°™ì´ ì‚¬ìš©í•˜ë©´ í•´ë‹¹ íŽ˜ì´ì§€ë‚´ì—ì„œì˜ ì¢Œí‘œë¥¼ ê°€ì ¸ ì˜¬ ìˆ˜ ìžˆìŒ
 	event.pageX
 	event.pageY
 
@@ -16,18 +16,18 @@
 	=================================================================================================================
 
 
-# ÇöÀç Ç¥½ÃµÇ´Â È­¸é¿¡¼­¸¸ ÁÂÇ¥ °¡Á®¿À±â
+# í˜„ìž¬ í‘œì‹œë˜ëŠ” í™”ë©´ì—ì„œë§Œ ì¢Œí‘œ ê°€ì ¸ì˜¤ê¸°
 
-	event.clientX, event.clientY´Â ºê¶ó¿ìÀú Å¬¶óÀÌ¾ðÆ® ¿µ¿ªÀÇ ÁÂÃø»ó´ÜÀ» ±âÁØÀ¸·Î ÃøÁ¤µÈ ÁÂÇ¥ÀÌ¸ç
-	½ºÅ©·ÑÀÌ µÇÁö ¾ÊÀº »óÅÂ¿¡¼± °°Àº °ªÀ» °¡Áö°Ô µÇÁö¸¸,
-	½ºÅ©·ÑÀÌ µÈ »óÅÂ¶ó¸é ÁÂ¾i¹åÀÌ ½ºÅ©·Ñ µÈ ¾ç¿¡ µû¶ó ´Þ¶óÁü
+	event.clientX, event.clientYëŠ” ë¸Œë¼ìš°ì € í´ë¼ì´ì–¸íŠ¸ ì˜ì—­ì˜ ì¢Œì¸¡ìƒë‹¨ì„ ê¸°ì¤€ìœ¼ë¡œ ì¸¡ì •ëœ ì¢Œí‘œì´ë©°
+	ìŠ¤í¬ë¡¤ì´ ë˜ì§€ ì•Šì€ ìƒíƒœì—ì„  ê°™ì€ ê°’ì„ ê°€ì§€ê²Œ ë˜ì§€ë§Œ,
+	ìŠ¤í¬ë¡¤ì´ ëœ ìƒíƒœë¼ë©´ ì¢Œí‘ë°§ì´ ìŠ¤í¬ë¡¤ ëœ ì–‘ì— ë”°ë¼ ë‹¬ë¼ì§
 
 	event.clientX;
 	event.clientY;
 
-	ÀÌ¸¦ ÀÏÄ¡½ÃÅ°·Á¸é Å¬¶óÀÌ¾ðÆ® ÁÂÇ¥¿¡ ½ºÅ©·Ñ µÈ ¾çÀ» ´õÇØ¼­ °è»ê¿¡ Æ÷ÇÔ½ÃÄÑ¾ß ÇÔ
-	document.getElementById(obj).style.left = event.clientX + document.body.scrollLeft + ¡®px¡¯;
-	document.getElementById(obj).style.top = event.clientY + document.body.scrollTop + ¡®px¡¯;
+	ì´ë¥¼ ì¼ì¹˜ì‹œí‚¤ë ¤ë©´ í´ë¼ì´ì–¸íŠ¸ ì¢Œí‘œì— ìŠ¤í¬ë¡¤ ëœ ì–‘ì„ ë”í•´ì„œ ê³„ì‚°ì— í¬í•¨ì‹œì¼œì•¼ í•¨
+	document.getElementById(obj).style.left = event.clientX + document.body.scrollLeft + â€˜pxâ€™;
+	document.getElementById(obj).style.top = event.clientY + document.body.scrollTop + â€˜pxâ€™;
 
 
 
