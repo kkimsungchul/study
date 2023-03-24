@@ -1,0 +1,271 @@
+[ SpringBoot - WebClient 사용하기 ]
+
+# 참고 URL 
+	https://velog.io/@yyong3519/%EC%8A%A4%ED%94%84%EB%A7%81%EB%B6%80%ED%8A%B8-WebClient
+	https://annajin.tistory.com/101
+	https://gngsn.tistory.com/154
+	https://dejavuhyo.github.io/posts/spring-webclient-vs-resttemplate/
+	
+	Spring mono / webflux 개념
+		https://devuna.tistory.com/108
+
+
+# RestTemplate 동작 원리
+	※ 출처 : https://velog.io/@yyong3519/%EC%8A%A4%ED%94%84%EB%A7%81%EB%B6%80%ED%8A%B8-WebClient
+
+	RestTemplate은 Multi-Thread와 Blocking 방식을 사용
+	
+	Hread Pool은 요청자 어플리케이션 구동 시에 미리 만들어 놓음
+	
+	Request는 먼저 Queue에 쌓이고 가용한 쓰레드가 있으면 그 쓰레드에 할당되어 처리됨
+	
+	즉 1요청 당 1스레드가 할당됨.
+	
+	각 쓰레드에서는 Blocking 방식으로 처리되어 응답이 올때까지 그 스레드는 다른 요청에 할당 될 수 없음
+
+	요청을 처리할 쓰레드가 있으면 아무런 문제가 없지만, 
+	쓰레드가 다 차는 경우 이후의 요청은 Queue에 대기하게 됨
+
+	대부분의 문제는 네트워킹이나 DB와의 통신에서 생기는데 
+	이런 문제가 여러 쓰레드에서 발생하면 가용한 쓰레드수가 현저하게 줄어들게 되고, 
+	결국 전체 서비스는 매우 느려지게 됨.
+
+
+# Webclient 동작 원리
+	Spring WebClient 는 Single Thread와 Non-Blocking 방식을 사용함
+	
+	Core 당 1개의 Thread를 이용한다
+
+
+# 사용 이유
+	
+	1000명까지는 비슷하지만 동시사용자가 늘수록 RestTemplate은 급격하게 느려지는것을 볼 수 있음
+	
+	Spring 커뮤니티에서는 RestTemplate을 이미 Depreciated시키고 WebClient를 사용할것을 강력히 권고하고 있음
+
+	뭐.. 이제 RestTemplate 안쓴다니까 써야지 이후 버전에서는 삭제된다고 함
+
+
+# GPT 가 설명해준 Resttemplate 와 webflux의 차이점
+	RestTemplate과 WebFlux는 둘 다 Spring Framework에서 제공하는 HTTP 클라이언트 라이브러리로, RESTful 웹 서비스와 상호작용하는 데 사용됩니다. 그러나 이 두 가지 라이브러리는 서로 다른 방식으로 동작하며 각각의 특징이 있습니다.
+
+	동기(Synchronous) vs 비동기(Asynchronous)
+	RestTemplate은 동기 방식으로 동작합니다. 즉, 호출한 요청이 완료될 때까지 호출자는 대기해야 합니다. 반면 WebFlux는 비동기 방식으로 동작하여 요청이 완료되기를 기다리지 않고 다른 작업을 처리할 수 있습니다.
+
+	Reactor vs 기본 Java
+	WebFlux는 Reactor 라이브러리를 기반으로 작성되어 비동기적인 데이터 스트림 처리를 위한 Reactive Programming 모델을 사용합니다. 반면 RestTemplate은 기본 Java의 HttpURLConnection을 사용하여 HTTP 요청을 처리합니다.
+
+	더 높은 처리량 및 확장성
+	WebFlux는 비동기 처리 및 Reactive Programming 모델을 사용하여 높은 처리량과 확장성을 제공합니다. 반면 RestTemplate은 동기 방식으로 동작하므로 높은 처리량 및 확장성을 제공하기 어렵습니다.
+
+	Spring Boot 2.0 이후 버전에서는 WebFlux를 권장
+	Spring Boot 2.0 이후 버전에서는 WebFlux를 권장합니다. 이는 WebFlux가 비동기 방식 및 Reactive Programming 모델을 사용하여 더 높은 처리량 및 확장성을 제공하기 때문입니다. 따라서 새로운 프로젝트를 시작하거나 기존의 RestTemplate 기반 애플리케이션을 업그레이드할 때는 WebFlux를 사용하는 것이 좋습니다.
+
+	결론적으로, RestTemplate은 기존의 동기적인 방식으로 HTTP 요청을 처리하는 데 사용되고, WebFlux는 비동기 및 Reactive Programming 모델을 사용하여 높은 처리량과 확장성을 제공하는 데 사용됩니다.
+
+
+
+
+	RestTemplate과 WebFlux는 모두 Spring 프레임워크에서 HTTP 요청을 처리하는 데 사용되는 라이브러리입니다. 그러나 RestTemplate은 Blocking I/O를 사용하고, WebFlux는 Non-Blocking I/O를 사용합니다.
+
+	Blocking I/O는 I/O 작업이 완료될 때까지 스레드를 차단(block)하고, Non-Blocking I/O는 I/O 작업이 완료될 때까지 스레드를 차단하지 않습니다. 이는 많은 동시 요청을 처리할 때 큰 차이를 만들 수 있습니다.
+
+	RestTemplate은 Blocking I/O를 사용하므로, 하나의 요청에 대해 하나의 스레드가 차단됩니다. 따라서 많은 동시 요청을 처리하는 경우, 대기열이 발생할 수 있고 시스템 성능이 저하될 수 있습니다.
+
+	반면에 WebFlux는 Non-Blocking I/O를 사용하므로, 하나의 요청에 대해 스레드 차단이 없으며 적은 수의 스레드로 많은 요청을 처리할 수 있습니다. 이는 더 빠른 응답 시간과 높은 처리량을 제공할 수 있습니다.
+
+	따라서 RestTemplate은 작은 규모의 애플리케이션에서 사용하기에 적합하며, WebFlux는 대규모 애플리케이션에서 사용하기에 더 적합합니다. 그러나 이는 모든 상황에 해당하지는 않으므로, 애플리케이션의 요구사항에 따라 선택해야 합니다.
+
+
+# webclient , webflux , resttemplate 차이점
+
+	WebClient, WebFlux, RestTemplate 모두 Spring 프레임워크에서 HTTP 요청을 처리하는 데 사용되는 라이브러리입니다. 그러나 각각의 라이브러리는 아래와 같은 차이점이 있습니다.
+
+	WebClient
+		WebClient는 Spring WebFlux에서 제공하는 Non-Blocking HTTP Client입니다. 즉, Non-Blocking I/O 모델을 사용하여, I/O 작업이 완료될 때까지 스레드를 차단하지 않습니다. 따라서 많은 동시 요청을 처리하는 경우에 높은 처리량과 더 빠른 응답 시간을 제공할 수 있습니다.
+		WebClient는 Fluent API를 제공하여 요청 및 응답 데이터를 쉽게 조작할 수 있습니다. 또한, Reactive Streams API를 지원하므로, 데이터를 스트리밍 할 수 있으며, Backpressure를 제어할 수 있습니다.
+
+	WebFlux
+		WebFlux는 Spring WebFlux에서 제공하는 Non-Blocking Web Framework입니다. 즉, Non-Blocking I/O 모델을 사용하여, I/O 작업이 완료될 때까지 스레드를 차단하지 않습니다. 따라서 많은 동시 요청을 처리하는 경우에 높은 처리량과 더 빠른 응답 시간을 제공할 수 있습니다.
+		WebFlux는 Reactor 라이브러리를 기반으로 하며, Reactive Streams API를 지원합니다. 따라서 Reactive Programming 모델을 사용하여, 비동기적으로 데이터를 처리할 수 있습니다.
+
+	RestTemplate
+		RestTemplate은 Spring에서 제공하는 Blocking I/O를 사용하는 HTTP Client입니다. 따라서 I/O 작업이 완료될 때까지 스레드를 차단하게 됩니다. 따라서 많은 동시 요청을 처리하는 경우, 대기열이 발생할 수 있고 시스템 성능이 저하될 수 있습니다.
+		RestTemplate는 간단한 API를 제공하여 요청 및 응답 데이터를 쉽게 조작할 수 있습니다. 그러나, Reactive Streams API를 지원하지 않으므로, 데이터를 스트리밍 할 수 없고, Backpressure를 제어할 수 없습니다.
+
+	따라서, WebClient는 Non-Blocking I/O를 사용하는 HTTP Client로서, WebFlux와 함께 Reactive Programming 모델을 사용하여 비동기적으로 데이터를 처리할 수 있습니다. WebFlux는 Non-Blocking Web Framework로서, Reactive Streams API를 지원하며, Reactive Programming 모델을 사용하여 비동기적으로 데이터를 처리할 수 있습니다. RestTemplate은 Blocking I/O를 사용하는 HTTP Client로서, 간단한 API를 제공합니다. 각각의 라이브러리
+
+
+# WebClient 생성 방법
+	
+
+# 응답값 요청 방법
+
+
+	- GET 방식
+
+		-- 호출
+		=================================================================================================================
+		public void getTest(){
+			String response = webClientService()
+					.get()
+					.uri("http://localhost:8082/get/tttt")
+					.retrieve()
+					.bodyToMono(String.class)
+					.block();
+			System.out.println("### response : " + response);
+		}
+		=================================================================================================================
+
+
+		-- 응답
+		=================================================================================================================
+		@GetMapping("/get/{data}")
+		public ResponseEntity getTest(@PathVariable("data") String data){
+			System.out.println(data);
+			return new ResponseEntity("GET SUCCESS", HttpStatus.OK);
+		}
+		=================================================================================================================
+
+		※ 이건 List 리턴 테스트
+		=================================================================================================================
+
+        List<HashMap<String,Object>> response  =  client.get()
+                .uri("https://api.upbit.com/v1/market/all?isDetails=false")
+                .retrieve()
+                .bodyToMono(ArrayList.class)
+                .block();
+
+		=================================================================================================================
+
+	- POST 방식
+		-- 호출
+		=================================================================================================================
+		public void postTest(){
+			HashMap<String,Object> map = new HashMap<>();
+			map.put("name","김성철");
+			map.put("age",33);
+			map.put("address","경기도 용인시 처인구 역북동");
+
+			String response = webClientService()
+					.post()
+					.uri("http://localhost:8082/post")
+					.bodyValue(map)
+					.retrieve()
+					.bodyToMono(String.class)
+					.block();
+			System.out.println("### response : " + response);
+
+		}
+
+		=================================================================================================================
+		
+		-- 응답
+		=================================================================================================================
+		@PostMapping("/post")
+		public ResponseEntity postTest(@RequestBody HashMap<String,Object> dataMap){
+			System.out.println(dataMap);
+			HashMap<String,Object> map = new HashMap<>();
+			map.put("message" , "POST success");
+			map.put("data" , dataMap);
+
+
+			return new ResponseEntity(map, HttpStatus.OK);
+
+		}
+		=================================================================================================================
+
+	- PUT 방식
+		-- 호출
+		=================================================================================================================
+		public void putTest(){
+			HashMap<String,Object> map = new HashMap<>();
+			map.put("직업" , "개발자");
+			map.put("경력","만5년");
+			String response = webClientService()
+					.put()
+					.uri("http://localhost:8082/put")
+					.bodyValue(map)
+					.retrieve()
+					.bodyToMono(String.class)
+					.block();
+			System.out.println("### response : " + response);
+
+		}
+		=================================================================================================================
+		
+		--응답
+		=================================================================================================================
+		@PutMapping("/put")
+		public ResponseEntity putTest(@RequestBody HashMap<String,Object> dataMap){
+			System.out.println(dataMap);
+			return new ResponseEntity("PUT SUCCESS", HttpStatus.OK);
+		}
+		=================================================================================================================
+
+	- DELETE 방식
+		-- 호출
+		=================================================================================================================
+		public void deleteTest(){
+			String response = webClientService()
+					.delete()
+					.uri("http://localhost:8082/delete/dddd")
+					.retrieve()
+					.bodyToMono(String.class)
+					.block();
+			System.out.println("### response : " + response);
+
+		}
+		=================================================================================================================
+		
+		-- 응답
+		=================================================================================================================
+		@DeleteMapping("/delete/{data}")
+		public ResponseEntity deleteTest(@PathVariable("data") String data){
+			System.out.println(data);
+			return new ResponseEntity("DELETE SUCCESS", HttpStatus.OK);
+		}
+		=================================================================================================================
+			
+
+	- 공통
+		=================================================================================================================
+		public static WebClient webClientService(){
+			WebClient client = WebClient.create();
+			return client;
+		}
+		=================================================================================================================
+
+	- 메소드 설명
+		uri("https://sungchul.com/get?key=hi") - baseURI 및 파라미터를 지정해주는 부분
+		
+		retrieve() - 응답값을 받게 해주는 메소드
+		
+		bodyToMono(String.class) - response body를 String 타입으로 받게 해줌
+			리턴받을 타입을 기재하면 해당 클래스 타입으로 리턴을 받을 수 있음
+		
+		block() - webclient는 기본적으로 비동기 방식인데 block메서드를 이용해 동기 방식으로 바꿔준다. 
+				block을 붙여줘야 string으로 바꿀 수 있다고 한다.
+
+
+
+
+
+# Builder 에 들어갈수 있는 옵션
+
+	uriBuilderFactory		: Customized UriBuilderFactory to use as a base URL.
+								base url을 커스텀한 UriBuilderFactory
+	defaultUriVariables		: default values to use when expanding URI templates.
+
+	defaultHeader			: Headers for every request.
+								모든 요청에 사용할 헤더
+	defaultCookie			: Cookies for every request.
+								모든 요청에 사용할 쿠키
+	defaultRequest			: Consumer to customize every request.
+								모든 요청을 커스텀할 Consumer
+	filter					: Client filter for every request.
+								모든 요청에 사용할 클라이언트 필터
+	exchangeStrategies		: HTTP message reader/writer customizations.
+								HTTP 메시지 reader & writer 커스터마이징
+	clientConnector			: HTTP client library settings.
+								HTTP 클라이언트 라이브러리 세팅
