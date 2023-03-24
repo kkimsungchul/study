@@ -1,16 +1,13 @@
+[ SpringBoot - JUnit5 사용하기 ] 
+	https://www.youtube.com/watch?v=SFVWo0Z5Ppo&t=589s
+
 # 테스트
 
 	https://goddaehee.tistory.com/210?category=367461 
 
- 
-
-# 통합테스트
-
- 
+ # 통합테스트
 
 	https://goddaehee.tistory.com/211?category=367461 
-
- 
 
 # 컨트롤러 단위테스트 어노테이션 및 설명
 

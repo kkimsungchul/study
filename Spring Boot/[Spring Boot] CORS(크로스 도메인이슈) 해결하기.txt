@@ -2,6 +2,10 @@
 
 	Cross-Origin Resource Sharing,CORS 란 다른 출처의 자원을 공유할 수 있도록 설정하는 권한임
 
+# Spring Security
+	https://toycoms.tistory.com/37
+	https://velog.io/@chullll/Spring-Security-CORS
+
 
 
 # WebConfig 클래스 생성후 아래의 메소드들 추가

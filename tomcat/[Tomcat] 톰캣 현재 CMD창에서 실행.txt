@@ -14,9 +14,9 @@
 
 # 실행방법
 
-	1. CMD 창에서 해당 톰캣의 catalina.bat 가 있는 디렉토리로 이동
+	1. CMD 창에서 해당 톰캣의 catalina.bat 가 있는 디렉토리로 이동file:/C:/IntellijProject/logSearch/config.properties
 	ex ) cd C:\apache-tomcat-7.0.53\bin
-
+file:/C:/IntellijProject/logSearch/config.properties
 	2. 해당 창에서 catalina.bat run 명령어 입력
 	ex ) catalina.bat run
 

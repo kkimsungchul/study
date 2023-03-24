@@ -1,0 +1,72 @@
+# 프로젝트 가져오기
+
+	프로젝트를 생성할 디렉토리에서 Git bash를 실행 한 후 아래의 명령어 입력 
+		git clone https://securusgit1:tlzbfjtm1@github.com/securusgit1/securus_ciim
+
+
+	
+# 인텔리J에서 프로젝트 실행
+
+
+# 프로젝트 구조 설정
+	컨트롤+ 알트 +시프트 + S 동시입력 (프로젝트 구조 설정창)
+
+		1. 라이브러리 셋팅
+
+			
+
+			좌측 세번째 라이브러리 항목에서 라이브러리들 추가
+				경로 : securus_ciim\webapp\WEB-INF\lib
+
+		2. 아티팩트 셋팅
+			좌측 다섯번째 아티팩트 할목에서 아티팩트 추가
+
+			web application exploded 선택
+			우측화면의 Available Elements 를 다 추가
+
+
+		3. 모듈 셋팅
+			
+			
+			좌측 두번째 모듈 항목에서 Spring , Web 추가
+
+			Spring 항목에는 현재 프로젝트에 있는 스프링 관련 xml파일들을 추가
+
+			web항목에서
+				web Module deployment descriptor 의 경로를 변경
+					C:\temp_clone\securus_ciim\webapp\WEB-INF\web.xml
+						
+				web resource directory path 의 경로를 변경
+					C:\temp_clone\securus_ciim\webapp
+
+
+	
+
+# 프로젝트 빌드
+
+	상단에 있는 Build 메뉴에서 빌드를 해도 되고
+	컨트롤+F9로 프로젝트 빌드를 실행
+
+
+
+# 프로젝트 실행 설정
+
+	우측 상단에 Addconfiguations 클릭
+	좌측상단의 Tomcat Server 클릭 -> 로컬 클릭
+
+	생성된 톰캣에서 설정 변경
+
+
+	# Server 탭
+		URL : http://localhost:8080/ciim_manager_Web_exploded/ 이렇게 되어있는 것을
+				http://localhost:8080/ 로 변경
+
+	
+	# Deployment 탭
+		우측+ 버튼을 클릭하여 아티팩트를 추가
+
+		제일 하단의 Application context 경로를 /ciim_manager_Web_exploded 로 하지말고
+		아무것도 없는 공백으로 변경
+
+
+			

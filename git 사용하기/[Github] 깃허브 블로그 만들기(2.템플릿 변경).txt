@@ -1,0 +1,42 @@
+[ Github - 깃허브 블로그 만들기 - 템플릿 변경 ]
+	※ 아래의 내용은 작성하다가 더이상 진행할수 없어서 멈춤
+
+
+# 참고  URL 
+	https://theorydb.github.io/envops/2019/05/03/envops-blog-github-pages-jekyll/
+	http://jekyllrb-ko.github.io/docs/structure/
+
+# 템플릿 변경 이유
+	- 사이드바가 없다.
+	- 검색 기능이 없다.
+
+	뭐 찾을려고 한다면 찾을수도 있고,, 만들려고 한다면 만들수도 있는데,,,
+	퍼블리싱쪽은 정말 나랑 안맞는거 같고,,, 내가 디자인 하면 초등학생 수준이라는 얘기 들을까봐 잘되있는 템플릿을 찾던중
+	https://theorydb.github.io/envops/2019/05/03/envops-blog-github-pages-jekyll/ 
+	위의 블로그를 발견하였음
+
+	해당 블로그는 검색, 메뉴바등을 다 구현해놓았으며 
+	이쁘게 정리가 잘되어 있었음
+	진짜 맘에 듬
+
+	또한 위 블로그의 개발자분께서 템플릿 가져다 쓰셔도 된다했음 (star) 버튼만 눌러달라했음
+
+	그래서 가져다 쓰기로함
+
+
+# 적용방법
+	※ 안됨, 버전이 Ruby 버전이 안맞아서 번들 인스톨 자체가 안됨..
+
+
+	1. https://github.com/theorydb/theorydb.github.io 접속
+		※ 우측상단에  star 누르자
+	
+	2. download.zip 으로 코드파일을 내려받기
+
+	3. 압축풀기
+
+	4. 해당 디렉토리에서 "bundle install" 명령어 입력
+
+	5. bundle exec jekyll serve 명령어 실행
+
+	

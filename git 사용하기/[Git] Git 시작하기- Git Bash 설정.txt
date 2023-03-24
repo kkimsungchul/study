@@ -1,34 +1,34 @@
-Âü°í URL :
+ì°¸ê³  URL :
 	https://secuinfo.tistory.com/entry/tip-github?category=857378
 	https://secuinfo.tistory.com/entry/Local-Project-GitHub?category=857378
 
 
-# Git Bash ½ÇÇà ¹× ¼³Á¤
+# Git Bash ì‹¤í–‰ ë° ì„¤ì •
 
-	#¹ÙÅÁÈ­¸é¿¡¼­ ¿ìÅ¬¸¯ ÈÄ "Git Bash here" Å¬¸¯
+	#ë°”íƒ•í™”ë©´ì—ì„œ ìš°í´ë¦­ í›„ "Git Bash here" í´ë¦­
 
-	# »ç¿ëÀÚ Á¤º¸ ÀÔ·Â 
+	# ì‚¬ìš©ì ì •ë³´ ì…ë ¥ 
 
 		$ git config --global user.name "kimsc1218" 
 		$ git config --global user.email "kimsc1218@gmail.com" 
 
-	# ½© color ÁöÁ¤ 
+	# ì‰˜ color ì§€ì • 
 		$ git config --global color.ui "auto" 
 
-	# »ç¼³ ÀÎÁõ¼­¸¦ »ç¿ëÇÒ °æ¿ì ssl °ËÁõÀ» Å¬¶óÀÌ¾ğÆ®¿¡¼­ ÇÏÁö ¾ÊÀ½ 
+	# ì‚¬ì„¤ ì¸ì¦ì„œë¥¼ ì‚¬ìš©í•  ê²½ìš° ssl ê²€ì¦ì„ í´ë¼ì´ì–¸íŠ¸ì—ì„œ í•˜ì§€ ì•ŠìŒ 
 
 		$ git config --global --bool --add http.sslVerify false 
 
-	# Http POST ¿äÃ» ¹öÆÛ »çÀÌÁî¸¦ ¼³Á¤ 
+	# Http POST ìš”ì²­ ë²„í¼ ì‚¬ì´ì¦ˆë¥¼ ì„¤ì • 
 
 		$ git config --global http.postBuffer 524288000 
 
-	#UTF-8 ¼³Á¤ (Windows¸¸ ÇØ´çµÊ) 
+	#UTF-8 ì„¤ì • (Windowsë§Œ í•´ë‹¹ë¨) 
 
 		$ git config --global i18n.commitEncoding cp949 
 		$ git config --global i18n.logOutputEncoding cp949 
 
-	#intelliJ¿¬µ¿À» À§ÇØ ignored ±â´É ¼³Á¤(Global Scope) 
+	#intelliJì—°ë™ì„ ìœ„í•´ ignored ê¸°ëŠ¥ ì„¤ì •(Global Scope) 
 
 		$ vi ~/.gitignore_global 
 
@@ -45,20 +45,20 @@
 
 
 
-# ·ÎÄÃ ÇÁ·ÎÁ§Æ®¸¦ ±êÇãºê¿¡ µî·Ï
+# ë¡œì»¬ í”„ë¡œì íŠ¸ë¥¼ ê¹ƒí—ˆë¸Œì— ë“±ë¡
 
-	#ÇÁ·ÎÁ§Æ® Æú´õ¿¡¼­ ¿ìÅ¬¸¯ ÈÄ "Git Bash here" Å¬¸¯
+	#í”„ë¡œì íŠ¸ í´ë”ì—ì„œ ìš°í´ë¦­ í›„ "Git Bash here" í´ë¦­
 
-	# Git ÃÊ±âÈ­ 
+	# Git ì´ˆê¸°í™” 
 		$ git init 
 
-	# Local Project¸¦ Add¸¦ ÅëÇØ Staging to index 
+	# Local Projectë¥¼ Addë¥¼ í†µí•´ Staging to index 
 		$ git add . 
 
-	# StagingÀ» ½ÇÁ¦ Local Repository·Î ÀúÀå 
+	# Stagingì„ ì‹¤ì œ Local Repositoryë¡œ ì €ì¥ 
 		$ git commit -m "First Commit to existed local project" 
 
-	# Remote Repository·Î Push¸¦ À§ÇÑ ¿ø°İ ºê·±Ä¡ URL¼³Á¤ ¹× È®ÀÎ 
+	# Remote Repositoryë¡œ Pushë¥¼ ìœ„í•œ ì›ê²© ë¸ŒëŸ°ì¹˜ URLì„¤ì • ë° í™•ì¸ 
 		$ git remote add origin https://github.com/kkimsungchul/if_buy.git
 		$ git remote -v 
 
@@ -69,29 +69,29 @@
 
 
 
-# ¿ø°İ¿¡¼­ ÇÁ·ÎÁ§Æ® °¡Á®¿À±â
+# ì›ê²©ì—ì„œ í”„ë¡œì íŠ¸ ê°€ì ¸ì˜¤ê¸°
 
-	# ¿ø°İ ºê·±Ä¡ ¿¬°á
-		$ git remote [·ÎÄÃÀúÀå¼Ò] [ºê·±Ä¡URL]
+	# ì›ê²© ë¸ŒëŸ°ì¹˜ ì—°ê²°
+		$ git remote [ë¡œì»¬ì €ì¥ì†Œ] [ë¸ŒëŸ°ì¹˜URL]
 			git remote origin https://github.com/kkimsungchul/study.git
 		
-	# Ã¼Å©¾Æ¿ô 
-		$ git checkout [ºê·£Ä¡¸í]
+	# ì²´í¬ì•„ì›ƒ 
+		$ git checkout [ë¸Œëœì¹˜ëª…]
 			git checkout master
 		
-	# did not match any file(s) known to git ¿À·ù ¹ß»ı
-		¾Æ·¡ÀÇ ¸í·É¾î¸¦ ÀÔ·Â
+	# did not match any file(s) known to git ì˜¤ë¥˜ ë°œìƒ
+		ì•„ë˜ì˜ ëª…ë ¹ì–´ë¥¼ ì…ë ¥
 		$ git remote update
 		$ git fetch 
 	
-	# ÇöÀç ºê·±Ä¡ È®ÀÎ - ·ÎÄÃ
+	# í˜„ì¬ ë¸ŒëŸ°ì¹˜ í™•ì¸ - ë¡œì»¬
 		git branch -a
 	
-	# ÇöÀç ºê·±Ä¡ È®ÀÎ - ¿ø°İ
+	# í˜„ì¬ ë¸ŒëŸ°ì¹˜ í™•ì¸ - ì›ê²©
 		git branch -r
 
 
-# ±ê ºê·±Ä¡ ÀÌ¸§ º¯°æ
+# ê¹ƒ ë¸ŒëŸ°ì¹˜ ì´ë¦„ ë³€ê²½
 	$ git init
 
 	$ git remote origin https://github.com/kkimsungchul/study.git
@@ -104,14 +104,14 @@
 
 	$ git branch -a
 
-	$ git branch -m [±âÁ¸ÀÌ¸§] [º¯°æÇÒÀÌ¸§]
+	$ git branch -m [ê¸°ì¡´ì´ë¦„] [ë³€ê²½í• ì´ë¦„]
 
 		$ git branch -m	master main
 	
 	$ git push origin :master
 
 
-# ±ê °èÁ¤ ¾È¹°¾î º¸°Ô ÇÏ±â
+# ê¹ƒ ê³„ì • ì•ˆë¬¼ì–´ ë³´ê²Œ í•˜ê¸°
 
 	git config credential.helper store
 	git config credential.helper store --global
