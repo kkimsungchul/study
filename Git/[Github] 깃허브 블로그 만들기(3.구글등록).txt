@@ -1,0 +1,30 @@
+# 구글 서치 콘솔에 등록
+	https://search.google.com/search-console/welcome?utm_source=about-page
+
+	URL에 내 깃허브 블로그 등록 
+	https://kkimsungchul.github.io/
+
+	HTML 태그를 생성받아
+
+	_includesc 폴더의 head.html에 메타태그 추가
+
+# 사이트맵 생성 URl 
+	https://www.xml-sitemaps.com/
+	여러가지 방법을 다 해봤는데 하나도 안됐음
+	그냥 위에 사이트에가서 내꺼 깃허브 블로그 URL을 넣음
+
+# 사이트맵 파일 등록
+	jekyll의 root 디렉토리에 sitemap.xml 파일을 붙여넣기
+
+# Github에 업로드
+	깃허브에 push를 한뒤 아래의 URL 접속
+	https://kkimsungchul.github.io/sitemap.xml
+
+
+# 구글 서치 콘솔에 sitemap 등록
+	1. 구글 서치콘솔로 돌아와서 좌측 속성검색 부분에 이전에 등록한 내 사이트를 클릭
+	
+	2. 사이트맵 제출
+
+# 등록 후 업데이트까지는 몇일 소요된다고 함
+	
