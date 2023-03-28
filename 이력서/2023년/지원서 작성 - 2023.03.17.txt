@@ -3,3 +3,4 @@ kimsc1218@gmail.com
 현대오토에버
 구매시스템 개발/운영 부문 경력 채용 (Java)
 https://hyundai-autoever.recruiter.co.kr/app/applicant/myPage/login
+https://hyundai-autoever.recruiter.co.kr/app/applicant/alwaysModifyResume?jobnoticeSn=52523&systemKindCode=MRS2
