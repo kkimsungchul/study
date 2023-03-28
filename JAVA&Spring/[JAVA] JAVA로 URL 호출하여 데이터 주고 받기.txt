@@ -193,7 +193,7 @@ public class Main {
 		String message="";
 		Test t = new Test();
 		HashMap<String,String> messageMap = new HashMap();
-		//message = t.get("https://aaaaaa.co.kr/api/sso/user/check/idms/"+91287301);
+		//message = t.get("https://aaaaaa.co.kr/api/sso/user/check/idms/"kimsc1218);
 		
 		
 		//message = t.post("https://aaaaaa.aa.co.kr/api/sso/user/check/insideCheck","{\"loginId\": \""+username+"\" , \"loginIp\" : \""+loginIp+"\"}");
@@ -221,7 +221,7 @@ public class Main {
 			
 		}
 		
-		//t.get("https://tbdspace.kt.co.kr/auth/admin/serverinfo");
+		//t.get("https://sungchul.com/auth/admin/serverinfo");
 	}
 	
 
