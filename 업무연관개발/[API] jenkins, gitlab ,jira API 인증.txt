@@ -1,4 +1,5 @@
-[API - jenkins, gitlab ,jira API 인증 방법]
+# API - jenkins, gitlab ,jira API 인증 방법
+	지라의 경우 miniOrange OAuth Configuration 플러그인도 설치
 
 # 깃랩
 	header 
