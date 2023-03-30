@@ -1,0 +1,189 @@
+# Effective Java - 챕터11. equals를 재정의 하려거든 HashCode도 재정의 하라 - 2
+	
+	여태까지의 내용을 참고하여 실제로 사용하는 코드를 작성해보자
+	
+	테스트를 위해 hashCode 를 재정의한 HashCodeTestVO 클래스
+	=================================================================================================================
+	package EffectiveJava.item11;
+
+	import java.util.Objects;
+
+	public class HashCodeTestVO {
+
+		int firstPhoneNumber;
+		int secondPhoneNumber;
+		int thirdPhoneNumber;
+
+		String userName;
+
+		public HashCodeTestVO(int firstPhoneNumber, int secondPhoneNumber, int thirdPhoneNumber, String userName) {
+			this.firstPhoneNumber = firstPhoneNumber;
+			this.secondPhoneNumber = secondPhoneNumber;
+			this.thirdPhoneNumber = thirdPhoneNumber;
+			this.userName = userName;
+		}
+
+		public int getFirstPhoneNumber() {
+			return firstPhoneNumber;
+		}
+
+		public void setFirstPhoneNumber(int firstPhoneNumber) {
+			this.firstPhoneNumber = firstPhoneNumber;
+		}
+
+		public int getSecondPhoneNumber() {
+			return secondPhoneNumber;
+		}
+
+		public void setSecondPhoneNumber(int secondPhoneNumber) {
+			this.secondPhoneNumber = secondPhoneNumber;
+		}
+
+		public int getThirdPhoneNumber() {
+			return thirdPhoneNumber;
+		}
+
+		public void setThirdPhoneNumber(int thirdPhoneNumber) {
+			this.thirdPhoneNumber = thirdPhoneNumber;
+		}
+
+		public String getUserName() {
+			return userName;
+		}
+
+		public void setUserName(String userName) {
+			this.userName = userName;
+		}
+
+		/*equals 재정의*/
+	//    @Override
+	//    public boolean equals(Object o){
+	//        //같은객체인지 비교
+	//        if(o ==this){
+	//            return true;
+	//        }
+	//        //타입 비교
+	//        if(!(o instanceof HashCodeTestVO)){
+	//            return false;
+	//        }
+	//        //안에 들어있는 필드들의 값 비교
+	//        HashCodeTestVO equalsTestVO = (HashCodeTestVO)o;
+	//        return equalsTestVO.firstPhoneNumber == firstPhoneNumber && equalsTestVO.secondPhoneNumber==secondPhoneNumber
+	//                && equalsTestVO.thirdPhoneNumber == thirdPhoneNumber && equalsTestVO.userName.equals(userName);
+	//    }
+
+		/*hashCode 재정의*/
+		@Override
+		public int hashCode() {
+			int result = Integer.hashCode(firstPhoneNumber);
+			result = 31 * result + Integer.hashCode(secondPhoneNumber);
+			result = 31 * result + Integer.hashCode(thirdPhoneNumber);
+			result = 31 * result + Objects.hashCode(userName);
+
+			return result;
+		}
+
+
+		//Intellij 에서 생성한 equals
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			HashCodeTestVO that = (HashCodeTestVO) o;
+			return firstPhoneNumber == that.firstPhoneNumber && secondPhoneNumber == that.secondPhoneNumber && thirdPhoneNumber == that.thirdPhoneNumber && Objects.equals(userName, that.userName);
+		}
+		//intelliJ에서 생성한 hashCode
+	//    @Override
+	//    public int hashCode() {
+	//        return Objects.hash(firstPhoneNumber, secondPhoneNumber, thirdPhoneNumber, userName);
+	//    }
+
+	}
+	=================================================================================================================
+
+	테스트를 위한 HashCodeMain 클래스
+	=================================================================================================================
+	package EffectiveJava.item11;
+
+	import EffectiveJava.item10.EqualsTestVO;
+
+	import java.util.HashMap;
+
+	public class HashCodeMain {
+		public static void main(String[]args){
+			//hashCode 를 정의하기 전에 아래와 같이 key부분에 HashCodeTestVO 로 키를 만들고 값을 성처리로 넣고,
+			//get으로 가져오면 null 이 나온다.
+			HashMap<HashCodeTestVO,String> map = new HashMap<>();
+			map.put(new HashCodeTestVO(1,2,3,"김성철"),"성처리");
+			System.out.println(map.get(new HashCodeTestVO(1,2,3,"김성철")));
+		}
+	}
+	=================================================================================================================
+
+	위에는 책에서 설명해준대로 정의한 hashCode와 Intellij 툴에서 생성해준 HashCode메소드가 둘다 포함되어 있다.
+
+	Objects 클래스는 임의의 개수만큼 객체를 받아 해시코드를 계산해주는 정적 메소드인 hash를 제공한다
+	
+	Objects 클래스의 hash 메소드를 찾아가서 확인해보자
+	=================================================================================================================
+	public final class Objects {
+		...중략...
+		public static int hash(Object... values) {
+			return Arrays.hashCode(values);
+		}
+		...중략...
+	}
+	=================================================================================================================
+
+	위와같이 Arrays클래스의 hashCode에 데이터를 넘기고 있다.
+	그럼 다시 Arrays 클래스의 hashCode 를 찾아가보자.
+	=================================================================================================================
+	public class Arrays {
+		...중략...
+		public static int hashCode(Object a[]) {
+			if (a == null)
+				return 0;
+
+			int result = 1;
+
+			for (Object element : a)
+				result = 31 * result + (element == null ? 0 : element.hashCode());
+
+			return result;
+		}
+		...중략...
+	}
+	=================================================================================================================
+
+	해당 내용을 찾아가보면 책에서 알려준것과 똑같이 해당 객체를 받아서 31을 곱하고 더하고 하고있다.
+
+	이 메소드를 활용하면 앞서의 요령대로 구현한 코드와 비슷한 수준의 hashCode 메소드를 단 한줄로 작성할 수 있다.
+	하지만 아쉽게도 속도는 더 느리다.
+
+	입력 인수를 담기 위한 배열이 만들어지고, 입력중 기본타입이 있다면 박싱과 언박싱도 거쳐야 하기 때문이다.
+	그러니 Objects.hash() 메소드는 성능에 민감하지 않은 상황에서만 사용하자.
+	
+	클래스가 불변이고 캐시코드를 계산하는 비용이 크다면, 매번 새로 계산하기 보다는 캐싱하는 방식을 고려해야 한다.
+	이 타입의 객체가 주로 해시의 키로 사용될 것 같다면 인스턴스가 만들어질 때 해시코드를 계산해둬야 한다.
+	해시의 키로 사용되지 않는 경우라면 hashCode가 처음 불릴 때 계산하는 지연초기화(lazy initialization) 전략을 사용하자
+	필드를 지연 초기화 하려면 그 클래스의 스레드를 안전하게 만들도록 신경 써야 한다.
+	hashCode의 필드의 초깃값은 흔히 생성되는 객체의 해시코드와는 달라야 함에 유의해야 한다.
+	
+	해시코드를 지연초기화 하는 hashCode 메소드
+	=================================================================================================================
+    /*hashCode 지연 초기화*/
+    int hashCode =0;
+    @Override
+    public int hashCode() {
+        int result =hashCode;
+        if(result==0){
+            result = Integer.hashCode(firstPhoneNumber);
+            result = 31 * result + Integer.hashCode(secondPhoneNumber);
+            result = 31 * result + Integer.hashCode(thirdPhoneNumber);
+            result = 31 * result + Objects.hashCode(userName);
+            hashCode = result;
+        }
+        return result;
+    }
+	=================================================================================================================
+

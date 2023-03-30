@@ -78,7 +78,7 @@
 			}
 
 			@Override
-			public Boolean equals(Object o){
+			public boolean equals(Object o){
 				if(o instanceof CaseInsensitiveString){
 					return s.equalsIgnoreCase((CaseInsensitiveString)o).s);
 				}

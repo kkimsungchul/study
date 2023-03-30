@@ -90,3 +90,118 @@
 	재정의해야 할 때는 그 클래스의 핵심 필드 모두를 빠짐없이, 다섯 가지 규약을 확실히 지켜가며 비교해야 한다
 
 
+
+# 테스로 작성한 equals 메소드 재정의와 테스트
+
+	테스트를 위한 EqualsMain 클래스
+	=================================================================================================================
+	package EffectiveJava.item10;
+
+	public class EqualsMain {
+
+		public static void main(String[]args){
+			EqualsTestVO equalsTestVO1 = new EqualsTestVO(1,2,3,"김성철");
+			EqualsTestVO equalsTestVO2 = new EqualsTestVO(1,2,4,"김성철");
+
+			EqualsTestVO equalsTestVO3 = new EqualsTestVO(1,2,4,"양혜은");
+			EqualsTestVO equalsTestVO4 = new EqualsTestVO(1,2,4,"양혜은");
+
+			System.out.println("### equalsTestVO1.equals(equalsTestVO2) : " + equalsTestVO1.equals(equalsTestVO2));
+			System.out.println("### equalsTestVO3.equals(equalsTestVO4) : " + equalsTestVO3.equals(equalsTestVO4));
+			System.out.println();
+			
+			//아래에 테스트를 위해서 equals 메소드를 재정의 한 부분에서 userName 을빼보자
+			//equalsTestVO2 와 equalsTestVO4 은 phone number는 같아도이름은 다르지만 같다고 나온다 
+			System.out.println("### equalsTestVO1.equals(equalsTestVO3) : " + equalsTestVO1.equals(equalsTestVO3));
+			System.out.println("### equalsTestVO2.equals(equalsTestVO4) : " + equalsTestVO2.equals(equalsTestVO4));
+			
+		}
+
+	}
+
+
+	=================================================================================================================
+
+
+
+	테스트를 위한 equals 를 재정의한 EqualsTestVO 클래스
+	=================================================================================================================
+	package EffectiveJava.item10;
+
+	import java.util.Objects;
+
+	public class EqualsTestVO {
+
+		int firstPhoneNumber;
+		int secondPhoneNumber;
+		int thirdPhoneNumber;
+
+		String userName;
+
+		public EqualsTestVO(int firstPhoneNumber, int secondPhoneNumber, int thirdPhoneNumber, String userName) {
+			this.firstPhoneNumber = firstPhoneNumber;
+			this.secondPhoneNumber = secondPhoneNumber;
+			this.thirdPhoneNumber = thirdPhoneNumber;
+			this.userName = userName;
+		}
+
+		public int getFirstPhoneNumber() {
+			return firstPhoneNumber;
+		}
+
+		public void setFirstPhoneNumber(int firstPhoneNumber) {
+			this.firstPhoneNumber = firstPhoneNumber;
+		}
+
+		public int getSecondPhoneNumber() {
+			return secondPhoneNumber;
+		}
+
+		public void setSecondPhoneNumber(int secondPhoneNumber) {
+			this.secondPhoneNumber = secondPhoneNumber;
+		}
+
+		public int getThirdPhoneNumber() {
+			return thirdPhoneNumber;
+		}
+
+		public void setThirdPhoneNumber(int thirdPhoneNumber) {
+			this.thirdPhoneNumber = thirdPhoneNumber;
+		}
+
+		public String getUserName() {
+			return userName;
+		}
+
+		public void setUserName(String userName) {
+			this.userName = userName;
+		}
+
+		/*equals 재정의*/
+		@Override
+		public boolean equals(Object o){
+			//같은객체인지 비교
+			if(o ==this){
+				return true;
+			}
+			//타입 비교
+			if(!(o instanceof EqualsTestVO)){
+				return false;
+			}
+			//안에 들어있는 필드들의 값 비교
+			EqualsTestVO equalsTestVO = (EqualsTestVO)o;
+			return equalsTestVO.firstPhoneNumber == firstPhoneNumber && equalsTestVO.secondPhoneNumber==secondPhoneNumber
+					&& equalsTestVO.thirdPhoneNumber == thirdPhoneNumber && equalsTestVO.userName.equals(userName);
+		}
+
+	//IntelliJ 에서 생성한 equals
+	//    @Override
+	//    public boolean equals(Object o) {
+	//        if (this == o) return true;
+	//        if (o == null || getClass() != o.getClass()) return false;
+	//        EqualsTestVO that = (EqualsTestVO) o;
+	//        return firstPhoneNumber == that.firstPhoneNumber && secondPhoneNumber == that.secondPhoneNumber && thirdPhoneNumber == that.thirdPhoneNumber && Objects.equals(userName, that.userName);
+	//    }
+	}
+
+	=================================================================================================================
