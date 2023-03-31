@@ -152,7 +152,7 @@ public class CommonUtil {
             }
             */
             
-            throw new ApiException("E0004", ex.getMessage());
+			ex.getMessage();
         }
     }
 
@@ -188,7 +188,7 @@ public class CommonUtil {
             }
             */
 
-            throw new ApiException("E0004", ex.getMessage());
+			ex.getMessage();
         }
     }
 }
