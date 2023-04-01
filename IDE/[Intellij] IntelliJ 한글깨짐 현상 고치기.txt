@@ -1,0 +1,19 @@
+# IntelliJ - IntelliJ 한글깨짐 현상 고치기
+
+# 설정 변경
+	1. 알트 + 시프트 + s 또는 file -> Settings 클릭
+	2. Editor -> File Encodings 클릭
+	3. Global Encoding , Project Encoding , Default Encoding for properties files 
+		위 세개를 전부다 UTF-8 로 변경
+
+# VM 옵션 변경
+	1. IntelliJ 에서 시프트 두번을 빠르게 입력
+	2. edit Custom vm Options 검색
+	3. 제일밑에 아래의 옵션 두줄 추가
+		-Dconsole.encoding=UTF-8
+		-Dfile.encoding=UTF-8
+
+# 위 두개로 증상 해결이 안됨
+	나같은 경우 위 두개를 다 했는데도 증상 해결이 안됨.
+	구글링해본 결과 Gradle 프로젝트에서 빌드한 결과물이 문제일수있다고 함.
+	그래서 clean 후 다시 빌드를 하니 정상적으로 표시가 되었음

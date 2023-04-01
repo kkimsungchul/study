@@ -1,0 +1,48 @@
+# JAVA - JAVA 프로젝트에 Gradle 추가하기
+
+	공식문서 : https://docs.gradle.org/current/userguide/userguide.html
+	번역문서 : https://velog.io/@orijoon98/Gradle-Documentation2-Authoring-Gradle-Builds
+	※개인블로그임
+
+		
+
+
+# 프로젝트에 아래의 파일 생성
+	build.gradle
+	setting.gradle
+
+# build.gradle 파일에 아래의 내용 추가
+	======================================================================================================
+	plugins {
+		id 'java'
+	}
+
+	group 'com.sungchul'
+	version '1.0-SNAPSHOT'
+
+	repositories {
+		mavenCentral()
+	}
+
+	dependencies {
+		testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
+		testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+	}
+
+	test {
+		useJUnitPlatform()
+	}
+
+	======================================================================================================
+
+
+# setting.gradle 파일에 아래의 내용 추가
+	프로젝트명은 해당 프로젝트에 맞게 변경
+	======================================================================================================
+	rootProject.name = 'JUnitTestProject'
+	======================================================================================================
+
+# IntelliJ에서 자동으로 Gradle 파일을 인식하고 load 하겠냐는 알림을 띄어줌
+	- 혹여나 자동으로 import 가 안된다고 하면 프로젝트 우클릭 후 Import Gradle Project 버튼 클릭
+
+
