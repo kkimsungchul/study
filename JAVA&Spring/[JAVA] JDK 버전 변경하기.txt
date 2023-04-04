@@ -1,0 +1,61 @@
+# JAVA - JDK 버전 변경하기
+	기존JDK가 1.8 버전이였는데, 스프링부트 3.0 부터는 최소 JDK 요구사항이 17임.
+	17으로 올릴까 했는데 이왕 최신으로 올려서 쓰자라는 생각으로 20으로 올림
+	
+	※ 정정함
+	20버전하면 안됨 JDK20 에서 SpringBoot 3.0을 빌드하지 못함, 그래서 17로 다시했음
+	오류코드 : unsupported class file major version 64
+	오류설명 : Gradle 시스템이 현재 적용 된 jdk 버전과 호환 되지 않을 때 발생하는 문제
+
+
+# 1. JDK 최신 버전 다운로드
+	URL : https://jdk.java.net/17/
+	다운로드 파일 : Windows/x64 zip 
+
+# 2. 환경변수 변경
+	시스템속성 -> 고급 -> 환경변수 변경 클릭
+	
+	JAVA_HOME 변수에 설정되어 있는 경로를 아래와 같이 변경
+	C:\Program Files\Java\jdk-17.0.2
+
+# 3. 오라클 환경 변수 삭제
+	오라클 환경변수가 존재하면 java -version 을 입력하였을 때 버전이 기존버전으로 나오는 이슈가 발생함
+	
+	PATH 변수에서 아래의 변수를 제거
+	C:\Program Files (x86)\Common Files\Oracle\Java\javapath
+
+
+# 4. 버전 확인
+	cmd 창에서 java -version 입력
+	=================================================================================================================
+	C:\Users\USER>java -version
+	openjdk version "17.0.2" 2022-01-18
+	OpenJDK Runtime Environment (build 17.0.2+8-86)
+	OpenJDK 64-Bit Server VM (build 17.0.2+8-86, mixed mode, sharing)
+	=================================================================================================================
+
+# IntelliJ 설정 변경
+
+	컨트롤 + 알트 + S ( File -> Setting)
+	Build, Execution, Deployment
+	-> Compiler
+	-> Java Compiler
+	Project bytecode version 을 해당 버전으로 변경
+
+
+	Build, Execution, Deployment
+	-> Build Tools
+	-> Gradle
+	Gradle JVM 을 해당 버전으로 변경
+
+
+	컨트롤 + 알트 + 시프트 + S ( Project Stucture)
+	-> Project
+	-> SDK 17버전으로 변경
+
+
+
+## 오류사항
+	환경변수설정, 오라클 변수를 삭제 해도 java -version 에서는 예전 버전이 표시되었음.
+	재부팅을 해도 똑같음.
+	이럴 경우에는 2번항목 환경변수 설정에서 JAVA_HOME을 제일 위로 끌고오면 해결됨

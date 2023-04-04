@@ -3,7 +3,7 @@
 
 	정적 메소드와 정적 필드만을 담은 클래스를만들때가 있음
 		=================================================================================================================
-		public class StringUril {
+		public class StringUtil {
 			public static final String stringValue = "hihi";
 			
 			//생성자가 존재하지 않음
