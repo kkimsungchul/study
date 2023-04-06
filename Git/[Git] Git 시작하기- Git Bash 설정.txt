@@ -23,10 +23,13 @@
 
 		$ git config --global http.postBuffer 524288000 
 
-	#UTF-8 설정 (Windows만 해당됨) 
+	# UTF-8 설정 (Windows만 해당됨) 
 
 		$ git config --global i18n.commitEncoding cp949 
 		$ git config --global i18n.logOutputEncoding cp949 
+
+	# 파일명의 대소문자 구분을 무시하지 않도록 설정
+		$ git config --global core.ignorecase false
 
 	#intelliJ연동을 위해 ignored 기능 설정(Global Scope) 
 
