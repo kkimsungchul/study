@@ -6,6 +6,9 @@
 		테스트 결과 똑같은 스프링 2.5.6 버전에서 스웨거 버전만 swagger2.9.2 로 했을시엔 오류가 발생하지 않음
 	
 
+# 개발환경
+springboot : 2.6.2
+swagger : 3.0.0
 
 
 # 사용 이유	
@@ -131,32 +134,3 @@
 
 	http://localhost/swagger-ui/index.html
 
-
-
-
-
-
-	
-
-
-	
-
-
-
-
-
-
-springboot : 2.6.2
-
-swagger : 3.0.0
-
- 
-
-
-
- 
-
-spring:
-  mvc:
-    pathmatch:
-      matching-strategy: ant_path_matcher
