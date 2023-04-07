@@ -1,0 +1,170 @@
+[Spring Boot  - Springsecurity 사용하기]
+	
+	스프링에서 제공해주는 스프링시큐리티로 로그인 및 권한부분 구현
+	
+	* 스프링시큐리티 적용
+		https://dkyou.tistory.com/15?category=877213
+
+		
+
+
+# gradle 에 라이브러리 추가
+
+    //Springsecurity
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.security:spring-security-test'
+    implementation group: 'org.thymeleaf.extras', name: 'thymeleaf-extras-springsecurity5', version: '3.0.4.RELEASE'
+
+
+
+# 스프링 시큐리티 config 작성
+
+	진짜 아래같이 작성만 하면 끝임
+	사용자가 로그인한 계정에 따라서 권한을 부여하는것임.
+	저 위에 블로그 들어가면 잘 설명되어있음
+
+	스웨거를 사용한다면  "/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**" 
+	이부분을 permitAll()에 추가하자
+	=================================================================================================================
+	package com.sungchul.stock.config.security;
+
+	import lombok.extern.slf4j.Slf4j;
+	import org.springframework.beans.factory.annotation.Autowired;
+	import org.springframework.context.annotation.Bean;
+	import org.springframework.context.annotation.Configuration;
+	import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+	import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+	import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+	import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+	import org.springframework.security.core.userdetails.UserDetailsService;
+	import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+	import org.springframework.security.crypto.password.PasswordEncoder;
+
+	@Configuration
+	@EnableWebSecurity
+	@Slf4j
+	public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+
+		@Override
+		public void configure(AuthenticationManagerBuilder auth) throws Exception {
+
+	        String password = passwordEncoder().encode("1111");
+	        auth.inMemoryAuthentication().withUser("user").password(password).roles("USER");
+	        auth.inMemoryAuthentication().withUser("manager").password(password).roles("MANAGER");
+	        auth.inMemoryAuthentication().withUser("admin").password(password).roles("ADMIN");
+
+			
+
+		}
+
+		@Bean
+		// BCryptPasswordEncoder는 Spring Security에서 제공하는 비밀번호 암호화 객체입니다.
+		// Service에서 비밀번호를 암호화할 수 있도록 Bean으로 등록합니다.
+		public PasswordEncoder passwordEncoder() {
+			return new BCryptPasswordEncoder();
+		}
+
+		@Override
+		protected void configure(HttpSecurity http) throws Exception {
+			http
+					.csrf().disable()
+					.authorizeRequests()
+					 //.antMatchers("/").permitAll()
+					//스웨거에는 바로 접속할수 있도록 아래의 URL에서 예외처리
+					.antMatchers("/", "/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**").permitAll()
+					.antMatchers("/user").hasRole("USER") //해당 룰이 있어야 접근 가능
+					.antMatchers("/manager").hasRole("MANAGER")
+					.antMatchers("/admin" , "/test" , "/test/**").hasRole("ADMIN")
+					.antMatchers("/findText").authenticated() //인증이 있어야 접근 가능
+					.anyRequest().authenticated()
+					.and()
+					//아래의 옵션을 적용하면 Springsecurity 의 기본 로그인 페이지를 사용함 
+					//url : http://localhost:8080/login
+					.formLogin();
+		}
+
+
+	}
+
+
+	=================================================================================================================
+
+
+# 로그아웃
+	URL 뒤에 /logout 붙이면 로그아웃 됨
+	localhost/logout
+
+
+# 블로그 발췌
+	=================================================================================================================
+	- @Configuration, @EnableWebSecurity 어노테이션을 추가해줘서 이게 시큐리티 설정을 해주는 클래스다~라는 것을 알려주는 것 같습니다.
+
+	 
+
+	- AuthenticationManagerBuilder 객체 오버 라이딩은 가상의 계정을 만들어 주는 설정입니다.
+
+	- password는 passwordEncoder()에 의해 인코딩 되고, 비밀번호는 간단하게 '1111' string으로 설정하였습니다.
+
+	- 그 후 각각의 계정을 생성하고, 권한을 부여해주었습니다.
+
+	 
+
+	- Bean을 주입한 PasswordEncoder는 BCryptPasswordEncoder라는 스프링 시큐리티 자체 인코딩을 이용하여 암호화해줍니다.
+
+	 
+
+	- HttpSecurity 객체 오버 라이딩은 시큐리티 설정의 핵심 부분으로, 각각의 권한에. antMatchers("controller mapping url명"). permitAll()이나, hasRole("권한명")으로 연결되어있습니다.
+
+	- .anyRequest(). authenticated()는 이것을 제외한 모든 url 연결에는 인증이 사용됩니다.
+
+	- .and() 로 묶어주었고, .formLogin() 을 사용하여 스프링 시큐리티에서 제공하는 기본 form Login 형태를 이용하도록 해주었습니다.
+
+	=================================================================================================================
+
+
+# springsecurity 에서 사용하는 내장함수
+	https://offbyone.tistory.com/91
+	※ 일반적인 내장 표현식을 정리하였습니다.
+	
+#hasRole([role])				
+	현재 로그인된 사용자가 지정된 role을 가지고 있으면 true를 반환합니다. 제공된 role이 'ROLE_'로 시작하지 않으면 기본적으로 'ROLE_'를 추가합니다. 이것은 DefaultWebSecurityExpressionHandler에서 defaultRolePrefix를 수정하여 커스터마이즈할 수 있습니다.
+
+#hasAnyRole([role1,role2])	
+	현재 로그인된 사용자가 콤마(,)로 분리하여 주어진 role들 중 하나라도 가지고 있으면 true를 반환합니다. 제공된 role이 'ROLE_'로 시작하지 않으면 기본적으로 'ROLE_'를 추가합니다. 이것은 DefaultWebSecurityExpressionHandler에서 defaultRolePrefix를 수정하여 커스터마이즈할 수 있습니다.
+
+#hasAuthority([authority])	
+	현재 로그인된 사용자가 지정된 권한이 있으면 true를 반환합니다.
+
+#hasAnyAuthority([authority1,authority2])	
+	현재 로그인된 사용자가 콤마(,)로 분리하여 주어진 권한들중 하나라도 가지고 있으면 true를 반환합니다.
+
+#principal							
+	현재 사용자를 나타내는 principal 객체에 직접 접근할 수 있습니다.
+
+#authentication					
+	SecurityContext로 부터 얻은 Authentication 객체에 직접 접근할 수 있습니다.
+
+#permitAll					
+	항상 true로 평가 됩니다.
+
+#denyAll					
+	항상 false로 평가 됩니다.
+
+#isAnonymous()					
+	현재 사용자가 익명사용자(로그인 안됨) 사용자이면 true를 반환합니다.
+
+#isRememberMe()					
+	현재 로그인된 사용자가 remember-me 사용자이면 true를 반환합니다.(로그인 정보 기억 기능에 의한 사용자)
+
+#isAuthenticated()				
+	현재 사용자가 로그인된 사용자라면 true를 반환합니다.
+
+#isFullyAuthenticated()						
+	로그인 정보 기억(remember-me)이 아니라 아이디/비밀번호를 입력하여 로그인 했다면 true를 반환합니다.
+
+#hasPermission(Object target, Object permission)			
+	사용자가 주어진 권한으로 제공된 대상에 액세스 할 수 있으면 true 를 반환합니다. 예, hasPermission(domainObject, 'read')
+
+#hasPermission(Object targetId, String targetType, Object permission)		
+	사용자가 주어진 권한으로 제공된 대상에 액세스 할 수 있으면 true 를 반환합니다. 예, hasPermission(1, 'com.example.domain.Message', 'read')

@@ -1,0 +1,78 @@
+[ SpringBoot - Gradle 로 라이브러리를 포함한 jar 파일 만들기 ] 
+
+	참고 링크 : 
+		https://blog.leocat.kr/notes/2017/10/11/gradle-shadowjar-make-fat-jar
+		https://www.baeldung.com/gradle-fat-jar
+
+	배포시에 라이브러리를 포함해서 배포해야하는 경우가 있음
+	그럴때 아래와 같이 플러그인을 추가한 후 shadowJar로 빌드하면 라이브러리가 포함된 상태로 배포가 됨
+
+
+# 내가 사용한 방법
+	- 아래와 같이 plugins에 추가만 해주면 자동으로 shadowJar가 활성화 됨
+		=================================================================================================================
+		plugins {
+			id 'java'
+			id 'com.github.johnrengelman.shadow' version '5.2.0'
+		}
+		=================================================================================================================
+
+	- 빌드 방법
+		루트 디렉토리에서 gradlew shadowJar 명령어 입력시 라이브러리가 포함된 jar 파일이 생성됨
+
+
+	- 그외 설정
+		=================================================================================================================
+		shadowJar{                        //shadowJar Task시 이름 지정
+			archiveBaseName.set("test")
+			archiveClassifier.set('')
+		}
+		=================================================================================================================
+
+
+# 참고 링크에 있는 코드 - 1
+	※ shadow 플러그인을 사용하지 못할 경우  아래의 방법으로 진행하면 됨
+
+	manifest : 메인클래스 없이 모듈만 배포할꺼면 굳이 필요없음, 지워도됨
+	baseName : 생성할 jar 파일명 
+	그외에 옵션은 따로 건드리지 않았음, from 이부분이 있어야 fat jar 로 생성됨
+	
+	=================================================================================================================
+	task customFatJar(type: Jar) {
+		manifest {
+			attributes 'Main-Class': 'com.baeldung.fatjar.Application'
+		}
+		baseName = 'all-in-one-jar'
+		duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+		from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+		with jar
+	}
+	=================================================================================================================
+
+
+
+# 참고 링크에 있는 코드 - 2
+	=================================================================================================================
+	apply plugin: 'java'
+	apply plugin: 'com.github.johnrengelman.shadow'
+
+	buildscript {
+		repositories {
+			jcenter()
+		}
+		dependencies {
+			classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
+		}
+	}
+
+
+
+	jar {
+		finalizedBy shadowJar
+		manifest {
+			attributes 'Main-Class': 'my.package.MyMain'
+		}
+	}
+
+	=================================================================================================================
+

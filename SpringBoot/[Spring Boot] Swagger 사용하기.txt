@@ -1,0 +1,148 @@
+#SpringBoot - swagger 사용하기
+
+# 참고링크
+	https://kim-jong-hyun.tistory.com/49
+	https://dev-jwblog.tistory.com/20
+
+※ 참고로 현재 스프링 2.6 버전대에서는 스웨거 3.0 을 사용하지 못하는 이슈가 존재함
+	https://stackoverflow.com/questions/70036953/springboot-2-6-0-spring-fox-3-failed-to-start-bean-documentationpluginsboot
+	2.5 버전대로 내리면 적상적으로 작동함
+	=================================================================================================================
+	This problem's caused by a bug in Springfox. It's making an assumption about how Spring MVC is set up that doesn't always hold true. Specifically, it's assuming that MVC's path matching will use the Ant-based path matcher and not the PathPattern-based matcher. PathPattern-based matching has been an option for some time now and is the default as of Spring Boot 2.6.
+
+	As described in Spring Boot 2.6's release notes, you can restore the configuration that Springfox assumes will be used by setting spring.mvc.pathmatch.matching-strategy to ant-path-matcher in your application.properties file. Note that this will only work if you are not using Spring Boot's Actuator. The Actuator always uses PathPattern-based parsing, irrespective of the configured matching-strategy. A change to Springfox will be required to if you want to use it with the Actuator in Spring Boot 2.6 and later.	
+	
+	
+	=================================================================================================================
+
+
+# swagger 라이브러리 추가
+	
+	gradle 파일에 아래의 내용을 추가
+	=================================================================================================================
+    
+	compile 'io.springfox:springfox-swagger2:2.9.2'
+    compile 'io.springfox:springfox-swagger-ui:2.9.2'
+
+	=================================================================================================================
+
+# swagger Config 파일 생성
+	=================================================================================================================
+
+	@Configuration
+	@EnableSwagger2
+	public class SwaggerConfig {
+
+		@Bean
+		public Docket api(){
+			return new Docket(DocumentationType.SWAGGER_2)
+				.select()
+				.apis(RequestHandlerSelectors.any())
+				.paths(PathSelectors.any())
+				.build();
+		}
+	}
+
+	=================================================================================================================
+
+
+# 접속
+	http://localhost:8080/swagger-ui.html
+
+
+# 설명 적용
+
+	@ApiOperation 어노테이션을 통해서 API에 대한 설명을 작성
+	@ApiImplicitParam 을 통해서 해당 변수의 설명과 디폴트 값을 작성
+	@ApiResponses http 상태코드에 따른 메시지를 작성
+	=================================================================================================================
+    @GetMapping("/a")
+    @ApiOperation(value="a페이지" , notes="접속시 bye라는 단어를 리턴합니다.")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name="a" , value = "걍 테스트용 a변수에 대한 설명", defaultValue = "디폴트값")
+    })
+	@ApiResponses({
+		@ApiResponse(code = 200, message = "성공", response = Map.class),
+		@ApiResponse(code = 403, message = "접근거부", response = HttpClientErrorException.Forbidden.class),
+		@ApiResponse(code = 500, message = "서버 에러", response = ServerError.class),
+    })
+    public String bye(String a){
+        return "bye";
+    }
+	=================================================================================================================
+
+	@ApiModel vo클래스에 대한 설명 작성
+	@ApiModelProperty 변수에 대한 설명 작성
+
+	@ApiModelProperty 사용법
+	value - 파라메터 이름
+	name - Swagger에서 입력 받을 리얼 파라메터 명
+	notes - 부가설명
+	example - 지정된 임의 테스트 값을 입력 함
+	required - 필수 입력 여부
+
+	@JsonProperty 는 lombok에서 제공해주는 어노테이션이고, 스네이크케이스를 카멜케이스로 변환해줌
+	(화면단에서 stock_code 변수명으로 데이터를 전달하면, 서버단에서는 stockCode 로받음)
+	=================================================================================================================
+	@ApiModel("parsing VO")
+	public class ParsingVO {
+
+		@ApiModelProperty(required = true, name = "stock_code" ,value = "주식종목코드", notes = "필수", example = "005930")
+		@JsonProperty("stock_code")
+		private String stockCode;
+
+	=================================================================================================================
+
+
+# CSRF 토큰 컨트롤러 생성
+
+	swagger 사용시 http://localhost:/csrf 404 오류메시지가 출력되어서 구현함
+
+	=================================================================================================================
+
+	import org.springframework.http.ResponseEntity;
+	import org.springframework.security.web.csrf.CsrfToken;
+	import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
+	import org.springframework.stereotype.Controller;
+	import org.springframework.web.bind.annotation.RequestMapping;
+	import org.springframework.web.bind.annotation.RequestMethod;
+
+	import javax.servlet.http.HttpServletRequest;
+
+
+	//swagger 사용시 http://localhost:/csrf 404 오류메시지가 출력되어서 구현함
+	//https://stackoverflow.com/questions/55582023/when-loading-the-swagger-ui-html-page-a-request-is-made-to-hostport-and-host
+	@Controller
+	public class CSRFController {
+		@RequestMapping(value = "/csrf", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+		public ResponseEntity<CsrfToken> getToken(final HttpServletRequest request) {
+			return ResponseEntity.ok().body(new HttpSessionCsrfTokenRepository().generateToken(request));
+		}
+	}
+
+	=================================================================================================================
+
+
+# 오류발생
+
+	Spring boot 2.6버전 이후에 spring.mvc.pathmatch.matching-strategy 값이 ant_apth_matcher에서 path_pattern_parser로 변경되면서 몇몇 라이브러리(swagger포함)에 오류가 발생
+	
+
+	-오류메시지
+	=================================================================================================================
+	org.springframework.context.ApplicationContextException: Failed to start bean 'documentationPluginsBootstrapper'; nested exception is java.lang.NullPointerException
+	=================================================================================================================
+	
+	- 조치방법
+	application.properties 파일일 경우 아래의 옵션 추가
+	=================================================================================================================
+	spring.mvc.pathmatch.matching-strategy=ant_path_matcher
+	=================================================================================================================
+
+	application.yml 파일일 경우 아래의 옵션 추가
+	=================================================================================================================
+	spring:
+	  mvc:
+		pathmatch:
+		  matching-strategy: ant_path_matcher
+	=================================================================================================================

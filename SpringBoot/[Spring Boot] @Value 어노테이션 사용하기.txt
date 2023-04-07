@@ -1,0 +1,81 @@
+[ Spring boot - @Value 사용하기 ]
+
+	https://blog.hodory.dev/2019/05/28/required-a-bean-of-type-that-could-not-be-found/
+	https://stackoverflow.com/questions/52321988/best-practice-for-value-fields-lombok-and-constructor-injection
+
+# 사용하게된 이유
+	application.yml 파일에 변수를 설정해두고, 해당값을 꺼내서 사용하고 싶었음
+	환경변수정보라던지 뭐...
+
+# 적용 방법 (오류발생했음)
+
+	1. application.yml 파일에 원하는 변수명으로 설정을 먼저 함
+	=================================================================================================================
+	
+	test :
+	  testword1 : hihi
+	  testword2 : byebye
+
+	=================================================================================================================
+
+	2. 사용하려고 하는 클래스 상단에서 @Value 어노테이션으로 해당 값을 꺼내옴
+
+	=================================================================================================================
+	@Slf4j
+	@RestController
+	@AllArgsConstructor
+	@RequestMapping("/test")
+		public class TestController {
+		
+			ParsingService parsingService;
+			CSVService csvService;
+
+			@Value("${test.testword}")
+			private String aaa;
+
+	=================================================================================================================
+
+	3. 오류발생...
+	오류메시지	
+	=================================================================================================================
+	Consider defining a bean of type 'java.lang.String' in your configuration.
+	=================================================================================================================
+
+
+# 분석
+	구글링해본 결과 저기 상단에 있는 URL이 젤 처음나오고, 나랑 똑같았음..
+	
+	난 개발할때 lombok 을 사용해서 개발하고있는데,
+	@AllArgsConstructor 어노테이션을 사용하여서 자동으로 의존성 주입을 받고있었음
+	해당 어노테이션을 사용하면, @Autowired 를 붙이지 않아도 되서 좀더 깔끔해보이기도 했음
+	뭐 일단 편하니까...
+
+	근데 해당 어노테이션 때문에 오류가 발생한것이였음
+
+	private String aaa; 얘는 String 타입 변수고, 스프링에서 관리하는 Bean이 아니기때문에 의존성 자동 주입이 될수 없다고 함
+	* 저 위에 블로그해서 그래말해줌
+
+	솔직히 나도 @Value 하면 끝날줄 알았음,, 남들 다 그캐했으니까
+	근데 그 남들은 다 @Autowired를 쓰고잇는건 안봣네..
+
+
+# 해결
+	@AllArgsConstructor 어노테이션을 지우고, 서비스들위에 직접 @Autowired를 명시해줌
+	그리고 @Value 로 값을 받아오도록 했음
+	=================================================================================================================
+
+	@Slf4j
+	@RestController
+	@RequestMapping("/test")
+		public class TestController {
+
+			@Autowired
+			ParsingService parsingService;
+			@Autowired
+			CSVService csvService;
+
+			@Value("${test.testword}")
+			private String aaa;
+
+	=================================================================================================================
+

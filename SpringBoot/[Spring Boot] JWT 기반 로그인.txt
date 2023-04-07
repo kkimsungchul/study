@@ -1,0 +1,570 @@
+[ Spring Boot - JWT 기반 로그인 ]
+	참고 URL : https://dkyou.tistory.com/65?category=877213
+
+# jwt 기반 로그인의 장단점
+	Session 을 사용하지 않으므로 서버에 부하가 적게 감.
+	다만 인증 토근을 사용자에게 전송하므로, 해당 토큰의 유효기간동안은 해당 토큰으로 계속 접근이 가능함
+	로그아웃한다고 해서 폐기처분하거나 그러지 않음
+	
+	그래서 토큰을 발급할때는 유효시간을 짧게하고 리프레시 토큰을 같이 발급하여서 접근하도록 해야함
+
+
+# 참고사항
+	일단 이전에 생성한 Springsecurity가 있으므로, 이부분을 염두해 주고 작성하였음.
+
+	[Spring Boot] Springsecurity 사용하기(DB정보로 로그인).txt 파일을 보면 계정을 어떻게 생성했는지 나옴.
+	현재는 스웨거에서 계정을 생성 할 수 있음
+
+
+
+# 테스트 방법
+	포스트맨으로 서버에 요청을 보냄
+	회원가입은 스웨거를 통해서 사용자를 생성 할 수 있음
+
+	
+	포스트맨으로 "/authenticate" URL에 요청을 보내면 되고. header 에는 Content-Type : application/json 를 추가해 줘야함.
+	아니면 스웨거에서 바로 요청을 보내서 테스트를 해도됨.
+
+	로그인이 성공하면 토큰값이 리턴이 오고, 실패할 경우 401오류메시지가 리턴됨
+
+
+
+
+# 필요한 라이브러리 추가
+	
+	build.gradle 파일의 아래의 내용 추가
+	=================================================================================================================	
+	    //jwt
+		// https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt
+		implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+	=================================================================================================================
+
+# application.yml 파일에 아래의 내용 추가
+	
+	해당변수는 JwtTokenUtil 파일에서 사용할 예정임
+
+	=================================================================================================================
+		spring
+		  jwt:
+			secret : jwtsecretkey
+
+	=================================================================================================================
+
+
+# JwtTokenUtil 클래스 생성
+	토큰 관련 설정을 담당
+	토큰 발급, 자격증명 관리를 해줌
+
+	=================================================================================================================
+	import java.io.Serializable;
+	import java.util.Date;
+	import java.util.HashMap;
+	import java.util.Map;
+	import java.util.function.Function;
+
+	import org.springframework.beans.factory.annotation.Value;
+	import org.springframework.security.core.userdetails.UserDetails;
+	import org.springframework.stereotype.Component;
+
+	import io.jsonwebtoken.Claims;
+	import io.jsonwebtoken.Jwts;
+	import io.jsonwebtoken.SignatureAlgorithm;
+
+	@Component
+	public class JwtTokenUtil implements Serializable {
+
+		private static final long serialVersionUID = -2550185165626007488L;
+
+		public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
+
+		@Value("${spring.jwt.secret}")
+		private String secret;
+
+		//retrieve username from jwt token
+		// jwt token으로부터 username을 획득한다.
+		public String getUsernameFromToken(String token) {
+			return getClaimFromToken(token, Claims::getSubject);
+		}
+
+		//retrieve expiration date from jwt token
+		// jwt token으로부터 만료일자를 알려준다.
+		public Date getExpirationDateFromToken(String token) {
+			return getClaimFromToken(token, Claims::getExpiration);
+		}
+
+		public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
+			final Claims claims = getAllClaimsFromToken(token);
+			return claimsResolver.apply(claims);
+		}
+		//for retrieveing any information from token we will need the secret key
+		private Claims getAllClaimsFromToken(String token) {
+			return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+		}
+
+		//check if the token has expired
+		// 토큰이 만료되었는지 확인한다.
+		private Boolean isTokenExpired(String token) {
+			final Date expiration = getExpirationDateFromToken(token);
+			return expiration.before(new Date());
+		}
+
+		//generate token for user
+		// 유저를 위한 토큰을 발급해준다.
+		public String generateToken(UserDetails userDetails) {
+			Map<String, Object> claims = new HashMap<>();
+			return doGenerateToken(claims, userDetails.getUsername());
+		}
+
+		//while creating the token -
+		//1. Define  claims of the token, like Issuer, Expiration, Subject, and the ID
+		//2. Sign the JWT using the HS512 algorithm and secret key.
+		//3. According to JWS Compact Serialization(https://tools.ietf.org/html/draft-ietf-jose-json-web-signature-41#section-3.1)
+		//   compaction of the JWT to a URL-safe string
+		private String doGenerateToken(Map<String, Object> claims, String subject) {
+
+			return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
+					.setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
+					.signWith(SignatureAlgorithm.HS512, secret).compact();
+		}
+
+		//validate token
+		public Boolean validateToken(String token, UserDetails userDetails) {
+			final String username = getUsernameFromToken(token);
+			return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+		}
+	}
+
+
+
+	=================================================================================================================
+
+
+
+
+# JwtUserDetailsService 클래스 생성
+
+	"[Spring Boot] Springsecurity 사용하기(DB정보로 로그인).txt" 파일을 보면 이전에 작성한 CustomUserDetailService 클래스와 똑같음.
+	다만 jwt 기반으로 사용할때와 헷갈리지 않기위해 파일명을 새로 하나 더 작성해서 사용함
+
+	=================================================================================================================
+
+
+	import java.util.ArrayList;
+	import java.util.List;
+
+	import com.sungchul.stock.config.security.UserContext;
+	import com.sungchul.stock.user.mapper.UserMapper;
+	import com.sungchul.stock.user.vo.UserVO;
+	import lombok.RequiredArgsConstructor;
+	import org.springframework.security.core.GrantedAuthority;
+	import org.springframework.security.core.authority.SimpleGrantedAuthority;
+	import org.springframework.security.core.userdetails.User;
+	import org.springframework.security.core.userdetails.UserDetails;
+	import org.springframework.security.core.userdetails.UserDetailsService;
+	import org.springframework.security.core.userdetails.UsernameNotFoundException;
+	import org.springframework.stereotype.Service;
+
+
+	//CustomUserDetailService 랑똑같음
+	@Service
+	@RequiredArgsConstructor
+	public class JwtUserDetailsService implements UserDetailsService {
+
+		private final UserMapper userMapper;
+
+		@Override
+		public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
+
+			UserVO userVO = userMapper.getUser(userId);
+
+			if(userVO == null){
+				throw new UsernameNotFoundException("UsernameNotFoundException");
+			}
+
+			List<GrantedAuthority> roles = new ArrayList<>();
+			roles.add(new SimpleGrantedAuthority(userVO.getRoleId()));
+
+			UserContext userContext = new UserContext(userVO,roles);
+
+			return userContext;
+		}
+	}
+
+	=================================================================================================================
+
+
+
+
+
+# UserContext.java 클래스 구현
+
+	해당 클래스는 "org.springframework.security.core.userdetails.User" 를 상속받아서 구현함
+	뭐 클래스명에는 크게 연연하지말고 맘대로해도됨
+	생성자에서 부모클래스로 보내주는값에는 userid 가 들어있는데 이값은 나중에 토큰을 꺼내와서 비교 할때 사용함.
+	꺼내올때는 UserDetails 클래스에서 getUserName 으로 가져오기때문에 헷갈리면 안됨.
+	=================================================================================================================
+	package com.sungchul.stock.config.security.user.service;
+
+	import com.sungchul.stock.config.security.user.vo.UserVO;
+	import org.springframework.security.core.GrantedAuthority;
+	import org.springframework.security.core.userdetails.User;
+
+	import java.util.Collection;
+
+	public class UserContext extends User {
+
+		private final UserVO userVO;
+
+		//여기서 전달해준 ID를 토큰에 저장함
+		//다만 토큰에서 가져올때는 userDetails.getUsername() 로 가져옴. 이걸 바꾸려고 하면 UserDetails 인터페이스를 구현해야함
+		public UserContext(UserVO userVO, Collection<? extends GrantedAuthority> authorities) {
+			super(userVO.getUserId(), userVO.getPassword(), authorities);
+			this.userVO = userVO;
+		}
+		public UserVO getUserVO() {
+			return userVO;
+		}
+	}
+
+
+
+	=================================================================================================================
+
+
+
+
+
+
+# JwtAuthenticationController 클래스 생성
+	
+	해당클래스는 컨트롤러로 로그인 인증 요청에 대해서 토큰을 발급해주는 기능을 작성함
+
+
+
+	=================================================================================================================
+
+	import org.springframework.beans.factory.annotation.Autowired;
+	import org.springframework.http.ResponseEntity;
+	import org.springframework.security.authentication.AuthenticationManager;
+	import org.springframework.security.authentication.BadCredentialsException;
+	import org.springframework.security.authentication.DisabledException;
+	import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+	import org.springframework.security.core.userdetails.UserDetails;
+	import org.springframework.web.bind.annotation.CrossOrigin;
+	import org.springframework.web.bind.annotation.RequestBody;
+	import org.springframework.web.bind.annotation.RequestMapping;
+	import org.springframework.web.bind.annotation.RequestMethod;
+	import org.springframework.web.bind.annotation.RestController;
+
+	@RestController
+	@CrossOrigin
+	public class JwtAuthenticationController {
+
+		@Autowired
+		private AuthenticationManager authenticationManager;
+
+		@Autowired
+		private JwtTokenUtil jwtTokenUtil;
+
+		@Autowired
+		private JwtUserDetailsService userDetailsService;
+
+		@RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+		public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
+
+			authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
+
+			final UserDetails userDetails = userDetailsService
+					.loadUserByUsername(authenticationRequest.getUsername());
+
+			final String token = jwtTokenUtil.generateToken(userDetails);
+
+			return ResponseEntity.ok(new JwtResponse(token));
+		}
+		private void authenticate(String username, String password) throws Exception {
+			try {
+				authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+			} catch (DisabledException e) {
+				throw new Exception("USER_DISABLED", e);
+			} catch (BadCredentialsException e) {
+				throw new Exception("INVALID_CREDENTIALS", e);
+			}
+		}
+	}
+
+
+	=================================================================================================================
+
+
+
+
+
+
+
+
+
+# JwtRequest 클래스 생성
+	VO임, 다만 로그인에만 사용할 예정이므로 별다른 필드는 작성하지 않았음.
+
+	=================================================================================================================
+	import com.fasterxml.jackson.annotation.JsonProperty;
+	import io.swagger.annotations.ApiModelProperty;
+	import lombok.AllArgsConstructor;
+	import lombok.Getter;
+	import lombok.NoArgsConstructor;
+	import lombok.Setter;
+
+	import java.io.Serializable;
+
+	@Getter @Setter
+	@NoArgsConstructor //need default constructor for JSON Parsing
+	@AllArgsConstructor
+	public class JwtRequest implements Serializable {
+
+		private static final long serialVersionUID = 5926468583005150707L;
+
+
+
+		@ApiModelProperty(name = "user_id", value = "관리자ID", notes = "필수", example = "")
+		@JsonProperty("user_id")
+		private String userId;
+
+		@ApiModelProperty(name = "password", value = "비밀번호", notes = "필수", example = "")
+		@JsonProperty("password")
+		private String password;
+	}
+
+	=================================================================================================================
+
+
+
+# JwtResponse 클래스 생성
+	응답 객체
+	토큰을 반환해줌
+
+	=================================================================================================================
+
+	import java.io.Serializable;
+
+	public class JwtResponse implements Serializable {
+
+		private static final long serialVersionUID = -8091879091924046844L;
+		private final String jwttoken;
+
+		public JwtResponse(String jwttoken) {
+			this.jwttoken = jwttoken;
+		}
+
+		public String getToken() {
+			return this.jwttoken;
+		}
+	}
+
+	=================================================================================================================
+	
+
+
+
+# doFilterInternal 클래스 생성
+	OncePerRequestFilter 클래스를 상속받아서 구현하며,
+	프론트엔드에서 매 순간 request 를 요청 할 때마다 이 필터를 거쳐서 요청이 들어옴
+	인증되지 않은 사용자가 정보를 요청하는것을 막기 위해서 작성함.
+	헤더에 담겨있는 토큰 정보가 유효한지 확인함
+
+
+	=================================================================================================================
+
+	import java.io.IOException;
+
+	import javax.servlet.FilterChain;
+	import javax.servlet.ServletException;
+	import javax.servlet.http.HttpServletRequest;
+	import javax.servlet.http.HttpServletResponse;
+
+	import org.springframework.beans.factory.annotation.Autowired;
+	import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+	import org.springframework.security.core.context.SecurityContextHolder;
+	import org.springframework.security.core.userdetails.UserDetails;
+	import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+	import org.springframework.stereotype.Component;
+	import org.springframework.web.filter.OncePerRequestFilter;
+
+	import io.jsonwebtoken.ExpiredJwtException;
+
+	@Component
+	public class JwtRequestFilter extends OncePerRequestFilter {
+
+		@Autowired
+		private JwtUserDetailsService jwtUserDetailsService;
+
+		@Autowired
+		private JwtTokenUtil jwtTokenUtil;
+
+		@Override
+		protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+				throws ServletException, IOException {
+
+		        //헤더에서 Authorization 키값으로 저장된 값을 꺼내옴
+			final String requestTokenHeader = request.getHeader("jwt");
+
+			String username = null;
+			String jwtToken = null;
+			// JWT Token is in the form "Bearer token". Remove Bearer word and get
+			// only the Token
+			if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
+				jwtToken = requestTokenHeader.substring(7);
+				try {
+					username = jwtTokenUtil.getUsernameFromToken(jwtToken);
+				} catch (IllegalArgumentException e) {
+					System.out.println("Unable to get JWT Token");
+				} catch (ExpiredJwtException e) {
+					System.out.println("JWT Token has expired");
+				}
+			} else {
+				logger.warn("JWT Token does not begin with Bearer String");
+			}
+
+			// Once we get the token validate it.
+			if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+
+				UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(username);
+
+				// if token is valid configure Spring Security to manually set
+				// authentication
+				if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
+
+					UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+							userDetails, null, userDetails.getAuthorities());
+					usernamePasswordAuthenticationToken
+							.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+					// After setting the Authentication in the context, we specify
+					// that the current user is authenticated. So it passes the
+					// Spring Security Configurations successfully.
+					SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+				}
+			}
+			chain.doFilter(request, response);
+		}
+
+	}
+
+
+	=================================================================================================================
+
+
+
+# JwtAuthenticationEntryPoint 클래스 생성
+	허가되지 않은 사용자가 접근하면, 접근 불가 메시지를 띄우고, 리소스 정보를 획득하지 못하게 막아줌
+	
+
+	=================================================================================================================
+
+	import java.io.IOException;
+	import java.io.Serializable;
+
+	import javax.servlet.http.HttpServletRequest;
+	import javax.servlet.http.HttpServletResponse;
+
+	import org.springframework.security.core.AuthenticationException;
+	import org.springframework.security.web.AuthenticationEntryPoint;
+	import org.springframework.stereotype.Component;
+
+	@Component
+	public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint, Serializable {
+
+		private static final long serialVersionUID = -7858869558953243875L;
+
+		@Override
+		public void commence(HttpServletRequest request, HttpServletResponse response,
+							 AuthenticationException authException) throws IOException {
+
+			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+		}
+	}
+
+
+	=================================================================================================================
+
+
+
+
+
+
+# WebSecurityConfig 클래스 생성
+	해당 클래스는 이전에 스프링시큐리티를 적용할때 생성한 SecurityConfig.java 클래스와 거의 똑같음
+	스웨거 부분에 대해서 접속을 허용하기 위하여, 스웨거는 예외처리를 지정함
+	.authorizeRequests().antMatchers("/authenticate","/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**").permitAll().
+
+
+	=================================================================================================================
+
+
+	import com.sungchul.stock.jwt.config.JwtAuthenticationEntryPoint;
+	import com.sungchul.stock.jwt.config.JwtRequestFilter;
+	import org.springframework.beans.factory.annotation.Autowired;
+	import org.springframework.context.annotation.Bean;
+	import org.springframework.context.annotation.Configuration;
+	import org.springframework.security.authentication.AuthenticationManager;
+	import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+	import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+	import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+	import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+	import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+	import org.springframework.security.config.http.SessionCreationPolicy;
+	import org.springframework.security.core.userdetails.UserDetailsService;
+	import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+	import org.springframework.security.crypto.password.PasswordEncoder;
+	import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+	@Configuration
+	@EnableWebSecurity
+	@EnableGlobalMethodSecurity(prePostEnabled = true)
+	public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+		@Autowired
+		private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
+		@Autowired
+		private UserDetailsService jwtUserDetailsService;
+
+		@Autowired
+		private JwtRequestFilter jwtRequestFilter;
+
+		@Autowired
+		public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+			// configure AuthenticationManager so that it knows from where to load
+			// user for matching credentials
+			// Use BCryptPasswordEncoder
+			auth.userDetailsService(jwtUserDetailsService).passwordEncoder(passwordEncoder());
+		}
+
+		@Bean
+		public PasswordEncoder passwordEncoder() {
+			return new BCryptPasswordEncoder();
+		}
+
+		@Bean
+		@Override
+		public AuthenticationManager authenticationManagerBean() throws Exception {
+			return super.authenticationManagerBean();
+		}
+
+		@Override
+		protected void configure(HttpSecurity httpSecurity) throws Exception {
+			// We don't need CSRF for this example
+			httpSecurity.csrf().disable()
+					// dont authenticate this particular request
+					.authorizeRequests().antMatchers("/authenticate","/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**").permitAll().
+					// all other requests need to be authenticated
+							anyRequest().authenticated().and().
+					// make sure we use stateless session; session won't be used to
+					// store user's state.
+							exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
+					.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
+			// Add a filter to validate the tokens with every request
+			httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+		}
+	}
+
+	=================================================================================================================                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  

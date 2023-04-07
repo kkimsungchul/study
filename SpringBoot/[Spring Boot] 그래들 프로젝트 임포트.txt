@@ -1,0 +1,42 @@
+[ 스프링부트 - 그래들 프로젝트 임포트 ]
+
+# 임포트 하기
+	파일 -> 오픈 -> 프로젝트명 클릭
+
+
+# 오류발생
+	Warning:Unable to make the module: if_buy, related gradle configuration was not found. Please, re-import the Gradle project and try again.
+
+	그래들 프로젝트 임포트 할떄 발생하는에러
+
+
+- 해결방안 1
+	1. IntelliJ 메뉴에서 [View - Tool Windows - Gradle] 클릭
+
+	2. 뷰창이 뜨면 refreshsh all gradle project 클릭 (새로고침모양)
+
+- 해결방안 2
+	버전이 안맞음
+	사무실에서는 6.8.3 버전을 사용했는데, 집에서는 안되는거이 빌드가 안댐
+
+	그래서 설정파일의 버전을 낮췄음
+
+	파일경로 : if_buy\gradle\wrapper\gradle-wrapper.properties
+	파일명 : gradle-wrapper.properties
+
+	기존 버전
+	=================================================================================================================
+	distributionUrl=https\://services.gradle.org/distributions/gradle-6.8.3-all.zip
+
+	변경 후 버전
+	=================================================================================================================
+	distributionUrl=https\://services.gradle.org/distributions/gradle-5.6.4-all.zip
+
+
+
+
+
+
+
+
+https://ooz.co.kr/420

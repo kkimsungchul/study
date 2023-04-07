@@ -1,0 +1,300 @@
+# SpringBoot - JUnit5 사용하기 - 2 (2023년 정리)
+
+# 공식 문서
+	https://junit.org/junit5/docs/current/user-guide/
+
+# JUnit 를 사용해야 하는 이유와 예제 코드
+
+	- 테스트 자동화
+		JUnit을 사용하면 테스트를 자동화할 수 있습니다. 테스트 케이스를 작성하고 실행하면, JUnit이 자동으로 결과를 분석하여 테스트 결과를 알려줍니다.
+		이를 통해 개발자는 테스트를 반복적으로 수행하며 코드를 수정하고, 테스트 결과를 분석하면서 품질을 향상시킬 수 있습니다.
+	
+	- 빠른 피드백
+		JUnit을 사용하면 개발자는 빠른 피드백을 받을 수 있습니다. 테스트를 자주 수행하면서 코드를 수정하면, 테스트 결과를 즉시 확인할 수 있습니다.
+		이를 통해 개발자는 문제를 빠르게 발견하고 수정하여 품질을 높일 수 있습니다.
+		
+	- 품질 향상
+		JUnit을 사용하면 개발자는 테스트를 통해 코드의 품질을 높일 수 있습니다. 테스트를 작성하면서 코드를 검증하고, 불필요한 코드를 제거하며, 코드의 구조를 개선할 수 있습니다.
+		
+	- 예제 코드
+		아래는 JUnit 예제 코드 아래 코드는 덧셈을 수행하는 간단한 계산기 클래스(Calculator)를 테스트하는 코드
+		=================================================================================================================
+		java
+		Copy code
+		import org.junit.Test;
+		import static org.junit.Assert.assertEquals;
+
+		public class CalculatorTest {
+			
+			@Test
+			public void testAdd() {
+				Calculator calculator = new Calculator();
+				int result = calculator.add(2, 3);
+				assertEquals(5, result);
+			}
+		}
+		=================================================================================================================
+		위 예제 코드에서는 Calculator 클래스의 add 메소드를 테스트하고 있습니다. @Test 어노테이션을 사용하여 해당 메소드가 테스트 메소드임을 표시하고, assertEquals 메소드를 사용하여 예상하는 값과 실제 결과 값이 일치하는지 확인이와 같은 방식으로 JUnit을 사용하여 여러분도 손쉽게 테스트 코드를 작성하고 실행할 수 있습니다.
+
+# JUnit5에서 사용하는 어노테이션
+
+	@Test: 메서드가 테스트 메서드임을 선언
+		테스트 메서드는 public, void, parameter가 없어야 하며, JUnit 테스트 프레임워크가 이를 실행합니다
+
+	@BeforeAll: 테스트 클래스 내의 모든 테스트가 실행되기 전에 한 번만 실행될 코드를 지정
+		이 어노테이션을 사용하여 테스트 케이스 실행 전에 필요한 초기화 작업을 수행할 수 있습니다.
+		static 메서드에서 사용됩니다.
+
+	@AfterAll: 테스트 클래스 내의 모든 테스트가 실행된 후에 한 번만 실행될 코드를 지정
+		이 어노테이션을 사용하여 테스트 케이스 실행 후 정리 작업을 수행할 수 있습니다.
+		static 메서드에서 사용됩니다.
+
+	@BeforeEach: 각 테스트 메서드가 실행되기 전에 실행될 코드를 지정
+		이 어노테이션을 사용하여 테스트 케이스를 실행하기 전에 필요한 초기화 작업을 수행할 수 있습니다.
+
+	@AfterEach: 각 테스트 메서드가 실행된 후에 실행될 코드를 지정
+		이 어노테이션을 사용하여 테스트 케이스 실행 후 정리 작업을 수행할 수 있습니다.
+
+	@DisplayName: 테스트 메서드의 이름을 변경할 수 있습니다.
+		어떤 테스트인지 쉽게 표현할 수 있도록 해주는 어노테이션
+		공백, 이모지, 특수문자등을 모두 지원
+		테스트 메서드의 이름이 복잡하거나, 테스트 결과가 어떤 동작을 하는지 잘 설명하지 않을 경우 유용
+
+	@Disabled: 해당 테스트 메서드가 비활성화되어 실행되지 않도록 
+		이 어노테이션을 사용하여 현재 작동하지 않는 테스트 케이스를 임시로 비활성화할 수 있습니다.
+		특정 테스트를 일시적으로 비활성화하거나, 향후 구현할 것으로 예상되는 테스트에 사용할 수 있습니다.
+
+	@RepeatedTest: 지정된 횟수만큼 반복해서 실행됩니다.
+		특정 테스트를 반복시키고 싶을 때 사용하는 어노테이션
+		반복 횟수와 반복 테스트 이름을 설정 가능
+		반복 횟수는 @RepeatedTest(n)의 형식으로 지정할 수 있습니다.
+
+	@ParameterizedTest: 지정된 값들로 테스트를 반복 실행
+		테스트에 여러 다른 매개변수를 대입해가며 반복 실행할 때 사용하는 어노테이션
+		매개 변수는 @ValueSource, @EnumSource, @MethodSource, @CsvSource 등 다양한 방법으로 지정할 수 있습니다.
+
+	@Tag: 테스트 메서드를 논리적인 그룹으로 묶을 수 있습니다.
+	
+	@Nested: 중첩된 테스트 클래스를 선언(Inner Class)
+		테스트 클래스 안에서 내부 클래스를 정의해 테스트를 계층화 할 때 사용
+		내부 클래스는 부모클래스의 멤버 필드에 접근 가능
+		Before / After와 같은 테스트 생명주기에 관계된 메소드들도 계층에 맞춰 동작
+
+	@Timeout : 해당 테스트 메서드가 제한 시간 내에 실행되어야 함을 나타냅니다.
+	시간 제한은 @Timeout(millis)의 형식으로 지정할 수 있습니다.
+
+# @BeforeAll 과 @BeforeEach 차이
+	하나 혹은 여러개의 테스트 조건을 셋업할때 사용
+	@BeforeEach는 여러번 실행됨
+	@BeforeAll은 한번만 실행됨
+
+	테스트가 조건에 영향을 받는다고 한다면 @BeforeEach 를 사용하고
+	그게 아니라면 @BeforeAll을 사용
+
+
+# JUnint5 - Assertions 클래스에서 제공하는 메서드
+	assertAll(): 주어진 모든 Executable의 실행을 하나의 묶음으로 실행하고, 그 중 어떤 하나라도 실패하면 해당 테스트를 실패로 처리
+		매개변수로 받는 모든 테스트코드를 한 번에 실행
+		오류가 나도 끝까지 실행한 뒤 한번에 모아서 출력
+
+	assertEquals(expected, actual) : 
+		두 값이 같은지 비교
+		expected는 예상 값이고, actual은 실제 값
+
+	assertArrayEquals(expected, actual) : 
+		두 배열이 같은지 비교expected는 예상 배열이고, actual은 실제 배열
+
+	assertSame(expected, actual) : 
+		두 객체가 같은 객체인지 비교expected는 예상 객체이고, actual은 실제 객체
+
+	assertNotEquals(unexpected, actual) : 
+		두 값이 다른지 비교
+		unexpected는 예상하지 않은 값이고, actual은 실제 값
+
+	assertNotSame(unexpected, actual) : 
+		두 객체가 다른 객체인지 비교
+		unexpected는 예상하지 않은 객체이고, actual은 실제 객체
+
+	assertTrue(condition) : 
+		조건이 참인지 확인
+		condition은 검사할 조건
+
+	assertFalse(condition) : 
+		조건이 거짓인지 확인
+		condition은 검사할 조건
+
+	assertNull(actual) : 
+		값이 null인지 확인
+		actual은 검사할 값
+
+	assertNotNull(actual) : 
+		값이 null이 아닌지 확인
+		actual은 검사할 값
+
+	assertIterableEquals(expected, actual) : 
+		두 Iterable이 같은지 비교
+		expected는 예상 Iterable이고, actual은 실제 Iterable
+
+	assertLinesMatch(expected, actual) : 
+		두 문자열 리스트가 같은 줄의 순서로 일치하는지 확인
+		expected는 예상 문자열 리스트이고, actual은 실제 문자열 리스트
+
+
+	assertThrows(expectedType, executable): 
+		지정된 예외가 발생하는지 확인
+		expectedType은 예상 예외 타입이고, executable은 실행할 코드
+		executable의 로직이 실행하는 도중 expectedType의 에러를 발생시키는지 확인
+
+	assertDoesNotThrow() : 예외가 발생하지 않음을 검증하는 메소드
+
+	assertTimeout(duration, executable): 실행 시간이 지정된 시간 내에 완료되는지 확인
+		특정 시간 안에 실행이 완료되는지 확인
+		duration : 원하는 시간
+		executable : 테스트할 로직
+
+	fail(): 테스트를 실패로 처리
+
+# JUnint5 - Assumption 클래스에서 제공하는 메서드
+
+	assumeTrue(boolean assumption): 
+		주어진 조건이 true일 때 테스트를 실행
+		그렇지 않으면 해당 테스트를 무시
+
+	assumeFalse(boolean assumption): 
+		주어진 조건이 false일 때 테스트를 실행
+		그렇지 않으면 해당 테스트를 무시
+
+	assumingThat(boolean assumption, Executable executable): 
+		주어진 조건이 true일 때, Executable을 실행
+		그렇지 않으면 Executable을 무시
+		파라미터로 전달된 코드블럭만 실행되지 않음
+
+	assumeNotNull(Object... objects): 
+		주어진 객체가 모두 null이 아닐 때 테스트를 실행
+		그렇지 않으면 해당 테스트를 무시
+
+	assumeThat(T actual, Matcher<? super T> matcher): 
+		주어진 매처가 참일 때 테스트를 실행
+		그렇지 않으면 해당 테스트를 무시
+
+	assumeNoException(Throwable throwable): 
+		예외가 발생하지 않을 때 테스트를 실행
+		그렇지 않으면 해당 테스트를 무시
+
+	assumingThat(boolean assumption, Executable executable): 
+		주어진 조건이 true일 때, Executable을 실행
+		그렇지 않으면 Executable을 무시
+
+
+
+# 테스트 코드 - ExampleTest.java
+	테스트는 Calculator 클래스를 생성하여서 테스트를 하였음
+	======================================================================================================
+	package com.sungchul;
+
+	import com.sungchul.service.Calculator;
+	import org.junit.jupiter.api.*;
+	import static org.junit.jupiter.api.Assertions.*;
+	import static org.junit.jupiter.api.Assumptions.assumeTrue;
+
+	@DisplayName("계산기 테스트")
+	class ExampleTest {
+
+		static Calculator calculator;
+		@BeforeAll
+		static void setUp() {
+			// 테스트 실행 전에 딱 한 번 호출됨
+			System.out.println("Calculator 초기화");
+			calculator = new Calculator();
+		}
+
+		@BeforeEach
+		void init() {
+			// 각각의 테스트 메소드가 실행되기 전에 호출됨
+			System.out.println("테스트 메서드 시작");
+		}
+
+		@Test
+		@DisplayName("더하기 테스트")
+		void testAddition() {
+			calculator = new Calculator();
+			int result = calculator.add(1,2);
+			assertEquals(3, result, "1 + 2 should equal 3");
+		}
+
+		@Test
+		//@Disabled("Temporarily disabled")
+		@DisplayName("나누기 테스트")
+		void testDivision() {
+			assertThrows(ArithmeticException.class, () -> {
+				calculator = new Calculator();
+				int result = calculator.divide(1,0) ;// divide by zero
+			});
+		}
+
+		@Test
+		@DisplayName("곱하기 테스트")
+		void testMultiplication() {
+			int result = calculator.multiply(2,3);
+			assertTrue(result == 6, () -> "2 * 3 should equal 6");
+		}
+
+		@Test
+		@DisplayName("배열이 같은지 테스트")
+		void testArray() {
+			int[] expected = {1, 2, 3};
+			int[] actual = {1, 2, 3};
+			assertArrayEquals(expected, actual, "Arrays should be equal");
+		}
+
+		@Test
+		@Timeout(1)
+		void testTimeout() throws InterruptedException {
+			Thread.sleep(500); // delay for 500 milliseconds
+		}
+
+		@Test
+		void testAssumptions() {
+			String env = System.getenv("ENV");
+			System.out.println(env);
+			assumeTrue(env != null && env.equals("DEV"));
+			assertTrue(true, "This test should only run on DEV environment");
+		}
+
+		@AfterEach
+		void tearDown() {
+			// 각각의 테스트 메소드가 실행된 후에 호출됨
+		}
+
+		@AfterAll
+		static void done() {
+			// 모든 테스트가 실행된 후에 딱 한 번 호출됨
+			System.out.println("모든 테스트 종료");
+		}
+	}
+	=====================================================================================================
+
+# 테스트 코드 - Calculator.java
+
+	======================================================================================================
+	package com.sungchul.service;
+
+	public class Calculator {
+
+		public int add(int a , int b){
+			return a+b;
+		}
+
+		public int subtract(int a , int b){
+			return a-b;
+		}
+
+		public int divide(int a , int b){
+			return a/b;
+		}
+
+		public int multiply(int a, int b){
+			return a*b;
+		}
+	}
+	======================================================================================================

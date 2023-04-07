@@ -1,0 +1,145 @@
+# SpringBoot - shedlock 사용하기 (스케줄러 중복 실행 방지)
+
+# 설명
+	여러 인스턴스의 스케줄러 동기화 기능을 제공
+	쉽게 말해서 scal-out 을 하여 여러대의 was가 생성될 경우
+	was가 한대일때는 스케줄러가 한번만 실행되지만 was가 여러개로 늘어날 경우 해당 스케줄러가 was의 갯수만큼 실행됨
+
+
+# ChatGPT 설명
+	ShedLock은 Spring Boot 기반의 분산 락 라이브러리로, 여러 서버에서 동시에 실행되는 작업들 간에 충돌을 방지하고 작업 실행의 독점성을 보장해줍니다.
+	
+	Quartz, Cron 또는 FixedRate와 같은 스케줄링 프레임워크와 함께 사용될 수 있습니다. 
+	
+	데이터베이스를 사용하여 락을 관리합니다. 예를 들어, 데이터베이스 테이블에 특정 락 정보를 저장하고, 작업을 수행할 때 해당 락 정보를 확인하여 락이 획득되었을 경우에만 작업을 실행하고, 락이 획득되지 않았을 경우에는 다음 스케줄링 시간으로 넘어갑니다.
+	
+	Spring Boot와 함께 사용되기 때문에, ShedLock은 Spring의 기능을 쉽게 활용할 수 있습니다. 예를 들어, ShedLock은 Spring의 AOP를 사용하여 간단한 애너테이션을 사용하여 락을 적용할 수 있습니다.
+	
+	ShedLock은 분산 환경에서 안전하고 신뢰성 높은 작업 수행을 보장해주는 좋은 라이브러리입니다.
+
+
+# 사전 준비 사항
+	해당 라이브러리는 데이터베이스가 있어야 사용가능함
+
+
+# DB 세팅
+
+	SpringBoot와 연결한 데이터베이스에 테이블을 생성
+	=================================================================================================================
+	CREATE TABLE shedlock (
+		name VARCHAR(64),
+		lock_until TIMESTAMP(3) NULL,
+		locked_at TIMESTAMP(3) NULL,
+		locked_by VARCHAR(255),
+		PRIMARY KEY (name)
+	)
+	=================================================================================================================
+
+
+
+# 라이브러리 추가
+	build.gradle 파일에 아래의 내용을 추가
+	=================================================================================================================
+    implementation 'net.javacrumbs.shedlock:shedlock-spring:4.14.0'
+    implementation 'net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.14.0'
+
+	//DB커넥션을 위해 추가
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.27'
+	=================================================================================================================
+
+# DB 정보 추가 
+	application.yml 파일에 아래의 내용을 추가
+	=================================================================================================================
+	spring:
+	  datasource:
+		driver-class-name: com.mysql.cj.jdbc.Driver
+		url: jdbc:mysql://localhost:3306/if_buy?serverTimezone=UTC&characterEncoding=UTF-8
+		username: securus
+		password: securus1234
+	server :
+	  port : 9997
+
+	=================================================================================================================
+
+
+
+# Main 클래스에 스케줄러 어노테이션 추가
+	=================================================================================================================
+	@EnableScheduling
+	@SpringBootApplication	//추가
+	public class ShedlockTestApplication {
+
+		public static void main(String[] args) {
+			SpringApplication.run(ShedlockTestApplication.class, args);
+		}
+
+	}
+	=================================================================================================================
+
+
+# SchedulerConfiguration.java 파일 생성
+
+	=================================================================================================================
+	package com.sungchul.shedlocktest.config;
+
+	import net.javacrumbs.shedlock.core.LockProvider;
+	import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
+	import org.springframework.context.annotation.Bean;
+	import org.springframework.context.annotation.Configuration;
+	import org.springframework.jdbc.core.JdbcTemplate;
+	import javax.sql.DataSource;
+
+	@Configuration
+	public class SchedulerConfiguration {
+		@Bean
+		public LockProvider lockProvider(DataSource dataSource) {
+			return new JdbcTemplateLockProvider(
+					JdbcTemplateLockProvider.Configuration.builder()
+							.withJdbcTemplate(new JdbcTemplate(dataSource))
+							.usingDbTime()//DB시간사용
+							.build()
+			);
+		}
+	}
+
+	=================================================================================================================
+
+# 스케줄러 설정
+
+	@SchedulerLock에 있는 name 은 DB테이블에 들어갈 이름으로, 여러개의 스케줄러를 설정할 경우 각각 이름을 다르게 하면됨
+	=================================================================================================================
+	package com.sungchul.shedlocktest.schdule;
+
+	import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
+	import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
+	import org.springframework.scheduling.annotation.Scheduled;
+	import org.springframework.stereotype.Component;
+
+	@EnableSchedulerLock(defaultLockAtMostFor = "PT10S")
+	@Component
+	public class ScheduleTest {
+
+
+		@Scheduled(cron ="0 0/1 * * * *")
+		@SchedulerLock(name="ScheduleTestMethod",lockAtMostFor = "10S", lockAtLeastFor = "10S")
+		public void ScheduleTestMethod(){
+			for(int i=0;i<100000;i++){
+				System.out.println("### i : " + i);
+			}
+		}
+	}
+
+
+	=================================================================================================================
+
+
+# 테스트
+	1. 테스트를 위해 gradle 에서 bootjar 더블클릭
+	2. jar파일이 생성되면 port 번호를 변경후 gredle clean 후 다시 bootjar 더블클릭
+
+	3. 위 방법을 3번 한후 CMD창을 3개 띄운후 각각 jar 파일 실행
+		java -jar shedlockTest-1.jar
+		java -jar shedlockTest-2.jar
+		java -jar shedlockTest-3.jar
+	
