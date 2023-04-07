@@ -1,4 +1,4 @@
-[ Javascript - setInterval 함수 사용하기 ]
+# Javascript - setInterval 함수 사용하기
 
 	화면단에서 몇초마다, 일정 간격으로 실행하고싶은 함수가 있을경우 setInterval 를 통해서 할수 있음
 	사용방법은

@@ -1,4 +1,4 @@
-[ Spring boot - JSONObject 를 VO로 변경하기 ]
+# Spring boot - JSONObject 를 VO로 변경하기
 
 	참고링크 : https://interconnection.tistory.com/137
 

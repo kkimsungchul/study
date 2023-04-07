@@ -1,4 +1,4 @@
-[keycloak - 사용자 삭제 API 사용]
+# keycloak - 사용자 삭제 API 사용
 
 # 관리자 토큰 발급
 	URL : <keycloak URL> /auth/realms/master/protocol/openid-connect/token

@@ -1,4 +1,4 @@
-[ Jenkins - pipeline job update api ]
+# Jenkins - pipeline job update api
 	jenkins 에서 pipeline 로 생성한 job 을 수정 해야 할 일이 생김.
 	API문서를 찾아본 결과 job을 수정하는 APi는 없음
 	API정리한 곳은 아래의 링크 참고

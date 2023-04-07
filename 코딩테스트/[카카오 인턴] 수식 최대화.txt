@@ -1,4 +1,4 @@
-[카카오 인턴] 수식 최대화
+# 카카오 인턴 수식 최대화
 	URL : https://school.programmers.co.kr/learn/courses/30/lessons/67257
 	
 	이거 풀었었는데 모르고 나누기까지 넣어놧었음 

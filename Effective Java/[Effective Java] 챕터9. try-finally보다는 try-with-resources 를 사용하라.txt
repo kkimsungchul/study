@@ -1,4 +1,4 @@
-# Effective Java - 챕터9. try-finally보다는 try-with-resources 를 사용하라 
+# Effective Java - 챕터9. try-finally보다는 try-with-resources 를 사용하라
 
 	자바 라이브러리에서는 close 메소드를 호출해 직접 닫아줘야 하는 자원들이 많음
 	InputStream , OutputStream , java.sql.Connection 등이 있음

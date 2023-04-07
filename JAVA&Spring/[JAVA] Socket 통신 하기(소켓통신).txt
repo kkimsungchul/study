@@ -1,4 +1,4 @@
-[ JAVA - Socket 통신하기 ]
+# JAVA - Socket 통신하기
 
 	참고링크 : 
 		https://kadosholy.tistory.com/125

@@ -1,4 +1,4 @@
-[ Vue.js 시작하기 ]
+# Vue.js 시작하기
 	참고 링크 : https://ojava.tistory.com/185
 
 

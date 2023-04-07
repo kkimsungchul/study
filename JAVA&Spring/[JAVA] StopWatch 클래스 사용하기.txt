@@ -1,4 +1,4 @@
-[JAVA - StopWatch 클래스 사용하기]
+# JAVA - StopWatch 클래스 사용하기
 
 
 	일단 해당 클래스는 Spring Core 2.5.6 에 포함되어 있음

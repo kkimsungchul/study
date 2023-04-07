@@ -1,4 +1,4 @@
-[ Mybatis - trim 사용하기 ]
+# Mybatis - trim 사용하기
 
 	https://velog.io/@joyfuljoyful/MyBatis-%EB%8F%99%EC%A0%81%EC%BF%BC%EB%A6%AC-trimwhereset
 	https://java119.tistory.com/90

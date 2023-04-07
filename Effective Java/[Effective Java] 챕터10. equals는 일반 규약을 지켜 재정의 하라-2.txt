@@ -1,4 +1,4 @@
-# Effective Java - 챕터10. equals는 일반 규약을 지켜 재정의 하라 -2 
+# Effective Java - 챕터10. equals는 일반 규약을 지켜 재정의 하라 -2
 	
 	
 	- 추이성(transitivity) :

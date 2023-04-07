@@ -1,4 +1,4 @@
-[ JAVA - Multi Socket 통신하기 ]
+# JAVA - Multi Socket 통신하기
 
 	https://kadosholy.tistory.com/126
 

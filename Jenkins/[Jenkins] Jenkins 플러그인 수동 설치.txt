@@ -1,4 +1,4 @@
-[ Jenkins - 플러그인 수동 설치 ]
+# Jenkins - 플러그인 수동 설치
 
 	참고 URL : https://server-engineer.tistory.com/763
 	

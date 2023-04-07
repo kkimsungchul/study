@@ -1,4 +1,4 @@
-[ JAVA - Optional 사용하기 ]
+# JAVA - Optional 사용하기
 
 # Optional
 	https://hbase.tistory.com/212 

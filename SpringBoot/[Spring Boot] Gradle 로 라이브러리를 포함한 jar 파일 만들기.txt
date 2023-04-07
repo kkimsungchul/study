@@ -1,4 +1,4 @@
-[ SpringBoot - Gradle 로 라이브러리를 포함한 jar 파일 만들기 ] 
+# SpringBoot - Gradle 로 라이브러리를 포함한 jar 파일 만들기
 
 	참고 링크 : 
 		https://blog.leocat.kr/notes/2017/10/11/gradle-shadowjar-make-fat-jar

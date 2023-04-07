@@ -1,4 +1,4 @@
-# Effective Java - 챕터10. equals는 일반 규약을 지켜 재정의 하라 -3 
+# Effective Java - 챕터10. equals는 일반 규약을 지켜 재정의 하라 -3
 	
 	지금까지의 내용을 종합해서 양질의 equals 메소드를 구현하는 방법을 정리하면 아래와 같다.
 

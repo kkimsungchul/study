@@ -1,4 +1,4 @@
-[ Github - 깃허브 블로그 만들기 ]  
+# Github - 깃허브 블로그 만들기
   
 # jekyll 설치  
 	https://jekyllrb-ko.github.io/docs/installation/windows/  

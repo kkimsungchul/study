@@ -1,4 +1,4 @@
-[gitlab - API로 파일 생성 및 수정 ]
+# gitlab - API로 파일 생성 및 수정
 
 [ Create new file in repository - git 원격지에서 파일 생성 , 커밋 ]
 

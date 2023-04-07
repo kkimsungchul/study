@@ -1,4 +1,4 @@
-[ Jenkins - 문법 정리 ]
+# Jenkins - 문법 정리
 
 	https://blog.voidmainvoid.net/104
 	https://waspro.tistory.com/554

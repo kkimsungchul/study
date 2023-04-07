@@ -1,4 +1,4 @@
-[Jenkins - 윈도우 설치]
+# Jenkins - 윈도우 설치
 	
 	참고링크 : https://lock.tistory.com/2
 			 https://lock.tistory.com/3

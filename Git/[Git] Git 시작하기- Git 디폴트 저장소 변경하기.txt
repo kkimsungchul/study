@@ -1,4 +1,4 @@
-[ 깃허브 디폴트 저장소 변경하기 ]
+# 깃허브 디폴트 저장소 변경하기
 	
 	참고 URL : https://dalya-tech.tistory.com/16
 

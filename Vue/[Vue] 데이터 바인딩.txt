@@ -1,4 +1,4 @@
-[ Vue - 데이터 바인딩 ]
+# Vue - 데이터 바인딩
 	https://www.youtube.com/watch?v=b0ImUEsqaAA
 
 # views 폴더

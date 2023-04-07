@@ -1,4 +1,4 @@
-[ vue - User Snippets 등록 ]
+# vue - User Snippets 등록
 
 	VS Code 에서 자주 사용하는 템플릿을 등록해놓아서 편리하게 사용할수 있도록함
 

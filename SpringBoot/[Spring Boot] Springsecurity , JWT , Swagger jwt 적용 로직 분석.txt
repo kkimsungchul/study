@@ -1,4 +1,4 @@
-[Spring boot - Springsecurity , JWT , Swagger jwt 적용 로직 분석 ]
+# Spring boot - Springsecurity , JWT , Swagger jwt 적용 로직 분석
 
 # 소스파일 경로
 	https://github.com/kkimsungchul/study/tree/master/Spring%20Boot/SpringSecurity

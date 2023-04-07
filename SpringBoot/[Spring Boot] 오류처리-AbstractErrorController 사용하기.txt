@@ -1,4 +1,4 @@
-[ SpringBoot - AbstractErrorController 사용하기 ]
+# SpringBoot - AbstractErrorController 사용하기
 	
 	참고링크 : https://giantdwarf.tistory.com/24
 				https://mangkyu.tistory.com/204

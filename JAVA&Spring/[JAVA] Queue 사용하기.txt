@@ -1,4 +1,4 @@
-[ JAVA - Queue 사용하기 ]
+# JAVA - Queue 사용하기
 	
 
 

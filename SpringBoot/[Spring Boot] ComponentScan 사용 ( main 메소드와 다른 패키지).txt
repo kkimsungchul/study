@@ -1,4 +1,4 @@
-[ SpringBoot - ComponentScan 사용 ]
+# SpringBoot - ComponentScan 사용
 
 	스프링에서는 config.xml 파일에 아래와 같이 ComponentScane 을 설정해줬었음
 		<context:component-scan base-package="com.sungchul.main">

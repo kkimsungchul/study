@@ -1,4 +1,4 @@
-[ Vue - Build 하기 ] 
+# Vue - Build 하기
 	Build 를 하면 해당 프로젝트 폴더 안에 dist 로 폴더가 생성되며
 	그 안에 HTML파일들이 쭉 생성됨,
 	해당 파일들을 그대로 Nginx 나 Apache 폴더에 넣으면 바로 작동이 가능함

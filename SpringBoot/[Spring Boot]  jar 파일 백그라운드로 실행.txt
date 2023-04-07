@@ -1,4 +1,4 @@
-[ SpringBoot - jar 파일 백그라운드로 실행 ]
+# SpringBoot - jar 파일 백그라운드로 실행
 	참고링크 : https://velog.io/@jinyeong-afk/Springboot-jar-%ED%8C%8C%EC%9D%BC-%EB%B0%B1%EA%B7%B8%EB%9D%BC%EC%9A%B4%EB%93%9C-%EC%8B%A4%ED%96%89-%EC%A2%85%EB%A3%8C
 
 # 리눅스 서버에서 Spring boot jar 파일 실행

@@ -1,4 +1,4 @@
-[ Docker - Nginx 테스트 ]
+# Docker - Nginx 테스트
 	참고링크 : https://www.lainyzine.com/ko/article/how-to-install-wsl2-and-use-linux-on-windows-10/
 
 	도커 컨테이너를 실행해서 Nginx 를 띄어볼려고함

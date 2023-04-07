@@ -1,4 +1,4 @@
-[Jenkins - Pipeline 배포하기 (Pipeline script from SCM)]
+# Jenkins - Pipeline 배포하기 (Pipeline script from SCM)
 	
 	Pipeline script from SCM 을 사용하여 배포하기
 	

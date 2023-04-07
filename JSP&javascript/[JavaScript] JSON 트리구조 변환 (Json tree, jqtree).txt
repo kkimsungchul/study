@@ -1,4 +1,4 @@
-[ JSON 트리구조로 변환 ]
+# JSON 트리구조로 변환
 	* 참고 URL : http://gjjoo.github.io/portfolio/Plugin/zooTree/index.html
 
 	* 상위, 하위 그룹등으로 표현되야되는 값들을 제이슨타입으로 변환해줌

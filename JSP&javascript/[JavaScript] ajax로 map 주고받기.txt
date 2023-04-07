@@ -1,4 +1,4 @@
-[ ajax 로 map 타입 주고받기 ] 
+# ajax 로 map 타입 주고받기
 
 
 

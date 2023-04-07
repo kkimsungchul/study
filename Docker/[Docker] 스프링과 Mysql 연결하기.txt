@@ -1,4 +1,4 @@
-[ Docker - 스프링과 Mysql 연결하기 ]
+# Docker - 스프링과 Mysql 연결하기
 	참고 링크 : 
 		https://velog.io/@dhk22/Springboot-MySQL-Docker-%EB%8F%84%EC%BB%A4%EB%A5%BC-%EC%9D%B4%EC%9A%A9%ED%95%9C-%EC%BB%A8%ED%85%8C%EC%9D%B4%EB%84%88-%ED%99%98%EA%B2%BD-%EA%B5%AC%EC%84%B1
 		

@@ -1,4 +1,4 @@
-[ 스프링 부트 - lombok 사용]
+# 스프링 부트 - lombok 사용
 
 # 사용 이유
 	getter , setter , tostring 등을 만들지 않아도 됨

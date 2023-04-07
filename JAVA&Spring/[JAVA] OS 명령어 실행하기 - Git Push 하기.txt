@@ -1,4 +1,4 @@
-[ JAVA - OS명령어로 gitlab push 하기 ]
+# JAVA - OS명령어로 gitlab push 하기
 
 	gitlab에서 특정 코드를 내려받아서 다른 프로젝트에 푸쉬하기.
 	운영체제 명령어를 사용하였으며 리눅스 기반임

@@ -1,4 +1,4 @@
-[ Vue - 프로젝트 생성 ]
+# Vue - 프로젝트 생성
 
 	참고링크 : https://www.youtube.com/watch?v=b0ImUEsqaAA&t=1s
 

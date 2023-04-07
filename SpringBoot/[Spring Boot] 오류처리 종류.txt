@@ -1,4 +1,4 @@
-[ SpringBoot - 오류처리의 종류 ]
+# SpringBoot - 오류처리의 종류
 	참고 URL : 
 		https://mangkyu.tistory.com/204
 

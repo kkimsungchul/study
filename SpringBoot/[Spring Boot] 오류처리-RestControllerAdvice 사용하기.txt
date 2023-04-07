@@ -1,4 +1,4 @@
-[ Spring Boot - RestControllerAdvice 사용하기 ]
+# Spring Boot - RestControllerAdvice 사용하기
 
 참고 URL : 
 	https://velog.io/@banjjoknim/RestControllerAdvice

@@ -1,4 +1,4 @@
-[ 깃 한글 깨짐 ]
+# 깃 한글 깨짐
 
 	참고 URL : https://ezcocoa.com/2019-09-11-git-encoding-problem/
 

@@ -1,4 +1,4 @@
-[ Spring boot - RestAPI 방식으로 파일 업로드 ]
+# Spring boot - RestAPI 방식으로 파일 업로드
 	
 	Spring Boot 2.6.6 버전에서는 아래와 같이 두개의 오류가 남..
 	

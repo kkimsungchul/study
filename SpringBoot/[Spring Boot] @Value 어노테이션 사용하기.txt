@@ -1,4 +1,4 @@
-[ Spring boot - @Value 사용하기 ]
+# Spring boot - @Value 사용하기
 
 	https://blog.hodory.dev/2019/05/28/required-a-bean-of-type-that-could-not-be-found/
 	https://stackoverflow.com/questions/52321988/best-practice-for-value-fields-lombok-and-constructor-injection

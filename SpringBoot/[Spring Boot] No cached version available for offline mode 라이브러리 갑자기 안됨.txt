@@ -1,4 +1,4 @@
-[ Spring boot - No cached version available for offline mode 라이브러리 갑자기 안됨 ]
+# Spring boot - No cached version available for offline mode 라이브러리 갑자기 안됨
 
 # 오류메시지
 	

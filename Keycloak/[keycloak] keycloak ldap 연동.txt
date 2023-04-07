@@ -1,4 +1,4 @@
-[keycloak - LADP 연동 설정 ]
+# keycloak - LADP 연동 설정
 
 keycloak (ldap user federation)
 	https://www.bantrain.com/detail-setup-for-user-federation-on-keycloak/

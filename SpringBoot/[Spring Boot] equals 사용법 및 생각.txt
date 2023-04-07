@@ -1,4 +1,4 @@
-[ java -  equals 사용]
+# java -  equals 사용
 
 # 2023.03.08 에 작성한 내용
 

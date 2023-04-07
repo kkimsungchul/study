@@ -1,4 +1,4 @@
-[ IntelliJ - Gradle 버전을 못찾을 때 ]
+# IntelliJ - Gradle 버전을 못찾을 때
 
 	다운로드 링크 : https://services.gradle.org/distributions/gradle-6.7-all.zip
 		오류가 나는 버전을 위에서 다운받으면됨, 6.7버전이 없어서 다운받은거고

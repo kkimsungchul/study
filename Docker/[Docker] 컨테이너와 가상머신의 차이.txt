@@ -1,4 +1,4 @@
-[ Docker - 컨테이너와 가상머신의 차이 ]
+# Docker - 컨테이너와 가상머신의 차이
 	참고 링크  : 
 		https://born-dev.tistory.com/39
 		https://medium.com/@lhs6395/container%EC%99%80-vm%EC%9D%98-%EB%B9%84%EA%B5%90-84f6a8b7cd4c

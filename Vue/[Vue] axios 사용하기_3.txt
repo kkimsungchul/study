@@ -1,4 +1,4 @@
-[ Vue - axios 사용하기 ] 
+# Vue - axios 사용하기
 
 # Vue 코드
 	Get 방식으로 데이터를 가져와서 리스트를 출력해줌

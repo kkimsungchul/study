@@ -1,4 +1,4 @@
-[JAVA] Stream 사용하기(스트림)- 4. 리스트 비교하기
+# JAVA Stream 사용하기(스트림)- 4. 리스트 비교하기
 	
 	https://kyhyuk.tistory.com/m/184
 	사용하게된 이유는 두개의 리스트를 비교해서 DB에 Insert Update Delete 를 해줘야함

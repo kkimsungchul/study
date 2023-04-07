@@ -1,4 +1,4 @@
-[Jenkins - 기본 이해 ]
+# Jenkins - 기본 이해
   https://ict-nroo.tistory.com/31
   https://krksap.tistory.com/1377
  

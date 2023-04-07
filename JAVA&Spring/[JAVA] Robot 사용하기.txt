@@ -1,4 +1,4 @@
-[JAVA - robot 사용하기]
+# JAVA - robot 사용하기
 
 	API
 		https://docs.oracle.com/javase/7/docs/api/java/awt/Robot.html

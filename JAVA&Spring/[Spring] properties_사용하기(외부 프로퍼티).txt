@@ -1,4 +1,4 @@
-[ properties 사용하기 ]
+# properties 사용하기
 
 
 	참고 URL : 

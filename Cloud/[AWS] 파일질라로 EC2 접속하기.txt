@@ -1,4 +1,4 @@
-[ AWS - 파일질라로 EC2 접속하기 ]
+# AWS - 파일질라로 EC2 접속하기
 	참고링크 : https://boansecurity.blogspot.com/2016/07/aws-filezilla-ftp.html
 			https://app-developer.tistory.com/93
 

@@ -1,4 +1,4 @@
-[Spring Boot  - Springsecurity 사용하기 (DB정보로 로그인) ]
+# Spring Boot  - Springsecurity 사용하기 (DB정보로 로그인)
 	
 	스프링에서 제공해주는 스프링시큐리티로 로그인 및 권한부분 구현
 	DB에 저장된 데이터를 통해서 로그인 하도록 구현하였음

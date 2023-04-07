@@ -1,4 +1,4 @@
-[keycloak - Adapter config 설정 ]
+# keycloak - Adapter config 설정
 
 
 # 참고 링크

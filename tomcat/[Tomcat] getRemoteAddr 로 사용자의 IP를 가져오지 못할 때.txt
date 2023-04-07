@@ -1,4 +1,4 @@
-[ Tomcat - getRemoteAddr 로 사용자의 IP를 가져오지 못할 떄 ]
+# Tomcat - getRemoteAddr 로 사용자의 IP를 가져오지 못할 떄
 
 	공식문서 URL : https://tomcat.apache.org/tomcat-8.5-doc/api/org/apache/catalina/valves/RemoteIpValve.html
 	참고 문서 : https://confluence.atlassian.com/jirakb/how-to-log-the-client-source-ip-in-access-logs-for-jira-data-center-978196913.html

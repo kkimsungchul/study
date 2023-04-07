@@ -1,4 +1,4 @@
-[ Vue - axios 사용하기 ] 
+# Vue - axios 사용하기
 
 # Vue 코드
 	Get 방식과 Post 방식으로 호출했음

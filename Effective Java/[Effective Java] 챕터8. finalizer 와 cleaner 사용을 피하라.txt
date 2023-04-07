@@ -1,4 +1,4 @@
-# Effective Java - 챕터8. finalizer 와 cleaner 사용을 피하라 
+# Effective Java - 챕터8. finalizer 와 cleaner 사용을 피하라
 
 
 # 설명

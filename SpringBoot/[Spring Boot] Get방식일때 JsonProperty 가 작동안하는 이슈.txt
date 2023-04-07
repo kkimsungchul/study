@@ -1,4 +1,4 @@
-[ Spring Boot - Get방식일때 JsonProperty 가 작동안하는 이슈 ]
+# Spring Boot - Get방식일때 JsonProperty 가 작동안하는 이슈
 
 	
 # 증상

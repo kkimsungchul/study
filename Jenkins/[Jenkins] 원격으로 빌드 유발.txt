@@ -1,4 +1,4 @@
-[ jenkins 원격 빌드 유발 ]
+# jenkins 원격 빌드 유발
 
 	# 사용자 API Token 생성
 		1. 젠킨스 로그인

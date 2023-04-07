@@ -1,4 +1,4 @@
-[ JAVA - Stream 사용하기 - 가공 ]
+# JAVA - Stream 사용하기 - 가공
 
 	https://mangkyu.tistory.com/114
 

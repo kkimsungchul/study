@@ -1,4 +1,4 @@
-[ Jenkins - Freestyle project 로 배포하기 ]
+# Jenkins - Freestyle project 로 배포하기
 
 
 

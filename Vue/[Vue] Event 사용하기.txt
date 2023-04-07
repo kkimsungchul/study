@@ -1,4 +1,4 @@
-[ Vue - Event 사용하기 ]
+# Vue - Event 사용하기
 	https://www.youtube.com/watch?v=b0ImUEsqaAA
 
 # click 이벤트 

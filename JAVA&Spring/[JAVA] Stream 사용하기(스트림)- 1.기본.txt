@@ -1,4 +1,4 @@
-[ JAVA - Stream 사용하기 - 기본 ]
+# JAVA - Stream 사용하기 - 기본
 	https://mangkyu.tistory.com/112
 	https://mangkyu.tistory.com/search/stream?page=5
 

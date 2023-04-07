@@ -1,4 +1,4 @@
-# Effective Java - 챕터10. equals는 일반 규약을 지켜 재정의 하라 -1 
+# Effective Java - 챕터10. equals는 일반 규약을 지켜 재정의 하라 -1
 
 
 # 이전에 정리해놓은 equals 내용

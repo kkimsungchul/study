@@ -1,4 +1,4 @@
-[ JAVA - Stream 사용하기 - 결과 ]
+# JAVA - Stream 사용하기 - 결과
 	https://mangkyu.tistory.com/114
 
 
