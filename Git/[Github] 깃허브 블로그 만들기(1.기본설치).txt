@@ -66,7 +66,7 @@
 	2. 해당저장소를 로컬에 클론  
   
 	3. 클론한 저장소의 경로에서 아래의 명령어 입력  
-		jekyll new ./ -f  
+		jekyll new ./ -f
   
 		- 오류발생  
 			처음에는 jekyll new ./ 명령어를 사용하였음,  
@@ -80,7 +80,7 @@
 			※ 참고 사이트 : https://cjy-tech.github.io/make-blog-with-jekyll-and-github_pages/  
   
 	4. 아래의 명령어 입력하여 로컬서버에서 jekyll 실행  
-		bundle exec jekyll serve  
+		bundle exec jekyll serve
   
 	5. 로컬서버 접속 확인  
 		http://localhost:4000/  
