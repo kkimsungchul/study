@@ -1,3 +1,5 @@
+# Jenkins - 젠킨스 배포스크립트
+
 pipeline {
     agent any
 

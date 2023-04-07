@@ -1,38 +1,41 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+# 코딩테스트 - 완전 탐색 소수 찾기
+	======================================================================================================
+	import java.util.ArrayList;
+	import java.util.Arrays;
+	import java.util.List;
 
-public class Main {
+	public class Main {
 
-    public static void main(String[] args) {
-        String numbers="123";
-        System.out.println("#  1234");
-        String tempNumbers[] = numbers.split("");
-        List<String> arr = Arrays.asList(tempNumbers);
-        ArrayList<String> returnArr = new ArrayList<>();
+		public static void main(String[] args) {
+			String numbers="123";
+			System.out.println("#  1234");
+			String tempNumbers[] = numbers.split("");
+			List<String> arr = Arrays.asList(tempNumbers);
+			ArrayList<String> returnArr = new ArrayList<>();
 
-        returnArr = result(arr,returnArr,"");
-        System.out.println(returnArr);
-        System.out.println("Hello World!");
-    }
+			returnArr = result(arr,returnArr,"");
+			System.out.println(returnArr);
+			System.out.println("Hello World!");
+		}
 
-    public static ArrayList<String> result(List<String> arr, ArrayList<String> returnArr, String temp){
+		public static ArrayList<String> result(List<String> arr, ArrayList<String> returnArr, String temp){
 
-        String loopTemp=temp;
-        for(int i=0;i<arr.size();i++) {
-            loopTemp += arr.get(i);
+			String loopTemp=temp;
+			for(int i=0;i<arr.size();i++) {
+				loopTemp += arr.get(i);
 
-            returnArr.add(loopTemp);
+				returnArr.add(loopTemp);
 
-            if(arr.size()!=1){
-                ArrayList<String> tempArr = new ArrayList<>(arr);
-                tempArr.remove(i);
-                result(tempArr,returnArr,loopTemp);
-            }
-            loopTemp = temp;
-        }
+				if(arr.size()!=1){
+					ArrayList<String> tempArr = new ArrayList<>(arr);
+					tempArr.remove(i);
+					result(tempArr,returnArr,loopTemp);
+				}
+				loopTemp = temp;
+			}
 
-        return returnArr;
+			return returnArr;
 
-    }
-}
+		}
+	}
+	======================================================================================================

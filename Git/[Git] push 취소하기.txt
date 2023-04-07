@@ -1,4 +1,8 @@
-https://gmlwjd9405.github.io/2018/05/25/git-add-cancle.html
+# Git - push 취소하기
+
+
+# 참고링크 
+	https://gmlwjd9405.github.io/2018/05/25/git-add-cancle.html
 
 
 # 가장 최근의 커밋 취소

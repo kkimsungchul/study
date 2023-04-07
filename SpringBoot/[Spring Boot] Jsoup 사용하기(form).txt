@@ -1,1 +1,30 @@
-https://partnerjun.tistory.com/43
+# SpringBoot - Jsoup 사용하기
+
+# 참고링크 : 
+	https://partnerjun.tistory.com/43
+
+# 적용 코드
+	실제로 토이프로젝트에서 적용한 코드임
+	https://github.com/kkimsungchul/camping/blob/master/src/main/java/com/sungchul/camping/reservation/ThankYouCampingReservationService.java
+	======================================================================================================
+    /**
+     * URL 에서 데이터 받아오기
+     * @param map , 데이터 파싱에 필요한 데이터를 넣은 맵
+     * @param parsingUrl , 파싱할 URL
+     * */
+    public String callUrl(Map<String,String> map , String parsingUrl){
+        try{
+            Document doc = Jsoup
+                    .connect(parsingUrl)
+                    .header("Content-Type", "application/x-www-form-urlencoded")
+                    .data(map)
+                    .post();
+            //System.out.println(doc);
+            Elements elements = doc.select("#container > div > div.imply_l > div.section.select_site > div.resInfo_wp > div");
+            return elements.text();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return "";
+    }
+	======================================================================================================

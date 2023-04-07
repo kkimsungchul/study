@@ -1,26 +1,25 @@
+# Camping - 대상 시스템 데이터 분석
+
 https://booking.ddnayo.com/booking-calendar-status?accommodationId=13676&groupId=&isPriceCalendar=true&channelCode=0030
-
-
 						
-						
-						"date": "2022-10-02",
-                        "displayDate": "10/2",
-                        "dayOfWeek": 7,
-                        "available": true,
-                        "seasonType": "0003",
-                        "seasonName": "준성수기",
-                        "dayTypeName": "공휴일전날",
+	"date": "2022-10-02",
+	"displayDate": "10/2",
+	"dayOfWeek": 7,
+	"available": true,
+	"seasonType": "0003",
+	"seasonName": "준성수기",
+	"dayTypeName": "공휴일전날",
 
 
 
-                        "date": "2022-10-03",
-                        "displayDate": "10/3",
-                        "dayOfWeek": 1,
-                        "available": true,
-                        "seasonType": "0003",
-                        "seasonName": "준성수기",
-                        "dayTypeName": "주중",
-                        "holidayName": "개천절",
+	"date": "2022-10-03",
+	"displayDate": "10/3",
+	"dayOfWeek": 1,
+	"available": true,
+	"seasonType": "0003",
+	"seasonName": "준성수기",
+	"dayTypeName": "주중",
+	"holidayName": "개천절",
 
 
 

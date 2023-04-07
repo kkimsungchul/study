@@ -1,4 +1,6 @@
-참고 URL :
+# Git - Git Bash 설정
+
+# 참고 URL :
 	https://secuinfo.tistory.com/entry/tip-github?category=857378
 	https://secuinfo.tistory.com/entry/Local-Project-GitHub?category=857378
 

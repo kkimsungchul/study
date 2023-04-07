@@ -1,4 +1,4 @@
-[ AWS - 아마존 EC2에서 그래들 프로젝트 컴파일 하기
+# AWS - 아마존 EC2에서 그래들 프로젝트 컴파일 하기
 
 	https://may9noy.tistory.com/546
 

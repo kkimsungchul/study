@@ -1,18 +1,20 @@
-https://medium.com/@inhyuck/java-8%EC%97%90-%EC%B6%94%EA%B0%80%EB%90%9C-%EA%B2%83%EB%93%A4-8c66023cbbae
+# JAVA - 나중에 볼거
 
-걍 볼거많음
+
+# 참고링크
+	https://medium.com/@inhyuck/java-8%EC%97%90-%EC%B6%94%EA%B0%80%EB%90%9C-%EA%B2%83%EB%93%A4-8c66023cbbae
+
+
 	https://mangkyu.tistory.com/217?category=872426
 
-
-
-hashcode equals 재정의
+# hashcode equals 재정의
 	https://live-everyday.tistory.com/238
 	https://velog.io/@hsjung2015/JAVAEquals%EC%99%80-Hashcode%EB%A5%BC-%EC%9E%AC%EC%A0%95%EC%9D%98override-%ED%95%B4%EC%95%BC%ED%95%98%EB%8A%94-%EC%9D%B4%EC%9C%A0
 
 
-java 동일성 동등성
+# java 동일성 동등성
 	https://live-everyday.tistory.com/213
 
 
-스프링 스케줄러 중복실행 관련 라이브러리
+# 스프링 스케줄러 중복실행 관련 라이브러리
 	ShedLock

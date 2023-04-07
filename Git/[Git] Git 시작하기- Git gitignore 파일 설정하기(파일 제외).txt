@@ -1,4 +1,6 @@
-참고 URL :
+# Git - Git gitignore 파일 설정하기(파일 제외)
+
+# 참고 URL :
 	https://m.blog.naver.com/PostView.nhn?blogId=simpolor&logNo=221065977618&proxyReferer=https:%2F%2Fwww.google.com%2F
 	
 	* 깃에서 플러그인으로 바로 설정도 가능함. 플러그인으로 하는게 더 빠르고 편리함

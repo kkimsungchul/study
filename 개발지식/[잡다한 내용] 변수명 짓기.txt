@@ -1,1 +1,2 @@
-https://www.curioustore.com/#!/util/naming
+# 개발지식 - 변수명 네이밍
+	https://www.curioustore.com/#!/util/naming

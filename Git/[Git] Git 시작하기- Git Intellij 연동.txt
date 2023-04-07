@@ -1,4 +1,6 @@
-참고 URL :
+# Git - Git Intellij 연동
+
+# 참고 URL :
 	https://secuinfo.tistory.com/entry/Intellij-Github-Link
 	https://gbsb.tistory.com/409
 

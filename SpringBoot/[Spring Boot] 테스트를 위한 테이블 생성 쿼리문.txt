@@ -1,3 +1,5 @@
+# SpringBoot - 테스트를 위한 테이블 생성 쿼리문
+
 CREATE TABLE `board` (
 	`id` INT(11) NOT NULL AUTO_INCREMENT,
 	`writer` VARCHAR(10) NULL DEFAULT NULL,
