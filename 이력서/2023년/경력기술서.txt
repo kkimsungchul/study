@@ -72,7 +72,7 @@
 
 
 4-3.KT Dev Space 개발 / 운영 - 지뉴소프트
-설명 : 다양한 개발 툴 (Jira , Gitlab , Jenkins , Sparrow) 을 하나의 시스템에서 관리하는 시스템 입니다.
+설명 : DevOps(Jira , Gitlab , Jenkins , Sparrow) 툴을 연계하여 관리할수 있는 포털 사이트개발
 개발환경 :Spring Boot , PostgreSQL , Keycloak , Linux
 업무 참여 내용 : 
 * RestAPI 를 통한 개발 툴(Jira , Gitlab , Jenkins , Sparrow) 과의 데이터 연동

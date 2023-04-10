@@ -14,7 +14,7 @@
 
 # KT Dev-Space Portal (Back-End Developer)
 - 업무 내용 및 성과 :
-Rest API 를 사용하여 포털 사이트를 개발
+Rest API를 사용하여 포털 사이트를 개발
 불필요한 리소스 제거에 소요 시간 감소를 위한 DevOps Tool간의
 데이터 동기화 기능 개발
 데이터 유출 방지를 위해 오픈소스 KeyCloak의 암호화 모듈 개발
