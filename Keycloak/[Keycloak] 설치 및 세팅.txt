@@ -161,13 +161,13 @@
 # 사용자 생성 완료 테스트
 	
 	토큰 요청 (sungchul) : 
-curl -X POST "http://localhost:8080/auth/realms/demo/protocol/openid-connect/token" ^
---header "Content-Type:application/x-www-form-urlencoded" ^
---data-urlencode "grant_type=password" ^
---data-urlencode "client_id=my_client" ^
---data-urlencode "client_secret=JBFLaz1mgZKPwYNqE9Tfyf0c3b2mnkOl" ^
---data-urlencode "username=sungchul" ^
---data-urlencode "password=admin"
+	curl -X POST "http://localhost:8080/auth/realms/demo/protocol/openid-connect/token" ^
+	--header "Content-Type:application/x-www-form-urlencoded" ^
+	--data-urlencode "grant_type=password" ^
+	--data-urlencode "client_id=my_client" ^
+	--data-urlencode "client_secret=JBFLaz1mgZKPwYNqE9Tfyf0c3b2mnkOl" ^
+	--data-urlencode "username=sungchul" ^
+	--data-urlencode "password=admin"
 	
 	응답값 : 
 		{"access_token":"eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPdGViQldzSmdhRWozeXVaMGZlbTVWclFmbkZpcDlLczE5aVN6anBybGw0In0.eyJleHAiOjE2NDQzNDE5MzYsImlhdCI6MTY0NDMwNTkzNiwianRpIjoiNDM4ZjkzZGEtZmU5ZC00ZmVlLTg5ZmQtMjY2YTdhNTM2YmNmIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL2F1dGgvcmVhbG1zL2RlbW8iLCJhdWQiOiJhY2NvdW50Iiwic3ViIjoiNzNkNWYwOWUtZTY2Ny00YjA2LTgwZDctMTk3ZDM1NzQyNmQ0IiwidHlwIjoiQmVhcmVyIiwiYXpwIjoibXlfY2xpZW50Iiwic2Vzc2lvbl9zdGF0ZSI6IjgzMjBmNjdhLTNmZWYtNGRiMS1iMDA1LTk0OTMzNGY1MTY5YSIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwIl0sInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJvZmZsaW5lX2FjY2VzcyIsInVtYV9hdXRob3JpemF0aW9uIiwiZGVmYXVsdC1yb2xlcy1kZW1vIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsibXlfY2xpZW50Ijp7InJvbGVzIjpbIlJPTEVfVVNFUiJdfSwiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJwcm9maWxlIGVtYWlsIiwic2lkIjoiODMyMGY2N2EtM2ZlZi00ZGIxLWIwMDUtOTQ5MzM0ZjUxNjlhIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJuYW1lIjoia2ltIHN1bmdjaHVsIiwicHJlZmVycmVkX3VzZXJuYW1lIjoic3VuZ2NodWwiLCJnaXZlbl9uYW1lIjoia2ltIiwiZmFtaWx5X25hbWUiOiJzdW5nY2h1bCIsImVtYWlsIjoia2ltc2MxMjE4QGdtYWlsLmNvbSJ9.WNx3PCifntNCZxft_vzfptesU1i4X7WPlALxuQgadSEH6k-csdHkdORcYuGDK6TK2ycjbvOvy7AhDlj1GHbGxqFLX6Xr-iEsMeoBkmqaM8uPMoCfGFYcIznqCi6cvQE3YXFBbtUWz3VEH_wWyqNNoz8ssvUce0mU31kt5ePzFr_svbLSJimNEzpJAIjLEj3dOAU-mbBMUZm5Dnuhllaxa8bKsjRRWvBDzgGRyP_-q2Y9C0QpaBwcpfypGE3ptp_ZrZlGat-neGnPmcj9j2-rmwJID0fOqZatBTNbb85shjw46JEoxf2AjyDcNXJ0jWcobHYwFa8AA48_ZDNTHidW2A","expires_in":36000,"refresh_expires_in":1800,"refresh_token":"eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJhZDM2NmVmOS1kMTNmLTQyM2YtOTRhMS04OTI4M2YxN2JmNGUifQ.eyJleHAiOjE2NDQzMDc3MzYsImlhdCI6MTY0NDMwNTkzNiwianRpIjoiMTMzZWI4YWItMDA5ZC00NDM2LWJjOTktOGVmMWJjYmM1Yzc5IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL2F1dGgvcmVhbG1zL2RlbW8iLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvYXV0aC9yZWFsbXMvZGVtbyIsInN1YiI6IjczZDVmMDllLWU2NjctNGIwNi04MGQ3LTE5N2QzNTc0MjZkNCIsInR5cCI6IlJlZnJlc2giLCJhenAiOiJteV9jbGllbnQiLCJzZXNzaW9uX3N0YXRlIjoiODMyMGY2N2EtM2ZlZi00ZGIxLWIwMDUtOTQ5MzM0ZjUxNjlhIiwic2NvcGUiOiJwcm9maWxlIGVtYWlsIiwic2lkIjoiODMyMGY2N2EtM2ZlZi00ZGIxLWIwMDUtOTQ5MzM0ZjUxNjlhIn0.WvzPDJ7sx_DwvrNSCcX_5o6khGtbu6K3XUco6Upanug","token_type":"Bearer","not-before-policy":0,"session_state":"8320f67a-3fef-4db1-b005-949334f5169a","scope":"profile email"}
@@ -176,23 +176,23 @@ curl -X POST "http://localhost:8080/auth/realms/demo/protocol/openid-connect/tok
 
 
 	토큰 요청 (admin) : 
-curl -X POST "http://localhost:8080/auth/realms/demo/protocol/openid-connect/token" ^
---header "Content-Type:application/x-www-form-urlencoded" ^
---data-urlencode "grant_type=password" ^
---data-urlencode "client_id=my_client" ^
---data-urlencode "client_secret=JBFLaz1mgZKPwYNqE9Tfyf0c3b2mnkOl" ^
---data-urlencode "username=admin" ^
---data-urlencode "password=admin"
+	curl -X POST "http://localhost:8080/auth/realms/demo/protocol/openid-connect/token" ^
+	--header "Content-Type:application/x-www-form-urlencoded" ^
+	--data-urlencode "grant_type=password" ^
+	--data-urlencode "client_id=my_client" ^
+	--data-urlencode "client_secret=JBFLaz1mgZKPwYNqE9Tfyf0c3b2mnkOl" ^
+	--data-urlencode "username=admin" ^
+	--data-urlencode "password=admin"
 
 
 
 	# 관리자 권한 토큰 요청
-curl -X POST "http://localhost:8080/auth/realms/master/protocol/openid-connect/token" ^
---header "Content-Type:application/x-www-form-urlencoded" ^
---data-urlencode "grant_type=password" ^
---data-urlencode "client_id=admin-cli" ^
---data-urlencode "username=kimsc1218" ^
---data-urlencode "password=admin"
+	curl -X POST "http://localhost:8080/auth/realms/master/protocol/openid-connect/token" ^
+	--header "Content-Type:application/x-www-form-urlencoded" ^
+	--data-urlencode "grant_type=password" ^
+	--data-urlencode "client_id=admin-cli" ^
+	--data-urlencode "username=kimsc1218" ^
+	--data-urlencode "password=admin"
 
 # 새로운 사용자로 로그인
 	
@@ -210,25 +210,16 @@ curl -X POST "http://localhost:8080/auth/realms/master/protocol/openid-connect/t
 
 
 
-
-
-
-
-
-
-
 =================================================================================================================
 =================================================================================================================
-91296885
-!Gnew007
 
 curl -X POST "http://localhost:8080/auth/realms/demo/protocol/openid-connect/token" ^
 --header "Content-Type:application/x-www-form-urlencoded" ^
 --data-urlencode "grant_type=password" ^
 --data-urlencode "client_id=my_client" ^
 --data-urlencode "client_secret=qvkQHSyu9o0y6PuwCKcteVw0YrrK52dU" ^
---data-urlencode "username=91296885" ^
---data-urlencode "password=!Gnew007"
+--data-urlencode "username=23411223" ^
+--data-urlencode "password=!apassword"
 
 
 
