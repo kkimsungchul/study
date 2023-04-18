@@ -1,4 +1,6 @@
 [ 현대오토에버 지원 가능 공고 ]
+https://hyundai-autoever.recruiter.co.kr/app/jobnotice/view?systemKindCode=MRS2&jobnoticeSn=139980
+
 ======================================================================================================
 # 공고명 : 판매시스템 구축/운영
 ## 직무 : 
@@ -99,15 +101,15 @@
 	KCD 시스템 글로벌 확산 지원
 
 ## 필수역량 및 경험
-- Spring Framework, Spring Boot 활용					- O
-- JAVA/JSP/Javascript/JQuery/React 활용				- O
-- Database (Oracle/Tibero/MariaDB) 활용				- O
-- GItlab/Jenkins 활용									- O
-- OS (Unix/Linux) 활용								- O
+	Spring Framework, Spring Boot 활용				- O
+	JAVA/JSP/Javascript/JQuery/React 활용				- O
+	Database (Oracle/Tibero/MariaDB) 활용				- O
+	GItlab/Jenkins 활용								- O
+	OS (Unix/Linux) 활용								- O
 ## 우대사항
-- 글로벌 대상 시스템 운영경험 보유							- X
-- 자동차 관련 지식 보유									- X
-- 영어 회화 가능자										- X
+	글로벌 대상 시스템 운영경험 보유							- X
+	자동차 관련 지식 보유									- X
+	영어 회화 가능자										- X
 
 ======================================================================================================
 # 공고명 : 인증 어플리케이션 개발/운영
@@ -148,18 +150,18 @@
 	SFaaS 서비스/플랫폼 기술 개발 및 구축_B/E(Java)
 	스마트팩토리 모바일 서비스 개발 (Kotlin)
 ## 필수역량 및 경험
-	JAVA / Vue.js 개발									- ㅅ
-	Restful API 설계 및 개발 경험							- O
-	모바일 App 개발 및 운영 경험								- X
+	JAVA / Vue.js 개발								- ㅅ
+	Restful API 설계 및 개발 경험						- O
+	모바일 App 개발 및 운영 경험							- X
 ## 우대사항
-	MES 및 스마트팩토리 서비스 개발/구축 경험						- X
-	클라우드 기반 서비스 개발/운영 경험							- ㅅ
-	안드로이드 UI/UX 개발 경험								- X
+	MES 및 스마트팩토리 서비스 개발/구축 경험					- X
+	클라우드 기반 서비스 개발/운영 경험						- ㅅ
+	안드로이드 UI/UX 개발 경험							- X
 ## 적합/선호전공
-	컴퓨터, SW 등 IT 관련 또는 산업공학 전공자					- O
+	컴퓨터, SW 등 IT 관련 또는 산업공학 전공자				- O
 ## 기술스택
-	개발 언어 : Vue.js, Kotlin								- X
-	Tool : CI/CD 관련 툴 사용 경험, Android Studio			- X
+	개발 언어 : Vue.js, Kotlin							- X
+	Tool : CI/CD 관련 툴 사용 경험, Android Studio		- X
 
 
 ======================================================================================================
@@ -184,8 +186,8 @@
 	현대자동차 품질개선을 위한 업무프로세스 개발 및 시스템 운영
 	X-plateform -> React /Spring Boot 로 전환 시 주도적 역할 담당
 ## 필수역량 및 경험
-	React/Spring Boot
-	CI/CD 활용
-	Sprint / agile 방법론 이해 및 지식
-## 우대사항
-	Intelli-J(중), Eclipse(하), Infomatica-ETL
+	React/Spring Boot								- O
+	CI/CD 활용										- O
+	Sprint / agile 방법론 이해 및 지식					- O
+## 우대사항	
+	Intelli-J(중), Eclipse(하), Infomatica-ETL		- O
