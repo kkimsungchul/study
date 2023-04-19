@@ -1,3 +1,13 @@
+지원 직무 중심으로 기술해 주시기 바랍니다.
+[현대오토에버에 지원한 동기를 기술하십시오(이직사유 포함) (최소 200자, 최대 500자 입력가능)]
+
+
+
+
+[입사후 희망 업무를 본인의 강점을 근거로 기술하여 주시기 바랍니다. (채용 공고상 담당업무 참고) (최소 300자, 최대 1,000자 입력가능)]
+
+
+
 [ 현대오토에버 지원 가능 공고 ]
 https://hyundai-autoever.recruiter.co.kr/app/jobnotice/view?systemKindCode=MRS2&jobnoticeSn=139980
 
@@ -186,7 +196,7 @@ https://hyundai-autoever.recruiter.co.kr/app/jobnotice/view?systemKindCode=MRS2&
 	현대자동차 품질개선을 위한 업무프로세스 개발 및 시스템 운영
 	X-plateform -> React /Spring Boot 로 전환 시 주도적 역할 담당
 ## 필수역량 및 경험
-	React/Spring Boot								- O
+	React/Spring Boot								- ㅅ
 	CI/CD 활용										- O
 	Sprint / agile 방법론 이해 및 지식					- O
 ## 우대사항	
