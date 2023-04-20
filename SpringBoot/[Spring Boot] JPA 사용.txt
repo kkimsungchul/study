@@ -134,6 +134,10 @@
 	exists(Example<S> example): 주어진 예제(Example)를 만족하는 엔티티가 존재하는지 여부를 반환합니다.
 
 # JpaRepository - JOIN 관련 어노테이션
+	참고링크 : https://private-space.tistory.com/87
+				https://developer-youngjun.tistory.com/21
+				https://gofnrk.tistory.com/58
+
 	findAll(Specification<T> spec, Pageable pageable): 주어진 조건(Specification)에 따라 엔티티를 조회하고, 페이징(Paging) 처리를 수행합니다. 
 	Specification은 검색 조건을 표현하는 객체로, JPA Criteria API를 사용하여 생성할 수 있습니다. 이 메서드를 사용하면 다수의 엔티티 간의 조인을 처리할 수 있습니다.
 
@@ -150,6 +154,9 @@
 
 	findAllBy(Specification<T> spec, Class<R> resultClass, String... selection): 주어진 조건(Specification)에 따라 엔티티를 조회하고, 
 	지정된 결과 클래스(resultClass)와 선택(selection)에 따라 결과를 반환합니다. 이 메서드는 복잡한 조인 쿼리를 처리할 때 유용합니다.
+
+
+
 
 # JpaRepository - UPDATE 관련 어노테이션
 

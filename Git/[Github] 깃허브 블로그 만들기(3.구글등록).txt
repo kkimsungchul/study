@@ -34,4 +34,8 @@
 	ex) https://www.google.com/ping?sitemap=https://kkimsungchul.github.io/sitemap.xml
 	
 	위와같이 강제로 업데이트를 하자
-	
+
+# bing 등록
+	https://www.bing.com/webmasters/
+
+# naver 등록
