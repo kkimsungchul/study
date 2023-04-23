@@ -1,0 +1,88 @@
+# 그리디 알고리즘
+	https://www.acmicpc.net/problem/11047
+	https://www.acmicpc.net/problem/1541
+# 그리디 알고리즘이란
+	현재 상태에서 보는 선택지 중 최선의 선택지가 전체 선택지 중 최선의 선택지라고 가정하는 알고리즘
+	※ 최적을 보장하지 않음
+
+# 핵심 이론
+	가. 해 선택 : 
+		현재 상태에서 가장 최선이라고 생각되는 해를 선택한다.
+	
+	나. 적절성 검사 : 
+		현재 선택한 해가 전체 문제의 제약 조건에 벗어나지 않는지 검사한다.
+
+	다. 해 검사 : 
+		현재까지 선택한 해 집합이 전체 문제를 해결할 수 있는지 검사한다.
+		전체문제를 해결하지 못한다면 "가" 로 돌아가 같은 과정으로 반복한다.
+	
+	동전 0
+	======================================================================================================
+	package backup;
+
+	import java.util.Scanner;
+
+	public class Main03 {
+		public static void main(String[]args){
+			Scanner sc = new Scanner(System.in);
+			int count =0;
+			int n = sc.nextInt();
+			int target = sc.nextInt();
+			int [] coin = new int[n];
+			for(int i=0;i<n;i++){
+				coin[i] = sc.nextInt();
+			}
+			for(int i=coin.length-1;i>=0;i--){
+				count += target/coin[i];
+				target = target%coin[i];
+				if(target==0){
+					break;
+				}
+			}
+			System.out.println(count);
+
+		}
+	}
+
+	======================================================================================================
+
+	
+	잃어버린 괄호
+	======================================================================================================
+	package backup;
+
+	import java.util.Scanner;
+
+	public class Main04 {
+		public static void main(String[]args){
+			Scanner sc = new Scanner(System.in);
+			String s = sc.nextLine();
+
+			String [] splitData = s.split("-");
+
+
+			int result=0;
+			for(int i=0;i<splitData.length;i++){
+				if(i==0){
+					result +=sum(splitData[i]);
+				}else{
+					result -=sum(splitData[i]);
+				}
+			}
+
+			System.out.println(result);
+	//10+20+30+40
+	//55-50+40
+
+		}
+		public static int sum (String str){
+			int result=0;
+			String [] temp = str.split("\\+");
+			for(int i=0;i<temp.length;i++){
+				result += Integer.parseInt(temp[i]);
+			}
+			return result;
+		}
+	}
+
+	======================================================================================================
