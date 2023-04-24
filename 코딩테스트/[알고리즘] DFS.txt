@@ -1,0 +1,94 @@
+# DFS(깊이 우선 탐색)
+
+# DFS란
+	DFS (Depth First Search) 로 그래프 완전 탐색 기법중 하나임
+	그래프의 시작 노드에서 출발하여 탐색할 한쪽 분기를 정하여 최대 깊이까지 탐색한 후다른쪽 분기로 이동하여 다시 탐색 하는 알고리즘
+
+# 주의할점
+	재귀함수를 이용하므로 스택 오버플로(stack overflow)에 유의해야함.
+	
+# 활용 가능한 부분
+	단절점 찾기
+	단절선 찾기
+	사이클 찾기
+	위상 정렬
+
+# 핵심
+	한번 방문한 노드를 다시 방문하면 안되므로 노드 방문 여부를 체크할 배열이 필요.
+	그래프는 인접 리스트로 표현.
+	후입선출의 특성을 가지고 있음 (스택)
+
+	스택에 노드를 삽입할 때 방문 배열 체크
+	스택에 노드를 뺄 때 탐색 순서에 기록
+
+
+# 예시
+	가. 아래와 같이 인접 노드가 있다고 가정 
+		1 -> 2,3
+		2 -> 5,6
+		3 -> 4
+		4 -> 6
+		5 
+		6
+
+	나. 탐색 순서
+		1 ,3 ,4 ,6 ,2 ,5
+	
+			
+# 문제 풀이
+	https://www.acmicpc.net/problem/11724
+	======================================================================================================
+	import java.io.BufferedReader;
+	import java.io.IOException;
+	import java.io.InputStreamReader;
+	import java.util.ArrayList;
+	import java.util.StringTokenizer;
+
+	public class Solution {
+
+		static boolean visited[];
+		static ArrayList<Integer>[] A;
+		public static void main(String[]args) throws IOException {
+			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+			StringTokenizer st = new StringTokenizer(br.readLine());
+			int n = Integer.parseInt(st.nextToken());
+			int m = Integer.parseInt(st.nextToken());
+			visited = new boolean[n];
+			A = new ArrayList[n];
+			for(int i=0;i<n;i++){
+				A[i] = new ArrayList<Integer>();
+			}
+			for(int i=0;i<m;i++){
+				st = new StringTokenizer(br.readLine());
+				int start = Integer.parseInt(st.nextToken());
+				int end = Integer.parseInt(st.nextToken());
+				A[start-1].add(end-1);
+				A[end-1].add(start-1);
+			}
+
+			int count =0;
+
+			for(int i=0;i<n;i++){
+				if(!visited[i]){
+					count++;
+					dfs(i);
+				}
+			}
+			System.out.println(count);
+		}
+
+		public static void dfs(int v){
+			if(visited[v]){
+				return;
+			}else{
+				visited[v]=true;
+				for(int i: A[v]){
+					if(!visited[i]){
+						dfs(i);
+					}
+				}
+			}
+		}
+
+	}
+	======================================================================================================
