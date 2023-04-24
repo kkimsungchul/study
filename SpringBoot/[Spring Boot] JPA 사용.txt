@@ -3,7 +3,7 @@
 			https://zeroco.tistory.com/44
 			https://github.com/jojoldu/freelec-springboot2-webservice/issues/67
 			https://jforj.tistory.com/83
-
+			https://mangkyu.tistory.com/20
 # JPA의 장점
 	생산성: SpringBoot JPA는 ORM(Object-Relational Mapping)을 사용하므로 개발자는 SQL 쿼리를 직접 작성하지 않아도 됩니다. 
 	이는 개발 생산성을 높이고 코드 작성 시간을 줄입니다.
