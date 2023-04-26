@@ -5,6 +5,9 @@
 			https://jforj.tistory.com/83
 			https://mangkyu.tistory.com/20
 
+			https://careerly.co.kr/comments/82539?utm_campaign=user-share
+			https://tech.onepredict.ai/4367923e-8e13-407c-8845-67d270d324d7
+
 # JPA란
 	출처 : https://velog.io/@rladuswl/ORM%EC%9D%98-%EA%B0%9C%EB%85%90-JPA%EC%99%80-MyBatis-%EC%B0%A8%EC%9D%B4
 	ORM은 객체와 DB테이블을 매핑시켜 RDB테이블을 객체 지향적으로 사용할수 있도록 해주는 기술입니다.
