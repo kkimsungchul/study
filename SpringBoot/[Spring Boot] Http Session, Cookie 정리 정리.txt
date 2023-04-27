@@ -1,4 +1,9 @@
 # SpringBoot - HTTP Session
+	애도 처음에 개발 시작했을때.. 완전 편하다.
+	세션에 값 다 넣으면 되네! 라고 하면서 이것저것 찾아보고 공부했었는데, 막상 시간이 지나고서 보니
+	그냥 가져다 쓰기만하고 어떻게 썻는지 어떤 특성이 있는지를 설명 못하겠었음.
+	"세션에 값넣고 꺼내~ " , "세션 지우면 되지~" 이런식으로만 말하고 사용했던거 같음....ㅜㅜ
+	그래서 다시 공부할겸 내용을 정리함
 
 # HTTP Protocol
 	HTTP (Hypertext Transfer Protocol)는 웹에서 데이터를 주고받는 프로토콜입니다. HTTP 프로토콜의 특징은 다음과 같습니다.
@@ -113,3 +118,59 @@
 
 	HTTP 쿠키의 라이프 사이클은 이러한 과정을 거치면서 서버와 클라이언트 사이의 상호작용을 지원합니다. 
 	쿠키를 사용하여 세션 상태를 유지하거나 사용자의 기호 등을 저장하고 활용할 수 있습니다.
+
+# Spring에서 세션 사용
+
+	자주 사용하는 메소드들 위주로 정리했습니다.
+	=================================================================================================================
+	@Controller
+	public class SessionController{
+		
+			@RequestMapping(value="/test" , method = RequestMethod.GET)
+			public void sessionTest(HttpServletRequest request){
+				//세션을 가져옴
+				HttpSession session = request.getSession();
+
+				//세션에 값을 넣어줌
+				session.setAttribute("key" , "value");
+
+				//세션에서 값을 가져옴
+				session.getAttribute("key");
+
+				//세션의 ID를 가져옴
+				String sessionId = session.getId();
+
+				//세션에 속성을 지움
+				session.removeAttribute("key");
+
+				//세션 타임아웃 설정 ,초단위
+				session.setMaxInactiveInterval(시간);
+
+				//세션 제거
+				session.invalidate();
+
+			}
+	}
+	=================================================================================================================
+
+# new Session 을 하지 않고 HttpServletRequest.getSession() 을 하는 이유
+
+	new Session을 호출하면 새로운 세션 객체가 만들어지기 때문에 이전에 생성된 세션과는 다른 세션 객체가 반환
+	Spring은 HttpServletRequest.getSession() 메소드를 통해 HttpSession 객체를 생성하고, 이미 생성된 객체가 있다면 해당 객체를 반환하는 방식을 사용합니다. 
+
+	- 세션 관리
+	HttpServletRequest.getSession() 메서드는 세션을 생성하거나 현재 요청과 연결된 세션을 반환합니다. 
+	이 메서드를 사용하면 Spring에서 자동으로 세션을 관리할 수 있습니다. 
+	Spring은 애플리케이션 컨텍스트를 초기화할 때 SessionRepositoryFilter를 자동으로 구성하므로 이 필터는 모든 HTTP 요청을 처리하고 요청과 연결된 세션을 찾아서 사용할 수 있습니다.
+
+	- 세션 스코프 빈
+	Spring에서 HttpServletRequest.getSession()을 사용하면 세션 스코프 빈을 사용할 수 있습니다. 
+	세션 스코프 빈은 애플리케이션에서 세션을 통해 공유해야 하는 객체를 나타냅니다. 
+	예를 들어 사용자가 로그인하면 로그인 정보를 세션에 저장하여 세션 스코프 빈에서 사용할 수 있습니다.
+
+	- 테스트 용이성
+	HttpServletRequest.getSession()은 MockMvc 테스트에서 쉽게 사용할 수 있습니다. 
+	MockMvc는 Spring MVC의 테스트 지원 클래스로, HTTP 요청 및 응답을 시뮬레이트하고 컨트롤러를 테스트하는 데 사용됩니다. 
+	MockHttpServletRequestBuilder.session() 메서드를 사용하여 테스트할 세션을 설정할 수 있으며, HttpServletRequest.getSession()을 사용하여 테스트 중인 세션에 액세스할 수 있습니다.
+
+	따라서, Spring에서 세션을 사용할 때 new Session()을 사용하지 않고 HttpServletRequest.getSession()을 사용하는 이유는 세션 관리, 세션 스코프 빈 사용, 테스트 용이성 등의 이점이 있기 때문입니다.	
