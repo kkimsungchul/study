@@ -5,11 +5,11 @@
 2) Jenkins를 사용한 빌드/배포 자동화
 1-2. 프로젝트
 1-2-1. 사업명: KT 사내 개발자 포털(Dev-Space Portal) 서비스 개발 및 유지보수
-1)	고객사: KTds
-2)	기간: 2021.10 ~ 현재
-3)	역할: PL (Backend Developer)
-4)	환경: SpringBoot / PostgreSQL / Linux
-5)	업무 내용 및 성과
+1) 고객사: KTds
+2) 기간: 2021.10 ~ 현재
+3) 역할: PL (Backend Developer)
+4) 환경: SpringBoot / PostgreSQL / Linux
+5) 업무 내용 및 성과
 > 고객요구사항 개발 가능 검토
 > Rest API 를 사용하여 포털 사이트를 개발
 > 불필요한 리소스 제거에 소요 시간 감소를 위한 DevOps Tool(Gitlab,Jenkins,Sparrow)의 데이터 동기화 기능 개발
