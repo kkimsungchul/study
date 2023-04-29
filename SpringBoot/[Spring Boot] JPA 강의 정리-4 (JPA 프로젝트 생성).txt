@@ -1,0 +1,128 @@
+# SpringBoot - JPA 강의 정리-4(JPA 프로젝트 생성)
+
+# H2 데이터베이스 설치와 실행
+	- 다운로드 링크 : https://www.h2database.com
+	- 가벼움
+	- 웹용 쿼리툴 제공
+	- MySQL , Oracle 데이터베이스 시뮬레이션 기능
+	- 시퀀스, AUTO INCREMENT 기능 지원
+
+# H2 데이터베이스 설치 후 접속
+	- 다운로드 링크 : https://www.h2database.com
+	1. 윈도우용 파일 다운로드 후 설치
+	2. 설치 후 H2 Console 실행
+	3. web 브라우저에서 아래의 내용 설정
+		저장한 설정 : Generic H2(Server)
+		설정 이름 : Generic H2(Server)
+		드라이버 클래스 : org.h2.Driver
+		JDBC URL : jdbc:h2:~/test
+		사용자명 : sa
+		비밀번호 : 
+		※ 비밀번호는 입력하지 않음
+		※ 저장한 설정만 바꾸고 나머지는 디폴트임
+	4. 연결 클릭
+		- 브라우저 접속
+			http://127.0.0.1:8082/
+		- 추후 연결할 경우 JDBC URL 을 아래와 같이 변경 후 연결
+			jdbc:h2:tcp://localhost/~/test
+		
+
+	※ 오류발생
+		Database "C:/Users/sung/test" not found, either pre-create it or allow remote database creation (not recommended in secure environments) [90149-214] 90149/90149 
+		위 오류는 데이터베이스가 없을 경우 발생하므로 JDBC에 값을 아래와 같이 변경 후 연결 
+		JDBC URL : jdbc:h2:~/test
+		
+		jdbc:h2:~/test 로 계속 연결해도 되는데 파일에 락이 걸려서 접속 못하는 문제가 있다고 함
+
+# 프로젝트 생성
+	※ maven 프로젝트로 진행함, 강의에서 maven 사용하기때문임
+	※ 하이버네이트 버전은 강의와 똑같고, H2 버전은 내가 내려받은 데이터베이스 버전이랑 맞춤
+	※ 다른 버전 사용시 레퍼런스 확인
+		https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/
+	1. 프로젝트 생성
+		File 
+		-> new
+		-> Project
+		-> Generators : Maven Archetype
+		-> Name : jpaStudy
+			Language : JAVA
+			Build system : Maven
+	
+	2. pom.xml 작성
+		=====================================================================
+		<dependencies>
+			<!--JPA 하이버 네이트-->
+			<dependency>
+				<groupId>org.hibernate</groupId>
+				<artifactId>hibernate-entitymanager</artifactId>
+				<version>5.3.10.Final</version>
+			</dependency>
+			<!--H2 데이터베이스-->
+			<dependency>
+				<groupId>com.h2database</groupId>
+				<artifactId>h2</artifactId>
+				<version>2.1.214</version>
+			</dependency>
+		</dependencies>
+		=====================================================================
+		
+		위와 같이 작성하면 해당 라이브러리를 찾을수 없다고 오류가 나옴
+		그러면 IntelliJ 우측 모서리에 있는 Maven을 클릭하여 
+		Download Sources and/or Documentation 버튼 클릭
+		※ 버튼은 내려받기 모양임
+		※ 밑줄이 그어진건 무시하자, CVE 취약점 있다는 내용임
+
+# JPA 설정하기 - persistence.xml
+	참고링크 : https://atoz-develop.tistory.com/entry/JPAHibernate-persistencexml-%EC%84%A4%EC%A0%95-%EB%B0%A9%EB%B2%95
+	
+	1. 파일 생성 위치
+		META-INF/persistence.xml
+	
+	2. 설정파일 내용 작성
+		=====================================================================
+		<?xml version="1.0" encoding="UTF-8"?>
+		<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+					 version="2.2">
+			<persistence-unit name="simple-jpa-application">
+				<properties>
+					<!-- 필수 속성 -->
+					<property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
+					<property name="javax.persistence.jdbc.user" value="sa"/>
+					<property name="javax.persistence.jdbc.password" value=""/>
+					<property name="javax.persistence.jdbc.url" value="jdbc:h2:tcp://localhost/~/test"/>
+					<property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
+					<!-- 옵션 -->
+					<!-- 콘솔에 하이버네이트가 실행하는 SQL문 출력 -->
+					<property name="hibernate.show_sql" value="true"/>
+					<!-- SQL 출력 시 보기 쉽게 정렬 -->
+					<property name="hibernate.format_sql" value="true"/>
+					<!-- 쿼리 출력 시 주석(comments)도 함께 출력 -->
+					<property name="hibernate.use_sql_comments" value="true"/>
+					<!-- JPA 표준에 맞춘 새로운 키 생성 전략 사용 -->
+					<property name="hibernate.id.new_generator_mappings" value="true"/>
+					<!-- 애플리케이션 실행 시점에 데이터베이스 테이블 자동 생성 -->
+					<!-- 아래의 옵션에서 create를 적용하면 어플리케이션 실행 시 DB를 초기화 하므로 조심해서 사용해야함-->
+					<property name="hibernate.hbm2ddl.auto" value="create"/>
+					<!-- 이름 매핑 전략 설정 - 자바의 카멜 표기법을 테이블의 언더스코어 표기법으로 매핑
+					 ex) lastModifiedDate -> last_modified_date -->
+					<property name="hibernate.ejb.naming_strategy" value="org.hibernate.cfg.ImprovedNamingStrategy"/>
+				</properties>
+			</persistence-unit>
+		</persistence>
+		=====================================================================
+	
+	※ hibernate.dialect 설정에는 사용할 데이터베이스의 속성을 지정
+		H2 : H2Dialect
+		Oracle : Oracle10gDialect
+		MySQL : MySQL5Dialect 또는 MySQL5InnoDBDialect 
+
+
+
+# 데이터베이스 방언
+	- JPA는 특정 데이터베이스에 종속X
+	- 각각의 데이터베이스가 제공하는 SQL 문법과 함수는 조금씩 다름
+		* 가변 문자 : MySQL 은 VARCHAR , Oracle은 VARCHAR2
+		* 문자열을 자르는 함수 : SQL 표준은 SUBSTRING() , Oracle은 SUBSTR()
+		* 페이징 : MySQL 은 LIMIT , Oracle은 ROWNUM
+	- 방언 : SQL표준을 지키지 않는 특정 데이터베이스만의 고유한 기능
+	- 하이버네이트는 40가지의 데이터베이스를 지원

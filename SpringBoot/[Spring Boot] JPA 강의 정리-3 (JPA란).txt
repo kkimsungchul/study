@@ -1,0 +1,121 @@
+# SpringBoot - JPA 강의 정리-3(JPA란)
+
+# JPA
+	Java Persistence API
+	자바 진영의 ORM 기술 표준
+	JPA는 어플리케이션과 JDBC 사이에 동작
+		JAVA어플리케이션 - JPA - JDBC API - SQL - DB
+	JPA는 인터페이스의 모임
+	JPA 2.1 표준 명세를 구현한 3가지 구현체
+	하이버네이트, EclipseLink , DataNucleus
+
+# JPA 버전
+	1.0(JSR 220) 2006년 : 초기버전, 복합 키와 연관관계 기능이 부족
+	2.0(JSR 317) 2009년 : 대부분의 ORM 기능을 포함, JPA Criteria 추가
+	2.1(JSR 338) 2013년 : 스토어드 프로시저 접근, 컨버터(Converter), 엔티티 그래프 기능 추가
+
+# ORM
+	Object-relational mapping(객체 관계 매핑)
+	객체는 객체대로 설계
+	관계형 데이터베이스는 관계형 데이터베이스대로 설계
+	ORM 프레임워크가 중간에서 매핑
+	대중적인 언어에는 대부분 ORM 기술이 존재
+
+# JPA 동작 
+	- 저장
+		MemberDAO
+		-> JPA
+			Entity 분석
+			INSERT SQL 생성
+			JDBC API 사용
+			패러다임 불일치 해결
+		-> INSERT SQL
+		-> DB
+	
+	- 조회
+		MemberDAO
+		-> JPA
+			SELECT SQL 생성
+			JDBC API 사용
+			ResultSet 매핑
+			패러다임 불일치 해결
+		-> SQL
+		-> DB
+		-> 결과 반환
+		-> Entity Object
+
+# JPA 사용 이유
+	SQL 중심적인 개발에서 객체 중심으로 개발
+	생산성 향상
+	유지보수 편리함
+	패러다임의 불일치 해결
+	성능 상향
+	데이터 접근 추상화와 벤더 독립성
+	표준
+
+# 생산성
+	JAVA 컬렉션에서 데이터 변경하듯이 할수 있음
+
+	저장 : jpa.persist(member)
+	조회 : Member member = jpa.find(memberId)
+	수정 : member.setName("변경할 이름")
+	삭제 : jpa.remove(member)
+
+# 유지보수
+	VO필드 변경시 관련된 모든 쿼리를 수정해야함.
+	JPA를 사용하면 그럴일이 없음
+
+# 패러다임의 불일치 해결
+	1. JPA와 상속
+		개발자가 했던 쿼리작성을 JPA가 전부다 함	
+	
+	2. JPA와 연관관계
+		연관관계를 저장할수 있음
+		member.setTeam(team);
+		spa.persist(member);
+	3. JPA와 객체 그래프 탐색
+		Member member = jpa.find(Member.class , memberId);
+		Team team = member.getTeam();
+
+	4. 신리할수 있는 엔티티, 계층
+
+	5. JPA와 비교하기
+		동일한 트랙잭션에서 조회한 엔티티는 같음을 보장함
+
+# JPA의 성능 최적화 기능
+	1. 1차 캐시와 동일성(identity) 보장
+		- 같은 트랜잭션 안에서는 같은 엔티티를 반환 - 약간의 조회 성능 향상
+		- DB Isolation Level이 Read Commit이어도 어플리케이션에서 Repeatable Read 보장
+		
+		SQL을 한번만 실행함
+		※ 같은 데이터베이스 트랜잭션 안에서만 가능함
+		=====================================================================
+		String memberId = 100;
+		Member m1 = jpa.find(Member.class , memberId);	//SQL
+		Member m2 = jpa.find(Member.class , memberId);	//캐시
+		m1==m2 //true
+		=====================================================================
+
+	2. 트랜잭션을 지원하는 쓰기 지연(transactional write-behind)
+		- 트랜잭션을 커밋할 때 까지 INSERT SQL을 모음
+		- JDBC BATCH SQL 기능을 사용해서 한번에 SQL 전송
+		
+		=====================================================================
+		transaction.begin();
+
+		em.persist(memberA);
+		em.persist(memberB);
+		em.persist(memberC);
+		//여기까지 INSERT SQL 을 데이터베이스에 보내지 않음
+
+		//커밋하는 순간 데이터베이스에 INSERT SQL을 모아서 보냄
+		transaction.commit();
+		=====================================================================
+
+	3. 지연 로딩(Laza Loading)과 즉시로딩
+		지연 로딩 : 객체가 실제 사용될 때 로딩
+			SELECT * FROM MEMBER;
+			SELECT * FROM TEAM;
+
+		즉시 로딩 : JOIN SQL로 한번에 연관된 객체까지 미리 조회
+			SELECT * FROM MEMBER JOIN TEAM...

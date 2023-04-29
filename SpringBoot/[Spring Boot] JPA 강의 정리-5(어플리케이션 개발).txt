@@ -1,0 +1,204 @@
+# SpringBoot - JPA 강의 정리-5(어플리케이션 개발)
+
+# JPA 구동 방식
+	1. Persistence 클래스에서 실행
+	
+	2. MATA-INF/persistence.xml 설정정보 읽음
+
+	3. EntityManagerFactory 에서 EntityManager 클래스 생성
+
+
+# Main 클래스 생성
+	
+	=====================================================================
+	package org.hello.jpa;
+
+	import javax.persistence.EntityManagerFactory;
+	import javax.persistence.Persistence;
+
+	public class JpaMain {
+		public static void main(String[] args) {
+			EntityManagerFactory entityManagerFactory =  Persistence.createEntityManagerFactory("hello");
+
+		}
+	}
+	=====================================================================
+
+
+	※ 오류 발생
+		Exception in thread "main" java.lang.NoClassDefFoundError: javax/xml/bind/JAXBException
+		해당 오류는 java 8에서 사용하던 jaxb-api 가 java 11버전부터는 삭제되었음
+		현재 Java 17사용중
+		Maven에 아래의 라이브러리 추가
+		=====================================================================
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.0</version>
+        </dependency>
+		=====================================================================
+
+# 테이블 생성
+	접속 : http://127.0.0.1:8082/
+		jdbc:h2:tcp://localhost/~/test
+	
+	테이블 생성 
+		=====================================================================
+		create table Member(
+			id bigint not null,
+			name varchar(255),
+			primary key(id)
+		)
+		=====================================================================
+
+		
+# 매핑 클래스 생성
+	=====================================================================
+	package org.hello.jpa;
+
+	import javax.persistence.Entity;
+	import javax.persistence.Id;
+
+
+	@Entity //필수
+	public class Member {
+		@Id
+		private Long id;
+		private String name;
+
+		public Long getId() {
+			return id;
+		}
+		public void setId(Long id) {
+			this.id = id;
+		}
+		public String getName() {
+			return name;
+		}
+		public void setName(String name) {
+			this.name = name;
+		}
+	}
+
+	=====================================================================
+
+
+# 기본적인 JAP 커넥션 및 INSERT 쿼리
+	=====================================================================
+	package org.hello.jpa;
+
+	import javax.persistence.EntityManager;
+	import javax.persistence.EntityManagerFactory;
+	import javax.persistence.EntityTransaction;
+	import javax.persistence.Persistence;
+
+	public class JpaMainCreate {
+		public static void main(String[] args) {
+
+			//EntityManagerFactory는 클래스 로딩시점에 하나만 만들어야함
+			EntityManagerFactory emf =  Persistence.createEntityManagerFactory("hello");
+			//DB커넥션을 얻고 쿼리를 날릴때 마다 생성해줘야함
+			EntityManager em = emf.createEntityManager();
+			//jpa는 트랜잭션안에서 작업해야함 쿼리문 실행할때 DB커넥션을 받아와야함
+			EntityTransaction tx = em.getTransaction();
+			//트랜잭션 실행
+			tx.begin();
+			try{
+				Member member = new Member();
+				member.setId(1L);
+				member.setName("HelloA");
+				em.persist(member);
+				tx.commit();
+			}catch (Exception e){
+				e.printStackTrace();
+				tx.rollback();
+			}finally {
+				//사용을 다하면 닫아줘야함
+				em.close();
+			}
+			emf.close();
+		}
+	}
+	=====================================================================
+
+# CRUD 실행
+	CRUD는 내용이 길어서 별도의 코드 링크로 대체함
+	아래의 링크에 들어가서 CRUD 이름에 맞는 클래스를 확인
+	https://github.com/kkimsungchul/study_code/tree/main/jpaStudy/src/main/java/org/hello/jpa
+
+
+# 주의사항
+	- EntityManagerFactory는 하나만 생성해서 어플리케이션 전체에서 공유하여 사용
+	- EntityManager는 쓰레드간에 공유X (사용하고 버려야 함)
+	- JPA의 모든 데이터 변경은 트랜잭션 안에서 실행해야함
+
+# JPQL 소개
+	- 가장 단순한 조회 방법
+		EntityManager.find()
+		객체 그래프 탐색( a.getB().getC() )
+
+	- JPA를 사용하면 Entity 객체를 중심으로 개발
+	- JPA는 SQL을 추상화한 JPQL이라는 객체 지향 쿼리 언어 제공
+	- 객체지향적 쿼리를 생성해줌
+		사용하는 DB에 맞도록 쿼리문이 작성됨
+	- 검색을 할 때도 테이블이 아닌 Entity 객체를 대상으로 검색
+	- 모든 DB 데이터를 객체로 변환해서 검색하는 것은 불가능
+	- 어플리케이션이 필요한 데이터만 DB에서 불러오려면 결국 검색 조건이 포함된 SQL이 필요함
+	- SQL과 문법 유사, SELECt , FROM , WHERE , GROUP BY , HAVING , JOIN 지원
+	- JPQL은 엔티티 객체를 대상으로 쿼리
+	- SQL은 데이터베이스 테이블을 대상으로 쿼리
+	- SQL을 추상화 해서 특정 데이터베이스 SQL에 의존하지 않음
+	=====================================================================
+	package org.hello.jpa;
+
+	import javax.persistence.EntityManager;
+	import javax.persistence.EntityManagerFactory;
+	import javax.persistence.EntityTransaction;
+	import javax.persistence.Persistence;
+	import java.util.List;
+
+	public class JpaMainJPQL {
+		public static void main(String[] args) {
+
+			//EntityManagerFactory는 클래스 로딩시점에 하나만 만들어야함
+			EntityManagerFactory emf =  Persistence.createEntityManagerFactory("hello");
+			//DB커넥션을 얻고 쿼리를 날릴때 마다 생성해줘야함
+			EntityManager em = emf.createEntityManager();
+			//jpa는 트랜잭션안에서 작업해야함 쿼리문 실행할때 DB커넥션을 받아와야함
+			EntityTransaction tx = em.getTransaction();
+			//트랜잭션 실행
+			tx.begin();
+			try{
+				//Member 객체를 대상으로 쿼리를 작성
+				List<Member> members= em.createQuery("select m from Member as m",Member.class)
+						.setFirstResult(1)//시작
+						.setMaxResults(8)//최대갯수
+						.getResultList();
+				for (Member m: members) {
+					System.out.println(m);
+				}
+				tx.commit();
+			}catch (Exception e){
+				e.printStackTrace();
+				tx.rollback();
+			}finally {
+				//사용을 다하면 닫아줘야함
+				em.close();
+			}
+			emf.close();
+		}
+	}
+	=====================================================================
+
+	실행된 쿼리문
+	=====================================================================
+	Hibernate: 
+		/* select
+			m 
+		from
+			Member as m */ select
+				member0_.id as id1_0_,
+				member0_.name as name2_0_ 
+			from
+				MEMBER member0_
+	=====================================================================

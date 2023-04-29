@@ -1,0 +1,86 @@
+# JPA 강의 정리-2(객체와 관계형 데이터베이스의 차이)
+
+	요약 : 계층형 아키텍처의 진정한 의미인 계층 분할이 어렵다.
+		물리적으로는 분할되어있으나, 논리적으로는 엮어 있다.
+		객체지향적으로 모델링 할수록 매핑작업만 늘어남.
+
+	RDB에서는 상속이란 개념이 없음, 대신 슈퍼타입-서브타입 관계가 있음
+	item이 있고, item 밑에 여러 종류의 아이템(ex. Album)이 있다고 했을때
+	조회 할때는 join을 해서 해야함
+	item 객체가 늘어날 수록 쿼리문의 갯수도 늘어남
+	=====================================================================
+	insert into item...
+	insert into album...
+
+	select * from item i join album a on i.id = b.id
+	=====================================================================
+
+
+	자바 컬렉션에 저장할때는 아래와 같음
+	=====================================================================
+	List<Item> itemList = new ArrayList<>();
+	itemList.add(album);
+	itemList.add(item)
+	Item item = itemList.get(i);
+	Album album = itemList.get(i);
+	=====================================================================
+
+	객체는 참조를 사용하지만 테이블은 외래키를 사용
+	=====================================================================
+	item i join album a on i.id = a.id
+	=====================================================================
+
+	JAVA 에서의 객체 모델링
+	=====================================================================
+	class member{
+		String id;			//MEMEBER_ID 컬럼 사용
+		Team team;			//참조로 연관관계를 맺음
+		String userName;	//USERNAME 컬컬럼 사용
+
+		Team getTeam(){
+			return team;
+		}
+	}
+
+	class Team{
+		Long id;			//TEAM_ID PK 사용
+		String name;		//NAME 컬럼 사용
+	}
+	=====================================================================
+	
+	위와같이 객체로 모델링을 하면 데이터베이스 insert 시에 까다로움
+	조회시에도 join을 해서 가져와야하며, java의 객체에 넣을때도 setTeam을 해줘야함
+	=====================================================================
+	insert into member(member_id , team_id , username) values ...
+	=====================================================================
+	
+	객체는 자유롭게 객체 그래프를 탐색할수 있어야 함
+	근데 쿼리에서 조회해온 데이터에 따라서 탐색 범위가 결정이됨
+
+	비교할 경우에도 어려움.
+	아래와 같이 JDBC를 사용하여 데이터를 조회 해온 경우 데이터를 == 비교하면 다르다고 출력이 됨
+	=====================================================================
+	class MemberDAO{
+		public Member getMember(String memberId){
+			String sql = "SELECT * FROM MEMBER WHERE MEMBER_ID = ?";
+			...
+
+			return new Member(...);
+		}
+	}
+	String memberId = "100";
+	Member member1 = memberDAO.getMember(memberId);
+	Member member2 = memberDAO.getMember(memberId);
+	member1 == member2; //false
+	=====================================================================
+
+	자바 컬렉션에서 가져온 데이터를 비교할 경우
+	=====================================================================
+	String memberId = "100";
+	Member member1 = list.getMember(memberId);
+	Member member2 = list.getMember(memberId);
+	member1 == member2; //true
+	=====================================================================
+
+
+
