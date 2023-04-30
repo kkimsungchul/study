@@ -1,0 +1,237 @@
+# SpringBoot - JPA 강의 정리-6(JPA 내부 구조 - 영속)
+
+# 객체와 관계형 데이터베이스 매핑하기
+
+# 영속성 컨텍스트
+	JPA를 이해하는데 가장 중요한 용어
+	Entity를 영구 저장하는 환경
+	EntityManager.persist(entity);
+
+	영속성 컨텍스트는 논리적인 개념
+	EntityManager를 통해서 영속성 컨텍스트에 접근
+
+
+	- J2SE 환경
+		EntityManager 영속성 컨텍스트가 1:1
+		EntityManager -> PersistenceContext
+
+	
+	- J2EE , 스프링 프레임워크 같은 컨테이너 환경
+		EntityManager와 영속성 컨텍스트가 N:1
+		EntityManager ->
+		EntityManager -> PersistenceContext
+		EntityManager ->
+
+	
+
+
+# Entity의 생명주기
+	
+	- 비영속 (new / transient)
+		영속성 컨텍스트와 전혀 관계가 없는 새로운 상태
+	
+	- 영속 (managed)
+		영속성 컨텍스트에 관리되는 상태
+	
+	- 준영속 (detached)
+		영속성 컨텍스트에 저장되었다가 분리된 상태
+
+	- 삭제 (removed)
+		삭제된 상태
+
+
+# 비영속
+	=====================================================================
+	//객체를 생성한 상태(비영속)
+	Member member = new Member();
+	member.setId("member1");
+	member.setUsername("회원1");
+	=====================================================================
+
+# 영속
+	영속 상태가 됐다고 해서 DB에 쿼리가 날라가지 않음
+	commit을 해야 쿼리가 날라감
+	=====================================================================
+	//객체를 생성한 상태(비영속)
+	Member member = new Member();
+	member.setId("member1");
+	member.setUsername("회원1");
+	
+	EntityManager em = emf.createEntityManager();
+	em.getTransaction().begin();
+	
+	//객체를 저장한 상태(영속)
+	em.persist(member);
+
+	tx.commit(); //여기서 DB에 쿼리를 날림
+	
+	=====================================================================
+
+
+	
+# 영속성 컨텍스트의 이점
+	1. 1차 캐시
+	2. 동일성(identity) 보장
+	3. 트랜잭션을 지원하는 쓰기 지연 (transactional write-behind)
+	4. 변경 감지 (Dirty Checking)
+	5. 지연 로딩 (Lazy Loading)
+
+# 1차 캐시
+	※ 고객의 비지니스 요청이 끝나면 EntityManager가 지워지므로 그렇게 큰 이점이 없음
+	- 한번 조회한 데이터를 또 조회하면 1차 캐시에서 조회 함 (동일한 트랜잭션 안에서만)
+	- 없을 경우 DB에서 조회함
+	- DB에서 조회가 될 경우 다시 1차 캐시에 저장함
+	
+	예시 
+		=====================================================================
+		Member member = new Member();
+		member.setId(100L);
+		member.setName("member100");
+		em.persist(member);//1차 캐시에 저장
+
+		//DB에있는 데이터가 아닌 1차 캐시에 있는 데이터를 가져옴
+		System.out.println(em.find(Member.class,100L));
+		=====================================================================
+
+	위의 코드 출력
+		조회가 먼저 된 후 insert 쿼리가 실행됨
+		=====================================================================
+		Member{id=100, name='member100'}
+		Hibernate: 
+			/* insert org.hello.jpa.Member
+				*/ insert 
+				into
+					MEMBER
+					(name, id) 
+				values
+					(?, ?)
+
+		=====================================================================
+	
+		똑같은 조회를 두번 요청함
+		=====================================================================
+		Member findMember1 = em.find(Member.class,100L);
+		Member findMember2 = em.find(Member.class,100L);
+		System.out.println(findMember1);
+		System.out.println(findMember2);
+		=====================================================================
+
+		실행 결과 쿼리는 한번만 실행됨
+		=====================================================================
+		Hibernate: 
+			select
+				member0_.id as id1_0_0_,
+				member0_.name as name2_0_0_ 
+			from
+				MEMBER member0_ 
+			where
+				member0_.id=?
+		Member{id=100, name='member100'}
+		Member{id=100, name='member100'}
+		=====================================================================
+
+# 영속 엔티티의 동일성(identity) 보장
+	1차 캐시로 반복 가능한 읽기(REPEATABLE READ) 등급의 트랜잭션 격리 수준을 데이터베이스가 아닌 어플리케이션 차원에서 제공
+	=====================================================================
+	Member findMember1 = em.find(Member.class,100L);
+	Member findMember2 = em.find(Member.class,100L);
+	System.out.println(findMember1==findMember2);	
+	=====================================================================
+	
+	결과
+	=====================================================================
+	true
+	=====================================================================
+
+# 엔티티 등록 시 트랜잭션을 지원하는 쓰기 지연 (transactional write-behind)
+	BufferWrite 이점을 얻을수 있음
+
+	=====================================================================
+	tx.begin(); //트랜잭션 시작
+	Member member = new Member();
+	member.setId(101L);
+	member.setName("member101");
+	//1차 캐시에 저장, SQL 쿼리를 실행하지 않고 쿼리만 생성함
+	//쓰기 지연 SQL 저장소에 저장
+	em.persist(member);
+
+	Member member2 = new Member();
+	member.setId(102L);
+	member.setName("member102");
+	//1차 캐시에 저장, SQL 쿼리를 실행하지 않고 쿼리만 생성함
+	//쓰기 지연 SQL 저장소에 저장
+	em.persist(member);
+	//여기까지 INSERT SQL을 데이터베이스에 보내지 않음
+	
+	tx.commit();//commit 하는 시점에 쓰기 지연 SQL 저장소에 있는  INSERT 쿼리가 실행됨	
+	=====================================================================
+
+	persistence.xml 파일에서 아래의 옵션을 추가하면 쿼리를 모아서 날리는 사이즈를 정할수 있음
+	=====================================================================
+	<!--아래의 사이즈만큼 쿼리를 모았다가한번에 쿼리를 날림-->
+	<property name="hibernate.jdbc.batch_size" value="10"/>
+	=====================================================================
+
+# 엔티티 수정시 변경 감지 (Dirty Checking)
+	데이터 수정시에는 em.persist(findMember); 를 해주지 않아도 됨
+	1. flush()
+	2. Entity와 스냅샷 비교
+	3. UPDATE SQL 생성
+	=====================================================================
+	Member findMember = em.find(Member.class,100L);
+	findMember.setName("zzzzz");//데이터 수정
+	//JPA가 자동으로 업데이트를 쳐주므로 쿼리를 보내지않아도 됨
+	//em.persist(findMember);
+	tx.commit();//commit 하는 시점에 쓰기 지연 SQL 저장소에 있는  INSERT 쿼리가 실행됨
+	=====================================================================
+	
+	삭제 또한 commit 시점에 실행됨
+	em.remove(findMember);
+	
+
+# 플러시 (flush)
+	영속성 컨텍스트의 변경 내용을 데이터베이스에 반영
+	commit이 실행될때 flush가 실행됨
+	쓰기 지연 SQL 저장소에 있는 쿼리들이 DB에 반영이 되는 과정
+	
+	영속성 컨텍스트를 비우지 않음
+	영속성 컨텍스트의 변경내용을 데이터베이스에 동기화
+	트랜잭션이라는 작업 단위가 중요 -> 커밋 직전에만 동기화 하면 됨
+	
+	영속성 컨텍스트와 트랜잭션의 주기를 맞춰서 설계해야 문제가 없음
+
+	- 플러시 발생
+		변경 감지
+		수정된 엔티티 쓰기 지연 SQL 저장소에 등록
+		쓰기 지연 SQL 저장소의 쿼리를 데이터베이스에 전송 (등록,수정,삭제 쿼리)
+	
+	- 플러시 하는 방법
+		직접 호출 : em.flush()
+		플러시 자동 호출 : 트랜잭션 커밋 , em.commit();
+		플러시 자동 호출 : JPQL 쿼리 실행
+	
+	- JPQL 실행
+		=====================================================================
+		em.persist(memberA);
+		em.persist(memberB);
+		em.persist(memberC);
+		
+		//자동으로 플러시가 실행이 안되면 아래의 데이터에선 위에 추가한 memberA , memberB , memberC가 보이지 않음
+		//그렇기에 자동으로 실행 한 후 아래의 쿼리 실행
+		query = em.createQuery("select * from member",Member.class);
+		List<Member> members = query.getResultList();
+		=====================================================================
+	
+	- 플러시 모드 옵션
+		em.setFlushMode(FlushModeType.AUTO)
+			기본값 , 커밋이나 쿼리를 실행할 때 플러시
+
+		em.setFlushMode(FlushModeType.COMMIT)
+			커밋할 때만 플러시 
+			쓰기 지연 SQL 저장소에 등록되어 있는 쿼리와 SELECT 쿼리가 상관 없을때 써도되나,, 그냥 AUTO로 냅두는게 젤 좋음
+		
+
+
+# 지연 로딩 (Lazy Loading)
+	member.getTeam(); 쿼리를 나중에 날리는 기능
+	실무에서 가장 중요하므로 별도로 정리
