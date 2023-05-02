@@ -4,3 +4,121 @@
 	회원은 상품을 주문할 수 있다.
 	주문 시 여러 종류의 상품을 선택할 수 있다.
 
+# 테이블과 엔티티 설계
+
+	MEMBER
+		MEMBER_ID			Long
+		NAME				String
+		CITY				String
+		STREET				String
+		ZIPCODE				String
+
+	ORDERS
+		ORDER_ID			Long
+		MEMBER_ID (FK)		Long
+		ORDERDATE			Date
+		STATUS				OrderStatus
+	
+	ORDER_ITEM
+		ORDER_ITEM_ID (FK)	Long
+		ORDER_ID (FK)		Long
+		ITEM_ID				Long
+		ORDERPRIC			int
+		COUNT				int
+
+	ITEM
+		ITEM_ID				Long
+		NAME				String
+		PRICE				int
+		STOCKQUANTITY		int
+
+# 그래들로 JPA 프로젝트 생성
+	File
+	-> project
+	-> 그래들 선택후 프로젝트 성성
+	name : jpashop
+
+# 그래들 프로젝트 설정
+	build.gradle
+	=================================================================================================================
+	plugins {
+		id 'java'
+	}
+
+	group = 'com.jpabook'
+	version = '1.0-SNAPSHOT'
+
+	repositories {
+		mavenCentral()
+	}
+
+	dependencies {
+		testImplementation platform('org.junit:junit-bom:5.9.1')
+		testImplementation 'org.junit.jupiter:junit-jupiter'
+		implementation group: 'org.hibernate', name: 'hibernate-entitymanager', version: '5.3.10.Final'
+		implementation group: 'com.h2database', name: 'h2', version: '2.1.214'
+		implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'
+	}
+
+	test {
+		useJUnitPlatform()
+	}
+
+	=================================================================================================================
+
+# persistence.xml 파일 설정
+	maven과 다르게 <class>com.jpabook.jpashop.domain.Member</class> 이 추가되었음.
+	gradle로 할때 클래스 인식이 자동으로 안되는 경우가 있다고 함.
+	=================================================================================================================
+	<?xml version="1.0" encoding="UTF-8"?>
+	<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+				 version="2.2">
+		<!--데이터베이스 유닛 이름-->
+		<persistence-unit name="jpaShop">
+			<!--gradle로 할때 클래스 인식이 자동으로 안되는 경우가 있음-->
+			<class>com.jpabook.jpashop.domain.Member</class>
+			<properties>
+				<!-- 필수 속성 -->
+				<property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
+				<property name="javax.persistence.jdbc.user" value="sa"/>
+				<property name="javax.persistence.jdbc.password" value=""/>
+				<property name="javax.persistence.jdbc.url" value="jdbc:h2:tcp://localhost/~/test"/>
+				<property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
+				<!-- 옵션 -->
+				<!-- 콘솔에 하이버네이트가 실행하는 SQL문 출력 -->
+				<property name="hibernate.show_sql" value="true"/>
+				<!-- SQL 출력 시 보기 쉽게 정렬 -->
+				<property name="hibernate.format_sql" value="true"/>
+				<!-- 쿼리 출력 시 주석(comments)도 함께 출력 -->
+				<property name="hibernate.use_sql_comments" value="true"/>
+				<!-- JPA 표준에 맞춘 새로운 키 생성 전략 사용 -->
+				<property name="hibernate.id.new_generator_mappings" value="true"/>
+				<!-- 애플리케이션 실행 시점에 데이터베이스 테이블 자동 생성 -->
+				<!--<property name="hibernate.hbm2ddl.auto" value="create"/>-->
+				<property name="hibernate.hbm2ddl.auto" value="create"/>
+
+				<!-- 이름 매핑 전략 설정 - 자바의 카멜 표기법을 테이블의 언더스코어 표기법으로 매핑
+				 ex) lastModifiedDate -> last_modified_date -->
+				<property name="hibernate.ejb.naming_strategy" value="org.hibernate.cfg.ImprovedNamingStrategy"/>
+
+				<!--아래의 사이즈만큼 쿼리를 모았다가한번에 쿼리를 날림-->
+				<property name="hibernate.jdbc.batch_size" value="10"/>
+
+			</properties>
+		</persistence-unit>
+	</persistence>
+
+	=================================================================================================================
+
+
+
+# DB 생성
+	1. 윈도우 으측하단의 H2콘솔 우클릭
+	2. create a new Database 클릭
+	3. 아래의 값 입력
+		Database path : C:/Users/USER/jpashop
+		username : sa
+		password : sa1234
+		password confirmation : sa1234
+
+# 
