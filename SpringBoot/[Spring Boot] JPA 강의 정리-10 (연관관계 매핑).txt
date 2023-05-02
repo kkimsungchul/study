@@ -1,5 +1,10 @@
 # SpringBoot - JPA 강의 정리-10(연관관계 매핑)
 
+# 용어 이해
+	방향(Direction) : 단방향 , 양방향
+	다중성 (Multiplicity) : 다대일(N:1) , 일대다(1:N), 일대일(1:1) , 다대다(N:M) 이해
+	연관관계의 주인(Owner) : 객체 양방향 연관관계는 관리 주인 필요
+
 # 테이블 중심 설계의 문제점
 	- 현재 방식은 객체 설계를 테이블 설계에 맞춘 방식
 	- 테이블의 외래키를 객체에 그대로 가져옴
@@ -7,22 +12,257 @@
 	- 참조가 없으므로 UML도 잘못됨
 
 
+# 객체를 테이블에 맞추어 데이터 중심으로 모델링하면, 협력 관계를 만들 수 없다.
+	- 테이블은 외래 키로 조인을 사용해서 연관된 테이블을 찾는다.
+	- 객체는 참조를 사용해서 연관된 객체를 찾는다.
+	- 테이블과 객체 사이에는 이런 큰 간격이 있다.
+
 # 연관관계가 필요한 이유
 	객체지향 설계의 목표는 자율적인 객체들의 협력 공동체를 만드는 것이다.
 
+# 단방향 연관 관계
+	객체 지향 모델링 (객체 연관관계 사용)
+	@ManyToOne : N:1
+	@OneToMany : 1:N
+	@JoinColumn : 조인 컬럼명(DB의 FK)
 
-# 객체와 테이블 연관관계의 차이를 이해
+	Member (여러개) -> Team(한개)
+	=====================================================================
+	class Member{
+		@ManyToOne
+		@JoinColumn(name ="TEAM_ID")
+		private Team team;
+	}
+	=====================================================================
 
-# 객체의 참조와 테이블의 외래 키를 매핑
+	Team (한개) -> Member (여러개)
+	=====================================================================
+	class Team{
+		@OneToMany(mappedBy = "team") //연관된 객체의 변수명
+		List<Member> members = new ArrayList<>();
+	}
+	=====================================================================
 
-# 용어 이해
-	방향(Direction) : 단방향 , 양방향
-	다중성 (Multiplicity) : 다대일(N:1) , 일대다(1:N), 일대일(1:1) , 다대다(N:M) 이해
-	연관관계의 주인(Owner) : 객체 양방향 연관관계는 관리 필요
+	작성하려는 객체 기준으로 정하면 되며, 해당 객체 여러개에 하나의 객체면 ManyToOne
+	해당 객체 하나에 연관된 객체 여러개면 OneToMany
+
+
+
+# 양뱡향 연관관계와 연관관계의 주인
+	객체는 참조라는것을 사용
+	테이블은 외래키를 조인하여 사용
+
+# 연관관계의 주인과 mappedBy
+	객체와 테이블간에 연관관계를 맺는 차이를 이해해야 함
+	=====================================================================
+    @OneToMany(mappedBy = "team") //연관된 객체의 변수명
+    private List<Member> members = new ArrayList<>();
+	=====================================================================
 	
+	객체와 테이블의 관계를 맺는 차이
+		객체 연관관계 = 2개
+			회원 -> 팀 연관관계 1개(단방향)
+			팀 -> 회원 연관관계 1개(단방향)
+		테이블 연관관계 = 1개
+			회원 <->팀 연관관계 1개(양방향)
+			
+			아래 두개의 쿼리는 똑같음.
+			=====================================================================
+			SELECT * FROM TEAM T
+			JOIN MEMBER M on T.TEAM_ID = M.TEAM_ID
 
-# 연관관계 매핑
+			SELECT * FROM MEMBER M
+			JOIN TEAM T on T.TEAM_ID = M.TEAM_ID
+			=====================================================================
 
-	@ManyToOne
-	@JoinColumn
+	객체의 양방향 관계
+		- 객체의 양방향 관계는 사실 양뱡향 관계가 아니라 서로 다른 단방향 관계 2개임
+		- 객체를 양뱡향으로 참조하려면 단방향 연관관계를 2개 만들어야 함
+		A -> B(a.getB();)
+		=====================================================================
+		class A{
+			B b;
+		}
+		=====================================================================
+		
+		B -> A(b.getA();)
+		=====================================================================
+		class B{
+			A a;
+		}
+		=====================================================================
+
+# 연관관계의 주인(Owner)
+	딜레마 발생 구간	
+		Member 클래스의 Team team 객체
+
+		Team 클래스의 List<Member> members 객체
+
+		DB MEMBER테이블의 TEAM_ID(FK) 컬럼
+
+		Member 클래스의 team 객체의 TEAM_ID값을 변경하던, 
+		Team 클래스의 members에 들어있는 객체의 TEAM_ID 값을 변경하던,
+		DB입장에선 뭐 누가 바꾸던 상관이 없음.
+		양방향이 되면서 누구를 업데이트 해야 할지를 골라야함
+	
+	양방향 매핑 규칙
+		- 객체의 두 관계중 하나를 연관관계의 주인으로 지정
+		- 연관관계의 주인만이 외래 키를 관리 (등록,수정) ☆☆☆☆☆
+		- 주인이 아닌쪽은 읽기만 가능 ☆☆☆☆☆
+		- 주인은 mappedBy 속성을 사용하면 안됨
+		- 주인이 아니면 mappedBy 속성으로 주인을 지정해줌
+
+	주인(Owner)을 정할때
+		- 비지니스 로직을 기준으로 연관관계의 주인을 선택하면 안됨
+		- 외래키가 있는 곳을 주인으로 정함 ☆☆☆☆☆
+		- @ManyToOne이 있는 곳을 주인으로 지정
+		- @ManyToOne이 있는 곳은 주인이므로 mappedBy속성을 사용할 수 없음
+		- N:1일때 N인쪽이 주인이 되면 됨
+		- 엔티티와 테이블이 매핑된되서 하는게 직관적임
+
+		위에 작성한 Member와 Team의 경우 아래와 같음
+		진짜 매핑 - 연관관계의 주인 (Member.team)
+		가짜 매핑 - 주인의 반대편 (Team.members)
+
+# 양뱡향 매핑시 가장 많이 하는 실수
+	- 연관관계의 주인에 값을 입력하지 않음
+		=====================================================================
+		Member member = new Member();
+		member.setUsername("member1");
+		//member에서 팀을 넣어주지 않았음
+		//member.setTeam("");
+		em.persist(member);
+
+		Team team = new Team();
+		team.setName("TeamA");
+		em.persist(team);
+		team.getMembers().add(member);
+		=====================================================================
+		
+		-DB 쿼리
+		=====================================================================
+		Hibernate: 
+			/* insert org.hello.jpa.member.domain.Member
+				*/ insert 
+				into
+					Member
+					(TEAM_ID, USERNAME, MEMBER_ID) 
+				values
+					(?, ?, ?)
+		Hibernate: 
+			/* insert org.hello.jpa.member.domain.Team
+				*/ insert 
+				into
+					Team
+					(name, TEAM_ID) 
+				values
+					(?, ?)
+
+		=====================================================================
+
+		JPA에서는 mappedBy 속성이 지정되어 있는 객체는 읽기 전용임
+		아래와 같이 해야함
+		=====================================================================
+		Team team = new Team();
+		team.setName("TeamA");
+		em.persist(team);
+
+		Member member = new Member();
+		member.setUsername("member1");
+		member.setTeam(team);
+		em.persist(member);
+		=====================================================================
+
+	- 순수한 객체 관계를 고려하면 항상 양쪽 다 값을 입력해야 함
+	양뱡향에 다 입력을 해주지 않을 경우 1차캐시에서 데이터를 가져오지 못함(없으니까)
+	양뱡향 연관관계를 세팅할때는 양쪽에 다 값을 세팅해주자.
+
+		-아래의 내용은 조회가 됨, flush와 clear을 사용하여 1차 캐시에 있는 쿼리들을 전부다 실행하고 비웠으니까.
+		=====================================================================
+
+		Team team = new Team();
+		team.setName("TeamA");
+		em.persist(team);
+
+		Member member = new Member();
+		member.setUsername("member1");
+		member.setTeam(team);
+		em.persist(member);
+		em.flush();
+		em.clear();
+
+		Team findTeam = em.find(Team.class,team.getId());
+		//실제 사용하는 시점에서 쿼리를 한번 더 날림
+		List<Member> members = findTeam.getMembers();
+
+		for(Member m : members){
+			System.out.println("## m.getUsername() : " + m.getUsername());
+		}
+		=====================================================================
+		근데 위에서 em.flush(); ,em.clear(); 를 제거하면, 값이 조회되지 않음
+
+		양방향에 전부다 데이터를 넣어주면 em.flush(); ,em.clear();를 하지 않아도 이러한 상황이 발생하지 않음
+		=====================================================================
+		Team team = new Team();
+		team.setName("TeamA");
+		em.persist(team);
+
+		Member member = new Member();
+		member.setUsername("member1");
+		member.setTeam(team);
+		em.persist(member);
+
+		team.getMembers().add(member);
+
+		Team findTeam = em.find(Team.class,team.getId());
+		//실제 사용하는 시점에서 쿼리를 한번 더 날림
+		List<Member> members = findTeam.getMembers();
+
+		for(Member m : members){
+			System.out.println("## m.getUsername() : " + m.getUsername());
+		}
+		=====================================================================
+
+# 양뱡향 연관관계 주의 요약
+	- 순수 객체 상태를 고려해서 항상 양쪽에 값을 설정하자
+		flush , clear 을 하고나서는 전부다 조회가 되지만, 1차 캐시만 있는 상태에서는 조회가 안될수도 있다.
+
+	- 연관관계 편의 메소드를 생성하자
+		※ gettter , setter 관례가 있으니까 메소드명을 setTeam 보다 changeTeam등으로 바꾸는 것도 좋음
+		※ team에 적용할지 member에 적용할지는 본인이 면한대로 하자
+		※ 비지니스 로직이 복잡해지면 changeTeam에서 구현하자
+		※ 양쪽다 구현해도 되는데 잘못 구현하면 무한루프 돌수도 있으니까 조심하자
+		=====================================================================
+		//AS IS - 아래와 같이 되어 있다면
+		member.setTeam(team);
+		team.getMembers().add(member);
+		
+		//setTeam 메소드로 add(member)를 옮겨서 사용하면 편리해짐
+		//member 의 team을 설정하면서 team도 member를 세팅해줌
+		public void setTeam(Team team) {
+			this.team = team;
+			team.getMembers().add(this);
+		}
+		=====================================================================
+
+	- 양방향 매핑시에 무한 루프를 조심하자
+		ex) toString() , lombok , JSON 생성 라이브러리
+			lombok에서의 toString 사용 자제
+			컨트롤러에서는 Entity 반환하지말것 
+				- Entity 변경하면 API 스팩이 바뀜
+				- Entity 는 DTO로 변환해서 반환
+			
+# 양방향 매핑 정리
+	- 단방향 매핑만으로도 이미 연관관계 매핑은 완료
+		※ 단방향 매핑만으로 설계를 완료하고 나서 필요할 경우 양뱡향 매핑을 추가할 것
+		※ 단방향 매핑만으로도 이미 연관관계 매핑이 다 끝난 상태임
+		※ 양방향 설계를 할수록 고민거리만 많아짐
+		※ 객체 입장에서는 양방향 매핑이 이득이..
+
+
+	- 양방향 매핑으로 반대 방향으로 조회(객체 그래프 탐색) 기능이 추가된 것 뿐
+
+	- JPQL에서 역방향으로 탐색할 일이 많음
+
+	- 단방향 매핑을 잘 하고 양방향은 필요할 때 추가해도 됨 (테이블에 영향을 주지 않음)
 

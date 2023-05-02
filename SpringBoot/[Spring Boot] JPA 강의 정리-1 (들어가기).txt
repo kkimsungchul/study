@@ -1,5 +1,9 @@
 # SpringBoot - JPA 강의 정리-1 (들어가기)
 
+# 학습 방법
+	"자바 ORM 표준 JPA 프로그래밍 - 기본편"
+	https://www.inflearn.com/course/ORM-JPA-Basic/dashboard
+
 # JPA 장점
 	개발 생산성이 높아짐
 	개발 속도/유지보수 측면에서 좋음
