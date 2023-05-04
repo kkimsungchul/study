@@ -7,7 +7,7 @@
 1-2-1. 사업명: KT 사내 개발자 포털(Dev-Space Portal) 서비스 개발 및 유지보수
 1) 고객사: KTDS
 2) 기간 : 2021.10 ~ 현재
-3) 역할 : PL (Backend Developer)
+3) 역할 : PL (Backend Developer) - 고객 요구사항분석, 설계 , 개발
 4) 환경 : SpringBoot / PostgreSQL / Linux
 5) 설명 : Jira, Jenkins , Gitlab 등의 DevOps 툴들을 연계하여 하나의 사이트에서 관리할수 있도록 해주는 포털 사이트 개발
 6) 업무 내용 및 성과
@@ -32,7 +32,7 @@
 2-2-1. 사업명: 통합계정관리 솔루션 개발 및 구축
 1) 고객사 : 코스콤 , 엠씨케이퍼블리싱
 2) 기간 : 코스콤(2020.05 ~ 2020.08) , 엠씨케이퍼블리싱(2021.06 ~ 2021.09)
-3) 역할 : 팀원(Back-End Developer / Front-end Developer)
+3) 역할 : 팀원(Back-End Developer / Front-end Developer) - 고객 요구사항분석, 설계 , 개발
 4) 환경 : Spring / SpringBoot / MySQL / Linux / Windows Server
 5) 설명 : 사용자의 정보(이름,생년월일,휴대폰번호 등)을 통합하여 관리할 수 있는 계정관리 솔루션 개발 및 구축
 6) 업무 내용 및 성과
@@ -45,7 +45,7 @@
 2-2-2. 사업명: SSO 솔루션 구축
 1) 고객사 : 엠씨케이퍼블리싱
 2) 기간 : 1차 구축 (2019.12 ~ 2020.02) , 2차 구축(2021.03 ~ 2021.05)
-3) 역할 : 팀원(Back-End Developer / Front-end Developer)
+3) 역할 : 팀원(Back-End Developer / Front-end Developer) - 고객 요구사항분석, 설계 , 개발
 4) 환경 : Spring / JSP / ASP / PHP / Windows Server
 5) 설명 : SSO(Single Sign On) 솔루션 기능 개선 및 구축
 6) 업무 내용 및 성과 : 
@@ -58,7 +58,7 @@
 2-2-3. 사업명: SI 사업-학점은행제 및 정보공시 시스템 고도화 프로젝트
 1) 고객사 : 국가평생교육진흥원
 2) 기간 : 2020.12 ~ 2021.02
-3) 역할 : 팀원(Back-End Developer / Front-end Developer)
+3) 역할 : 팀원(Back-End Developer / Front-end Developer) -  개발
 4) 환경 : Spring / JSP / Linux
 5) 설명 : 학점은행제 대표 홈페이지 및 관리자 페이지 시스템 고도화
 6) 업무 내용 및 성과 : 
@@ -68,7 +68,7 @@
 2-2-4. 사업명: SI 사업-해양경찰청 인사평가시스템 개발 프로젝트
 1) 고객사 : 해양경찰청
 2) 기간 : 2020.10 ~ 2020.11
-3) 역할 : 팀원(Back-End Developer / Front-end Developer)
+3) 역할 : 팀원(Back-End Developer / Front-end Developer) -  개발
 4) 환경 : Spring / JSP / Linux
 5) 설명 : 해양경찰청 조직 내 인사평가 시스템 개발
 6) 업무 내용 및 성과 : 
@@ -78,7 +78,7 @@
 2-2-5. 사업명: 보안 SI 사업
 1) 고객사 : 약20여개의 업체
 2) 기간 : 2018.04 ~ 2020.07
-3) 역할 : 팀원(Back-End Developer / Front-end Developer)
+3) 역할 : 팀원(Back-End Developer / Front-end Developer) -  개발
 4) 환경 : Spring / JSP / PHP / ASP
 5) 설명 : 검출된 보안취약점(XSS / SQL Injection / CSRF 등)조치
 6) 업무 내용 및 성과 : 
