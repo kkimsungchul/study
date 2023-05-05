@@ -31,4 +31,51 @@
 		<version>5.3.10.Final</version>
 	</dependency>
 	=====================================================================
-		
+
+# references an unknown entity 오류
+	참고링크 : 
+		https://www.inflearn.com/questions/17098/unknown-entity-%EC%98%A4%EB%A5%98
+		https://zangzangs.tistory.com/164
+
+	아래의 오류가 발생했음.
+	이거이전에도 났었는데 잊어버렸었음
+	- 오류내용
+		=====================================================================
+		@OneToOne or @ManyToOne on com.jpabook.jpashop.domain.Order.delivery references an unknown entity: com.jpabook.jpashop.domain.Delivery
+			at org.hibernate.cfg.ToOneFkSecondPass.doSecondPass(ToOneFkSecondPass.java:100)
+			at org.hibernate.boot.internal.InFlightMetadataCollectorImpl.processEndOfQueue(InFlightMetadataCollectorImpl.java:1750)
+			at org.hibernate.boot.internal.InFlightMetadataCollectorImpl.processFkSecondPassesInOrder(InFlightMetadataCollectorImpl.java:1694)
+			at org.hibernate.boot.internal.InFlightMetadataCollectorImpl.processSecondPasses(InFlightMetadataCollectorImpl.java:1623)
+			at org.hibernate.boot.model.process.spi.MetadataBuildingProcess.complete(MetadataBuildingProcess.java:295)
+			at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.metadata(EntityManagerFactoryBuilderImpl.java:1460)
+			at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1494)
+			at org.hibernate.jpa.HibernatePersistenceProvider.createEntityManagerFactory(HibernatePersistenceProvider.java:56)
+		=====================================================================
+
+	- 해결 방안
+		해당 오류를 검색해보면 @Entity 를 클래스 위에 붙이라고 하는데 전부다 붙어있었음
+		"[Spring Boot] JPA 강의 정리-9 (요구사항 분석과 기본 매핑)-실전예제1.txt" 이 파일에 똑같이 오류가 기록되어있음..
+		새로 추가한 클래스들을 "persistence.xml" 파일 안에 추가해줘야함
+		=====================================================================
+		<!--gradle로 할때 클래스 인식이 자동으로 안되는 경우가 있음-->
+		<class>com.jpabook.jpashop.domain.Member</class>
+		<class>com.jpabook.jpashop.domain.Item</class>
+		<class>com.jpabook.jpashop.domain.Order</class>
+		<class>com.jpabook.jpashop.domain.OrderItem</class>
+		<class>com.jpabook.jpashop.domain.Category</class>
+		<class>com.jpabook.jpashop.domain.Delivery</class>
+		=====================================================================
+
+	- 다른 방안 (SpringBoot 사용시)
+		SpringBootApplication 클래스에 아래의 어노테이션을 추가
+		=====================================================================
+			@EntityScan("com.domain.*")
+			@EnableJpaRepositories("com.domain.*")
+			public class SpringBootApplication {
+
+			   public static void main(String[] args) {
+				  SpringApplication.run(AdminApplication.class, args);
+			   }
+
+			}
+		=====================================================================

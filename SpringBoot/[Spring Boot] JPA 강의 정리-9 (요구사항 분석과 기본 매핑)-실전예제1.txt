@@ -1,5 +1,5 @@
 # SpringBoot - JPA 강의 정리-9(요구사항 분석과 기본 매핑)
-
+	https://github.com/kkimsungchul/study_code/tree/main/jpashop
 # 요구사항
 	회원은 상품을 주문할 수 있다.
 	주문 시 여러 종류의 상품을 선택할 수 있다.
