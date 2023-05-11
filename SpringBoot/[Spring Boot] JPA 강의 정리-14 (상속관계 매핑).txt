@@ -1,0 +1,240 @@
+# SpringBoot - JPA 강의 정리-14(상속관계 매핑)
+
+# 상속관계 매핑
+	관계형 데이터베이스는 상속관계가 없음
+	슈퍼타입 서브타입 관계라는 모델링 기법이 객체 상속과 유사함
+	상속관계 매핑 : 객체의상속과 구조와 DB의 슈퍼타입 서브타입 관계를 매핑
+	
+	슈퍼타입 서브타입 논리 모델을 실제 물리 모델로 구현하는 방법
+		각각 테이블로 변환 -> 조인 전략
+		통합 테이블로 변환 -> 단일 테이블 전략
+		서브타입 테이블로 변화 -> 구현 클래스마다 테이블 전략
+
+# 주요 어노테이션
+	@Inheritance(strategy=InheritanceType.XXX)
+		JOINED : 조인 전략
+		SINGLE_TABLE : 단일 테이블 전략
+		TABLE_PER_CLASS : 구현 클래스마다 테이블 전략
+
+	@DiscriminatorColumn(name="DTYPE")
+		해당 어노테이션을 넣어주면 DTYPE 이라는 컬럼이 생성되며, 자식 클래스의 Entity 명으로 값이 들어감
+		name을 지정해주면 별도의 컬럼명으로 지정이 가능함
+	
+	@DiscriminatorValue("XXX")
+		해당 어노테이션을 넣어주면 @DiscriminatorColumn에 들어가는 값을 바꿀수 있음
+		@DiscriminatorValue("C") 로 자식 클래스에 지정하면 DTYPE 에 C라는 값이 들어감
+
+# 조인 전략
+	※ 기본적으로 조인전략이 객체지향과 설계쪽에 적합함
+	- 장점 
+		데이터가 정규화 되어 있음
+		외래 키 참조 무결성 제약조건 활용 가능
+		저장공간 효율화
+
+	- 단점
+		조회 시 조인을 많이 사용하여 성능이 저하됨
+		조회 쿼리가 복잡함
+		데이터 저장시 INSERT SQL 을 2번 호출함
+
+# 단일 테이블 전략
+	※ 확장 가능성이 없으면 단일 테이블 전략을 사용하는것을 고려
+	- 장점
+		조인이 필요 없으므로 일반적으로 조회 성능이 빠름
+		조회 쿼리가 단순함
+
+	- 단점
+		자식 Entity가 매핑한 컬럼은 모두 NULL 허용
+		단일 테이블에 모든 것을 저장하므로 테이블이 커질 수 있고 상황에 따라서 조회 성능이 오히려 느려질 수 있음
+
+# 구현 클래스마다 테이블 전략
+	※ 이 전략은 데이터베이스 설계자와 ORM전문가 둘다 추천하지 않으며,쓰면 안됨
+	- 장점
+		서브 타입을 명확하게 구분해서 처리할 때 효과적
+		NOT NULL 제약조건 사용 가능
+	
+	- 단점
+		여러 자식 테이블을 함께 조회할 때 성능이 느림 (UNION SQL)
+		자식 테이블을 통합해서 쿼리하기 어려움
+
+
+# 예시1
+	아래와 같이 부모클래스에 별도의 옵션(@Inheritance)을 주지 않고 생성하면 상속받은 클래스들의 내용들의 Item 테이블 안에 생성이됨
+	=====================================================================
+	SELECT * FROM item;
+	DTYPE  	ID  	NAME  	PRICE  	ACTOR  	DIRECTOR  	ARTIST  	AUTHOR  	ISBN  
+	=====================================================================
+
+
+	Item class
+	=====================================================================
+	package org.hello.jpa.member.domain;
+
+	import javax.persistence.*;
+
+	@Entity
+	public class Item {
+		@Id @GeneratedValue
+		private Long id;
+
+		private String name;
+
+		private int price;
+
+	}
+	=====================================================================
+
+	Book class
+	=====================================================================
+	package org.hello.jpa.member.domain;
+
+	import javax.persistence.Entity;
+
+	@Entity
+	public class Book extends Item{
+
+		private String author;
+		private String isbn;
+
+	}
+
+	=====================================================================
+	
+	Album class
+	=====================================================================
+	package org.hello.jpa.member.domain;
+
+	import javax.persistence.Entity;
+
+
+	@Entity
+	public class Album extends Item{
+
+		private String artist;
+
+	}
+
+	=====================================================================
+
+	Movie class
+	=====================================================================
+	package org.hello.jpa.member.domain;
+
+
+	import javax.persistence.Entity;
+
+	@Entity
+	public class Movie extends Item{
+
+		private String director;
+		private String actor;
+	}
+	=====================================================================
+
+
+# 예시2 - 조인 전략
+	아래와 같이 부모클래스에 @Inheritance(strategy = InheritanceType.JOINED) 옵션을 주고 생성하면
+	상속받은 각각의 클래스들의 별도의 테이블로 생성이 됨
+	@DiscriminatorColumn 을 주어서 DTYPE을 하는것이 나중에 쿼리를 할때 편리함 (필수 아님,다만 운영할때 있는게 좋음)
+
+	※ 다른 상속받은 테이블은 "예시1" 과 동일
+	=====================================================================
+	SELECT * FROM item;
+	ID  	NAME  	PRICE  
+
+	SELECT * FROM ALBUM;
+	ARTIST  	ID  
+
+	SELECT * FROM BOOK;
+	AUTHOR  	ISBN  	ID  
+
+	SELECT * FROM MOVIE;
+	ACTOR  	DIRECTOR  	ID  
+	=====================================================================
+
+	Item class
+	=====================================================================
+	package org.hello.jpa.member.domain;
+
+	import javax.persistence.*;
+
+	@Entity
+	@Inheritance(strategy = InheritanceType.JOINED)
+	@DiscriminatorColumn
+	public class Item {
+		@Id @GeneratedValue
+		private Long id;
+
+		private String name;
+
+		private int price;
+
+	}
+	=====================================================================
+
+
+# 예시3 - 단일 테이블 전략
+	아래와 같이 부모클래스에 @Inheritance(strategy = InheritanceType.SINGLE_TABLE) 옵션을 주고 생성하면 
+	하나의 테이블에 모든 칼럼들이 다 들어가며, 생성하지 않은 데이터들은 null로 들어감
+	@DiscriminatorColumn 어노테이션을 넣지 않아도 자동으로 DTYPE 컬럼이 생성됨 (DTYPE이 필수)
+
+
+	※ 다른 상속받은 테이블은 "예시1" 과 동일
+	=====================================================================
+	SELECT * FROM item;
+	DTYPE  	ID  	NAME  	PRICE  	ACTOR  	DIRECTOR  	ARTIST  	AUTHOR  	ISBN  
+	M	1	어벤져스	10000	BBB	AAAA	null	null	null
+	=====================================================================
+
+	Item class
+	=====================================================================
+	package org.hello.jpa.member.domain;
+
+	import javax.persistence.*;
+
+	@Entity
+	@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+	@DiscriminatorColumn
+	public class Item {
+		@Id @GeneratedValue
+		private Long id;
+
+		private String name;
+
+		private int price;
+	}
+
+	=====================================================================
+
+# 예시4 - 구현 클래스마다 테이블 전략
+	예시 1,2,3과 다르게 ITEM 클래스를 없애고 중복된 컬럼들을 포함하여 각각의 클래스들을 생성
+	Item 클래스를 없앨 필요가 없이 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS) 옵션으로 변경하고
+	해당 클래스를 추상클래스로 변경하면 됨
+	해당 전략에서는 @DiscriminatorColumn 이 필요가 없음, 넣어도 적용안됨
+
+	※ 부모 클래스 타입으로 데이터를 조회할때 UNION ALL로 모든 데이터를 조회해옴
+
+	=====================================================================
+	SELECT * FROM ALBUM;
+	ID  	NAME  	PRICE  	ARTIST  
+
+	SELECT * FROM BOOK;
+	ID  	NAME  	PRICE  	AUTHOR  	ISBN  
+
+	SELECT * FROM MOVIE;
+	ID  	NAME  	PRICE  	ACTOR  	DIRECTOR  
+	1	어벤져스	10000	BBB	AAAA
+
+	=====================================================================
+
+	=====================================================================
+	@Entity
+	@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+	public  abstract class Item {
+		@Id @GeneratedValue
+		private Long id;
+
+		private String name;
+
+		private int price;
+	}
+	=====================================================================
