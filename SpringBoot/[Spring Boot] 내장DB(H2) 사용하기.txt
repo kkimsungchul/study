@@ -1,0 +1,41 @@
+# SpringBoot - 내장DB(H2) 사용하기
+	스프링부트에서는 인메모리 DB를 사용할 수 있게 해줌
+
+# 참고 링크 
+	https://eddies.tistory.com/34
+	https://juntcom.tistory.com/162
+
+
+# application.yml 파일 작성
+	spring:
+	  h2:
+		console:
+		  enabled: true
+		  path: /h2-console
+
+	  datasource:
+		url:  jdbc:h2:~/test
+		driverClassName: org.h2.Driver
+		username: sa
+		password:
+
+	  sql :
+		init :
+		  mode : always
+
+# build.gradle 에 추가
+
+	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+	runtimeOnly 'com.h2database:h2'
+
+# schema.sql 파일 추가
+	=================================================================================================================
+	CREATE TABLE stock(
+		id varchar(10)
+	);
+
+	CREATE TABLE stock_price(
+		id varchar(10),
+		price varchar(20)
+	)
+	=================================================================================================================
