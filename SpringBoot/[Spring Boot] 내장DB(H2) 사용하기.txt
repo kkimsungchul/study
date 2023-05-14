@@ -1,6 +1,6 @@
 # SpringBoot - 내장DB(H2) 사용하기
 	스프링부트에서는 인메모리 DB를 사용할 수 있게 해줌
-
+	JPA, MyBatis 둘다 사용 가능함
 # 참고 링크 
 	https://eddies.tistory.com/34
 	https://juntcom.tistory.com/162
@@ -28,14 +28,44 @@
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 	runtimeOnly 'com.h2database:h2'
 
+
+
 # schema.sql 파일 추가
+	※ schema.sql , data.sql 파일은 스프링부트가 실행되면 자동으로 읽어와서 데이터베이스의 테이블과 데이터를 넣어줌
+
 	=================================================================================================================
+	DROP TABLE IF EXISTS stock;
+	DROP TABLE IF EXISTS stock_price;
+
 	CREATE TABLE stock(
-		id varchar(10)
+		id bigint(10) NOT NULL AUTO_INCREMENT,
+		code varchar(10),
+		name varchar(50),
+		PRIMARY KEY (code)
 	);
 
 	CREATE TABLE stock_price(
-		id varchar(10),
-		price varchar(20)
-	)
+		stock_code varchar(10),
+		price int(20),
+		create_time timestamp NOT NULL default now()
+	);
+
 	=================================================================================================================
+
+# data.sql 파일 추가
+	※ schema.sql , data.sql 파일은 스프링부트가 실행되면 자동으로 읽어와서 데이터베이스의 테이블과 데이터를 넣어줌
+	=====================================================================
+	--init stock table data
+	INSERT INTO stock (code , name) VALUES
+	('5930','삼성전자'),
+	('373220','LG에너지솔루션'),
+	('660','SK하이닉스'),
+	('207940','삼성바이오로직스')
+
+	--init stock_price table data
+	INSERT INTO stock_price (stock_code , price)VALUES
+	('5930',61500),
+	('373220',452000),
+	('660',95700),
+	('207940',875000),
+	=====================================================================
