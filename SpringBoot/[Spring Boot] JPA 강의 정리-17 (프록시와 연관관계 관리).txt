@@ -1,0 +1,148 @@
+# SpringBoot - JPA 강의 정리-17(프록시와 연관관계 관리)
+
+# 프록시
+	프록시 메커니즘을 이해해야 즉시로딩과 지연로딩을 이해할수 있음
+	=====================================================================
+	예시)
+		멤버와 팀이 있음,
+		1. 멤버만 가져오고 싶을 때가 있고 
+		2. 팀만 가져오고 싶을 때가 있고
+		3. 둘다 가져오고 싶을 때가 있음
+		1번처럼 멤버만 가져오고 싶을 때에 팀까지 조회한다고 하면 자원낭비임
+	=====================================================================
+	entityManager.find() vs entityManager.getReference()
+
+	entityManager.find() : 데이터베이스를 통해서 실제 인티티 객체 조회
+
+	entityManager.getReference() : 데이터베이스 조회를 미루는 가짜(프록시) 엔티티 객체 조회
+		프록시 객체를 리턴해줌, 프록시 객체는 ID값만 들고 있는 비어있는 객체
+
+# 프록시 특징
+	- 실제 클래스를 상속 받아서 만들어짐
+	- 실제 클래스와 겉 모양이 같음
+	- 사용하는 입장에서는 진짜 객체인지 프록시 객체인지 구분하지 않고 사용하면 됨(이론상)
+	- 프록시 객체는 실제 객체의 참조(target)를 보관함
+	- 프록시 객체는 호출하면 프록시 객체는 실체 객체의 메소드 호출
+
+	※ 중요!!
+	- 프록시 객체는 처음 사용할 때 한 번만 초기화
+	- 프록시 객체를 초기화 할 때, 프록시 객체가 실제 엔티티로 바뀌는 것은 아님,
+	  초기화되면 프록시 객체를 통해서 실제 엔티티에 접근 가능
+	- 프록시 객체는 원본 엔티티를 상속받음, 따라서 타입 체크시 주의해야함 (== 비교 실패, 대신 instanceOf 사용)
+		instanceOf 는 같은 클래스거나, 상속받은 클래스인지 체크하는 연산자
+		=====================================================================
+		Member member1 = new Member();
+		member1.setUsername("hello1");
+		entityManager.persist(member1);
+		Member member2 = new Member();
+		member2.setUsername("hello2");
+		entityManager.persist(member2);
+		entityManager.flush();
+		entityManager.clear();
+
+		Member findMember1 = entityManager.find(Member.class , member1.getId());
+		Member findMember2 = entityManager.find(Member.class,member2.getId());
+		System.out.println("### findMember1 == findMember2 : " + (findMember1.getClass()==findMember2.getClass()));//true
+		entityManager.clear();
+		Member findMember3 = entityManager.find(Member.class , member1.getId());
+		Member findMember4 = entityManager.getReference(Member.class,member2.getId());
+		System.out.println("### findMember3 == findMember4 : " + (findMember3.getClass()==findMember4.getClass()));  //false
+
+		entityManager.clear();
+		Member findMember5 = entityManager.find(Member.class , member1.getId());
+		Member findMember6 = entityManager.getReference(Member.class,member2.getId());
+		System.out.println("### findMember5 instanceOf Member : " + (findMember5 instanceof Member));  //true
+		System.out.println("### findMember6 instanceOf Member : " + (findMember6 instanceof Member));  //truendMember3.getClass()==findMember4.getClass()));  //false
+		=====================================================================
+
+	- 영속성 컨텍스트에 찾는 엔티티가 이미 있으면 entityManager.getReference()를 호출해도 실제 엔티티 반환
+		JPA의 한 트랜잭션에서 조회한 데이터는 같다고 보장해줌, 그래서 이미 find로 찾은 객체를 다시 한번 getReference 로 찾아도 실제 엔티티를 반환함
+		반대의 경우에는 find를 나중에 해도 프록시 객체를 반환함
+		=====================================================================
+		Member findMember1 = entityManager.find(Member.class , member1.getId());
+		System.out.println("## findMember1 : " + findMember1.getClass());
+		Member findMember2 = entityManager.getReference(Member.class , member1.getId());
+		System.out.println("## findMember2 : " + findMember2.getClass());
+		=====================================================================
+		
+		-- 출력
+		=====================================================================
+		## findMember1 : class org.hello.jpa.member.domain.Member
+		## findMember2 : class org.hello.jpa.member.domain.Member
+		=====================================================================
+		※ 위에 find와 getReference 의 순서를 바꾸면 같은 프록시 객체로 나옴
+		JPA의 한트랜잭션이기 때문임
+
+	- 영속성 컨텍스트의 도움을 받을 수 없는 준영속 상태일 때, 프록시를 초기화 하면 문제가 발생함
+		(하이버네이트는 org.hibernate.LazyInitializationException 예외를 터트림)
+		영속성 컨텍스트의 연결이 끊기면 문제가 발생함
+			entityManager.detach(findMember1)
+			entityManager.clear();
+			entityManager.close();
+		=====================================================================
+		Member findMember1 = entityManager.getReference(Member.class , member1.getId());
+		entityManager.detach(findMember1);//연결끊음
+		System.out.println(findMember1.getUsername());
+		=====================================================================
+
+		- 에러메시지
+		=====================================================================
+		org.hibernate.LazyInitializationException: could not initialize proxy [org.hello.jpa.member.domain.Member#1] - no Session
+			at org.hibernate.proxy.AbstractLazyInitializer.initialize(AbstractLazyInitializer.java:176)
+		=====================================================================
+
+# 프록시 객체의 초기화
+	=====================================================================
+	Member findMember2 = entityManager.getReference(Member.class,member.getId());
+	System.out.println("### getUsername : " + findMember2.getUsername());
+	=====================================================================
+
+	1. getName() 호출
+	1-1. MemberProxy 객체에 있는 Member target 의 값이 없는 것을 확인
+
+	2. 영속성 컨텍스트에 초기화 요청
+	※ 프록시 객체에 값이 없을때 초기화 요청함, 값이있을때는 하지 않음
+
+	3. 영속성 컨텍스트에서 DB 조회
+
+	4. 실제 Entity 생성
+
+	5. target.getName()이 진짜 객체인 Member를 연결
+
+	target에 있는 getName()을 통해서 가져옴
+
+
+# 프록시 확인
+	- 프록시 인스턴스의 초기화 여부 확인
+		findMember1 가 초기화 되어 있다면 true , 아니면 false를 반환함
+		entityManagerFactory.getPersistenceUnitUtil().isLoaded(Object Entity)
+		=====================================================================
+		entityManagerFactory.getPersistenceUnitUtil().isLoaded(findMember1);
+		=====================================================================
+
+	- 프록시 클래스 확인 방법
+		entity.getClass().getName() 사용
+		=====================================================================
+		findMember1.getClass().getName()
+		=====================================================================
+
+	- 프록시 강제 초기화
+		※ 하이버네이트에서만 지원해줌
+		Hibernate.initialize(entity);
+		=====================================================================
+		Hibernate.initialize(findMember1);
+		=====================================================================
+	- 참고 JPA 표준은 강제 초기화 없음
+		강제호출 : member.getName();
+
+# 즉시 로딩과 지연 로딩
+
+# 지연 로딩 활용
+
+# 영속성 전이 CASCADE
+
+# 고아 객체
+
+# 영속성 전이 + 고아 객체, 생명주기
+
+# 실전예제
