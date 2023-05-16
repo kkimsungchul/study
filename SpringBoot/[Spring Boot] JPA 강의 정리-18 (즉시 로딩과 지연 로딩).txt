@@ -1,0 +1,17 @@
+# SpringBoot - JPA 강의 정리-17(즉시 로딩과 지연 로딩)
+
+# Member를 조회할 때 Team도 함께 조회해야 할까
+	단순히 member 정보만 사용하는 비즈니스 로직
+
+# 즉시 로딩과 지연 로딩
+	@ManyToOne(fetch = FetchType.LAZY)
+
+# 지연 로딩 활용
+
+# 영속성 전이 CASCADE
+
+# 고아 객체
+
+# 영속성 전이 + 고아 객체, 생명주기
+
+# 실전예제
