@@ -1,12 +1,253 @@
-# SpringBoot - JPA 강의 정리-17(즉시 로딩과 지연 로딩)
+# SpringBoot - JPA 강의 정리-18(즉시 로딩과 지연 로딩)
 
 # Member를 조회할 때 Team도 함께 조회해야 할까
 	단순히 member 정보만 사용하는 비즈니스 로직
 
+# 즉시 로딩과 지연 로딩 중요
+	- 모든 연관관계에 지연 로딩을 사용
+
+	- 실무에서는 즉시 로딩을 사용하면 안됨
+
+	- JPQL fetch join 또는 엔티티 그래프 기능을 사용
+
+	- 즉시로딩은 상상하지도 못한 쿼리가 실행됨
+
 # 즉시 로딩과 지연 로딩
-	@ManyToOne(fetch = FetchType.LAZY)
+	- 가급적 지연로딩만 사용(특히 실무에서)
+	
+	- 즉시 로딩을 적용하면 예상하지 못한 SQL이 발생
+	
+	- 즉시 로딩은 JPQL에서 N+1 문제를 일으킴
+		지연로딩과 패치조인 사용
+	- @ManyToOne, @OneToOne 은 기본이 즉시로딩이므로 LAZY로 변경
+	
+	- @OneToMany , @ManyToMany 는 기본이 지연 로딩
+
+
+# 지연 로딩
+	Member 와 Team의 사용률을 봤을 때 Member 는 90%, Team은 10% 정도로 Team의 사용률이 적을떄 사용하면됨
+
+	지연로딩을 적용한 객체를 실제로 사용하는 시점에 쿼리문이 실행됨
+	지연로딩을 통해 가져온 객체는 프록시 객체임
+
+	FetchType.LAZY 적용
+	=====================================================================
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name ="TEAM_ID")
+    private Team team;
+	=====================================================================
+
+	호출
+	=====================================================================
+    Member findMember1 = entityManager.getReference(Member.class , member1.getId());
+	System.out.println("##### 1");
+	System.out.println(findMember1.getUsername());
+	System.out.println("##### 2");
+	System.out.println(findMember1.getTeam().getClass());
+	System.out.println("##### 3");
+	System.out.println(findMember1.getTeam().getName());		//팀 객체에 있는 실제 값을 사용할 떄 초기화가 됨
+	=====================================================================
+
+	쿼리 실행
+	=====================================================================
+	##### 1
+	Hibernate: 
+		select
+			member0_.MEMBER_ID as member_i1_3_0_,
+			member0_.createdBy as createdb2_3_0_,
+			member0_.createdDate as createdd3_3_0_,
+			member0_.lastModifiedBy as lastmodi4_3_0_,
+			member0_.lastModifiedDate as lastmodi5_3_0_,
+			member0_.TEAM_ID as team_id7_3_0_,
+			member0_.USERNAME as username6_3_0_ 
+		from
+			Member member0_ 
+		where
+			member0_.MEMBER_ID=?
+	hello1
+	##### 2
+	class org.hello.jpa.member.domain.Team$HibernateProxy$YzjTbO9K
+	##### 3
+	Hibernate: 
+		select
+			team0_.TEAM_ID as team_id1_7_0_,
+			team0_.createdBy as createdb2_7_0_,
+			team0_.createdDate as createdd3_7_0_,
+			team0_.lastModifiedBy as lastmodi4_7_0_,
+			team0_.lastModifiedDate as lastmodi5_7_0_,
+			team0_.name as name6_7_0_ 
+		from
+			Team team0_ 
+		where
+			team0_.TEAM_ID=?
+	TEAM_A
+	=====================================================================
+
+
+# 즉시 로딩
+	JPA 구현체는 가능하면 조인을 사용해서 SQL 한번에 함께 조회
+	Member와 Team의 사용율이 거의 비슷할 경우 같이 로딩함
+	즉시로딩이기 때문에 프록시객체가 아닌 실제 객체로 가져옴
+
+	※ 아래의 Team에 적용한 어노테이션의 설정만 다르고 그외 값은 즉시로딩과 똑같음
+	FetchType.EAGER 적용
+	=====================================================================
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name ="TEAM_ID")
+    private Team team;
+	=====================================================================
+
+
+	쿼리 실행
+	=====================================================================
+	##### 1
+	Hibernate: 
+		select
+			member0_.MEMBER_ID as member_i1_3_0_,
+			member0_.createdBy as createdb2_3_0_,
+			member0_.createdDate as createdd3_3_0_,
+			member0_.lastModifiedBy as lastmodi4_3_0_,
+			member0_.lastModifiedDate as lastmodi5_3_0_,
+			member0_.TEAM_ID as team_id7_3_0_,
+			member0_.USERNAME as username6_3_0_,
+			team1_.TEAM_ID as team_id1_7_1_,
+			team1_.createdBy as createdb2_7_1_,
+			team1_.createdDate as createdd3_7_1_,
+			team1_.lastModifiedBy as lastmodi4_7_1_,
+			team1_.lastModifiedDate as lastmodi5_7_1_,
+			team1_.name as name6_7_1_ 
+		from
+			Member member0_ 
+		left outer join
+			Team team1_ 
+				on member0_.TEAM_ID=team1_.TEAM_ID 
+		where
+			member0_.MEMBER_ID=?
+	hello1
+	##### 2
+	class org.hello.jpa.member.domain.Team
+	##### 3
+	TEAM_A
+
+	=====================================================================
+
+# N+1 문제 - 즉시로딩 설정
+	DB에 Member가 여러개가 있다고 가정
+	Team도 여러개가 있다고 가정
+	Team 의 갯수만큼 쿼리가 실행됨
+	(결과갯수 +N)  + (최초 쿼리SELECT +1) 로 해서 N+1문제임
+		
+	즉시 로딩 세팅
+	=====================================================================
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name ="TEAM_ID")
+    private Team team;
+	=====================================================================
+
+	=====================================================================
+	List<Member> memberList =  entityManager.createQuery("select m from Member m",Member.class).getResultList();
+	=====================================================================
+
+	쿼리 실행
+	=====================================================================
+	Hibernate: 
+		/* select
+			m 
+		from
+			Member m */ select
+				member0_.MEMBER_ID as member_i1_3_,
+				member0_.createdBy as createdb2_3_,
+				member0_.createdDate as createdd3_3_,
+				member0_.lastModifiedBy as lastmodi4_3_,
+				member0_.lastModifiedDate as lastmodi5_3_,
+				member0_.TEAM_ID as team_id7_3_,
+				member0_.USERNAME as username6_3_ 
+			from
+				Member member0_
+	Hibernate: 
+		select
+			team0_.TEAM_ID as team_id1_7_0_,
+			team0_.createdBy as createdb2_7_0_,
+			team0_.createdDate as createdd3_7_0_,
+			team0_.lastModifiedBy as lastmodi4_7_0_,
+			team0_.lastModifiedDate as lastmodi5_7_0_,
+			team0_.name as name6_7_0_ 
+		from
+			Team team0_ 
+		where
+			team0_.TEAM_ID=?
+	Hibernate: 
+		select
+			team0_.TEAM_ID as team_id1_7_0_,
+			team0_.createdBy as createdb2_7_0_,
+			team0_.createdDate as createdd3_7_0_,
+			team0_.lastModifiedBy as lastmodi4_7_0_,
+			team0_.lastModifiedDate as lastmodi5_7_0_,
+			team0_.name as name6_7_0_ 
+		from
+			Team team0_ 
+		where
+			team0_.TEAM_ID=?
+	=====================================================================
+
+	
+# N+1 해결 방안
+	1. 로딩 방식을 지연로딩으로 변경
+	2. 추후 fetch join 으로변경
+	3. @Entitygraph 어노테이션 사용
+	
+	아래의 방법은 로딩방식을 모두 Lazy로 변경 후 fetch join 사용
+
+	=====================================================================
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name ="TEAM_ID")
+    private Team team;
+	=====================================================================
+
+
+	=====================================================================
+	List<Member> memberList =  entityManager.createQuery("select m from Member m join fetch m.team",Member.class).getResultList();
+	=====================================================================
+
+	쿼리 실행
+	=====================================================================
+	Hibernate: 
+		/* select
+			m 
+		from
+			Member m 
+		join
+			fetch m.team */ select
+				member0_.MEMBER_ID as member_i1_3_0_,
+				team1_.TEAM_ID as team_id1_7_1_,
+				member0_.createdBy as createdb2_3_0_,
+				member0_.createdDate as createdd3_3_0_,
+				member0_.lastModifiedBy as lastmodi4_3_0_,
+				member0_.lastModifiedDate as lastmodi5_3_0_,
+				member0_.TEAM_ID as team_id7_3_0_,
+				member0_.USERNAME as username6_3_0_,
+				team1_.createdBy as createdb2_7_1_,
+				team1_.createdDate as createdd3_7_1_,
+				team1_.lastModifiedBy as lastmodi4_7_1_,
+				team1_.lastModifiedDate as lastmodi5_7_1_,
+				team1_.name as name6_7_1_ 
+			from
+				Member member0_ 
+			inner join
+				Team team1_ 
+					on member0_.TEAM_ID=team1_.TEAM_ID
+	=====================================================================
+	
+
+
 
 # 지연 로딩 활용
+	※ 아래는 이론적인 내용이며, 실무에 적용시는 전부다 "지연로딩" 으로 설정
+
+	Member 와 Team은 자주 함꼐 사용 -> 즉시 로딩
+	Member와 Order는 가끔 사용 -> 지연 로딩
+	Order와 Product는 자주 함께 사용 -> 즉시로딩
+
 
 # 영속성 전이 CASCADE
 
