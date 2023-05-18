@@ -73,3 +73,280 @@
 
 
 	=================================================================================================================
+
+
+# Json 파일을 읽어서 Object로 변경하기 (jackson)
+	위에 작성한 예시들도 있지만 아래와 같이 jackson 라이브러리를 사용할 수 있음
+
+	- 읽어오는 클래스
+	=====================================================================
+	import com.fasterxml.jackson.databind.ObjectMapper;
+	import java.io.File;
+	import java.io.IOException;
+	import org.slf4j.Logger;
+	import org.slf4j.LoggerFactory;
+
+	public class JsonPropertyReader {
+		private static final Logger logger = LoggerFactory.getLogger(JsonPropertyReader.class);
+
+		public void readProperty(){
+			try {
+				ObjectMapper objectMapper = new ObjectMapper();
+				ConfigVO config = objectMapper.readValue(new File("src/main/resources/config.json"), ConfigVO.class);
+				System.out.println(config);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	=====================================================================
+
+	- JSON 파일 내용
+	=====================================================================
+	{
+	  "port" : 8080,
+	  "host" : [
+		{
+		  "host_name" : "ahost",
+		  "home_directory" : "ahost",
+		  "error_page" : {
+			"error403" : "403.html",
+			"error404" : "404.html",
+			"error500" : "500.html"
+		  }
+		},
+		{
+		  "host_name" : "bhost",
+		  "home_directory" : "bhost",
+		  "error_page" : {
+			"error403" : "403.html",
+			"error404" : "404.html",
+			"error500" : "500.html"
+		  }
+		}
+	  ]
+	}
+	=====================================================================
+
+	- VO 내용
+	=====================================================================
+	import com.fasterxml.jackson.annotation.JsonProperty;
+
+	import java.util.List;
+
+	public class ConfigVO {
+
+
+		private List<Host> host;
+
+		private int port;
+
+		public List<Host> getHost() {
+			return host;
+		}
+
+		public void setHost(List<Host> host) {
+			this.host = host;
+		}
+
+		public int getPort() {
+			return port;
+		}
+
+		public void setPort(int port) {
+			this.port = port;
+		}
+
+		public static class Host {
+			@JsonProperty("error_page")
+			private ErrorPage errorPage;
+			@JsonProperty("home_directory")
+			private String homeDirectory;
+			@JsonProperty("host_name")
+			private String hostName;
+
+			public ErrorPage getErrorPage() {
+				return errorPage;
+			}
+
+			public void setErrorPage(ErrorPage errorPage) {
+				this.errorPage = errorPage;
+			}
+
+			public String getHomeDirectory() {
+				return homeDirectory;
+			}
+
+			public void setHomeDirectory(String homeDirectory) {
+				this.homeDirectory = homeDirectory;
+			}
+
+			public String getHostName() {
+				return hostName;
+			}
+
+			public void setHostName(String hostName) {
+				this.hostName = hostName;
+			}
+		}
+
+		public static class ErrorPage {
+			private String error500;
+			private String error404;
+			private String error403;
+
+			public String getError500() {
+				return error500;
+			}
+
+			public void setError500(String error500) {
+				this.error500 = error500;
+			}
+
+			public String getError404() {
+				return error404;
+			}
+
+			public void setError404(String error404) {
+				this.error404 = error404;
+			}
+
+			public String getError403() {
+				return error403;
+			}
+
+			public void setError403(String error403) {
+				this.error403 = error403;
+			}
+
+		}
+	}
+	=====================================================================
+
+# Json 파일을 읽어서 Object로 변경하기 (gson)
+	※ 아래의 코드는 테스트 안해봄
+	- 읽어오는 클래스
+	=====================================================================
+	import com.google.gson.Gson;
+	import com.google.gson.annotations.SerializedName;
+	import java.io.BufferedReader;
+	import java.io.FileReader;
+	import java.io.IOException;
+	import java.util.List;
+	import java.util.Map;
+
+	public class JsonPropertyReader {
+		private static final Logger logger = LoggerFactory.getLogger(JsonPropertyReader.class);
+
+		public void readProperty(){
+			try {
+				Gson gson = new Gson();
+				BufferedReader bufferedReader = new BufferedReader(new FileReader("config.json"));
+				Config config = gson.fromJson(bufferedReader, Config.class);
+				bufferedReader.close();
+				System.out.println(config);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	=====================================================================
+
+	- VO 
+	※ VO는 기존과 똑같으며 어노테이션만 @JsonProperty 에서 @SerializedName 로 변경
+	=====================================================================
+	import com.fasterxml.jackson.annotation.JsonProperty;
+
+	import java.util.List;
+
+	public class ConfigVO {
+
+
+		private List<Host> host;
+
+		private int port;
+
+		public List<Host> getHost() {
+			return host;
+		}
+
+		public void setHost(List<Host> host) {
+			this.host = host;
+		}
+
+		public int getPort() {
+			return port;
+		}
+
+		public void setPort(int port) {
+			this.port = port;
+		}
+
+		public static class Host {
+			@SerializedName("error_page")
+			private ErrorPage errorPage;
+			@SerializedName("home_directory")
+			private String homeDirectory;
+			@SerializedName("host_name")
+			private String hostName;
+
+			public ErrorPage getErrorPage() {
+				return errorPage;
+			}
+
+			public void setErrorPage(ErrorPage errorPage) {
+				this.errorPage = errorPage;
+			}
+
+			public String getHomeDirectory() {
+				return homeDirectory;
+			}
+
+			public void setHomeDirectory(String homeDirectory) {
+				this.homeDirectory = homeDirectory;
+			}
+
+			public String getHostName() {
+				return hostName;
+			}
+
+			public void setHostName(String hostName) {
+				this.hostName = hostName;
+			}
+		}
+
+		public static class ErrorPage {
+			private String error500;
+			private String error404;
+			private String error403;
+
+			public String getError500() {
+				return error500;
+			}
+
+			public void setError500(String error500) {
+				this.error500 = error500;
+			}
+
+			public String getError404() {
+				return error404;
+			}
+
+			public void setError404(String error404) {
+				this.error404 = error404;
+			}
+
+			public String getError403() {
+				return error403;
+			}
+
+			public void setError403(String error403) {
+				this.error403 = error403;
+			}
+
+		}
+	}
+
+	=====================================================================
