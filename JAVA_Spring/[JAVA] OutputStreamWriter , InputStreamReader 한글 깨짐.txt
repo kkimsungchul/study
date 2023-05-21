@@ -1,0 +1,21 @@
+# JAVA - InputStreamReader , OutputStreamWriter 한글 깨짐
+
+# 설명
+	JAVA에서 입출력을 사용하다보면 한글이 깨지는 다양한 이유가 있음
+	분명히 UTF-8로 파일도 저장하고 했는데 왜깨질까.. 하고 삽질하다가 찾은 내용임
+
+# 기존 코드
+	=====================================================================
+	OutputStream raw = new BufferedOutputStream(connection.getOutputStream());
+	Writer out = new OutputStreamWriter(raw);
+	Reader in = new InputStreamReader(new BufferedInputStream(connection.getInputStream()));
+	=====================================================================
+
+# 수정된 코드
+	OutputStreamWriter , InputStreamReader 생성시 명시적으로 UTF8을 지정
+	=====================================================================
+	OutputStream raw = new BufferedOutputStream(connection.getOutputStream());
+	Writer out = new OutputStreamWriter(raw,"UTF-8");
+	Reader in = new InputStreamReader(new BufferedInputStream(connection.getInputStream()), "UTF-8");
+	=====================================================================
+
