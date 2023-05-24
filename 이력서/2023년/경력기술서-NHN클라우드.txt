@@ -1,0 +1,68 @@
+1) 환경 : SpringBoot / PostgreSQL / Linux
+2) 설명 : Jira, Jenkins , Gitlab 등의 DevOps 툴들을 연계하여 하나의 사이트에서 관리할수 있도록 해주는 포털 사이트 개발
+3) 업무 내용 및 성과
+> 고객요구사항 개발 가능 검토
+> 불필요한 리소스 제거에 소요 시간 감소를 위한 DevOps Tool(Gitlab,Jenkins,Sparrow)의 데이터 동기화 기능 개발
+> 데이터 유출 방지를 위해 오픈소스 KeyCloak의 암호화 모듈 개발
+> 프로젝트 생성 소요 시간 감소를 위한 Gitlab 프로젝트 생성 시 Jenkins Job 동시 생성 기능 개발
+> 사내 접속시 SMS 인증을 일 1회만 하도록 설계하여 비용 50% 감소
+> Portal CI/CD 도입을 통해 빌드/배포에 소요되는 시간 83% 감소 (120분 ->20분)
+> 프로세스 자동화로 인한 일일 업무 소요 시간 일평균 30분 이상 감소
+
+
+1) 고객사 : 코스콤 , 엠씨케이퍼블리싱
+2) 기간 : 코스콤(2020.05 ~ 2020.08) , 엠씨케이퍼블리싱(2021.06 ~ 2021.09)
+3) 환경 : Spring / SpringBoot / MySQL / Linux / Windows Server
+4) 설명 : 사용자의 정보(이름,생년월일,휴대폰번호 등)을 통합하여 관리할 수 있는 계정관리 솔루션 개발 및 구축
+5) 업무 내용 및 성과
+> 고객 요구사항 개발 반영 / 고객 미팅 담당
+> 신입사원으로 입사하여 Spring / JSP를 사용하여 통합계정관리 솔루션의 매니저 프로그램 개발 진행 (Back-End, Front-End, 디자인)
+> 매니저 프로그램 개발 완료 후 통합계정관리 솔루션 첫 판매 성공
+> 기존 통합계정관리 매니저 프로그램의 기존기능 수정에 소요되는 시간이 해당 기능을 개발하는 시간과 똑같이 소요됨을 파악하고 SpringBoot / Thymeleaf 로 고도화 진행
+
+2-2-2. 사업명: SSO 솔루션 구축
+1) 고객사 : 엠씨케이퍼블리싱
+2) 기간 : 1차 구축 (2019.12 ~ 2020.02) , 2차 구축(2021.03 ~ 2021.05)
+3) 환경 : Spring / JSP / ASP / PHP / Windows Server
+4) 설명 : SSO(Single Sign On) 솔루션 기능 개선 및 구축
+5) 업무 내용 및 성과 : 
+> 고객 요구사항 개발 반영 / 고객 미팅 담당
+> SSO 솔루션 첫 판매 성공
+> 세 번의 SSO 프로젝트를 진행하며 6개 사이트에 SSO 솔루션 구축 (Spring 2개, ASP 1개, PHP 3개)
+> SSO 솔루션 유지보수 / 추가 사이트 SSO 연동으로 추가 수익 창출
+> 기존 SSO 솔루션에 소셜로그인 기능 추가
+
+2-2-3. 사업명: SI 사업-학점은행제 및 정보공시 시스템 고도화 프로젝트
+1) 역할 : 팀원(Back-End Developer / Front-end Developer) -  개발
+2) 환경 : Spring / JSP / Linux
+3) 설명 : 학점은행제 대표 홈페이지 및 관리자 페이지 시스템 고도화
+4) 업무 내용 및 성과 : 
+> 기존 시스템의 데이터 정렬 기능 개발
+> 공통 예외 처리 모듈 개발 , 보안취약점 조치
+
+2-2-4. 사업명: SI 사업-해양경찰청 인사평가시스템 개발 프로젝트
+
+1) 역할 : 팀원(Back-End Developer / Front-end Developer) -  개발
+2) 환경 : Spring / JSP / Linux
+3) 설명 : 해양경찰청 조직 내 인사평가 시스템 개발
+4) 업무 내용 및 성과 : 
+> 인사발령 및 부서 내 조직도 관리 시스템 개발
+> 데이터 통계 및 히스토리 기능 개발
+
+2-2-5. 사업명: 보안 SI 사업
+1) 고객사 : 약20여개의 업체
+2) 역할 : 팀원(Back-End Developer / Front-end Developer) -  개발
+3) 환경 : Spring / JSP / PHP / ASP
+4) 설명 : 검출된 보안취약점(XSS / SQL Injection / CSRF 등)조치
+5) 업무 내용 및 성과 : 
+> 20개 이상의 업체의 웹 취약점 조치(Spring, JSP, PHP, ASP)
+
+Toy Project : 캠핑장 예약가능 날짜 확인 시스템 개발 
+Github Project  URL : https://github.com/kkimsungchul/camping
+
+Toy Project :네이버 주식 파싱 시스템 개발 (SpringBoot)
+Github Project URL : https://github.com/kkimsungchul/stock
+
+Github : https://github.com/kkimsungchul
+Blog : https://kkimsungchul.github.io/
+Profile : https://kkimsungchul.github.io/profile/
