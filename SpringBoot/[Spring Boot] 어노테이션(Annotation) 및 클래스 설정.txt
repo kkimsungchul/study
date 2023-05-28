@@ -4,6 +4,45 @@
 	* lombok 라이브러리 사용하였으며, 몇몇의 어노테이션은 lombok 라이브러리가 존재해야 사용가능함
 
 
+# 어노테이션 DI(의존성주입) 설명
+	DI에는 생성자 주입, 필드 주입 ,setter 주입 세가지가 있음
+	
+	필드 주입은 수정할수 있는 방안이 없음
+	=====================================================================
+	@Controller
+	public class MemberController {
+		@Autowired
+		private final MemberService memberService;
+	}
+	=====================================================================
+	
+	setter 주입은 접근지시자가 public임
+	=====================================================================
+	@Controller
+	public class MemberController {    
+		private MemberService memberService;
+
+		@Autowired
+		public void setMemberService(MemberService memberService) {
+			this.memberService = memberService;
+		}
+	}
+	=====================================================================
+
+	생성자 주입은 어플리케이션 실행 시 한번만 호출되면서 끝남
+	=====================================================================
+	@Controller
+	public class MemberController {
+
+		private final MemberService memberService;
+
+		@Autowired
+		public MemberController(MemberService memberService) {
+			this.memberService = memberService;
+		}
+	}
+	=====================================================================
+	
 # 공통
 	@Slf4j
 		logger 클래스랑 같다고 보면댐
@@ -14,6 +53,37 @@
 		{}는 받는 인자의 수만큼 생성해주면됨
 		log.info("### resList : {} , {}" ,resList,aaa);
 
+
+# Bean 등록 방법
+	정형화된 컨트롤러, 서비스, 리포지토리 같은 코드는 컴포넌트 스캔을 사용함.
+	정형화 되지 않거나 상황에 따라 구현 클래스를 변경해야 하면 설정을 통해 스프링 빈으로 등록함.
+
+	- 어노테이션 사용
+		등록하려는 클래스 위에 @Controller , @Service , @Repository 사용
+		=====================================================================
+		@Service
+		public class MemberService {
+
+		}
+		=====================================================================
+	- JavaConfig 사용 방법
+		=====================================================================
+		@Configuration
+		public class SpringConfig {
+
+			@Bean
+			public MemberService memberService(){
+				return new MemberService(memberRepository());
+			}
+
+			@Bean
+			public MemberRepository memberRepository() {
+				return new MemoryMemberRepository();
+			}
+		}
+		=====================================================================
+
+	
 
 # 컨트롤러 클래스
 
@@ -159,3 +229,4 @@
 		그런데 예제에서 Service에서 Repository 메서드를 호출할 때, 
 		Entity를 전달한 이유는 JpaRepository에 정의된 함수들은 미리 정의되어 있기 때문입니다. 
 		그래서 Entity를 전달할 수 밖에 없었는데, 요점은 각 계층에서 필요한 객체전달은 Entity 객체가 아닌 dto 객체를 통해 주고받는 것이 좋다는 것입니다.
+

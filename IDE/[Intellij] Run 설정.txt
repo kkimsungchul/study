@@ -1,0 +1,15 @@
+# IntelliJ - Run 설정
+
+# 설명
+	IntelliJ 를 처음 설치하거나 업데이트를 하면 기본적으로 Gradle 로 작동함
+	그래들로 실행하면 속도가 많이느림..
+	그래서 설정을 Intellij 로 변경하면 빨라짐
+
+# 변경
+	Preferences 
+	-> Build, Execution, Deployment
+	-> Build Tools
+	-> Gradle
+	-> 아래의 옵션 변경
+		Build and run using : Gradle -> IntelliJ IDEA
+		Run tests using : Gradle -> IntelliJ IDEA
