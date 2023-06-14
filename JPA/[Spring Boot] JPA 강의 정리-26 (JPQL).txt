@@ -1,0 +1,50 @@
+# SpringBoot - JPA 강의 정리-26(JPQL)
+
+# JPQL (Java Persistence Query Language)
+	- JPQL은 객체지향 쿼리 언어임
+	- 테이블을 대상으로 쿼리하는 것이 아니라 엔티티 객체를 대상으로 쿼리함
+	- JPQL은 SQL을 추상화 해서 특정 데이터베이스 SQL에 의존하지 않음
+	- JPQL은 결국 SQL로 변환됨
+
+# JPQL 문법
+	- SQL과 똑같음
+	- select m from Member as m  where m.age >18
+	- 엔티티와 속성은 대소문자 구분함 (Member , age)
+	- JPQL 키워드는 대소문자 구분 X( SELECT , FROM , where)
+	- 엔티티 이름 사용, 테이블 이름이 아님
+	- 별칭은 필수(m) , as 는 생략 가능
+
+# TypeQuery , Query
+	- TypeQuery : 반환 타입이 명확할 때 사용
+	- Query : 반환 타입이 명확하지 않을 때 사용
+
+# 결과 조회API
+	- query.getResultList() : 결과가 하나 이상일 때, 리스트 반환
+		결과가 없으면 빈 리스트 반환
+	- query.getSingleResult() : 결과가 정확히 하나, 단일 객체 반환
+		- 결과가 없으면 : javax.persistence.NoResultException
+		- 둘 이상이면 : javax.persistence.NonUniqueResultException
+
+
+# 파라미터 바인딩 
+	- 이름 기준
+	=====================================================================
+	TypedQuery<Member> query3 = em.createQuery("select m from Member m where m.username = :username",Member.class);
+	query3.setParameter("username" , "김성철");
+	Member member3 = query3.getSingleResult();
+	System.out.println(member3);
+
+	//체이닝 사용
+	Member member3 = em.createQuery("select m from Member m where m.username = :username",Member.class)
+						.setParameter("username" , "김성철")
+						.getSingleResult();
+	System.out.println(member3);
+	=====================================================================
+
+	- 위치 기준
+	※ 사용하지 말것
+	=====================================================================
+	SELECT m from member m where m.username = ?1
+	query.setParameter(1,usernameParam);
+	=====================================================================
+
