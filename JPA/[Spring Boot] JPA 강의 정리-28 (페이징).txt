@@ -1,0 +1,83 @@
+# SpringBoot - JPA 강의 정리-28(페이징)
+
+# 페이징
+	- JPA 는 페이징을 다음 두 API로 추상화
+	- setFirstResult(int startPosition) : 조회 시작 위치 (0부터 시작)
+	- setMaxResults(int maxResult) : 조회할 데이터 수
+	- 데이터베이스 종류에 따라서 하이버 네이트가 알아서 페이징 쿼리를 작성해줌
+
+
+# 페이징 코드
+	=====================================================================
+	package paging;
+
+	import domain.Member;
+	import domain.MemberDTO;
+
+	import javax.persistence.EntityManager;
+	import javax.persistence.EntityManagerFactory;
+	import javax.persistence.EntityTransaction;
+	import javax.persistence.Persistence;
+	import java.util.List;
+
+	public class JpaPagingMain {
+		public static void main(String[]args){
+			EntityManagerFactory emf = Persistence.createEntityManagerFactory("hello");
+			EntityManager em = emf.createEntityManager();
+			EntityTransaction tx = em.getTransaction();
+			tx.begin();
+			try{
+
+				for(int i=0;i<50;i++){
+					Member member = new Member();
+					member.setUsername("member1"+i);
+					member.setAge(20+i);
+					em.persist(member);
+				}
+				em.flush();
+				em.clear();
+				List<Member>resultList =  em.createQuery("select m from Member m order by m.age asc", Member.class)
+								.setFirstResult(1)//시작값
+								.setMaxResults(10)//갯수
+								.getResultList();
+
+				for(Member member1 : resultList){
+					System.out.println("#####");
+					System.out.println(member1.getUsername());
+					System.out.println(member1.getAge());
+
+				}
+				tx.commit();
+			}catch (Exception e){
+				tx.rollback();
+
+				e.printStackTrace();
+			}finally {
+				em.close();
+			}
+			emf.close();
+		}
+	}
+	=====================================================================
+
+# 페이징 실행 쿼리
+
+	=====================================================================
+	Hibernate: 
+		/* select
+			m 
+		from
+			Member m 
+		order by
+			m.age asc */ select
+				member0_.id as id1_0_,
+				member0_.age as age2_0_,
+				member0_.TEAM_ID as team_id4_0_,
+				member0_.username as username3_0_ 
+			from
+				Member member0_ 
+			order by
+				member0_.age asc limit ? offset ?
+	=====================================================================
+
+
