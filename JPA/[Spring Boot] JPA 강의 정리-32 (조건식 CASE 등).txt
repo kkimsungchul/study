@@ -1,0 +1,158 @@
+# SpringBoot - JPA 강의 정리-32(조건식 CASE 등)
+
+# 조건식 - CASE 식
+
+	- 기본 CASE 식
+	=====================================================================
+	select
+		case 
+			when m.age <= 10 then '학생요금'
+			when m.age >= 60 then '경로요금'
+			else '일반요금'
+		end
+	from Member m
+	=====================================================================
+
+	- 단순 CASE 식
+	=====================================================================
+	select
+		case t.name
+			when '팀A' then '인센티브110%'
+			when '팀B' then '인센티브120%'
+			else '인센티브105%'
+		end
+	from Team t
+	=====================================================================
+
+	- COALESCE : 하나씩 조회해서 null이 아니면 반환
+	- NULL IF : 두 값이 같으면 null 반환 , 다르면 첫번 째 값 반환
+
+# CASE 예제
+	
+	- 실행 코드
+	=====================================================================
+	Member member = new Member();
+	member.setUsername("김성철");
+	member.setAge(8);
+	member.setType(MemberType.ADMIN);
+	em.persist(member);
+	em.flush();
+
+	String query = "select " +
+			"case when m.age<=10 then '학생요금' " +
+				"when m.age>=60 then '경로요금' " +
+				"else '일반요금' " +
+			"end " +
+			"from Member m";
+	List<String> result = em.createQuery(query , String.class)
+			.getResultList();
+
+	for(String s : result){
+		System.out.println("S : " + s);
+	}
+	=====================================================================
+	
+	- 실행 쿼리
+	=====================================================================
+	Hibernate: 
+		/* select
+			case 
+				when m.age<=10 then '학생요금' 
+				when m.age>=60 then '경로요금' 
+				else '일반요금' 
+			end 
+		from
+			Member m */ select
+				case 
+					when member0_.age<=10 then '학생요금' 
+					when member0_.age>=60 then '경로요금' 
+					else '일반요금' 
+				end as col_0_0_ 
+			from
+				Member member0_
+	S : 학생요금
+	=====================================================================
+
+
+# COALESCE 예제
+	- 실행 코드
+	=====================================================================
+	Member member = new Member();
+	member.setUsername("김성철");
+	member.setAge(8);
+	member.setType(MemberType.ADMIN);
+	em.persist(member);
+
+	Member member2 = new Member();
+	member2.setUsername(null);
+	member2.setAge(8);
+	member2.setType(MemberType.ADMIN);
+	em.persist(member2);
+	em.flush();
+
+	String query = "select " +
+			"case when m.age<=10 then '학생요금' " +
+			"when m.age>=60 then '경로요금' " +
+			"else '일반요금' " +
+			"end " +
+			"from Member m";
+	List<String> result = em.createQuery(query , String.class)
+			.getResultList();
+	for(String s : result){
+		System.out.println("S : " + s);
+	}
+
+	String query1 = "select coalesce(m.username , '이름 없는 회원') from Member m ";
+	List<String> result1 = em.createQuery(query1 , String.class)
+			.getResultList();
+	for(String s : result1){
+		System.out.println("S : " + s);
+	}
+
+	=====================================================================
+
+	- 실행 쿼리
+	=====================================================================
+	Hibernate: 
+		/* select
+			coalesce(m.username ,
+			'이름 없는 회원') 
+		from
+			Member m  */ select
+				coalesce(member0_.username,
+				'이름 없는 회원') as col_0_0_ 
+			from
+				Member member0_
+	S : 김성철
+	S : 이름 없는 회원
+	=====================================================================
+
+
+# NULL IF 예제
+
+	- 실행 코드
+	=====================================================================
+	String query2 = "select nullif(m.username,'관리자') from Member m ";
+	List<String> result2 = em.createQuery(query2 , String.class)
+			.getResultList();
+	for(String s : result2){
+		System.out.println("S : " + s);
+	}
+
+	=====================================================================
+
+	- 실행 쿼리
+	=====================================================================
+	Hibernate: 
+		/* select
+			nullif(m.username,
+			'관리자') 
+		from
+			Member m  */ select
+				nullif(member0_.username,
+				'관리자') as col_0_0_ 
+			from
+				Member member0_
+	S : 김성철
+	S : null
+	=====================================================================
