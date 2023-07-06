@@ -92,6 +92,26 @@
 			for(TestVO t5 : compareList){
 				System.out.println(t5);
 			}
+
+
+			//리스트 두개의 값에서 중복되지 않은 값만 가져오기
+			List<String> list1 = new ArrayList<>();
+			list1.add("apple");
+			list1.add("banana");
+			list1.add("orange");
+
+			List<String> list2 = new ArrayList<>();
+			list2.add("banana");
+			list2.add("grape");
+			list2.add("kiwi");
+
+			List<String> uniqueValues = Stream.concat(list1.stream(), list2.stream())
+					.distinct()
+					.collect(Collectors.toList());
+
+			System.out.println(uniqueValues);
+
+
 		}
 	}
 
