@@ -114,7 +114,7 @@
 
 			
 
-			//일치하지 않는 값만 가져오기
+			//list1 기준 일치하지 않는 값만 가져오기
 			List<String> list1 = new ArrayList<>();
 			list1.add("apple");
 			list1.add("banana");
@@ -127,6 +127,26 @@
 
 			List<String> nonMatchingValues = list1.stream()
 					.filter(value -> !list2.contains(value))
+					.collect(Collectors.toList());
+
+			System.out.println(nonMatchingValues);
+
+			//두개의 리스트에서 일치하지 않는 값 가져오기
+			List<String> list1 = new ArrayList<>();
+			list1.add("apple");
+			list1.add("banana");
+			list1.add("orange");
+
+			List<String> list2 = new ArrayList<>();
+			list2.add("banana");
+			list2.add("grape");
+			list2.add("kiwi");
+
+			Set<String> uniqueValues = new HashSet<>(list1);
+			uniqueValues.addAll(list2);
+
+			List<String> nonMatchingValues = uniqueValues.stream()
+					.filter(value -> !(list1.contains(value) && list2.contains(value)))
 					.collect(Collectors.toList());
 
 			System.out.println(nonMatchingValues);
