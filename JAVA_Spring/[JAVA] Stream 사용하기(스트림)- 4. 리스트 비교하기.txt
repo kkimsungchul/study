@@ -94,7 +94,7 @@
 			}
 
 
-			//리스트 두개의 값에서 중복되지 않은 값만 가져오기
+			//리스트 두개의 값에서 중복값 제거하기
 			List<String> list1 = new ArrayList<>();
 			list1.add("apple");
 			list1.add("banana");
@@ -111,6 +111,25 @@
 
 			System.out.println(uniqueValues);
 
+
+			
+
+			//일치하지 않는 값만 가져오기
+			List<String> list1 = new ArrayList<>();
+			list1.add("apple");
+			list1.add("banana");
+			list1.add("orange");
+
+			List<String> list2 = new ArrayList<>();
+			list2.add("banana");
+			list2.add("grape");
+			list2.add("kiwi");
+
+			List<String> nonMatchingValues = list1.stream()
+					.filter(value -> !list2.contains(value))
+					.collect(Collectors.toList());
+
+			System.out.println(nonMatchingValues);
 
 		}
 	}
