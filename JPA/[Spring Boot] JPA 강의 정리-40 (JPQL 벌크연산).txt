@@ -1,0 +1,70 @@
+# SpringBoot - JPA 강의 정리-40(JPQL 벌크연산)
+
+
+# 벌크 연산
+	- PK하나를 딱 찍어서 update , delete 하는 쿼리를 제외한 다른 update , delete 문
+	ex) 재고가 10개 미만인 모든 상품의 가격을 10% 상승하려면?
+		JPA 변경 감지 기능으로 실행하려면 너무 많은 SQL 실행됨
+		1. 재고가 10개 미만인 상품을 리스트로 조회
+		2. 상품 엔티티의 가격을 10% 증가
+		3. 트랜잭션 커밋 시점에 변경감지 동작
+		※ 변경된 데이터가 100건 이라면 100번의 update sql 실행
+
+	- 쿼리 한번으로 여러 테이블 로우 변경 (엔티티)
+	- executeUpdate()의 결과는 영향받은 엔티티 수 반환
+	- update , delete 지원
+	- insert (insert into ... select ,하이버네이트 지원)
+	- FLUSH가 자동 호출됨 (cimmit , query 가 실행될때)
+
+	JPQL
+	=====================================================================
+
+	//FLUSH 자동 호출
+	int resultCount = em.createQuery("update Member m set m.age = 20")
+					.executeUpdate();
+	=====================================================================	
+
+
+	SQL
+	=====================================================================
+	Hibernate: 
+		/* update
+			Member m 
+		set
+			m.age = 20 */ update
+				Member 
+			set
+				age=20
+	=====================================================================
+
+# 벌크 연산 주의
+	- 벌크 연산은 영속성 컨텍스트를 무시하고 데이터베이스에 직접 쿼리를 실행함
+	- 벌크 연산을 먼저 실행
+	- 벌크 연산 수행 후 영속성 컨텍스트 초기화
+
+
+	# 벌크연산 후 영속성 컨텍스트 초기화 여부에 따른 데이터 확인
+	JPQL
+	=====================================================================
+	//나이 20으로 업데이트
+	int resultCount = em.createQuery("update Member m set m.age = 20")
+					.executeUpdate();
+
+	//member3의 나이 출력
+	System.out.println("member3.getAge() = " + member3.getAge());
+	//member3.getAge() = 8
+
+
+	//member3을 조회 후 나이 출력
+	Member findMember = em.find(Member.class , member3.getId());
+	System.out.println(findMember);
+	//member3.getAge() = 8
+
+	
+	//영속성 컨텍스트 초기화
+	em.clear();
+	Member findMember2 = em.find(Member.class , member3.getId());
+	System.out.println("member3.getAge() = " +findMember2.getAge());
+	//member3.getAge() = 20
+	=====================================================================
+	
