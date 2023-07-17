@@ -1,0 +1,76 @@
+# SpringBoot - SpringBoot 실행 후 특정 코드 실행 시키기
+
+
+# 참고 링크 
+	https://mangkyu.tistory.com/233
+
+#  설명
+	- Spring Boot의 CommandLineRunner는 애플리케이션을 실행할 때 자동으로 실행되는 인터페이스
+	- 이 인터페이스를 구현하면 애플리케이션이 시작되고 컨텍스트가 로드된 후에 자동으로 실행되는 메서드를 정의할 수 있음
+	- 스프링 부트 애플리케이션이 실행될 때 추가적인 초기화 작업이나 특정한 동작을 수행하기 위해 사용됨 
+		ex) 데이터베이스 연결 설정, 외부 시스템과의 연동 설정, 데이터 초기화 등의 작업을 수행할 수 있음
+	
+
+# 구현
+	구현은 @SpringBootApplication 어노테이션이 있는 main 클래스에 추가하거나
+	CommandLineRunner 인터페이스를 구현하는 방법이 있음
+
+
+	1. SpringBoot main  메소드가있는 클래스에 구현
+	=====================================================================
+	public class SpringBootMain extends SpringBootServletInitializer
+
+		public static void main(String[] args) {
+			SpringApplication.run(SpringBootMain.class, args);
+		}
+		@Override
+		protected SpringApplicationBuilder configure(SpringApplicationBuilder application){
+			return application.sources(SpringBootMain.class);
+		}
+		
+
+		//여기 밑에 구현
+		@Bean
+		public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
+			return args -> {
+				System.out.println(">>>>>> Loading components.");
+				String[] componentNames = ctx.getBeanDefinitionNames();
+				Arrays.sort(componentNames);
+
+				for ( String beanName: componentNames ) {
+					System.out.println(beanName);
+				}
+			};
+		}
+
+	}
+
+	=====================================================================
+
+
+	2. 인터페이스를 구현
+	=====================================================================
+	import org.springframework.boot.CommandLineRunner;
+	import org.springframework.stereotype.Component;
+
+	@Component
+	public class MyCommandLineRunner implements CommandLineRunner {
+
+		@Override
+		public void run(String... args) throws Exception {
+			// 애플리케이션 실행 시 자동으로 실행되는 코드 작성
+			System.out.println("애플리케이션 시작됨");
+			// 추가적인 초기화 작업이나 동작 구현
+		}
+	}
+
+	=====================================================================
+
+
+
+#  인터페이스로 구현하는 방벙베 대한 설명
+
+	1. CommandLineRunner 인터페이스를 구현하는 클래스를 생성
+	2. 구현해야 하는 메서드인 run()을 오버라이드
+	3. run() 메서드 안에 초기화 작업이나 동작을 구현
+	
