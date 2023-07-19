@@ -1,0 +1,30 @@
+# Chat GPT - Chat GPT를 API로 사용하기
+
+# 토큰 발급
+	https://platform.openai.com/account/api-keys
+
+# Chat GPT 수정
+	https://platform.openai.com/playground
+
+
+# 오류 - You exceeded your current quota, please check your plan and billing details.
+
+	https://velog.io/@toezilla/ChatGPT-openai.error.RateLimitError-You-exceeded-your-current-quota-please-check-your-plan-and-billing-details
+	신용카드를 등록하면 해결된다고 함
+
+# POST Man 에서 사용
+	
+	URL : https://api.openai.com/v1/chat/completions
+	Content-Type : application/json
+	Method : POST
+	Header : 
+		Authorization : Bearer sk-DcKY***************************************
+	Body : 
+		{
+		  "model": "gpt-3.5-turbo",
+		  "messages": [{"role": "user", "content": "단편소설 아무거나 하나 작성해줘"}]
+		}
+
+
+
+
