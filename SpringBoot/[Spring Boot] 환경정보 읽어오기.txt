@@ -1,0 +1,147 @@
+# SpringBoot - 환경정보 읽어오기
+
+# 설명
+	SpringBoot를 사용하다보면 application.yml 파일에 작성한 설정들을 읽어와서 사용해야 할 때가 있음
+	@value 로 가져와서 사용해도 되지만, 공통 클래스를 만들어서 가저올수 있도록 하고싶음
+
+
+# 코드 - EnvUtil 사용
+	=====================================================================
+
+	@RestController
+	@RequestMapping("/gpt")
+	public class ChatGptController {
+
+		private final ChatGptService chatGptService;
+
+		private final EnvUtil envUtil;
+
+		@Autowired
+		public ChatGptController(ChatGptService chatGptService , EnvUtil envUtil){
+			this.chatGptService = chatGptService;
+			this.envUtil = envUtil;
+		}
+
+		//여기서 사용
+		@GetMapping(value ="/test")
+		public void test() throws Exception{
+			System.out.println(envUtil.getHostname());
+			System.out.println(envUtil.getPort());
+			System.out.println(envUtil.getServerUrlPrefix());
+			System.out.println(envUtil.getPortAsInt());
+			System.out.println(envUtil.getProfile());
+		}
+	}
+	=====================================================================
+
+# 코드 - EnvUtil.java
+	=====================================================================
+	package com.blog.createblogpost.common;
+
+	import org.springframework.beans.factory.annotation.Autowired;
+	import org.springframework.core.env.Environment;
+	import org.springframework.stereotype.Component;
+
+	import java.net.InetAddress;
+	import java.net.UnknownHostException;
+
+	@Component
+	public class EnvUtil {
+
+
+
+		private final Environment environment;
+
+		@Autowired
+		public EnvUtil(Environment environment){
+			this.environment = environment;
+		}
+
+		private String port;
+		private String hostname;
+
+		/**
+		 * Get port.
+		 *
+		 * @return
+		 */
+		public String getPort() {
+			if (port == null) {
+				port = environment.getProperty("server.port");
+			}
+			return port;
+		}
+
+		public String getProfile() {
+			return environment.getProperty("spring.profiles");
+		}
+
+		/**
+		 * ADMIN_FINE_GRAINED_AUTHZ
+		 * Get port, as Integer.
+		 *
+		 * @return
+		 */
+		public Integer getPortAsInt() {
+			return Integer.valueOf(getPort());
+		}
+
+		/**
+		 * Get Hostname.
+		 *
+		 * @return
+		 */
+		public String getHostname() throws UnknownHostException {
+			// TODO ... would this cache cause issue, when network env change ???
+			if (hostname == null) {
+				hostname = InetAddress.getLocalHost().getHostAddress();
+			}
+			return hostname;
+		}
+
+		public String getServerUrlPrefix() throws UnknownHostException {
+			return "http://" + getHostname() + ":" + getPort();
+		}
+
+		private boolean startWithAny(String source, String[] target) {
+
+			for (String tg : target) {
+				if (source.startsWith(tg)) {
+					return true;
+				}
+			}
+
+			return false;
+		}
+	}
+	=====================================================================
+
+
+# yml 파일
+	=====================================================================
+	spring:
+	  config:
+		activate:
+		  on-profile: local
+	  mvc:
+		pathmatch:
+		  matching-strategy: ant_path_matcher
+	server :
+	  port : 9090
+
+
+	springdoc:
+	  packages-to-scan: com.blog.createblogpost
+	  default-consumes-media-type: application/json;charset=UTF-8
+	  default-produces-media-type: application/json;charset=UTF-8
+	  swagger-ui:
+		path: swagger-ui.html         # Swagger UI ?? , localhost:9090/swagger-ui/index.html default : swagger-ui/index.html
+		tags-sorter: alpha            # alpha: ??? ? ?? ??, method: HTTP Method ? ??
+		operations-sorter: alpha      # alpha: ??? ? ?? ??, method: HTTP Method ? ??
+	  api-docs:
+		path: /api-docs/json
+		groups:
+		  enabled: true
+		cache:
+		  disabled: true
+	=====================================================================
