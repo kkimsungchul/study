@@ -1,0 +1,14 @@
+타임리프
+
+
+정적 컨텐츠
+-> resources\static
+
+동적 컨텐츠
+-> resources\templates
+
+
+개발 도구
+implementation 'org.springframework.boot:spring-boot-devtools'
+
+컨트롤+시프트+f9 리컴파일 하면 서버 재시작 없이 변경분 반영됨
