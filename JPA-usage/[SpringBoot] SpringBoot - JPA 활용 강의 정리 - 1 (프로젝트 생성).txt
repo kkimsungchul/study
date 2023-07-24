@@ -1,0 +1,29 @@
+# SpringBoot - JPA 활용 강의 정리 - 1 (프로젝트 생성)
+
+# 프로젝트 생성
+	※ 강의에서는 스프링 이니셜라이저(https://start.spring.io/ )에서 생성했지만, 나는 툴에서 바로 생성함
+	※ 강의에서 사용하는 스프링 버전과 좀 차이가 남
+	Java : 17
+	SpringBoot : 2.7.14
+	Dependencies : 
+		Spring Web
+		Thymeleaf
+		Spring Data JPA
+		H2 Database
+		Lombok
+	
+# Lombok 설치/세팅
+	※ 설치되어 있었지만 나중에 안찾도록 작성함
+	1. 설치
+		IntelliJ 
+		-> Setting 
+		-> Plugins
+		-> Lombok 설치
+
+	2. 세팅
+		IntelliJ 
+		-> Setting 
+		-> Annotation processor 검색
+		-> 우측 옵션의 Enable annotation processing 클릭
+		-> APPLY 클릭
+

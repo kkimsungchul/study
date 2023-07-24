@@ -1,0 +1,20 @@
+# SpringBoot - JPA 활용 강의 정리 - 3 (View 환경 설정)
+
+# 공식 문서
+	thymeleaf 템플릿 엔진
+	thymeleaf 공식 사이트: https://www.thymeleaf.org/
+	스프링 공식 튜토리얼: https://spring.io/guides/gs/serving-web-content/
+	스프링부트 메뉴얼: https://docs.spring.io/spring-boot/docs/2.1.6.RELEASE/reference/html/boot-features-developing-web-applications.html#boot-features-spring-mvc-templateengines
+
+# 컨텐츠 저장 위치
+	정적 컨텐츠
+	-> resources\static
+
+	동적 컨텐츠
+	-> resources\templates
+
+# 컨텐츠 바로 반영
+	개발 도구
+	implementation 'org.springframework.boot:spring-boot-devtools'
+
+	컨트롤+시프트+f9 리컴파일 하면 서버 재시작 없이 변경분 반영됨
