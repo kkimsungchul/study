@@ -1,0 +1,26 @@
+# SpringBoot - JPA 활용 강의 정리 - 4 (H2 데이터베이스 설치)
+
+# 다운로드 링크
+	https://www.h2database.com/html/main.html
+
+# 다운로드 후 아래의 파일 실행
+	h2-setup-2022-06-13.exe
+
+# 접속
+	http://172.28.96.1:8082
+	※ 위에 기재된 IP는 본인 컴퓨터에 할당된 IP
+	또는
+	http://localhost:8082
+	
+	※ 접속이 안될경우 시작버튼 클릭 후 H2 console 실행
+
+# 최초 접속
+
+	드라이버 클래스 : org.h2.Driver
+	JDBC URL : jdbc:h2:~/jpashop
+	사용자명 : sa
+
+# 추후 접속
+	JDBC URL : jdbc:h2:tcp://localhost/~/jpashop
+	사용자명 : sa
+	비밀번호 : sa1234
