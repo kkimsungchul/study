@@ -1,0 +1,42 @@
+# SpringBoot - JPA 활용 강의 정리 - 5 (환경설정)
+
+# application.yml 파일 설정
+	=====================================================================
+	Spring :
+	  datasource :
+		#url : jdbc:h2:tcp:localhost/~/jpashop;MVCC=TRUE
+		url : jdbc:h2:tcp:localhost/~/jpashop; #mvcc 지원을 안함 내가 설치한 버전은
+		username : sa
+		password : sa1234
+		driver-class-name : org.h2.Driver
+
+	  jpa :
+		hibernate:
+		  ddl-auto: create
+		properties:
+		  hibernate:
+			show_sql: true
+			format_sql: true
+
+	server:
+	  port: 9000
+	logging.level:
+		org.hibernate.sql : debug
+		org.hibernate.type : trace #쿼리문 하단에 파라메터 표시해줌
+	=====================================================================
+
+# SpringBoot JPA 설정
+	스프링 부트를 통해 복잡한 설정이 이미 다 되어 있음
+	persistence.xml 파일을 생성할 필요 없음
+	LocalContainerEntityManagerFactoryBean 도 없음
+
+
+# 쿼리 로그 설정
+	기본적으로 쿼리문은 보이지만 파라메터들이 보이지 않음
+	yml 파일에서 org.hibernate.type : trace 옵션으로 파라메터를 찍을 수 있지만 아래의 라이브러리 사용을 하면 더 편하게 확인 가능
+	https://github.com/gavlyukovskiy/spring-boot-data-source-decorator
+
+
+# 테스트 코드 작성
+	아래 URL 참고
+
