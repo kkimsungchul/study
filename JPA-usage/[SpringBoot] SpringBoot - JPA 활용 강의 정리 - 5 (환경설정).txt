@@ -35,8 +35,10 @@
 	기본적으로 쿼리문은 보이지만 파라메터들이 보이지 않음
 	yml 파일에서 org.hibernate.type : trace 옵션으로 파라메터를 찍을 수 있지만 아래의 라이브러리 사용을 하면 더 편하게 확인 가능
 	https://github.com/gavlyukovskiy/spring-boot-data-source-decorator
+	※ 운영에 배포할때는 꼭 성능테스트를 하고 하자
+
 
 
 # 테스트 코드 작성
 	아래 URL 참고
-
+	https://github.com/kkimsungchul/study_code/tree/main/jpashop/src/test/java/jpabook/jpashop

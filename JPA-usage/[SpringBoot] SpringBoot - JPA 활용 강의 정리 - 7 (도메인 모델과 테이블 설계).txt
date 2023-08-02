@@ -1,0 +1,62 @@
+# SpringBoot - JPA 활용 강의 정리 - 7 (도메인 모델과 테이블 설계)
+
+# 도메인 모델과 테이블 설계
+	회원 :  주문 ( 1:N )
+	주문 : 배송 ( 1:1 )
+	주문 : 주문상품 ( 1: N )
+	주문상품 :  상품 ( N : 1 )
+	상품 : 카테고리 ( N : N )
+
+# 회원 엔티티 분석
+
+	- Member
+		id : Long
+		name : String
+		address : Address
+		orders : List
+
+
+	- Order
+		id
+		member : Member
+		orderItems : List
+		delivery : Delivery
+		orderDate : Date
+		status : OrderStatus
+	
+	- Delivery
+		id
+		order : Order
+		address : Address
+		status : DeliveryStatus
+	
+	- Address
+		city
+		street
+		zipcode
+	
+	- OrderItem
+		id
+		item : Item
+		order : Order
+		orderPrice
+		count
+	
+	- Item
+		id
+		name
+		price : int
+		stpclQuantity
+		categories : List
+	
+	- Category
+		id
+		name
+		items : List
+		parent : Category
+		child : List
+	
+
+# 참고
+	외래 키가 있는 곳을 연관관계의 주인으로 정해야 한다.
+	연관관계의 주인은 단순히 외래 키를 누가 관리하냐의 문제이지 비즈니스상 우위에 있다고 주인으로 정하면 안된다.
