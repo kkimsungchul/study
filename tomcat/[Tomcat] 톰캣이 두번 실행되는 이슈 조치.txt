@@ -11,7 +11,7 @@
 	=================================================================================================================
 	  <Host name="localhost"  appBase="webapps"
             unpackWARs="true" autoDeploy="true">
-			<Context docBase="/test" path="/" reloadable="true">
+			<Context docBase="/test" path="/" reloadable="true"/>
 		
 	=================================================================================================================
 
