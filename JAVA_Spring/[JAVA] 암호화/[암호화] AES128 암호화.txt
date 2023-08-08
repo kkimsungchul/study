@@ -156,6 +156,36 @@ CASE 1. 로그인 페이지 do 사용
 	=================================================================================================================
 
 
+	※ 개선 코드, 추후 적용해볼것
+	=====================================================================
+	public Hashtable<String, String> aesTest() {
+			Hashtable<String, String> hashtable = new Hashtable<>();
+			SecureRandom secureRandom;
+			try {
+				secureRandom = SecureRandom.getInstanceStrong();
+				byte[] salt = new byte[16];
+				byte[] iv = new byte[16];
+				byte[] passPhrase = "yourStrongPassword".getBytes();
+
+				secureRandom.nextBytes(salt);
+				secureRandom.nextBytes(iv);
+
+				String enc_salt = Base64.getEncoder().encodeToString(salt);
+				String enc_iv = Base64.getEncoder().encodeToString(iv);
+				String enc_passPhrase = Base64.getEncoder().encodeToString(passPhrase);
+
+				hashtable.put("enc_iv", enc_iv);
+				hashtable.put("enc_salt", enc_salt);
+				hashtable.put("enc_passPhrase", enc_passPhrase);
+
+			} catch (NoSuchAlgorithmException e) {
+				System.out.println("난수 발생 에러");
+			}
+			return hashtable;
+		}
+
+	=====================================================================
+
 
 # 로그인 페이지
 
