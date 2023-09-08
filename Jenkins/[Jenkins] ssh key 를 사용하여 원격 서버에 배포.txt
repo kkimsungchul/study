@@ -1,12 +1,40 @@
 # Jenkins - ssh key를 사용하여 원격 서버에 배포
 
 
-	참고링크 : 
-		https://ktaes.tistory.com/100
+# SSH란
+	서버에 접속할 때 비밀번호 대신 key를 제출하는 방식
+	비밀번호보다 높은 보안
+	로그인 없이 자동으로 서버에 접속하여 배포 가능
 
+# 작동 방식
+	키를 생성하면 공개키(id_sa_pub)와 비공개키(id_rsa)가 만들어진다.
+	공개키는 원격서버에 비공개키는 클라이언트에 위치시킨다.
+	로그인 할때 가지고 있는 비공개키를 서버에 전송한다.
+	이 과장이 비밀번호를 입력하는 과정을 대신한다.
+
+
+# 참고링크 
+	https://ktaes.tistory.com/100
+
+
+# 작업 순서
+	※ 폴더 안에 내용 확인은 ll 명령어가 아닌 ls -al로 진행
 
 	1. Jenkins 서버 - Jenkins 계정으로 로그인 후 RSA키 생성 명령어 입력
+		su - jenkins
 		ssh-keygen -t rsa
+		
+	2. Jenkins 서버 - 키 생성 확인
+		jenkins 홈 디렉토리 확인	
+			cat /etc/passwd | grep jenkins 
+		
+		jenkins 홈 디렉토리의 .ssh 경로로 이동
+			cd /var/lib/jenkins/.ssh
+		
+		파일 생성 확인
+			ls -al
+			id_rsa_pub
+			id_rsa
 
 	2. Jenkins 관리 - Plugin Manager - 설치 가능에서 SSH plugin 을 설치한다.
 
