@@ -46,4 +46,4 @@
 		-> providers
 		-> 추가한 SPI명 검색
 	
-	3. 해당페이지에서 keycloak-password 가 보이지 않으면 설정이 완료된것
+	3. 해당페이지에서 keycloak-password 가 보여야 설정이 완료된것
