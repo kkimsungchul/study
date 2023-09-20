@@ -1,6 +1,10 @@
 # Keycloak - Keycloak으로 젠킨스 로그인 하기
 	https://kmaster.tistory.com/115
 	https://oingdaddy.tistory.com/244
+
+# 공식문서
+	https://plugins.jenkins.io/keycloak/#documentation
+
 # 사전작업
 	1. 젠킨스 설치
 		https://github.com/kkimsungchul/study/blob/master/Jenkins/%5BJenkins%5D%20%EC%A0%A0%ED%82%A8%EC%8A%A4%20%EC%84%A4%EC%B9%98(Windows).txt
