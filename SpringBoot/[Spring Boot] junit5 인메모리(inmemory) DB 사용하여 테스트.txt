@@ -1,0 +1,67 @@
+# SpringBoot - junit5 인메모리 DB 테스트
+
+url : https://h2database.com/html/cheatSheet.html
+
+# yml 파일 생성
+	test 디렉토리 밑에 resources 폴더 생성 후 application.yml 파일을 생성
+	해당 파일의 내용은 기존의 main 밑에 있는 resources 에 있는 yml파일을 그대로 가져와 사용함
+
+# yml 파일 설정
+해당 페이지에 있는 내용을 확인하여 인메모리 부분을 yml파일에 복사
+	==========================================================================
+	In-Memory
+	jdbc:h2:mem:test multiple connections in one process,
+	==========================================================================
+	"jdbc:h2:mem:test" 이부분
+
+# test 의 yml 파일 수정
+	==========================================================================
+	Spring :
+	  datasource :
+		url : jdbc:h2:mem:test
+		username : sa
+		password :
+		driver-class-name : org.h2.Driver
+
+	  jpa :
+		hibernate:
+		  ddl-auto: create
+		properties:
+		  hibernate:
+			show_sql: true
+			format_sql: true
+
+	server:
+	  port: 9090
+	logging.level:
+		org.hibernate.sql : debug
+		org.hibernate.type : trace 
+
+	==========================================================================
+
+# yml파일의 내용 주석처리
+	SpringBoot의 test에서 별도의 DB설정이 없으면 인메모리 모드로 자동으로 돌림
+	database 관련내용을 전부다 주석처리
+	==========================================================================
+	Spring :
+	#  datasource :
+	#    url : jdbc:h2:mem:test
+	#    username : sa
+	#    password :
+	#    driver-class-name : org.h2.Driver
+	#
+	#  jpa :
+	#    hibernate:
+	#      ddl-auto: create
+	#    properties:
+	#      hibernate:
+	#        show_sql: true
+	#        format_sql: true
+
+	server:
+	  port: 9090
+	logging.level:
+		org.hibernate.sql : debug
+		org.hibernate.type : trace 
+
+	==========================================================================
