@@ -1,0 +1,144 @@
+# Python - 파이썬으로 웹 사이트 크롤링 하기
+
+# 참고사항
+	현재 설치된 파이썬 버전 : 3.7
+
+# requests 설치
+	해당 라이브러리는 특정 URL을 호출하여 데이터를 받아오는 라이브러리임
+	pip install requests
+
+# 테스트 코드 작성 - 웹페이지 가져오기
+	=====================================================================
+	import requests
+
+	def fetch_data(url):
+		try:
+			response = requests.get(url)
+			# HTTP 응답 상태 코드가 200 (OK)일 경우에만 데이터를 반환합니다.
+			if response.status_code == 200:
+				return response.text
+			else:
+				print(f"Failed to fetch data. Status code: {response.status_code}")
+				return None
+		except requests.exceptions.RequestException as e:
+			print(f"An error occurred: {e}")
+			return None
+
+	# 특정 URL
+	url = "https://naver.com"
+
+	# 데이터를 받아옵니다.
+	data = fetch_data(url)
+
+	if data:
+		print("Received data:")
+		print(data)
+	else:
+		print("Failed to fetch data.")
+
+	=====================================================================
+
+
+# 오류 발생
+	오류메시지 : urllib3 v2.0 only supports OpenSSL 1.1.1+, currently
+	참고 URL : https://github.com/googleapis/python-bigquery/issues/1565
+			https://stackoverflow.com/questions/76187256/importerror-urllib3-v2-0-only-supports-openssl-1-1-1-currently-the-ssl-modu
+
+	해결방안 : pip install urllib3==1.26.6
+		
+# beautifulsoup4 설치
+	해당 라이브러리는 HTML을 파싱하는 라이브러리임
+	pip install beautifulsoup4
+	
+
+
+# 테스트 코드 작성 - 특정 태그 가져오기
+
+	=====================================================================
+	from bs4 import BeautifulSoup
+	import requests
+
+	def fetch_data(url):
+		try:
+			response = requests.get(url)
+			if response.status_code == 200:
+				return response.text
+			else:
+				print(f"Failed to fetch data. Status code: {response.status_code}")
+				return None
+		except requests.exceptions.RequestException as e:
+			print(f"An error occurred: {e}")
+			return None
+
+	def parse_with_css_selector(html, css_selector):
+		soup = BeautifulSoup(html, 'html.parser')
+		target_elements = soup.select(css_selector)
+		if target_elements:
+			for element in target_elements:
+				print("Content inside the target tag:")
+				print(element.text)
+		else:
+			print(f"No elements found for the CSS selector: {css_selector}")
+
+	# 특정 URL
+	url = "https://news.naver.com/"
+
+	# 데이터를 받아옵니다.
+	data = fetch_data(url)
+
+	if data:
+		# 파싱할 CSS 선택자
+		css_selector = "div.cjs_channel_card div.cjs_journal_wrap._item_contents div.cjs_news_tw div.cjs_t"
+
+		# CSS 선택자를 사용하여 파싱하고 내용 출력
+		parse_with_css_selector(data, css_selector)
+
+	=====================================================================
+
+
+# 헤더에 키값 추가
+
+	=====================================================================
+	from bs4 import BeautifulSoup
+	import requests
+
+	def fetch_data(url):
+		headers = {
+			'X-ApiKeys': 'accessKey=aajkdfhkejr3415fghfdgh;secretKey=lkzdmvlkasdjf1283123'
+
+		}
+		try:
+			response = requests.get(url,headers=headers, verify=False)
+			if response.status_code == 200:
+				return response.text
+			else:
+				print(f"Failed to fetch data. Status code: {response.status_code}")
+				return None
+		except requests.exceptions.RequestException as e:
+			print(f"An error occurred: {e}")
+			return None
+
+	def parse_with_css_selector(html, css_selector):
+		soup = BeautifulSoup(html, 'html.parser')
+		target_elements = soup.select(css_selector)
+		if target_elements:
+			for element in target_elements:
+				print("Content inside the target tag:")
+				print(element.text)
+		else:
+			print(f"No elements found for the CSS selector: {css_selector}")
+
+	# 특정 URL
+	url = "https://news.naver.com/"
+
+	# 데이터를 받아옵니다.
+	data = fetch_data(url)
+
+	if data:
+		# 파싱할 CSS 선택자
+		css_selector = "div.cjs_channel_card div.cjs_journal_wrap._item_contents div.cjs_news_tw div.cjs_t"
+
+		# CSS 선택자를 사용하여 파싱하고 내용 출력
+		parse_with_css_selector(data, css_selector)
+
+	=====================================================================
