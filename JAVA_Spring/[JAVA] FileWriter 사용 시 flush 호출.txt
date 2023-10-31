@@ -97,3 +97,6 @@
 	- 쓸내용이 많을경우 중간중간 flush()를 해주자.
 	- 내용이 적을 경우 close()만 호출해도 close()내부에서 flush()를 호출한다
 	- try-with-resources 를쓰면 flush() , close()를 안따져도 되니까 try-with-resources 를 사용하자
+
+	try-with-resources 에 대한 내용은 아래에 정리되어 있음
+		https://github.com/kkimsungchul/study/blob/master/Effective%20Java/%5BEffective%20Java%5D%20%EC%B1%95%ED%84%B09.%20try-finally%EB%B3%B4%EB%8B%A4%EB%8A%94%20try-with-resources%20%EB%A5%BC%20%EC%82%AC%EC%9A%A9%ED%95%98%EB%9D%BC.txt
