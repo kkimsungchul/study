@@ -1,16 +1,16 @@
-# JAVA - FileWriter »ç¿ë ½Ã flush È£Ãâ
-	Âü°í¸µÅ© : https://two.leojuly.com/6
+# JAVA - FileWriter ì‚¬ìš© ì‹œ flush í˜¸ì¶œ
+	ì°¸ê³ ë§í¬ : https://two.leojuly.com/6
 		https://docs.oracle.com/javase/8/docs/api/java/io/OutputStreamWriter.html#close--
 
-# FileWriter »ç¿ë¹æ¹ý
+# FileWriter ì‚¬ìš©ë°©ë²•
 
-	1. try - catch »ç¿ë
+	1. try - catch ì‚¬ìš©
 	==========================================================================
-	File file = new File(ÆÄÀÏ°æ·Î);
+	File file = new File(íŒŒì¼ê²½ë¡œ);
 	FileWriter fileWriter = null;
 	try{
 		fileWriter = new FileWriter(file);
-		fileWriter.writer("µ¥ÀÌÅÍ ³»¿ë");
+		fileWriter.writer("ë°ì´í„° ë‚´ìš©");
 		fileWriter.close();
 	}catch(Exception e){
 	
@@ -18,32 +18,32 @@
 	
 	==========================================================================
 	
-	2. try-with-resources »ç¿ë
+	2. try-with-resources ì‚¬ìš©
 	==========================================================================
-	File file = new File(ÆÄÀÏ°æ·Î);
+	File file = new File(íŒŒì¼ê²½ë¡œ);
 
 	try (FileWriter fileWriter = new FileWriter(file)) {
-		fileWriter.write("µ¥ÀÌÅÍ ³»¿ë");
+		fileWriter.write("ë°ì´í„° ë‚´ìš©");
 	} catch (Exception e) {
-		// ¿¹¿Ü Ã³¸®
+		// ì˜ˆì™¸ ì²˜ë¦¬
 	}
 	==========================================================================
 
 
-# flush()¸¦ È£ÃâÇØ¾ß ÇÏ´Â°¡ - ¼­·Ð
-	ÀÌ ³»¿ëÀ» ÀÛ¼ºÇÏ°ÔµÈ °è±âÀÓ.
-	"fileWriter °´Ã¼¸¦ »ý¼º ÈÄ fileWriter.flush()¸¦ È£ÃâÇÏÁö ¾Ê°í fileWriter.close()¸¦ È£ÃâÇÏ¸é ¿À·ù°¡ ¹ß»ýÇÒ¼ö ÀÖ´Ù."
-	³»°¡ ÀÛ¼ºÇÏÁø ¾Ê¾ÒÁö¸¸, À§¿¡ FileWriter »ç¿ë¹æ¹ý 1¿¡ ÀÛ¼ºÇÑ try - catch ·Î ÄÚµå°¡ ÀÛ¼ºµÇ¾î ÀÖ¾úÀ½.
-	½ÇÁ¦·Î ÄÚµåµµ close()¸¦ È£ÃâÇÏ´Â ¼ø°£¿¡ ÆÄÀÏ¿¡ ³»¿ëÀÌ ÀûÀçµÇ´Â °ÍÀ» È®ÀÎÇÏ¿´À½ (µð¹ö°Å ¸ðµå·Î È®ÀÎ)
+# flush()ë¥¼ í˜¸ì¶œí•´ì•¼ í•˜ëŠ”ê°€ - ì„œë¡ 
+	ì´ ë‚´ìš©ì„ ìž‘ì„±í•˜ê²Œëœ ê³„ê¸°ìž„.
+	"fileWriter ê°ì²´ë¥¼ ìƒì„± í›„ fileWriter.flush()ë¥¼ í˜¸ì¶œí•˜ì§€ ì•Šê³  fileWriter.close()ë¥¼ í˜¸ì¶œí•˜ë©´ ì˜¤ë¥˜ê°€ ë°œìƒí• ìˆ˜ ìžˆë‹¤."
+	ë‚´ê°€ ìž‘ì„±í•˜ì§„ ì•Šì•˜ì§€ë§Œ, ìœ„ì— FileWriter ì‚¬ìš©ë°©ë²• 1ì— ìž‘ì„±í•œ try - catch ë¡œ ì½”ë“œê°€ ìž‘ì„±ë˜ì–´ ìžˆì—ˆìŒ.
+	ì‹¤ì œë¡œ ì½”ë“œë„ close()ë¥¼ í˜¸ì¶œí•˜ëŠ” ìˆœê°„ì— íŒŒì¼ì— ë‚´ìš©ì´ ì ìž¬ë˜ëŠ” ê²ƒì„ í™•ì¸í•˜ì˜€ìŒ (ë””ë²„ê±° ëª¨ë“œë¡œ í™•ì¸)
 	
-	³í¸®ÀûÀ¸·Î »ý°¢ÇØºÃÀ»¶§ flush¸¦ close() ÇÒ¶§ È£Ãâ ÇÏ´Â ±¸³ª ¶ó°í »ý°¢ÇßÁö¸¸ º¸ÀÌÁö ¾Ê°í, 
-	ÀÌÀü¿¡´Â flush()¸¦ ÇØ¾ß ¿À·ù°¡ ¾È³µ´Ù ¶ó´Â ¸»À» µé¾úÀ¸´Ï ³»¿ëÀ» Ã£¾Æº¸°Ô µÇ¾úÀ½
+	ë…¼ë¦¬ì ìœ¼ë¡œ ìƒê°í•´ë´¤ì„ë•Œ flushë¥¼ close() í• ë•Œ í˜¸ì¶œ í•˜ëŠ” êµ¬ë‚˜ ë¼ê³  ìƒê°í–ˆì§€ë§Œ ë³´ì´ì§€ ì•Šê³ , 
+	ì´ì „ì—ëŠ” flush()ë¥¼ í•´ì•¼ ì˜¤ë¥˜ê°€ ì•ˆë‚¬ë‹¤ ë¼ëŠ” ë§ì„ ë“¤ì—ˆìœ¼ë‹ˆ ë‚´ìš©ì„ ì°¾ì•„ë³´ê²Œ ë˜ì—ˆìŒ
 
-# flush()¸¦ È£ÃâÇØ¾ß ÇÏ´Â°¡ - º»·Ð
-	javaÀÇ api¹®¼­¸¦ Ã£¾Æ µé¾î°¡ºÃÀ½
+# flush()ë¥¼ í˜¸ì¶œí•´ì•¼ í•˜ëŠ”ê°€ - ë³¸ë¡ 
+	javaì˜ apië¬¸ì„œë¥¼ ì°¾ì•„ ë“¤ì–´ê°€ë´¤ìŒ
 	URL : https://docs.oracle.com/javase/8/docs/api/java/io/OutputStreamWriter.html#close--
 	
-	- ÇØ´ç ¹®¼­ ³»¿ë
+	- í•´ë‹¹ ë¬¸ì„œ ë‚´ìš©
 	==========================================================================
 	public void close()
 			   throws IOException
@@ -51,52 +51,52 @@
 	Closes the stream, flushing it first. Once the stream has been closed, further write() or flush() invocations will cause an IOException to be thrown. 
 	Closing a previously closed stream has no effect.
 	...
-	½ºÆ®¸²À» ´Ý°í ¸ÕÀú ÇÃ·¯½ÃÇÕ´Ï´Ù. ½ºÆ®¸²ÀÌ ´ÝÈ÷°í ³ª¸é Ãß°¡ write() ¶Ç´Â flush() È£Ãâ·Î ÀÎÇØ IO ¿¹¿Ü°¡ ¹ß»ýÇÕ´Ï´Ù.
-	ÀÌÀü¿¡ ´Ý¾Ò´ø ½ºÆ®¸²À» ´ÝÀ¸¸é ¾Æ¹«·± ¿µÇâÀ» ÁÖÁö ¾Ê½À´Ï´Ù.
+	ìŠ¤íŠ¸ë¦¼ì„ ë‹«ê³  ë¨¼ì € í”ŒëŸ¬ì‹œí•©ë‹ˆë‹¤. ìŠ¤íŠ¸ë¦¼ì´ ë‹«ížˆê³  ë‚˜ë©´ ì¶”ê°€ write() ë˜ëŠ” flush() í˜¸ì¶œë¡œ ì¸í•´ IO ì˜ˆì™¸ê°€ ë°œìƒí•©ë‹ˆë‹¤.
+	ì´ì „ì— ë‹«ì•˜ë˜ ìŠ¤íŠ¸ë¦¼ì„ ë‹«ìœ¼ë©´ ì•„ë¬´ëŸ° ì˜í–¥ì„ ì£¼ì§€ ì•ŠìŠµë‹ˆë‹¤.
 	==========================================================================
 	
-	º¯¿ª±â¸¦ µ¹¸° ³»¿ëÀº ÀÌ»óÇÏÁö¸¸ ½±°Ô ¼³¸íÇÏ¸é 
-	"½ºÆ®¸²À» ´Ý±âÀü¿¡, ÇÃ·¯½ÌÀ» ¸ÕÀú ÇÑ´Ù" ¶ó°í µÇ¾î ÀÖÀ½
-	Âü ÀÌ ¸»ÀÌ ¾Ö¸ÅÇÑ°Ô 
-	1. flush()¸¦ ³»°¡ ÇØÁÖ°í ´ÝÀ¸¶ó´Â°ÇÁö 
-	2. close()¸¦ È£ÃâÇÏ¸é ÇÃ·¯½ÌÀ» ÇØÁØ´Ù´Â°ÇÁö 
-	1¹øÀÎÁö 2¹øÀÎÁö ¾Ö¸ÅÇßÀ½ ¿ÀÅä¶ó´Â ´Ü¾îµµ ¾ø¾úÀ¸´Ï±î
-	ÀÛµ¿ÇÏ´Â ¹æ½ÄÀ» º¸¸é 2¹øÀÌ ¸ÂÀ»²¨ °°¾ÒÀ½
+	ë³€ì—­ê¸°ë¥¼ ëŒë¦° ë‚´ìš©ì€ ì´ìƒí•˜ì§€ë§Œ ì‰½ê²Œ ì„¤ëª…í•˜ë©´ 
+	"ìŠ¤íŠ¸ë¦¼ì„ ë‹«ê¸°ì „ì—, í”ŒëŸ¬ì‹±ì„ ë¨¼ì € í•œë‹¤" ë¼ê³  ë˜ì–´ ìžˆìŒ
+	ì°¸ ì´ ë§ì´ ì• ë§¤í•œê²Œ 
+	1. flush()ë¥¼ ë‚´ê°€ í•´ì£¼ê³  ë‹«ìœ¼ë¼ëŠ”ê±´ì§€ 
+	2. close()ë¥¼ í˜¸ì¶œí•˜ë©´ í”ŒëŸ¬ì‹±ì„ í•´ì¤€ë‹¤ëŠ”ê±´ì§€ 
+	1ë²ˆì¸ì§€ 2ë²ˆì¸ì§€ ì• ë§¤í–ˆìŒ ì˜¤í† ë¼ëŠ” ë‹¨ì–´ë„ ì—†ì—ˆìœ¼ë‹ˆê¹Œ
+	ìž‘ë™í•˜ëŠ” ë°©ì‹ì„ ë³´ë©´ 2ë²ˆì´ ë§žì„êº¼ ê°™ì•˜ìŒ
 
 
-	±×·¡¼­ ÀÌ ³»¿ë¿¡ ´ëÇØ ÀÏ´Ü Ã£¾Æº¸´Ï ¾Æ·¡¿Í °°Àº ³»¿ëÀÌ ÀÖ¾úÀ½
+	ê·¸ëž˜ì„œ ì´ ë‚´ìš©ì— ëŒ€í•´ ì¼ë‹¨ ì°¾ì•„ë³´ë‹ˆ ì•„ëž˜ì™€ ê°™ì€ ë‚´ìš©ì´ ìžˆì—ˆìŒ
 	==========================================================================
-	FileWriterÀÇ close() ¸Þ¼­µå´Â ³»ºÎÀûÀ¸·Î flush() ¸Þ¼­µå¸¦ È£ÃâÇÕ´Ï´Ù. 
-	Áï, ÆÄÀÏÀ» ´ÝÀ» ¶§ flush()¸¦ È£ÃâÇÏ¿© ¹öÆÛ¿¡ ÀÖ´Â µ¥ÀÌÅÍ¸¦ ½ÇÁ¦ ÆÄÀÏ¿¡ ¾²µµ·Ï ÇÕ´Ï´Ù.
+	FileWriterì˜ close() ë©”ì„œë“œëŠ” ë‚´ë¶€ì ìœ¼ë¡œ flush() ë©”ì„œë“œë¥¼ í˜¸ì¶œí•©ë‹ˆë‹¤. 
+	ì¦‰, íŒŒì¼ì„ ë‹«ì„ ë•Œ flush()ë¥¼ í˜¸ì¶œí•˜ì—¬ ë²„í¼ì— ìžˆëŠ” ë°ì´í„°ë¥¼ ì‹¤ì œ íŒŒì¼ì— ì“°ë„ë¡ í•©ë‹ˆë‹¤.
 
-	µû¶ó¼­ ÀÏ¹ÝÀûÀ¸·Î close()¸¦ È£ÃâÇÏ¸é ¹öÆÛ°¡ ºñ¿öÁö°í µ¥ÀÌÅÍ°¡ ÆÄÀÏ¿¡ ¾²¿©Áý´Ï´Ù. 
-	µû·Î flush()¸¦ È£ÃâÇÒ ÇÊ¿ä´Â ¾ø½À´Ï´Ù. 
-	FileWriter¸¦ »ç¿ëÇÒ ¶§ ÆÄÀÏÀ» ´ÝÀ» ¶§ flush()¸¦ ÀÚµ¿À¸·Î È£ÃâÇØÁÖ¹Ç·Î ÇÁ·Î±×·¡¸Ó°¡ Á÷Á¢ È£ÃâÇÒ ÇÊ¿ä°¡ ¾ø½À´Ï´Ù
+	ë”°ë¼ì„œ ì¼ë°˜ì ìœ¼ë¡œ close()ë¥¼ í˜¸ì¶œí•˜ë©´ ë²„í¼ê°€ ë¹„ì›Œì§€ê³  ë°ì´í„°ê°€ íŒŒì¼ì— ì“°ì—¬ì§‘ë‹ˆë‹¤. 
+	ë”°ë¡œ flush()ë¥¼ í˜¸ì¶œí•  í•„ìš”ëŠ” ì—†ìŠµë‹ˆë‹¤. 
+	FileWriterë¥¼ ì‚¬ìš©í•  ë•Œ íŒŒì¼ì„ ë‹«ì„ ë•Œ flush()ë¥¼ ìžë™ìœ¼ë¡œ í˜¸ì¶œí•´ì£¼ë¯€ë¡œ í”„ë¡œê·¸ëž˜ë¨¸ê°€ ì§ì ‘ í˜¸ì¶œí•  í•„ìš”ê°€ ì—†ìŠµë‹ˆë‹¤
 	==========================================================================
 
-	¶ÇÇÑ ÇÃ·¯½Ã´Â ½ºÆ®¸²À» ´ÝÁö ¾ÊÀº »óÅÂ¿¡¼­ ¹ÙÀÌÆ®¸¦ º¸³»°í ½ÍÀº °æ¿ì »ç¿ëÇÑ´Ù°í º¸¸éµÊ.
-	¶ÇÇÑ °ø½Ä¹®¼­¿¡´Â ¹öÆÛ¾È¿¡ Å©±â°¡ 8192°¡ ³Ñ¾ú°í, ½ºÆ®¸²À» ´Ý¾Æ¼­´Â ¾ÈµÇ´Â °æ¿ì flush()¸¦ »ç¿ëÇØ¾ß ÇÑ´Ù°í µÇ¾î ÀÖÀ½
+	ë˜í•œ í”ŒëŸ¬ì‹œëŠ” ìŠ¤íŠ¸ë¦¼ì„ ë‹«ì§€ ì•Šì€ ìƒíƒœì—ì„œ ë°”ì´íŠ¸ë¥¼ ë³´ë‚´ê³  ì‹¶ì€ ê²½ìš° ì‚¬ìš©í•œë‹¤ê³  ë³´ë©´ë¨.
+	ë˜í•œ ê³µì‹ë¬¸ì„œì—ëŠ” ë²„í¼ì•ˆì— í¬ê¸°ê°€ 8192ê°€ ë„˜ì—ˆê³ , ìŠ¤íŠ¸ë¦¼ì„ ë‹«ì•„ì„œëŠ” ì•ˆë˜ëŠ” ê²½ìš° flush()ë¥¼ ì‚¬ìš©í•´ì•¼ í•œë‹¤ê³  ë˜ì–´ ìžˆìŒ
 
 
 	
-	±×·¡¼­ ½ÇÁ¦·Î java¿¡¼­ ÇØ´ç ÄÚµå¸¦ ÀÛ¼ºÇØ¼­ µð¹ö°Å ¸ðµå·Î ½ÇÇàÇÑ °á°úÀÓ
-	- flush() »ç¿ë
-	1. FileWriter°¡ ½ÇÇàµÉ¶§ ÆÄÀÏÀÌ »ý¼ºµÇ¸ç
-	2. flush()¸¦ È£ÃâÇØµµ ÆÄÀÏÀÇ ¿ë·®ÀÌ Áõ°¡ÇÏÁö ¾ÊÀ¸¸ç
-	3. close()¸¦ È£ÃâÇÏ¸é ÇØ´ç ÆÄÀÏ¿¡ ¿ë·®ÀÌ Áõ°¡ÇÔ
-	4. ·ÎÁ÷ Á¾·á
+	ê·¸ëž˜ì„œ ì‹¤ì œë¡œ javaì—ì„œ í•´ë‹¹ ì½”ë“œë¥¼ ìž‘ì„±í•´ì„œ ë””ë²„ê±° ëª¨ë“œë¡œ ì‹¤í–‰í•œ ê²°ê³¼ìž„
+	- flush() ì‚¬ìš©
+	1. FileWriterê°€ ì‹¤í–‰ë ë•Œ íŒŒì¼ì´ ìƒì„±ë˜ë©°
+	2. flush()ë¥¼ í˜¸ì¶œí•´ë„ íŒŒì¼ì˜ ìš©ëŸ‰ì´ ì¦ê°€í•˜ì§€ ì•Šìœ¼ë©°
+	3. close()ë¥¼ í˜¸ì¶œí•˜ë©´ í•´ë‹¹ íŒŒì¼ì— ìš©ëŸ‰ì´ ì¦ê°€í•¨
+	4. ë¡œì§ ì¢…ë£Œ
 
-	- flush() ¹Ì»ç¿ë
-	1. FileWriter°¡ ½ÇÇàµÉ¶§ ÆÄÀÏÀÌ »ý¼ºµÇ¸ç
-	2. close()¸¦ È£ÃâÇÏ¸é ÇØ´ç ÆÄÀÏ¿¡ ¿ë·®ÀÌ Áõ°¡ÇÔ
-	3. ·ÎÁ÷ Á¾·á
+	- flush() ë¯¸ì‚¬ìš©
+	1. FileWriterê°€ ì‹¤í–‰ë ë•Œ íŒŒì¼ì´ ìƒì„±ë˜ë©°
+	2. close()ë¥¼ í˜¸ì¶œí•˜ë©´ í•´ë‹¹ íŒŒì¼ì— ìš©ëŸ‰ì´ ì¦ê°€í•¨
+	3. ë¡œì§ ì¢…ë£Œ
 
 
 
-# flush()¸¦ È£ÃâÇØ¾ß ÇÏ´Â°¡ - °á·Ð
-	- ¾µ³»¿ëÀÌ ¸¹À»°æ¿ì Áß°£Áß°£ flush()¸¦ ÇØÁÖÀÚ.
-	- ³»¿ëÀÌ ÀûÀ» °æ¿ì close()¸¸ È£ÃâÇØµµ close()³»ºÎ¿¡¼­ flush()¸¦ È£ÃâÇÑ´Ù
-	- try-with-resources ¸¦¾²¸é flush() , close()¸¦ ¾ÈµûÁ®µµ µÇ´Ï±î try-with-resources ¸¦ »ç¿ëÇÏÀÚ
+# flush()ë¥¼ í˜¸ì¶œí•´ì•¼ í•˜ëŠ”ê°€ - ê²°ë¡ 
+	- ì“¸ë‚´ìš©ì´ ë§Žì„ê²½ìš° ì¤‘ê°„ì¤‘ê°„ flush()ë¥¼ í•´ì£¼ìž.
+	- ë‚´ìš©ì´ ì ì„ ê²½ìš° close()ë§Œ í˜¸ì¶œí•´ë„ close()ë‚´ë¶€ì—ì„œ flush()ë¥¼ í˜¸ì¶œí•œë‹¤
+	- try-with-resources ë¥¼ì“°ë©´ flush() , close()ë¥¼ ì•ˆë”°ì ¸ë„ ë˜ë‹ˆê¹Œ try-with-resources ë¥¼ ì‚¬ìš©í•˜ìž
 
-	try-with-resources ¿¡ ´ëÇÑ ³»¿ëÀº ¾Æ·¡¿¡ Á¤¸®µÇ¾î ÀÖÀ½
+	try-with-resources ì— ëŒ€í•œ ë‚´ìš©ì€ ì•„ëž˜ì— ì •ë¦¬ë˜ì–´ ìžˆìŒ
 		https://github.com/kkimsungchul/study/blob/master/Effective%20Java/%5BEffective%20Java%5D%20%EC%B1%95%ED%84%B09.%20try-finally%EB%B3%B4%EB%8B%A4%EB%8A%94%20try-with-resources%20%EB%A5%BC%20%EC%82%AC%EC%9A%A9%ED%95%98%EB%9D%BC.txt
