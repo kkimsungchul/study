@@ -20,6 +20,9 @@ indent Rainbow
 Presentation Assistant
 	사용한 단축키를 보여줌
 
+key promoter x
+	Intellij에서 마우스로 클릭한 버튼이나 행동에 대한 단축키를 보여줌
+
 
 Nyan progress Bar
 	귀여운 고양이 로딩바
