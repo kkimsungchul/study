@@ -78,6 +78,17 @@
 		CompletableFuture<Integer> lengthFuture = future.thenApply(String::length);
 		==========================================================================
 	
+	thenAccept : 
+		thenAccept 메서드는 CompletableFuture에서 비동기 작업이 완료된 후에 결과를 소비하고 추가적인 작업을 수행하는 데 사용함
+		이 메서드는 이전 작업의 결과를 소비하며, 반환 값이 없는 작업을 수행함.
+		==========================================================================
+		CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> "Hello");
+		// thenAccept 메서드를 사용하여 작업이 완료된 후에 결과를 소비
+		future.thenAccept(result -> System.out.println("Result: " + result));
+		==========================================================================
+
+	
+
 	join :
 		join 메서드는 작업이 완료될 때까지 기다리고 결과를 반환함
 		join은 예외를 던지지 않으므로 예외 처리가 필요 없음
