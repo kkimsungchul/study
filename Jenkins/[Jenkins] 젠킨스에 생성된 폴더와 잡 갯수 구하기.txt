@@ -1,0 +1,30 @@
+# Jenkins - 젠킨스에 생성된 폴더와 잡 갯수 구하기
+	Jenkins를 사용하다 보면 Jenkins 에 생성된 Job과 Folder 의 갯수를 알아야 할 때가 있음.
+	이럴때 Jenkins 에서 제공해주는 Script Console을 사용해서 알수 있음
+
+# Script Console 위치
+	1. Jenkins 로그인
+	2. Jenkins 관리 클릭
+	3. 화면 하단의 Tools and Actions 에 있는 Script Console 클릭
+
+# Jenkins folder / Jenkins job 갯수 확인
+	스크립트 입력 창에 아래와 같이 명령어를 입력
+	==========================================================================
+	import jenkins.model.Jenkins
+	import hudson.model.Job
+	import com.cloudbees.hudson.plugins.folder.Folder
+
+
+	def totalCount = Jenkins.instance.getAllItems().size()
+	println("Total number of jobs and folder : $totalCount")
+
+	def jobCount = Jenkins.instance.getAllItems(Job).size()
+	println("Total number of jobs : $jobCount")
+
+	def folderCount = Jenkins.instance.getAllItems(Folder).size()
+	println("Total number of folder s: $folderCount")
+
+	==========================================================================
+
+
+
