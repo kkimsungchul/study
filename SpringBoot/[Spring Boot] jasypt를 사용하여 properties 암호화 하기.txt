@@ -1,0 +1,183 @@
+# SpringBoot - jasypt를 사용하여 properties 암호화 하기
+
+# 참고링크
+	https://goddaehee.tistory.com/321
+	https://gksdudrb922.tistory.com/147
+	https://derveljunit.tistory.com/339
+
+# 암호화 의존성 추가
+	- Gradle 
+	==========================================================================
+	implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.4'
+	==========================================================================
+
+	- Maven
+	==========================================================================
+	<groupId>com.github.ulisesbocchio</groupId>
+	<artifactId>jasypt-spring-boot-starter</artifactId>
+	<version>3.0.1</version>
+	==========================================================================
+
+# YML 파일 읽기를 위한 의존성 추가
+
+	- Gradle
+	==========================================================================
+
+	==========================================================================
+
+	- Maven
+	==========================================================================
+	<dependency>
+		<groupId>com.github.ulisesbocchio</groupId>
+		<artifactId>jasypt-spring-boot-starter</artifactId>
+		<version>3.0.4</version>
+	</dependency>
+	<dependency>
+		<groupId>com.fasterxml.jackson.core</groupId>
+		<artifactId>jackson-core</artifactId>
+		<version>2.13.0</version>
+	</dependency>
+	<dependency>
+		<groupId>com.fasterxml.jackson.core</groupId>
+		<artifactId>jackson-databind</artifactId>
+		<version>2.13.0</version>
+	</dependency>
+	<dependency>
+		<groupId>com.fasterxml.jackson.dataformat</groupId>
+		<artifactId>jackson-dataformat-yaml</artifactId>
+		<version>2.13.0</version>
+	</dependency>
+	==========================================================================
+	
+
+
+
+
+# 암호화 JAVA 파일 작성
+	별도의 프로젝트를 생성하여 데이터들을 미리 암호화 진행
+	※ yml파일에 암호화할 계정 정보를 입력
+	ex) 
+		databaseId : kimsungchul
+		databasePassowrd : kimsungchulPassword123
+
+	==========================================================================
+	import com.fasterxml.jackson.databind.ObjectMapper;
+	import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+	import org.jasypt.encryption.pbe.PooledPBEStringEncryptor;
+	import org.jasypt.encryption.pbe.config.SimpleStringPBEConfig;
+	import java.io.File;
+	import java.util.Map;
+
+	public class Main {
+
+		static PooledPBEStringEncryptor encryptor;
+		static SimpleStringPBEConfig simpleStringPBEConfig;
+		public static void main(String[] args){
+			initConfig();
+			String filePath = "local.yml";
+			ClassLoader classLoader = Main.class.getClassLoader();
+			File file = new File(classLoader.getResource(filePath).getFile());
+			ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
+
+			try{
+				Map<String,Object> yamlMap = objectMapper.readValue(file,Map.class);
+				for(Map.Entry<String ,Object> entry : yamlMap.entrySet()){
+					encrypt(entry.getKey() , entry.getValue().toString());
+					//System.out.println(entry.getKey() + " : " + entry.getValue().toString());
+				}
+
+			}catch (Exception e){
+				e.printStackTrace();
+			}
+
+
+		}
+
+		public static void initConfig(){
+			String key = "kim-sung-chul-password-encrypt-key";
+			encryptor = new PooledPBEStringEncryptor();
+			simpleStringPBEConfig = new SimpleStringPBEConfig();
+			simpleStringPBEConfig.setPassword(key); // 암호화키
+			simpleStringPBEConfig.setAlgorithm("PBEWITHHMACSHA512ANDAES_256"); // 알고리즘
+			simpleStringPBEConfig.setKeyObtentionIterations("1000"); // 반복할 해싱 회수
+			simpleStringPBEConfig.setPoolSize("1"); // 인스턴스 pool
+			simpleStringPBEConfig.setProviderName("SunJCE");
+			simpleStringPBEConfig.setSaltGeneratorClassName("org.jasypt.salt.RandomSaltGenerator"); // salt 생성 클래스
+			simpleStringPBEConfig.setIvGeneratorClassName("org.jasypt.iv.RandomIvGenerator");
+			simpleStringPBEConfig.setStringOutputType("base64"); //인코딩 방식
+			encryptor.setConfig(simpleStringPBEConfig);
+		}
+
+		public static String encrypt(String fieldName , String word){
+			String encryptWord = encryptor.encrypt(word);
+			System.out.println("## encryptWord "+fieldName +" : " + encryptWord);
+			return encryptWord;
+		}
+
+		public static String decrypt(String fieldName , String word){
+			String decryptWord= encryptor.decrypt(word);
+			System.out.println("## decryptWord "+fieldName +" : " + decryptWord);
+			return decryptWord;
+		}
+	}
+
+	==========================================================================
+
+# SpringBoot에 JAVA Config 파일 생성
+	
+	- jasyptEncryptorAES.java
+	==========================================================================
+	@Configuration
+	@EnableEncryptableProperties
+	public class JasyptConfigAES {
+
+		@Bean("jasyptEncryptorAES")
+		public StringEncryptor stringEncryptor() {
+			PooledPBEStringEncryptor encryptor = new PooledPBEStringEncryptor();
+			SimpleStringPBEConfig config = new SimpleStringPBEConfig();
+
+			config.setPassword("kim-sung-chul-password-encrypt-key"); // 암호화키
+			config.setAlgorithm("PBEWITHHMACSHA512ANDAES_256"); // 알고리즘
+			config.setKeyObtentionIterations("1000"); // 반복할 해싱 회수
+			config.setPoolSize("1"); // 인스턴스 pool
+			config.setProviderName("SunJCE");
+			config.setSaltGeneratorClassName("org.jasypt.salt.RandomSaltGenerator"); // salt 생성 클래스
+			config.setIvGeneratorClassName("org.jasypt.iv.RandomIvGenerator");
+			config.setStringOutputType("base64"); //인코딩 방식
+			encryptor.setConfig(config);
+			return encryptor;
+		}
+	}
+	==========================================================================
+
+
+# SpringBoot의 yml 파일에 jasypt 설정
+	yml 파일 아래에 
+	==========================================================================
+	jasypt:
+	  encryptor:
+		bean: jasyptStringEncryptor // 빈으로 등록한 빈 이름과 매핑
+	==========================================================================
+
+# SpringBoot의 yml 파일에 암호화된 데이터로 변경
+	암호화 데이터 변경시 ENC() 로 감싼 후 입력해야 함
+	ex )
+		ENC(암호화된 데이터)
+	- 기존
+	==========================================================================
+	spring:
+	  datasource:
+		url: jdbc:mysql://...
+		username: user123
+		password: pass123
+		driver-class-name: com.mysql.cj.jdbc.Driver
+	==========================================================================
+
+	- 암호화 적용 후 
+	==========================================================================
+	spring:
+	  datasource:
+		url: jdbc:mysql://...
+		username: ENC(QK4EKadvkeEQJfrWEKAREq==)
+		password: ENC(QD5EZJeFSJYWIDmi75dmYQ==)
+	==========================================================================
