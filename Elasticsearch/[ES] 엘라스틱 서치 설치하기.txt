@@ -1,0 +1,56 @@
+# Elasticsearch - 엘라스틱 서치 설치하기
+
+※ java가 설치 되어 있어야 함
+
+1. 공식 홈페이지 접속
+	https://www.elastic.co/kr/downloads/elasticsearch
+
+2. 다운로드 버전 선택
+	Choose platform 에서 windows 선택
+
+3. 다운받은 파일 압축 해제
+
+4. 압축해제 한 파일에서 아래의 경로로 들어가 파일 실행
+	경로 : elasticsearch-8.13.0-windows-x86_64\elasticsearch-8.13.0\bin
+	파일명 : elasticsearch.bat
+
+5. 접속
+	localhost:9200
+	=====================================================================
+	{
+	  "name" : "SUNG-PC",
+	  "cluster_name" : "elasticsearch",
+	  "cluster_uuid" : "D2Fm1TLwSpuILS38vA8oew",
+	  "version" : {
+		"number" : "8.13.0",
+		"build_flavor" : "default",
+		"build_type" : "zip",
+		"build_hash" : "09df99393193b2c53d92899662a8b8b3c55b45cd",
+		"build_date" : "2024-03-22T03:35:46.757803203Z",
+		"build_snapshot" : false,
+		"lucene_version" : "9.10.0",
+		"minimum_wire_compatibility_version" : "7.17.0",
+		"minimum_index_compatibility_version" : "7.0.0"
+	  },
+	  "tagline" : "You Know, for Search"
+	}
+
+	=====================================================================
+
+※ 오류 발생
+	- 오류 내용 
+		페이지 접속시 "페이지가 작동하지 않습니다." 출력됨
+	
+	- 해결 방안
+		경로 : elasticsearch-8.13.0-windows-x86_64\elasticsearch-8.13.0\config
+		파일명 : elasticsearch.yml
+		해당 파일에서 아래의 값을 false로 변경
+		xpack.security.enabled : true
+		->
+		xpack.security.enabled : false
+
+	- 발생 원인
+		엘라스틱서치 6.3버전 이후로 x-pack이 기본 번들로 포함되어 자동 인스톨됨
+		true 일 경우 security가 활성화 되어 transport SSL이 활성화되어야 실행이 가능함
+	
+	- 참고 사이트 : https://team621.tistory.com/63
