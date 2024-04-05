@@ -1,4 +1,4 @@
-# SpringBoot - jasypt를 사용하여 properties 암호화 하기
+# SpringBoot - jasypt (Java Simplified Encryption)를 사용하여 properties 암호화 하기
 
 # 참고링크
 	https://goddaehee.tistory.com/321
