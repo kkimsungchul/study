@@ -1,0 +1,50 @@
+# Query - postgresql에서 계층쿼리 작성하기
+
+
+# 질문
+	데이터베이스에 아래와 같이 컬럼이 있음
+	==========================================================================
+	dept_code 부서코드
+	dept_parent_id 상위부서코드
+	dept_name 부서명
+	==========================================================================
+	이럴경우 특정부서와 그 하위부서를 가져오는 쿼리를 작성
+
+
+# 답변
+	PostgreSQL에서 특정 부서와 그 하위 부서를 가져오는 쿼리를 작성하고자 한다면, 재귀 쿼리를 활용하는 것이 이상적입니다. WITH RECURSIVE 구문을 사용하여 이를 구현할 수 있습니다. 아래 예시는 특정 부서 dept_id 값을 기준으로 해당 부서와 모든 하위 부서 정보를 가져오는 쿼리입니다.
+
+	만약 특정 부서 코드가 '1234'라고 가정하고, 해당 부서와 그 하위 부서 정보를 가져오고 싶다면, 다음과 같이 쿼리를 작성할 수 있습니다:
+
+	sql
+	==========================================================================
+	WITH RECURSIVE sub_depts AS (
+	  SELECT
+		dept_code,
+		dept_parent_id,
+		dept_name
+	  FROM
+		your_department_table
+	  WHERE
+		dept_code = '1234' -- 여기서 '1234'는 예시로 든 특정 부서 코드입니다. 실제 코드로 변경해야 합니다.
+	  
+	  UNION ALL
+	  
+	  SELECT
+		d.dept_code,
+		d.dept_parent_id,
+		d.dept_name
+	  FROM
+		your_department_table d
+	  INNER JOIN sub_depts sd ON sd.dept_code = d.dept_parent_id
+	)
+	SELECT * FROM sub_depts;
+	==========================================================================
+	이 쿼리는 다음 단계를 따릅니다:
+
+	WITH RECURSIVE 구문을 사용하여 sub_depts라는 임시 테이블(CTE)을 생성합니다.
+	첫 번째 SELECT 문에서는 기본이 되는 특정 부서를 선택합니다. 여기서 dept_code = '1234'는 시작점이 되는 부서의 코드를 의미합니다.
+	UNION ALL을 사용하여 재귀적으로 결과를 합칩니다.
+	두 번째 SELECT 문에서는 sub_depts에 있는 부서 코드를 dept_parent_id와 조인하여 해당 부서의 모든 하위 부서를 찾습니다.
+	최종적으로, sub_depts에 있는 모든 기록을 선택하여 반환합니다.
+	위 쿼리에서 your_department_table은 실제 부서 정보가 저장된 테이블 이름으로 대체해야 합니다. 그리고 '1234'는 조회하고자 하는 특정 부서의 코드로 변경해주세요.
