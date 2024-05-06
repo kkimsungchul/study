@@ -1,0 +1,48 @@
+# Data - Data Observability
+
+
+# Data Observability 란
+	- Data Observability란 조직 내의 시스템에 있는 데이터 상태를 온전히 알고 있는 것
+	- 자동화된 모니터링, 알람, 트리거 등을 통해 데이터 품질과 찾을 가능성이 있는 문제를 찾을 수 있음
+	
+# Data Observability 5 Pillars (5개의 요소)
+	- Freshness : 데이터의 최신 업데이트 시간을 확인
+	- Distribution : 데이터가 허용되는 범위 안에 들어 왔는지 확인
+	- Volume : 테이블의 데이터 건수가 일정하게 유지되는지를 확인
+	- Schema : 테이블이 왜 변경되었는지 모니터링 
+	- Lineage : 특정 데이터가 이상하다면 어디서부터 잘못됐는지 파악
+		* 데이터 마트가 이상하다면 원본 테이블에 이상이 있을 수 있음
+	
+
+# Data Observability 와 Monitoring 차이
+	- Data Observability는 기존 메트릭과 파라미터가 기존과 다르면 팀에 alert을 함
+	- Data Monitoring은 미리 정해놓은 문제의 값에 대해서만 alert을 함
+	
+	Data monitoring은 Data Observability에 비하면 빙산의 일각임
+
+
+# 신뢰할수 있는 데이터를 만드는 방법
+	- 데이터 중단 시간을 줄일 수 있음
+	- 데이터 다운 타임의 결과가 심각할 수 있기 떄문에 데이터 관찰 가능성이 중요
+	- 데이터 엔지니어와 개발자에게는 데이터 가동 중지 시간이 곧 시간과 리소스 낭비를 의미함
+	- 데이터 소비자의 경우 의사 결정에 대한 자신감이 약화됨
+
+# Data Quality
+	- Missing Data
+	- Invalid Data
+	- Noisy Data
+	- Duplicated Data
+	- Type Mismatch
+	- 좋은 상황에서의 기대되는 값을 가지고 파악
+	- 모니터링 설정과 Threshold를 걸어놓을 수 있음
+	- Data Quality Monitoring
+
+# Data Drift
+	- 시간이 지나면서 점점 변화하는 데이터
+	- 점점 변화하는 데이터는 이상을 감지하기 어려움
+	- Reference distribution과 현재 distribution과 다른것
+	- Data Quality보다 한 단계 깊은 내용
+	- 어떻게 이 Drift를 Quantify 정량화 할 것인지가 어려움
+	- Feauture Engineering에 특화된 내용
+	- 데이터 관리에 필수적인 항목
+	- 데이터마다의 통계적인 정의가 필요함

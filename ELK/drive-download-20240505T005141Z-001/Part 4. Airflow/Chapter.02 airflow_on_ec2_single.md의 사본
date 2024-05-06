@@ -1,0 +1,107 @@
+
+
+## airflow on EC2 (Single Node)
+
+- ubuntu로 EC2 서버 생성
+
+- ```
+  sudo apt update
+  ```
+
+- airflow 설치 전 설정
+
+- ```
+  sudo apt install python3-pip
+  ```
+
+  - airflow 설치를 위한 pip3 설치
+
+- airflow 설치
+
+- ```
+  pip install apache-airflow==2.5.2
+  ```
+
+
+
+- airflow 실행
+
+  ``` 
+  airflow
+  airflow standalone
+  ```
+
+- 만약 `airflow: command not found` 에러가 난다면?
+
+- ```
+  cd /usr/local/bin #airflow가 있는지 확인
+  cd ~/.local/bin/ #airflow가 있는지 확인
+  ```
+
+- 기본 ubuntu에서 실행하는 명령어는 `/usr/local/bin`을 바라봄
+
+- 또는 `export PATH=$PATH:~/.local/bin`
+
+- airflow 이동
+
+  - ```
+    mv airflow /usr/local/bin/
+    ```
+
+- 재 실행
+
+- 실행 로그에서 기본 제공되는 ID와 PW를 확인
+
+- 로그인 하여 접속하면 샘플 DAG들이 확인됨
+
+- ```
+  airflow users  create --role Admin --username admin --email admin --firstname admin --lastname admin --password admin
+  ```
+
+  
+
+/
+
+### airflow cfg 설정
+
+- 주요 설정 소개
+- [core]
+  - dags_folder : airflow가 바라보는 dag 디렉토리
+    - airflow worker, webserver, scheduler가 같은 dag 디렉토리를 바라봐야함
+  - default_timezone : 기본 시간대 (UTC, KST)
+  - executor : 사용할 executor 설정
+    - 기본은 SequentialExecutor
+    - 워커를 여러대 사용해야 한다면 CeleryExecutor 사용
+  - parallelism : Airflow 환경 내에서 동시에 실행할 수 있는 최대 task의 수
+    - 기본값 32, 모든 DAG에서 한 번에 32개 이하의 태스크만을 실행할 수 있음
+    - 이보다 커지면 queing 상태
+  - max_active_tasks_per_dag: DAG당 한 번에 스케줄링되는 최대 task의 수
+  - max_active_runs_per_dag: 한 DAG 안에서 최대 활성화되는 DAG의 수
+  - load_examples : 예시 DAG를 활성화 여부
+  - fernet_key : [Fernet을](https://github.com/fernet/spec/) 사용해 Connections 및 Variables 비밀번호를 암호화
+- [database]
+  - sql_alchemy_conn : Airflow는 sql alchemy를 사용해 DB//에 연결함
+    - 연결할 Database의 URI을 설정
+  - sql_alchemy_pool_size: maximum connection 수를 지정
+    - 0이면 no limit
+- [webserver]
+  - base_url : 기본 UI url 설정
+  - default_ui_timezone : UI에서 제공되는 기본 timezone
+  - web_server_port: UI 포트 지정
+    - 기본값 8080
+  - workers : Gunicorn webserver 워커의 개수 지정
+- [celery]
+  - broker_url : broker의 주소를 입력
+    - Redis 및 RabbitMQ 주소를 넣는다
+- [scheduler]
+  - min_file_process_interval : DAG를 몇 초 단위로 파싱할 것인지 설정
+    - 너무 낮게 설정하면 스케쥴러의 CPU를 많이 사용하게 됨
+  - dag_dir_list_interval : 새 DAG를 검색하는 빈도
+    - 역시 너무 낮게 설정하면 CPU를 많이 사용함
+  - parsing_processes : 스케쥴러 프로세스 병렬 설정, 프로세스 수를 설정
+    - DAG가 많을 경우 늘려준다
+    - vCPU의 2배정도로 넣어줌
+  - scheduler_heartbeat_sec : 스케쥴러에 hearbeat을 보내는 간격 설정
+    - 이 시간이 너무 크다면 scheduler가 동작하지 않는 것으로 착각할 수 있음
+  - catchup_by_default : start_date부터 현재 시간까지 실행하지 못한 작업들을 실행
+    - False설정을 권장

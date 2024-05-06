@@ -1,0 +1,344 @@
+
+
+# Airflow On EKS 
+
+## Rancher를 통해 K8S 조정
+
+![img](https://blog.kakaocdn.net/dn/tk5Vx/btqZUVd26VL/0YtuWGNw4dterK1rqppk5k/img.png)
+
+- ![rancher-architecture](https://rancher.com/docs/img/rancher/platform.png)
+- **Rancher**는 컨테이너 워크로드를 보다 쉽게 관리할 수 있도록 도와주는 멀티 클러스터 관리 플랫폼
+  - web기반 GUI와 command line 인터페이스로 쿠버네티스 클러스터를 구성할 수 있고 확장 또한 쉽게 가능
+  - 이미 존재하는 클러스터도 import하여 rancher 인터페이스로 관리가 가능하고 또한 제공되는 리포지토리에서 필요한 application들을 쉽게 배포
+
+- UI를 통해 쉽게 K8S를 다룰 수 있음
+- kubectl 명령, helm차트 이용한 app설치도 간편함
+- deploy 히스토리가 남지 않는게 단점이지만 운영, 관리로 많이 사용 중
+
+
+
+## Ubuntu Docker설치
+
+- ubuntu 20.04로 설치
+
+- ```
+  sudo apt-get update -y
+  
+  sudo apt-get install \
+      ca-certificates \
+      curl \
+      gnupg \
+      lsb-release
+  ```
+
+- Docker의 Official GPG Key 를 등록
+
+- ```
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+  ```
+
+- stable repository 를 등록
+
+- ```
+  echo \
+   "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+   $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  ```
+
+- Docker Engine 설치
+
+  - ```
+    sudo apt-get update
+    sudo apt-get install docker-ce docker-ce-cli containerd.io
+    ```
+
+  - 설치 확인 `docker --version` 
+
+- Docker permission 부여하기
+
+  - 기본적으로는 sudo docker를 사용해야 docker를 사용할 수 있다(root 권한 필요)
+
+  - docker group에 유저를 추가해주기
+
+  - ```
+    sudo groupadd docker
+    sudo usermod -aG docker $USER
+    newgrp docker
+    ```
+
+  - 확인
+
+    -  `docker run hello-world`
+
+
+
+### Rancher Setup
+
+- Rancher 도커 이미지 실행
+
+  - ```
+    docker run --privileged -d --restart=unless-stopped -p 80:80 -p 443:443 rancher/rancher
+    ```
+
+  - 보안그룹 80은 열어줄 것
+
+    - 포트 8080 오픈
+
+  - 외부 IP를 통해 접속
+
+- 초기 비밀번호 입력
+
+  - ```
+    docker logs [container-id] 2>&1 | grep "Bootstrap Password:"
+    ```
+
+  - 입력 후 원하는 비밀번호 설정(12자 이상)
+
+
+
+___
+
+
+
+## EKS Setup
+
+- Rancher를 통해 설치한다.
+  - Rancher에서 클러스터를 생성할 경우 Role을 자동으로 생성해준다
+
+- 부록
+
+  - Cluster Role 필요
+
+    - IAM에서 다음의 설명대로 롤을 생성한다
+    - https://docs.aws.amazon.com/eks/latest/userguide/service_IAM_role.html#create-service-role
+
+  - cluster가 만들어 지면 nodegroup을 생성한다
+
+  - Node IAM Role 필요
+
+    - https://docs.aws.amazon.com/eks/latest/userguide/create-node-role.html
+    - AmazonEKS_CNI_Policy
+    - AmazonEC2ContainerRegistryReadOnly
+    - AmazonEKSWorkerNodePolicy
+
+  - Node Group 생성
+
+  - Rancher에 EKS 클러스터 등록
+
+  - OIDC provider 생성 후 등록
+
+    - > **OpenID Connect(OIDC)는** 권한허가 프로토콜인 **OAuth 2.0** 기술을 이용하여 만들어진 인증 레이어 입니다. (OpenID Connect is an authentication layer on top of OAuth 2.0, an authorization framework.) JSON 포맷을 이용한 RESTful API 형식을 사용하여 인증합니다. OpenID Connect를 이용하면 손쉽게 외부 서비스를 통하여 사용자 인증을 구현할 수 있습니다.
+
+    - clientID: sts.amazonaws.com
+
+
+
+___
+
+
+
+## Airflow 설치
+
+- Chart Repository에 airflow 차트 등록
+  -  https://airflow-helm.github.io/charts
+- values.yaml
+
+
+
+### PostgreSQL 파드 Pending 이슈
+
+- ebs-csi driver
+
+- > Amazon Elastic Block Store(Amazon EBS) CSI(Container Storage Interface) 드라이버에서는 Amazon Elastic Kubernetes Service(Amazon EKS) 클러스터가 영구 볼륨을 위해 Amazon EBS 볼륨의 수명 주기를 관리할 수 있게 합니다.
+  >
+  > Amazon EBS CSI 드라이버 사용에 대해 고려해야 할 몇 가지 사항이 있습니다.
+  >
+  > Amazon EBS CSI 플러그 인이 사용자를 대신하여 AWS API를 호출하려면 IAM 권한이 필요합니다. 자세한 내용은 [서비스 계정에 대한 Amazon EBS CSI 드라이버 IAM 역할 생성](https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/csi-iam-role.html) 섹션을 참조하세요.
+  >
+  > Fargate에서 Amazon EBS CSI 컨트롤러를 실행할 수 있지만 Fargate pods에 볼륨을 탑재할 수는 없습니다.
+  >
+  > Amazon EKS 클러스터에서는 Amazon EBS CSI 드라이버의 알파 기능을 지원하지 않습니다.
+
+  - IAM policy, role, SA 생성이 필요
+
+    - CSI 를 위한 IAM Policy 는 생성하기 전에 이미 만들어서 제공되고 있는 Managed Policy 를 사용해도 된다. `arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy`
+
+    - ```
+      REGION=ap-northeast-2
+      CLUSTER_NAME=de-clsuter
+      
+      eksctl create iamserviceaccount \
+        --region $REGION \
+        --name ebs-csi-controller-sa \
+        --namespace kube-system \
+        --cluster $CLUSTER_NAME \
+        --attach-policy-arn arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy \
+        --approve \
+        --role-only \
+        --role-name AmazonEKS_EBS_CSI_DriverRole
+      ```
+
+  - ebs-csi driver add-on설치
+
+  - ```
+    eksctl create addon --region ap-northeast-2 --profile fastcampus --name aws-ebs-csi-driver --cluster de-cluster --service-account-role-arn arn:aws:iam::579938172413:role/AmazonEKS_EBS_CSI_DriverRole --force
+    ```
+
+  - csi-driver를 사용하는 storage class 생성
+
+    - ```
+      ## ebs-default-storageclass.yaml으로 생성
+      apiVersion: storage.k8s.io/v1
+      kind: StorageClass
+      metadata:
+        name: ebs-sc
+        annotations:
+          storageclass.kubernetes.io/is-default-class: "true"
+      provisioner: ebs.csi.aws.com
+      volumeBindingMode: WaitForFirstConsumer
+      ```
+
+    - ```
+      kubectl apply -f ebs-default-storageclass.yaml
+      ```
+
+  - 기본 gp2 스토리지 클래스를 기본값에서 해제
+
+    - ```
+      kubectl patch storageclass gp2 -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
+      ```
+
+    - `kubectl get sc` 로 확인
+
+
+
+___
+
+
+
+## Sidecar 패턴
+
+- sidecar?
+- ![Les chiens en sidecar | sidecarpassion](https://static.wixstatic.com/media/99734b_e84304cda66d41b5972eb69a1a1b5c16.jpg/v1/fill/w_736,h_509,al_c,q_85,enc_auto/99734b_e84304cda66d41b5972eb69a1a1b5c16.jpg)
+- 주 기능을 하는 컨테이너 옆에 보조 컨테이너를 띄워서 통신하게 하는 구조
+- 여기서 git-sync 사이드카는 airflow worker나 webserver Pod에 붙어서 github repo에 있는 최신의 DAG를 가져오는 기능을 수행
+
+- values.yaml 수정
+
+  - ```yaml
+    
+    dags:
+      gitSync:
+        branch: master
+        depth: 1
+        enabled: true # enable을 true로 변경해야 사용할 수 있다.
+        httpSecret: airflow-http-git-secret # private github을 사용하기 때문에 시크릿을 사용한다.
+        # 위의 시크릿은 생성이 필요
+        httpSecretPasswordKey: password # 위 시크릿에 등록된 password
+        httpSecretUsernameKey: username # 위 시크릿에 등록된 username
+        image:
+          gid: 65533
+          pullPolicy: IfNotPresent
+          repository: k8s.gcr.io/git-sync/git-sync
+          tag: v3.2.2
+          uid: 65533
+        maxFailures: 0
+        repo: https://github.com/jake-fc/fastcampus-airflow.git #원하는 레포를 .git까지 포함해 등록한다.
+        repoSubPath: 
+        resources: {}
+        revision: HEAD
+        sshKnownHosts: ''
+        sshSecret: ''
+        sshSecretKey: id_rsa
+        syncTimeout: 120
+        syncWait: 60
+      path: /opt/airflow/dags
+      persistence:
+        accessMode: ReadOnlyMany
+        enabled: false
+        existingClaim: ''
+        size: 1Gi
+        storageClass: ''
+        subPath: ''
+    
+    ```
+
+    
+
+___
+
+
+
+## Airflow KubernetesPodOperator
+
+- KubernetesPodOperator를 사용하기 위한 준비과정
+
+- Service Account가 필요
+
+  - 해당 서비스 어카운트에 필요한 권한을 넣어줘야 새 파드를 생성, 삭제 가능
+
+  - ```
+    kubectl get pod airflow-worker-0 -o yaml | grep -i serviceaccount
+    ```
+
+    
+
+- Service Account를 만들어 준 뒤 K8S의 ClusterRole을 넣어준다
+
+  - Create, Delete, Get, Update, Patch, List, Watch등의 권한
+
+-  ClusterRole에 대한 바인딩
+
+- error log 예시
+
+- > HTTP response body: b'{"kind":"Status","apiVersion":"v1","metadata":{},"status":"Failure","message":"pods \\"{pod_name}\\" is **forbidden**: 
+  > User \\"**system:serviceaccount:airflow:airflow-worker**\\"
+  >  cannot get resource \\"pods/log\\" in API group \\"\\" in the namespace \\"default\\"","reason":"Forbidden","details":{"name":"{pod_name}}","kind":"pods"},"code":403}\n'
+
+
+
+### ClusterRole VS Role 
+
+- 역할(Role)
+  - 어떤 API를 이용할 수 있는지 정의
+  - 쿠버네티스의 사용권한을 정의
+  - `지정된 네임스페이스`에서만 유효
+- RoleBinding
+  - 사용자/그룹 또는 Service Account와 역할을 연결
+- ClusterRole, ClusterRoleBinding
+  - 네임스페이스와 관계없이 사용 가능함
+
+- ClusterRoleBinding.yaml
+
+  - ```
+    apiVersion: rbac.authorization.k8s.io/v1
+    # This cluster role binding allows anyone in the "manager" group to read secrets in any namespace.
+    kind: ClusterRoleBinding
+    metadata:
+      name: {cluster_role_binding_name}
+    subjects:
+    - kind: ServiceAccount
+      name: {service_account_name} # Name is case sensitive
+      namespace: {namespace}
+    roleRef:
+      kind: ClusterRole
+      name: {cluster_role_name}
+      apiGroup: rbac.authorization.k8s.io
+    ```
+
+- ClusterRole.yaml
+
+  - ```
+    kind: ClusterRole
+    apiVersion: rbac.authorization.k8s.io/v1
+    metadata:
+      namespace: {namespace}
+      name: {cluster_role_name}
+    rules:
+    - apiGroups: [""] # "" indicates the core API group
+      resources: ["*"]
+      verbs: ["get", "watch", "list", "create", "patch", "delete"]
+      #원하는 verb 선택
+    ```
+
+- 

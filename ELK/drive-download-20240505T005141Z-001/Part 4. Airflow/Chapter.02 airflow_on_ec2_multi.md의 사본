@@ -1,0 +1,427 @@
+
+
+## airflow on EC2 (Multi Node)
+
+- 이전에 한 작업을 살펴보면,
+
+![airflow_single](./images/airflow_single.png)
+
+
+
+- Multi Node
+  - ![airflow_multi](./images/airflow_multi.png)
+
+
+
+- 설계도
+
+  - ![airflow_multi](./images/airflow_multi_detailed.png)
+
+  
+
+- 작업 목표
+
+  - Master Node안에 Webserver, Scheduler, Broker를 구성할 것
+  - DB는 따로 빼서 독립적으로 구성하기
+  - Worker는 N개를 실행할 수 있도록 설정
+    - 워커 설정한 이후에 이미지 생성, Start Template
+  - Github Repo에서 DAG들을 가져가는 구조
+    - airflow scheduler, airflow webserver, airflow worker 모두 같은 DAG를 사용
+    - airflow scheduler, airflow webserver, airflow worker 모두 같은 DAG path를 설정
+
+
+
+___
+
+
+
+## Master Node 설정
+
+### Airflow Main - Webserver, Scheduler, Redis
+
+- 보안그룹 3306(mysql), 6379(redis), 8793(worker) 열어주기
+
+### Webserver 설치
+
+- cfg 변경
+
+- 
+  
+  ```
+  dags_folder = /home/ubuntu/airflow/fastcampus-airflow
+  
+  executor = CeleryExecutor
+  
+  sql_alchemy_conn =  mysql+pymysql://airflow:qlalfqjsgh@[DB PrivateIP]:3306/airflow?charset=utf8
+  result_backend = db+mysql://airflow:qlalfqjsgh@[DB PrivateIP]:3306/airflow?charset=utf8
+  
+  broker_url = redis://:@[main server PrivateIP]:6379/0
+  
+  load_examples = False
+  catchup_by_default = False
+  ```
+  
+- github repository
+
+  - https://github.com/jake-fc/fastcampus-airflow
+
+- 필요 패키지 설치
+
+  - `pip install "apache-airflow[celery]"`
+
+  - `pip install mysqlclient redis`
+
+  - `sudo apt-get install libmysqlclient-dev`
+
+
+
+
+### Scheduler 설치
+
+- airflow는 이미 설치 되어 있음
+
+- 스케쥴러를 실행시키면 끝
+  - `airflow scheduler -D`
+    
+    - 데몬 모드로 실행
+    
+    - ```
+      nohup airflow scheduler &
+      ```
+
+
+
+### Redis 설치
+
+- ```
+  sudo apt-get update
+  sudo apt-get upgrade
+  
+  sudo apt install redis-server
+  ```
+
+- redis.conf 수정
+
+  - ```
+    sudo vim /etc/redis/redis.conf
+    
+    [..]
+    daemonize yes
+    [..]
+      
+    [..]
+    bind 0.0.0.0 ::1
+    [..]
+      
+    [..]
+    dir /var/lib/redis
+    [..]
+      
+    logfile /var/log/redis_6379.log
+    ```
+
+- ```
+  # 설정 적용
+  sudo systemctl restart redis-server.service
+  ```
+
+- ```
+  #6379 포트 사용하는지 확인
+  netstat -nlpt | grep 6379
+  ```
+
+- redis-cli 정상 기동 확인
+
+  - ```
+    redis-cli
+    
+    #접속 후
+    PING 
+    #PONG 응답 오면 성공
+    ```
+
+
+
+- airflow.cfg 수정
+
+- ```
+  broker_url = redis://:@[main server PrivateIP]:6379/0
+  ```
+
+
+
+- 필요 라이브러리 설치
+
+  - ```
+    pip install boto3
+    pip install celery
+    
+    ```
+
+
+
+
+___
+
+
+
+## DB 설정
+
+### mysql 8 설치
+
+- 새 인스턴스 생성
+
+- ```
+  sudo apt-get update
+  ```
+
+- ```
+  sudo apt-get install mysql-server
+  ```
+
+- 임시비밀번호 확인
+
+  - ```
+    cat /var/log/mysql/...
+    ```
+
+    
+
+- 없다면 empty password 일 것
+
+  - ````
+    sudo mysql -u root -p
+    ````
+
+- airflow 유저 생성
+
+  - ```
+    use mysql;
+    ```
+
+  - ```
+    # 사용자 생성
+    create user 'airflow'@'%' identified by 'qlalfqjsgh';
+    create user 'airflow'@'localhost' identified by 'qlalfqjsgh';
+    
+    # DB 생성
+    create database airflow;
+    
+    # DB 접속 권한 부여
+    grant all privileges on airflow.* to airflow@localhost;
+    grant all privileges on *.* to 'airflow'@'%';
+    
+    
+    flush privileges;
+    ```
+    
+  - 확인
+  
+  - ```
+    select user, host from user;
+    ```
+  
+  - mysql server listen ip 확인
+  
+    - ```
+      sudo netstat -ntlp | grep mysqld
+      sudo apt install net-tools
+      ```
+  
+  - LISTEN IP 변경
+
+    - ```
+      sudo vim /etc/mysql/mysql.conf.d/mysqld.cnf
+      ```
+
+    - ```
+      bind-address =  0.0.0.0
+      ```
+  
+    - ```
+      sudo systemctl restart mysql
+      ```
+
+
+
+
+- ERRORs
+  - `"Access denied for user 'airflow'@'ip-172-31-14-216.ap-northeast-2.compute.internal' (using password: YES)"`
+    - 비밀번호 틀린 것
+    
+  - "Can't connect to MySQL server on '[Private IP]' ([Errno 111] Connection refused)"
+    - mysql 설정 더 필요 혹은 보안그룹 확인
+    
+    - mysql bind address 설정 했는지 확인
+    
+    - ```
+      sudo systemctl restart mysql
+      ```
+  
+- mysql 서버에도 Redis를 설치해준다
+
+
+
+### (참고) 서버 재시작시
+
+- sudo systemctl start mysql
+- sudo systemctl start redis-server
+
+
+
+### airflow 기본 유저 생성
+
+- ```
+  airflow users  create --role Admin --username admin --email admin --firstname admin --lastname admin --password admin
+  ```
+  
+  
+
+## Fernet Key 생성
+
+- airflow 안에 Variable, Connections에는 노출되면 안되는 정보들이 기록됨
+
+- 이를 기본적으로 암호화
+
+- 이 암호를 해독해주는 것이 **fernet key**
+
+- fernet key를 생성하고 모든 구성요소에 공유해준다
+
+  - ```
+    from cryptography.fernet import Fernet
+    fernet_key= Fernet.generate_key()
+    print(fernet_key.decode())
+    ```
+
+- fernet key를 모든 airflow.cfg에 동일하게 적용
+
+  - exmaple
+    ```
+    fernet_key = F9Rree4jjh44368VQ_zQa6_etgyzNPCUdCYRAy1bU_c=
+    ```
+
+
+
+
+____
+
+
+
+## Worker 설정 (ec에 설치해서 오토스케일링)
+
+### 기본 워커 만들기
+
+- 새 ubuntu 서버 생성
+
+  
+
+  - ```
+    sudo apt-get update
+    ```
+    
+  - ```
+    export PATH=$PATH:~/.local/bin
+    ```
+    
+    
+
+- ```py
+  sudo apt install python3-pip
+  pip install pymysql
+  pip install celery
+  sudo apt-get install libmysqlclient-dev -y
+  #sudo pip install mysqlclient
+  pip install apache-airflow-providers-mysql
+  pip install apache-airflow[redis]
+  ```
+  
+- worker의 airflow.cfg는 airflow main과 똑같이 설정한다
+  
+  - ```
+    dags_folder = /home/ubuntu/airflow/fastcampus-airflow
+    
+    executor = CeleryExecutor
+    
+    sql_alchemy_conn =  mysql+pymysql://airflow:qlalfqjsgh@[DB PrivateIP]:3306/airflow?charset=utf8
+    result_backend = db+mysql://airflow:qlalfqjsgh@[DB PrivateIP]:3306/airflow?charset=utf8
+    
+    broker_url = redis://:@[main server PrivateIP]:6379/0
+    
+    load_examples = False
+    catchup_by_default = False
+    ```
+  
+  - git clone https://github.com/jake-fc/fastcampus-airflow
+  
+- `airflow celery worker -q [queue명]`
+
+
+
+### DAG 받아오기
+
+- DAG의 업데이트가 일어날 시 지속적으로 받아올 수 있게 만들어야 한다
+
+- cron을 사용
+
+  - ```
+    sudo apt update -y
+    sudo apt install -y cron
+    # cron 시작
+    sudo service cron start
+    ```
+
+  - crontab 편집
+
+    - ```
+      crontab -e
+      
+      # 아래 설정 해주기
+      * * * * * cd /home/ubuntu/airflow/fastcampus-airflow && git fetch --all && git reset --hard origin/main
+      ```
+      
+    - 매번 github repository에서 DAG를 가져오게 됨
+
+      - 강의용 github repo:
+         https://github.com/jake-fc/fastcampus-airflow
+    
+    - 업데이트 반영 확인
+    
+    - 지금은 jake-fc에 있는 레포로 실습하지만 각자의 레포 주소로 변경하고 cfg수정
+
+
+
+### 시작 템플릿 만들기
+
+- 만들어둔  airflow worker 서버를 이미지로 생성
+
+- 이미지 생성이 끝나면 시작 템플릿으로 만들기
+
+  - 내 AMI에서 생성한 이미지 선택
+
+  - 인스턴스 유형 선택
+
+  - 키페어 선택
+
+  - 보안 그룹은 현재 서버에서 사용하고 있는 것으로 선택
+
+  - 고급 세부 정보 클릭
+
+    - 사용자 데이터 란에 다음 명령어 작성
+
+    - ```
+      #!/bin/bash
+      su - ubuntu -c "airflow celery worker -q celery"
+      ```
+
+  - 인스턴스가 시작하면서 자동으로 airflow worker를 실행하게 만들 수 있음
+
+
+
+### 오토 스케일링 설정
+
+- 만들어진 시작 템플릿을 이용해 Auto Scaling Group 생성
+- 만들어둔 시작 템플릿은 비유하자면 일종의 CD와도 같은 것
+- 서버에 CD를 넣어서 시작하게 만듬
+- 원하는 용량을 넣고, limit CPU 설정
+  - CPU limit에 해당하는 부하가 발생하면 자동으로 워커가 스케일 아웃
+  - 부하가 해소되면 자동으로 워커가 스케일 인
