@@ -1,0 +1,47 @@
+# DB - postgresql 용량 확보
+
+# 참고 링크
+	https://techblog.woowahan.com/9478/
+	https://nick2ya.tistory.com/4
+	https://blog.gaerae.com/2015/09/postgresql-vacuum-fsm.html
+
+1. linux에서 postgresql에서 데이터를 저장중이 디렉토리에 접근하여 폴더명들을 확인
+	
+	ex) /data/15332/5452
+		위와같이 경로가 되어있으면
+		15332는 데이터베이스
+		5452는 해당 데이터베이스에 있는 테이블임
+	
+
+2. 용량이 큰 폴더명들을 postgreslq에서 조회
+	SELECT datname FROM pg_database WHERE oid = 16384;
+
+3. 해당 데이터베이스를 접속 후 테이블 조회
+	SELECT relname, relnamespace::regnamespace, relkind
+	FROM pg_class WHERE relfilenode = 16417;
+
+4. 테이블 명이 조회되면 Vacuum  명령어로 정리
+	Vacuum full analyse 테이블명
+
+
+# 옵션
+	vacuum : vacuum 수행중에도 select dml 작업 가능
+	단순히 사용 가능한 공간을 free space map에 반환, 실제 디스크 공간 확보는 안됨
+
+	full : 디스크상 여유공간 확보됨, 시간 오래걸림, 수행되는 테이블에 exclusive lock 발생
+	운영중인 DB에 사용 금지
+
+	analyze : 통계 메타데이터를 업데이트하므로 쿼리 옵티마이저가 더 정확한 쿼리 계획을 생성할수 있어 vacuum 명령어시 같이 실행하는게 좋음
+
+# 사용법
+	- DB 전체 실행
+	vacuum full analyze;
+
+	- DB 전체 간단하게 실행
+	vacuum verbose analyze;
+
+	- 특정 테이블만 간단하게 실행
+	vacuum analyse 테이블명
+
+	- 특정 테이블만 풀 실행
+	vacuum full 테이블명

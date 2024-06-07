@@ -13,6 +13,47 @@
 	DELETE			: DELETE
 
 
+# index 목록 조회
+	http://localhost:9200/_cat/indices?v
+	- health
+	인덱스의 전반적인 상태를 나타냅니다.
+	green: 모든 샤드가 정상적으로 작동하고 있음을 의미합니다.
+	yellow: 일부 복제본 샤드가 작동하지 않고 있지만, 기본 샤드는 정상적으로 작동하고 있음을 의미합니다.
+	red: 기본 샤드 중 일부가 작동하지 않고 있음을 의미합니다. 이 경우 데이터 손실의 위험이 있습니다.
+
+	- status
+	인덱스의 현재 상태를 나타냅니다.
+	open: 인덱스가 정상적으로 작동하고 있음을 의미합니다.
+	close: 인덱스가 닫혀있음을 의미합니다. 닫힌 인덱스는 검색이나 쓰기 작업을 수행할 수 없습니다.
+	red: 인덱스에 문제가 있음을 의미합니다.
+
+	- index
+	인덱스의 이름을 나타냅니다.
+
+	- uuid
+	인덱스의 고유 식별자를 나타냅니다.
+
+	- pri
+	기본 샤드(primary shard)의 개수를 나타냅니다.
+
+	- rep
+	복제본 샤드(replica shard)의 개수를 나타냅니다.
+
+	- docs.count
+	인덱스에 저장된 문서의 총 개수를 나타냅니다.
+
+	- docs.deleted
+	인덱스에 삭제된 문서의 개수를 나타냅니다.
+
+	- store.size
+	인덱스가 사용하고 있는 디스크 공간의 크기를 나타냅니다.
+
+	- pri.store.size
+	기본 샤드(primary shard)가 사용하고 있는 디스크 공간의 크기를 나타냅니다.
+
+
+# index 데이터 조회
+	https://{ES 주소}/{index 명}/_search
 
 # index 조회
 	curl -XGET http://localhost:9200/classes
