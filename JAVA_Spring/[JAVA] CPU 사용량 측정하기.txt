@@ -1,0 +1,93 @@
+# JAVA - CPU 사용량 측정하기
+
+# 사용 방법
+	https://mvnrepository.com/artifact/org.hyperic.sigar/sigar/1.6.4
+	Sigar 라이브러리 추가
+	implementation 'org.hyperic.sigar:sigar:1.6.4'
+
+# 인터넷이 있는 다른 방법
+	oracle에서 제공해주는 라이브러리를 사용하라그러는데, open jdk에서는 해당 메서드를 제공해주지 않음
+	그래서 사용할수 없음
+	=====================================================================
+	import java.lang.management.ManagementFactory;
+	import com.sun.management.OperatingSystemMXBean;
+
+	public class CpuUsageMonitor {
+
+		public static void main(String[] args) {
+			OperatingSystemMXBean osBean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
+
+			// 시스템 전체 CPU 사용량 (0.0 ~ 1.0)
+			double systemCpuLoad = osBean.getSystemCpuLoad();
+			System.out.println("System CPU Load: " + systemCpuLoad);
+
+			// JVM 프로세스의 CPU 사용량
+			double processCpuLoad = osBean.getProcessCpuLoad();
+			System.out.println("Process CPU Load: " + processCpuLoad);
+		}
+	}
+
+	=====================================================================
+
+# 실행 시 오류 
+	no sigar-amd64-winnt.dll in java.library.path
+	위와같은 오류가 발생하는데 이부분은 아래의 경로에서 zip파일을 다운 받은 후
+	sigar-amd64-winnt.dll 파일을 라이브러리 경로에 위치시키면 해결됨
+	https://sourceforge.net/projects/sigar/files/sigar/1.6/hyperic-sigar-1.6.4.zip/download
+# 코드
+
+	=====================================================================
+	import org.hyperic.sigar.Cpu;
+	import org.hyperic.sigar.CpuInfo;
+	import org.hyperic.sigar.Sigar;
+	import org.hyperic.sigar.SigarException;
+
+	public class Main{
+
+		public static void main(String[] args) throws SigarException {
+			Sigar sigar = new Sigar();
+			CpuInfo[] cpuInfoList = sigar.getCpuInfoList();
+
+			for (CpuInfo cpuInfo : cpuInfoList) {
+				System.out.println("CPU 정보:");
+				System.out.println("Vendor: " + cpuInfo.getVendor());
+				System.out.println("Model: " + cpuInfo.getModel());
+				System.out.println("Mhz: " + cpuInfo.getMhz());
+				System.out.println("Total CPUs: " + cpuInfo.getTotalCores());
+				System.out.println();
+			}
+
+			Cpu cpu = sigar.getCpu();
+			System.out.println("CPU 사용량:");
+
+			System.out.println("Idle: " + cpu.getIdle());
+			System.out.println("User: " + cpu.getUser());
+			System.out.println("Sys: " + cpu.getSys());
+		}
+	}
+
+
+
+	=====================================================================
+
+# 스프링에서 측정하기
+	https://nangmandeveloper.tistory.com/12
+	https://velog.io/@limsubin/Spring-Boot%EC%97%90%EC%84%9C-metric%EC%9D%84-%EC%A0%81%EC%9A%A9%ED%95%98%EC%9E%90
+# 라이브러리 추가
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+# application.yml 파일에 설정 추가
+=====================================================================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+=====================================================================
+# 접속
+	http://127.0.0.1:8080/actuator
+
+# 매트릭 확인
+	http://127.0.0.1:8080/actuator/metrics
+	위페이지에서 나오는 값들을 뒤에 붙여서 호출하면 더많은 정보를 볼수 있음
+	http://127.0.0.1:8080/actuator/metrics/여기
+	http://127.0.0.1:8080/actuator/metrics/jvm.memory.used
