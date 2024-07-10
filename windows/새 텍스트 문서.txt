@@ -1,0 +1,9 @@
+python -m venv venv
+venv\Scripts\activate
+pip install opentelemetry-sdk opentelemetry-exporter-otlp
+pip install watchdog
+pip install opentelemetry-sdk
+pip install opentelemetry-exporter-otlp
+pip install opentelemetry-api
+pip install opentelemetry-instrumentation
+python log_collector.py

@@ -1,0 +1,18 @@
+1. 깃허브 저장소 복제
+git clone https://github.com/kkimsungchul/otel.git
+
+2. 모든 브런치 내려받기
+git branch -r | grep -v '\->' | while read remote; do git branch --track "${remote#origin/}" "$remote"; done
+git fetch --all
+git pull --all
+
+
+3. 원격 저장소 remote 제거
+git remote remove origin
+
+4. 새 저장소 remote 추가
+git remote add origin https://본인의.깃허브.저장소의.URl
+
+5. 업로드
+git push -u origin --all
+git push -u origin --tags
