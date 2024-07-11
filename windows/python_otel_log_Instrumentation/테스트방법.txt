@@ -1,0 +1,28 @@
+# 로그파일 경로
+C:\ConvertedLogs\Application.log
+
+---
+# 실행 스크립트
+
+python -m venv venv
+venv\Scripts\activate
+pip install opentelemetry-sdk opentelemetry-exporter-otlp
+pip install watchdog
+pip install opentelemetry-sdk
+pip install opentelemetry-exporter-otlp
+pip install opentelemetry-api
+pip install opentelemetry-instrumentation
+log_collector_v2.py
+---
+
+# 테스트 방법
+1. 로그파일을 C:\ConvertedLogs\Application.log 경로에 생성
+2. 콜렉터 실행
+3. 파이썬 파일 실행
+4. 콜렉터 경로에 example.log 파일 생성되면 내용 확인
+
+
+---
+SeverityNumber 오류가 계속나서 SeverityNumber 구현된거를 찾아서 그냥 다 넣었음
+
+https://opentelemetry-python.readthedocs.io/en/latest/_modules/opentelemetry/_logs/severity.html

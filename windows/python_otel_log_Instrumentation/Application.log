@@ -1,0 +1,21 @@
+2024-07-10 오후 10:14:59    15 정보               Windows Defender 상태를 SECURITY_PRODUCT_STATE_ON(으)로 업데이트했습니다.             
+2024-07-10 오후 10:14:56    15 정보               Windows Defender 상태를 SECURITY_PRODUCT_STATE_ON(으)로 업데이트했습니다.             
+2024-07-10 오후 10:14:54    15 정보               Windows Defender 상태를 SECURITY_PRODUCT_STATE_ON(으)로 업데이트했습니다.             
+2024-07-10 오후 10:14:52    15 정보               Windows Defender 상태를 SECURITY_PRODUCT_STATE_ON(으)로 업데이트했습니다.             
+2024-07-10 오후 9:01:01     15 정보               Windows Defender 상태를 SECURITY_PRODUCT_STATE_ON(으)로 업데이트했습니다.             
+2024-07-10 오후 8:38:01   1008 경고               "C:\WINDOWS\system32\wbem\wmiaprpl.dll" DLL에서 "장치가 준비되지 않았습니다." 서비스에 대...
+2024-07-10 오후 8:37:59   2002 경고               쿼리 액세스에 대한 \BaseNamedObjects\WmiProviderSubSystemHostJob 작업 개체를 열 수 없습...
+2024-07-10 오후 8:37:58   2004 오류               Server 서비스 성능 개체를 열 수 없습니다. 데이터 영역의 처음 4바이트(DWORD)는 상태 코드입니다.            
+2024-07-10 오후 8:37:58   1008 경고               "C:\WINDOWS\system32\msdtcuiu.DLL" DLL에서 "지정된 파일을 찾을 수 없습니다." 서비스에 대한 ...
+2024-07-10 오후 8:37:58   1008 경고               "C:\Windows\System32\Secur32.dll" DLL에서 "액세스가 거부되었습니다." 서비스에 대한 "Lsa" ...
+2024-07-10 오후 8:37:58   1008 경고               "C:\WINDOWS\system32\esentprf.dll" DLL에서 "액세스가 거부되었습니다." 서비스에 대한 "ESEN...
+2024-07-10 오후 8:37:51     15 정보               Windows Defender 상태를 SECURITY_PRODUCT_STATE_ON(으)로 업데이트했습니다.             
+2024-07-10 오후 8:37:38      0 정보               Service stopped.                                                         
+2024-07-10 오전 1:27:32   6000 정보               winlogon 알림 가입자 <WSearch>이(가) 알림 이벤트를 처리할 수 없습니다.                        
+2024-07-10 오전 1:27:26  10001 정보               다음 응용 프로그램이 종료를 거부하려고 했습니다. SGuard64.exe.                                
+2024-07-10 오전 1:27:23  10001 정보               다음 응용 프로그램이 종료를 거부하려고 했습니다. SGuard64.exe.                                
+2024-07-10 오전 1:27:26  10001 정보               다음 응용 프로그램이 종료를 거부하려고 했습니다. SGuard64.exe.                                
+2024-07-10 오전 1:27:23  10001 정보               다음 응용 프로그램이 종료를 거부하려고 했습니다. SGuard64.exe.                               
+2024-07-10 오후 8:37:58   1008 경고               "C:\WINDOWS\system32\esentprf.dll" DLL에서 "액세스가 거부되었습니다." 서비스에 대한 "ESEN...
+2024-07-10 오후 10:14:59    15 정보               Windows Defender 상태를 SECURITY_PRODUCT_STATE_ON(으)로 업데이트했습니다.
+아시바 진짜 수집되나?
