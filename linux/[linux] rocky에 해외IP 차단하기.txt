@@ -105,3 +105,46 @@
 	- 차단된 로그 예시
 	Feb 1 12:34:56 hostname kernel: DROPPED: IN=eth0 OUT= MAC=00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd SRC=123.456.789.0 DST=10.0.0.1 LEN=60 TOS=0x00 PREC=0x00 TTL=49 ID=12345 DF PROTO=TCP SPT=54321 DPT=22 WINDOW=29200 RES=0x00 SYN URGP=0
 
+
+# firewalld.conf에서 로깅 설정 변경
+	vi /etc/firewalld/firewalld.conf
+	LogDenied=off
+	->
+	LogDenied=all
+
+# 서비스 재시작
+	systemctl restart firewalld
+
+# 설정 확인
+	firewall-cmd --get-log-denied
+
+# 로그 보기
+	dmesg | grep -i REJECT
+
+# 로그 파일 생성 후 로깅 설정 (신규 파일 생성 후 아래 내용 추가)
+	vi /etc/rsyslog.d/firewalld-droppd.conf
+	=====================================================================
+	:msg,contains,"_DROP" /var/log/firewalld-droppd.log
+	:msg,contains,"_REJECT" /var/log/firewalld-droppd.log
+	& stop
+	=====================================================================
+# rsyslog 서비스 재시작
+	systemctl restart rsyslog.service
+
+# deny log 확인
+	tail -f /var/log/firewalld-droppd.log
+	=====================================================================
+	Aug 11 23:42:16 localhost kernel: FINAL_REJECT: IN=enp1s0 OUT= MAC=01:00:5e:00:00:01:00:05:72:a5:30:22:08:00 SRC=192.168.55.1 DST=224.0.0.1 LEN=32 TOS=0x18 PREC=0xA0 TTL=1 ID=4372 DF PROTO=2
+	Aug 11 23:44:21 localhost kernel: FINAL_REJECT: IN=enp1s0 OUT= MAC=01:00:5e:00:00:01:00:05:72:a5:30:22:08:00 SRC=192.168.55.1 DST=224.0.0.1 LEN=32 TOS=0x18 PREC=0xA0 TTL=1 ID=4372 DF PROTO=2
+	Aug 11 23:44:21 localhost kernel: FINAL_REJECT: IN=enp1s0 OUT= MAC=01:00:5e:00:00:01:00:05:72:a5:30:22:08:00 SRC=192.168.55.1 DST=224.0.0.1 LEN=32 TOS=0x18 PREC=0xA0 TTL=1 ID=4372 DF PROTO=2
+	Aug 11 23:46:26 localhost kernel: FINAL_REJECT: IN=enp1s0 OUT= MAC=01:00:5e:00:00:01:00:05:72:a5:30:22:08:00 SRC=192.168.55.1 DST=224.0.0.1 LEN=32 TOS=0x18 PREC=0xA0 TTL=1 ID=4372 DF PROTO=2
+	Aug 11 23:46:26 localhost kernel: FINAL_REJECT: IN=enp1s0 OUT= MAC=01:00:5e:00:00:01:00:05:72:a5:30:22:08:00 SRC=192.168.55.1 DST=224.0.0.1 LEN=32 TOS=0x18 PREC=0xA0 TTL=1 ID=4372 DF PROTO=2
+	Aug 11 23:48:31 localhost kernel: FINAL_REJECT: IN=enp1s0 OUT= MAC=01:00:5e:00:00:01:00:05:72:a5:30:22:08:00 SRC=192.168.55.1 DST=224.0.0.1 LEN=32 TOS=0x18 PREC=0xA0 TTL=1 ID=4372 DF PROTO=2
+	Aug 11 23:49:38 localhost kernel: FINAL_REJECT: IN=enp1s0 OUT= MAC=ff:ff:ff:ff:ff:ff:4c:cc:6a:fb:01:32:08:00 SRC=192.168.55.184 DST=192.168.55.255 LEN=229 TOS=0x00 PREC=0x00 TTL=128 ID=3553 PROTO=UDP SPT=138 DPT=138 LEN=209
+	Aug 11 23:50:36 localhost kernel: FINAL_REJECT: IN=enp1s0 OUT= MAC=01:00:5e:00:00:01:00:05:72:a5:30:22:08:00 SRC=192.168.55.1 DST=224.0.0.1 LEN=32 TOS=0x18 PREC=0xA0 TTL=1 ID=4372 DF PROTO=2
+	Aug 11 23:50:36 localhost kernel: FINAL_REJECT: IN=enp1s0 OUT= MAC=01:00:5e:00:00:01:00:05:72:a5:30:22:08:00 SRC=192.168.55.1 DST=224.0.0.1 LEN=32 TOS=0x18 PREC=0xA0 TTL=1 ID=4372 DF PROTO=2
+	Aug 11 23:52:41 localhost kernel: FINAL_REJECT: IN=enp1s0 OUT= MAC=01:00:5e:00:00:01:00:05:72:a5:30:22:08:00 SRC=192.168.55.1 DST=224.0.0.1 LEN=32 TOS=0x18 PREC=0xA0 TTL=1 ID=4372 DF PROTO=2
+	=====================================================================
+
+
+
