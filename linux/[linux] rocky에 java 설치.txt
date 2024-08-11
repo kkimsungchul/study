@@ -1,0 +1,39 @@
+# rocky linux에 Java 17설치
+
+## 권한
+	※ Root 계정으로 진행할 것 
+	※ 모든 사용자들이 java를 사용할수 있도록 하기위함
+
+
+## 다운받을 경로 이동
+	cd /opt
+
+## jdk 다운로드
+	wget https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_linux-x64_bin.tar.gz
+
+## 압축 해제
+	tar -xvf openjdk-17.0.2_linux-x64_bin.tar.gz
+	tar 명령어를 찾을 수 없다고 할 경우 아래의 명령어 입력
+	dnf install -y tar
+
+## 환경변수 스크립트 작성
+	vi /etc/profile.d/jdk17.sh
+	=====================================================================
+	export JAVA_HOME=/opt/jdk-17.0.2
+	export PATH=$JAVA_HOME/bin:$PATH
+	=====================================================================
+
+## 스크립트 권한 설정
+	chmod +x /etc/profile.d/jdk17.sh
+
+## 환경 변수 적용
+	source /etc/profile.d/jdk17.sh
+
+## 설치 확인
+[username@localhost ~]$ java -version
+openjdk version "17.0.2" 2022-01-18
+OpenJDK Runtime Environment (build 17.0.2+8-86)
+OpenJDK 64-Bit Server VM (build 17.0.2+8-86, mixed mode, sharing)
+[username@localhost ~]$ javac -version
+javac 17.0.2
+[username@localhost ~]$

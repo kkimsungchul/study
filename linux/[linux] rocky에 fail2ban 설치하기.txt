@@ -1,0 +1,128 @@
+# rocky linux에 fail2ban 설치하기
+
+# 사용 이유
+	- 서버 구축한지 24시간도 안됐는데 진짜 미친듯이 들어오려고함
+
+# 침입 시도 기록
+	- 너무 많아서 일부만 작성함
+	=====================================================================
+	8월 10 12:50:29 localhost.localdomain sshd[37543]: Failed password for root from 116.212.111.186 port 40448 ssh2
+	8월 10 12:50:37 localhost.localdomain sshd[37546]: Failed password for root from 116.212.111.186 port 40454 ssh2
+	8월 10 12:50:44 localhost.localdomain sshd[37549]: Failed password for root from 116.212.111.186 port 55132 ssh2
+	8월 10 12:50:51 localhost.localdomain sshd[37552]: Failed password for root from 116.212.111.186 port 38288 ssh2
+	8월 10 15:56:31 localhost.localdomain sshd[37698]: Failed password for invalid user test from 8.219.4.181 port 56264 ssh2
+	8월 10 15:56:33 localhost.localdomain sshd[37698]: Failed password for invalid user test from 8.219.4.181 port 56264 ssh2
+	8월 10 15:56:35 localhost.localdomain sshd[37698]: Failed password for invalid user test from 8.219.4.181 port 56264 ssh2
+	8월 10 15:56:38 localhost.localdomain sshd[37700]: Failed password for invalid user dev from 8.219.4.181 port 59578 ssh2
+	8월 10 15:56:41 localhost.localdomain sshd[37700]: Failed password for invalid user dev from 8.219.4.181 port 59578 ssh2
+	8월 10 15:56:43 localhost.localdomain sshd[37700]: Failed password for invalid user dev from 8.219.4.181 port 59578 ssh2
+	8월 10 15:56:48 localhost.localdomain sshd[37702]: Failed password for invalid user ubuntu from 8.219.4.181 port 42318 ssh2
+	8월 10 15:56:50 localhost.localdomain sshd[37702]: Failed password for invalid user ubuntu from 8.219.4.181 port 42318 ssh2
+	8월 10 15:56:52 localhost.localdomain sshd[37702]: Failed password for invalid user ubuntu from 8.219.4.181 port 42318 ssh2
+	8월 10 22:15:46 localhost.localdomain sshd[37846]: Failed password for invalid user admin from 85.209.11.227 port 7013 ssh2
+	8월 10 22:41:18 localhost.localdomain sshd[37862]: Failed password for invalid user admin from 193.201.9.156 port 39520 ssh2
+	=====================================================================
+
+# 참고 링크
+	https://www.lesstif.com/security/fail2ban-ssh-43843899.html
+	https://velog.io/@invidam/init-fail2ban
+	https://blog.naver.com/haengro/220959419050
+	https://zetawiki.com/wiki/Fail2ban_%EB%A1%9C%EA%B7%B8_%EC%B9%A8%EC%9E%85%EC%8B%9C%EB%8F%84_%EC%95%84%EC%9D%B4%ED%94%BC_%ED%99%95%EC%9D%B8
+	
+# EPEL 저장소 설치
+	※ root 계정으로 진행, 또한 아래의 모든 명령어들도 전부 root로 실행
+	dnf install epel-release
+
+# 저장소 정보 업데이트
+	dnf makecache
+
+# 설치
+	dnf install fail2ban
+
+# 서비스 시작 
+	systemctl start fail2ban
+
+# 부팅 시 자동 실행 설정 
+	systemctl enable fail2ban
+
+# 설정 파일 수정
+	※ 참고사항
+	=====================================================================
+	fail2ban 의 기본 설정은 /etc/fail2ban/jail.conf 이며 설정을 수정할 필요가 있을 경우 
+	이 파일보다는 개인화 설정 파일인 /etc/fail2ban/jail.local 을 사용하는 것이 좋습니다.
+	=====================================================================
+	- 파일 복사
+	cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+	
+	- 파일 수정
+	vi /etc/fail2ban/jail.local
+	
+	- 기존
+	=====================================================================
+	[sshd]
+
+	# To use more aggressive sshd modes set filter parameter "mode" in jail.local:
+	# normal (default), ddos, extra or aggressive (combines all).
+	# See "tests/files/logs/sshd" or "filter.d/sshd.conf" for usage example and details.
+	#mode   = normal
+	port    = ssh
+	logpath = %(sshd_log)s
+	backend = %(sshd_backend)s
+	=====================================================================
+
+	- 수정 후
+	기존 내용들은 주석치고, 아래에 추가하였음
+	=====================================================================
+	[sshd]
+
+	# To use more aggressive sshd modes set filter parameter "mode" in jail.local:
+	# normal (default), ddos, extra or aggressive (combines all).
+	# See "tests/files/logs/sshd" or "filter.d/sshd.conf" for usage example and details.
+	#mode   = normal
+	#port    = ssh
+	#logpath = %(sshd_log)s
+	#backend = %(sshd_backend)s
+
+	enabled = true
+	port = ssh
+	filter = sshd
+	logpath = /var/log/secure
+	maxretry = 5
+	bantime = 600
+	=====================================================================
+
+	- 설정 정보
+	SSH에 대해 5번의 실패한 로그인 시도 후 600초 동안 해당 IP를 차단
+
+# 서비스 재시작
+	systemctl restart fail2ban
+
+# 접속 시도 확인
+	cat /var/log/fail2ban.log* | grep "] Ban" | awk '{print $NF}' | sort | uniq -c | sort -n
+
+# 차단 현황 확인
+	fail2ban-client status
+
+
+
+# 차단된 IP정보 확인
+	vi /var/log/fail2ban.log
+	위 로그에서 "[sshd] Ban xxx.xxx.xxx.xxx" 형태로 남아있는 로그를 찾아서 IP정보를 확인
+	
+	tail -f /var/log/fail2ban.log
+
+# fail2ban 차단ip 해제하기
+	fail2ban-client set sshd unbanip 221.xxx.xxx.xxx
+
+
+# 오류 모음
+	- fail2ban 을 찾을 수 없음
+	-> EPEL 저장소 설치 하면됨
+	=====================================================================
+	[root@localhost etc]# dnf install fail2ban
+	마지막 메타자료 만료확인(3:43:09 이전): 2024년 08월 10일 (토) 오후 10시 38분 18초.
+	일치하는 인수가 없습니다: fail2ban
+	오류: 일치하는 항목을 찾을 수 없습니다: fail2ban
+	=====================================================================
+
+

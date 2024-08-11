@@ -1,0 +1,43 @@
+# rokcy linux 접속 기록 확인
+
+# 참고 링크
+	https://gonpress.tistory.com/40
+	https://zetawiki.com/wiki/%EB%A6%AC%EB%88%85%EC%8A%A4_%EC%A0%91%EC%86%8D%EA%B8%B0%EB%A1%9D_%ED%99%95%EC%9D%B8_last
+	https://zetawiki.com/wiki/%EB%A6%AC%EB%88%85%EC%8A%A4_%ED%8C%A8%EC%8A%A4%EC%9B%8C%EB%93%9C_%ED%84%B8%EB%A0%B8%EB%8A%94%EC%A7%80_%ED%99%95%EC%9D%B8%ED%95%98%EA%B8%B0
+
+# 접속 실패 로그
+	last -f /var/log/btmp
+	
+	- 최근이 밑으로 오도록 정렬 (오름차순)
+	last -f /var/log/btmp | tac
+
+# 접속 정보 로그
+	last -f /var/log/wtmp
+	- 최근이 밑으로 오도록 정렬 (오름차순)
+	last -f /var/log/wtmp | tac
+
+# 사용자별 접속 로그
+	lastlog -u userid
+	ex) lastlog -u root
+
+
+# 접속 기록
+	last
+
+# 특정 계정 접속 기록
+	last 계정명
+
+# 로그인 성공 이력 확인
+	cat /var/log/secure* | grep Accepted | awk '{print $9"\t"$11"\t"$14}' | sort | uniq
+	=====================================================================
+	[root@localhost etc]# cat /var/log/secure* | grep Accepted | awk '{print $9"\t"$11"\t"$14}' | sort | uniq
+	계정1			118.235.14.106  ssh2
+	계정1			118.235.14.112  ssh2
+	계정1			118.235.14.172  ssh2
+	계정1			192.168.55.184  ssh2
+	계정2			192.168.55.184  ssh2
+	=====================================================================
+
+# 시스템 로그에서 확인
+	journalctl |grep Failed
+

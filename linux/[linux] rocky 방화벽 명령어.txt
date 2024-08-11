@@ -1,0 +1,31 @@
+# rocky linux 방화벽 명령어
+
+# 참고 링크 
+	https://javaoop.tistory.com/78
+
+# 리눅스 방화벽 리스트 확인 
+	firewall-cmd --list-all
+ 
+# 리눅스 방화벽 PORT 일시적 추가(reload시 초기화)
+	firewall-cmd --add-port=9999/tcp 
+ 
+# 리눅스 방화벽 PORT 영구적 추가
+	firewall-cmd --permanent --add-port=9999/tcp
+ 
+# 리눅스 방화벽 PORT 일시적 삭제(reload시 초기화)
+	firewall-cmd --remove-port=9999/tcp
+ 
+# 리눅스 방화벽 PORT 영구적 삭제 
+	firewall-cmd --permanent --remove-port=9999/tcp
+ 
+# 리눅스 방화벽 리로드
+	firewall-cmd --reload
+ 
+# 리눅스 방화벽 상태
+	firewall-cmd --state
+ 
+# 리눅스 방화벽 시작 
+	systemctl start firewalld 
+ 
+# 리눅스 방화벽 해제 
+	systemctl stop firewalld

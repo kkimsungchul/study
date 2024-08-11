@@ -1,0 +1,119 @@
+# rocky linux의 dnf 업데이트
+	※ 아래의 모든 명령어는 root로 진행
+# 참고링크 
+	http://yesxyz.kr/how-to-update-package-using-yum/
+	
+# update와 upgrade 차이
+	dnf update: 기존에 설치된 모든 패키지를 최신 버전으로 업그레이드하면서, 필요하다면 새로운 패키지도 설치합니다.
+	dnf upgrade: 현재 설치된 패키지를 최신 버전으로 업그레이드하지만, update와 달리 새로운 패키지를 설치하지는 않습니다.
+
+# 업데이트 전 cache 재구성
+	참고링크 :http://yesxyz.kr/how-to-refresh-package-cache-data-on-linux/
+	- 캐시 파일 확인
+	cd /var/cache/dnf
+	=====================================================================
+	[root@localhost dnf]# ll
+	합계 48284
+	drwxr-xr-x. 4 root root       56  8월 10 02:24 appstream-62ae9a0bbea44fbe
+	-rw-r--r--. 1 root root  8356613  8월 10 01:23 appstream-filenames.solvx
+	-rw-r--r--. 1 root root  2214682  8월 10 01:23 appstream-updateinfo.solvx
+	-rw-r--r--. 1 root root  3192987  8월 11 04:36 appstream.solv
+	drwxr-xr-x. 4 root root       56  8월 10 01:23 baseos-3e608afeebc9a90b
+	-rw-r--r--. 1 root root  2665888  8월 10 01:23 baseos-filenames.solvx
+	-rw-r--r--. 1 root root   657875  8월 10 01:23 baseos-updateinfo.solvx
+	-rw-r--r--. 1 root root  1930562  8월 11 04:36 baseos.solv
+	drwxr-xr-x. 4 root root       58  8월 11 02:24 epel-2f52d25564da0fd7
+	-rw-r--r--. 1 root root 13896309  8월 11 02:23 epel-filenames.solvx
+	-rw-r--r--. 1 root root     1428  8월 11 02:23 epel-presto.solvx
+	-rw-r--r--. 1 root root 10432427  8월 11 02:23 epel-updateinfo.solvx
+	-rw-r--r--. 1 root root  4208360  8월 11 04:36 epel.solv
+	-rw-r--r--. 1 root root        2  8월 11 04:36 expired_repos.json
+	drwxr-xr-x. 4 root root       56  8월 11 02:22 extras-b5feef55fd8cf39e
+	-rw-r--r--. 1 root root     1728  8월 10 01:23 extras-filenames.solvx
+	-rw-r--r--. 1 root root    23315  8월 11 04:36 extras.solv
+	-rw-r--r--. 1 root root        0  8월 11 01:41 last_makecache
+	-rw-r--r--. 1 root root  1830912  8월 11 04:36 packages.db
+	-rw-r--r--. 1 root root        2  8월 11 04:36 tempfiles.json
+	=====================================================================
+	
+	- 캐시 파일 정리
+	dnf clean all
+
+	- 캐시 파일 생성
+	dnf makecache
+
+# openssl 관련 패키지 제외 업데이트
+	※ 나는 설치한지 얼마안된거라서 아래의 내용은 추가가되는지만 테스트했음
+	versionlock 플러그인을 사용해서 openssl 버전을 업데이트 하지 않도록 함
+
+	dnf -y install 'dnf-command(versionlock)'
+	rpm -qa | grep "^openssl" | sort
+	=====================================================================
+	openssl-1.1.1k-12.el8_9.x86_64
+	openssl-libs-1.1.1k-12.el8_9.x86_64
+	openssl-pkcs11-0.4.10-3.el8.x86_64
+	=====================================================================
+	
+	- openssl 관련 패키지를 versionlock 에 추가
+	dnf versionlock add openssl
+	dnf versionlock add openssl-pkcs11
+	dnf versionlock add openssl-libs
+
+	- versionlock 추가 확인
+	dnf versionlock list
+
+	- versionlock에 추가 패키지 삭제
+	dnf versionlock delete openssl
+	dnf versionlock delete openssl-pkcs11
+	dnf versionlock delete openssl-libs
+
+
+# dnf 패키지 관리자 자체를 업데이트
+	dnf upgrade --refresh dnf
+	또는 
+	dnf update --refresh dnf
+
+# 시스템 및 모든 패키지 업데이트
+	dnf upgrade --refresh
+	또는
+	dnf update --refresh
+
+# 업데이트 히스토리 확인
+	dnf history list
+	=====================================================================
+	[root@localhost dnf]# dnf history list
+	ID     | 명령행                                                                                                    | 날짜와 시간      | 작업           | 변경됨
+	----------------------------------------------------------------------------------------------------------------------------------------------------------------
+    10 | -y install dnf-command(versionlock)                                                                       | 2024-08-11 04:44 | Install        |    1
+     9 | upgrade --refresh                                                                                         | 2024-08-11 04:36 | Upgrade        |    1
+     8 | install fail2ban                                                                                          | 2024-08-11 02:24 | Install        |   11 EE
+     7 | install epel-release                                                                                      | 2024-08-11 02:22 | Install        |    1 EE
+     6 | update                                                                                                    | 2024-08-10 03:04 | I, U           |   42
+     5 | install -y tar                                                                                            | 2024-08-10 02:29 | Install        |    1
+     4 | -y install wget curl                                                                                      | 2024-08-10 02:24 | Install        |    2
+     3 | install -y policycoreutils-python-utils                                                                   | 2024-08-10 01:57 | I, U           |    7
+     2 | install net-tools -y                                                                                      | 2024-08-10 01:23 | Install        |    1
+     1 |                                                                                                           | 2024-08-10 01:16 | Install        |  404 EE
+	=====================================================================
+
+# 롤백
+	dnf history list 명령어 실행
+	=====================================================================
+	[root@localhost dnf]# dnf history list
+	ID     | 명령행                                                                                                    | 날짜와 시간      | 작업           | 변경됨
+	----------------------------------------------------------------------------------------------------------------------------------------------------------------
+    10 | -y install dnf-command(versionlock)                                                                       | 2024-08-11 04:44 | Install        |    1
+     9 | upgrade --refresh                                                                                         | 2024-08-11 04:36 | Upgrade        |    1
+     8 | install fail2ban                                                                                          | 2024-08-11 02:24 | Install        |   11 EE
+     7 | install epel-release                                                                                      | 2024-08-11 02:22 | Install        |    1 EE
+     6 | update                                                                                                    | 2024-08-10 03:04 | I, U           |   42
+     5 | install -y tar                                                                                            | 2024-08-10 02:29 | Install        |    1
+     4 | -y install wget curl                                                                                      | 2024-08-10 02:24 | Install        |    2
+     3 | install -y policycoreutils-python-utils                                                                   | 2024-08-10 01:57 | I, U           |    7
+     2 | install net-tools -y                                                                                      | 2024-08-10 01:23 | Install        |    1
+     1 |                                                                                                           | 2024-08-10 01:16 | Install        |  404 EE
+	=====================================================================
+	
+	- 위의 번호를 확인하여 아래의 명령어를 입력하면 롤백됨
+	dnf history undo ID
+	ex) dnf history undo 10

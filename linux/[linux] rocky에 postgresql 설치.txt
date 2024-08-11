@@ -1,0 +1,4 @@
+# rocky linux에 postgresql 설치
+
+# 참고 링크 
+	https://blife.tistory.com/23 
