@@ -3,6 +3,9 @@
 # 참고 링크 
 	https://blife.tistory.com/23 
 	https://ryans-note.tistory.com/16
+	https://positivemh.tistory.com/467
+	https://velog.io/@moonpiderman/PostgreSQL-USER-DB-%EC%83%9D%EC%84%B1-%EB%B0%8F-%EA%B6%8C%ED%95%9C-%EB%B6%80%EC%97%AC
+	https://kikitown.tistory.com/42
 
 # dnf update
 	[root@localhost ~]# dnf update
@@ -24,7 +27,7 @@
 	dnf install -y postgresql-server
 
 # PostgreSQL 16 모듈 스트림 활성화 
-	먼저 PostgreSQL 16 버전 모듈을 활성화해야 합니다. 이렇게 하면 dnf가 PostgreSQL 16 버전을 설치하도록 설정됩니다.
+	먼저 PostgreSQL 16 버전 모듈을 활성화해야 dnf가 PostgreSQL 16 버전을 설치함
 	
 	dnf module enable postgresql:16
 	
@@ -69,17 +72,264 @@
 	psql (PostgreSQL) 16.1
 	==========================================================================
 
----2024-08-20,22시 여기까지 진행 완료
+# PostgreSQL 서비스 확인
+	systemctl status postgresql
+	=====================================================================
+	[root@localhost data]# systemctl status postgresql
+	● postgresql.service - PostgreSQL database server
+	   Loaded: loaded (/usr/lib/systemd/system/postgresql.service; enabled; vendor preset: disabled)
+	   Active: active (running) since Tue 2024-08-20 21:51:04 KST; 2h 24min ago
+	  Process: 8188 ExecStartPre=/usr/libexec/postgresql-check-db-dir postgresql (code=exited, status=0/SUCCESS)
+	 Main PID: 8191 (postgres)
+		Tasks: 7 (limit: 99159)
+	=====================================================================
 
-# postgres 계정 생성
+# PostgreSQL 포트 확인
+	netstat -ano | grep 5432
+	=====================================================================
+	[root@localhost data]# netstat -ano | grep 5432
+	tcp        0      0 127.0.0.1:5432          0.0.0.0:*               LISTEN      off (0.00/0/0)
+	tcp6       0      0 ::1:5432                :::*                    LISTEN      off (0.00/0/0)
+	unix  2      [ ACC ]     STREAM     LISTENING     40926    /tmp/.s.PGSQL.5432
+	unix  2      [ ACC ]     STREAM     LISTENING     40924    /var/run/postgresql/.s.PGSQL.5432
+	=====================================================================
+
+# PostgreSQL 접속
+	sudo -u postgres psql
+
+# 데이터베이스 목록 확인
+
+	postgres=# \l
+														데이터베이스 목록
+	   이름    |  소유주  | 인코딩 | 로케일 제공자 |   Collate   |    Ctype    | ICU 로케일 | ICU 룰 |      액세스 권한
+	-----------+----------+--------+---------------+-------------+-------------+------------+--------+-----------------------
+	 postgres  | postgres | UTF8   | libc          | ko_KR.UTF-8 | ko_KR.UTF-8 |            |        |
+	 template0 | postgres | UTF8   | libc          | ko_KR.UTF-8 | ko_KR.UTF-8 |            |        | =c/postgres          +
+			   |          |        |               |             |             |            |        | postgres=CTc/postgres
+	 template1 | postgres | UTF8   | libc          | ko_KR.UTF-8 | ko_KR.UTF-8 |            |        | =c/postgres          +
+			   |          |        |               |             |             |            |        | postgres=CTc/postgres
+	(3개 행)
+
+
+
+# 기본 계정 암호 설정
+	postgres=# \password			--패스워드 설정
+	Enter new password: "암호입력"
+	Enter it again: "암호다시입력"
+	postgres=# \q					--postgresql 종료
+
+
+
+# 다른 IP 접속 허용
+	※ 아래 설정 변경 전 서비스 중지
+	systemctl stop postgresql
+
+	vi /var/lib/pgsql/data/postgresql.conf
+	- 기존
+	=====================================================================
+	#listen_addresses = 'localhost'         # what IP address(es) to listen on;
+	=====================================================================
+	
+	- 수정 후
+	=====================================================================
+	listen_addresses = '*'          # what IP address(es) to listen on;
+	=====================================================================
+	
+	※ 설정 변경 후 PostgreSQL 재시작
+	systemctl restart postgresql
+	
+	※ 상태 확인
+	systemctl status postgresql
+	
+
+
+# 포트 변경 전 사전 작업
+	- SELinux 에 포트 추가
+	semanage port -a -t postgresql_port_t -p tcp 5532
+
+	- 추가 확인
+	semanage port -l |grep postgresql_port_t
+
+	- 기존 포트 제거 
+	-> 안됨 걍 씀
+	[root@localhost data]# semanage port -d -t postgresql_port_t -p tcp 5432
+	ValueError: 포트 tcp/5432 정책에 정의되어 있으며 삭제 할 수 없습니다
+	[root@localhost data]# semanage port -d -t postgresql_port_t -p tcp 9898
+	ValueError: 포트 tcp/9898 정책에 정의되어 있으며 삭제 할 수 없습니다
+
+
+# 포트 변경
+	※ 아래 설정 변경 전 서비스 중지
+	systemctl stop postgresql
+
+	vi /var/lib/pgsql/data/postgresql.conf
+	- 기존
+	=====================================================================
+	#port = 5432                             # (change requires restart)
+
+	=====================================================================
+
+	- 변경 후
+	=====================================================================
+	port = 5532                             # (change requires restart)
+	=====================================================================
+
+
+	-> 실패 시 확인 
+	-> 로그 확인
+		/var/lib/pgsql/data/log/postgresql-Wed.log
+		=====================================================================
+		2024-08-21 01:01:55.039 KST [8694] 로그:  IPv4 바인드 실패, 대상 주소: "0.0.0.0": 허가 거부
+		2024-08-21 01:01:55.039 KST [8694] 로그:  IPv6 바인드 실패, 대상 주소: "::": 허가 거부
+		2024-08-21 01:01:55.039 KST [8694] 경고:  "*" 응당 소켓을 만들 수 없습니다
+		2024-08-21 01:01:55.039 KST [8694] 치명적오류:  TCP/IP 소켓을 만들 수 없습니다.
+		=====================================================================
+	
+	-> SElinux 에서 허용하지 않아서 발생하는 오류
+	SELinux에 포트 추가할것
+
+
+# 포트 변경 확인
+	netstat -ano | grep 5532
+	=====================================================================
+	[root@localhost data]# netstat -ano | grep 5532
+	tcp        0      0 0.0.0.0:5532            0.0.0.0:*               LISTEN      off (0.00/0/0)
+	tcp6       0      0 :::5532                 :::*                    LISTEN      off (0.00/0/0)
+	unix  2      [ ACC ]     STREAM     LISTENING     46731    /tmp/.s.PGSQL.5532
+	unix  2      [ ACC ]     STREAM     LISTENING     46729    /var/run/postgresql/.s.PGSQL.5532
+	=====================================================================
+
+
+# 방화벽 포트 개방
+	firewall-cmd --permanent --add-port=5532/tcp
+
+# 방화벽 정책 리로드
+	firewall-cmd --reload
+
+
+# 방화벽 정책 확인
+	firewall-cmd --list-all
+
+
+# postgres 계정 바로 로그인 차단
+	※ 제일 마지막 줄에 작성
+
+	vi /etc/ssh/sshd_config
+	=====================================================================
+	DenyUsers postgres
+	=====================================================================
+	
+	- sshd 재시작
+	systemctl restart sshd
+
 
 # postgres 계정 전환
+	※ 별도로 생성하지 않아도 postgresql을 설치하면 자동으로 계정이 생성됨
+	sudo -i -u postgres
+
+# 데이터베이스 생성
+	※ 이전까지는 psql로 접속이 되었지만, 포트번호를 변경하여서 -p 5532 를 붙여야 함
+	- 데이터베이스 접속
+	sudo -i -u postgres
+	psql -p 5532
+
+	- 데이터베이스 생성
+	CREATE DATABASE test_database;
+	
+
+# 계정 생성 및 권한 부여
+	- 계정 생성
+	CREATE USER 사용할DB계정명 WITH PASSWORD '암호여기에입력';
+
+	- DB 권한 부여
+	GRANT ALL PRIVILEGES ON DATABASE test_database TO 사용할DB계정명;
+
+	- 슈퍼관리자 권한 부여
+	ALTER USER 사용할DB계정명 WITH superuser;
+	
+	※ 위의 계정 생성 명령어 진행 후 슈퍼 관리자 권한 부여를 하려고 하면 이미 존재한다고 뜰꺼임
+	※ ALTER 명령어 사용해도 되지만, 그냥 제거하고 주는 방법을 택함
+	- 계정 삭제
+	DROP OWNED BY 사용할DB계정명;
+	DROP USER 사용할DB계정명;
+	
+	- 사용자 생성 및 슈퍼 관리자 권한 부여
+	CREATE ROLE 사용할DB계정명 WITH LOGIN PASSWORD 'rlatjdcjf!1' SUPERUSER;
 
 
-sudo -i -u postgres
+	- 권한 확인
+	postgres=# \du
+								롤 목록
+		롤 이름    |                      속성
+	---------------+------------------------------------------------
+	 사용할DB계정명 | 슈퍼유저
+	 postgres      | 슈퍼유저, 롤 만들기, DB 만들기, 복제, RLS 통과
 
 
 
+	- postgre 계정과 똑같은 권한 주기
+	※ 모든 권한을 주는 명령어이며, 해당 계정이 털리면 답이 없음, 개발에 사용할거라서 아래와 같이 다 준거뿐임 
+	※ 운영 또는 외부에 공개된 서비스일경우 권한을 꼭 제어해야함
+
+	ALTER USER 사용할DB계정명 WITH superuser;
+
+	ALTER USER 사용할DB계정명 WITH createdb;
+
+	ALTER USER 사용할DB계정명 WITH createrole;
+
+	ALTER USER 사용할DB계정명 WITH replication;
+
+	ALTER USER 사용할DB계정명 WITH bypassrls;
+
+	- 권한 확인
+	postgres=# \du
+								롤 목록
+		롤 이름    |                      속성
+	---------------+------------------------------------------------
+	 사용할DB계정명 | 슈퍼유저, 롤 만들기, DB 만들기, 복제, RLS 통과
+	 postgres      | 슈퍼유저, 롤 만들기, DB 만들기, 복제, RLS 통과
 
 
 
+# 외부 접속 허용
+	※ 중요, 난 이 설정을 진행하기 전에 공유기 설정과 방화벽설정 fail2ban 설정을 해놓아서 5회이상 실패시 차단되도록 해놓았음
+	※ 설정 우선순위는 공유기 -> firewall> fail2ban -> pg_hba.conf 이므로 이미 들어오면 뚫렷다고 보기때문에 아래와 같이 설정한거임
+	※ 공격에 대한 차단을 하지 않은 상태에서는 IP,ID,DB를 전부다 명시해서 사용해야 함
+
+	※ 제일 마지막줄에 추가하면 됨
+	vi /var/lib/pgsql/data/pg_hba.conf
+	=====================================================================
+	host    test_database   사용할DB계정명   0.0.0.0/0               md5
+	=====================================================================
+	- 위와같이 설정하면 "test_database 데이터베이스를 사용할DB계정명 계정으로 모든IP에서 비밀번호를 사용하여 접속할수 있음"
+
+	=====================================================================
+	host    all   사용할DB계정명   0.0.0.0/0               md5
+	=====================================================================
+	- 위와 같이 설정하면 "모든 데이터베이스를 사용할DB계정명 계정으로 모든 IP에서 비밀번호를 사용하여 접속할수 있음"
+
+	host: TCP/IP 연결
+	all: 모든 데이터베이스에 대한 설정
+	사용할DB계정명: 사용할DB계정명 사용자 계정에 대해 적용
+	0.0.0.0/0: 모든 외부 IP 주소에서 접속을 허용
+	md5: 비밀번호 인증 방식을 사용
+
+	※ 설정 완료 후 Postgresql 재기동
+	systemctl restart postgresql
+
+# 외부 접속 테스트
+	IP : 서버IP
+	PORT : 5532
+	ID : 사용할DB계정명
+	PW : 생성한 비번
+	database : test_database
+	
+	접속 후 아래의 쿼리 실행
+	select current_database();
+	결과 : test_database
+
+	※ postgres 계정의 경우에는 외부 접속 허용을 하지 않았음, 외부에서 접속 시도 하면 아래와 같이 나옴
+	=====================================================================
+	connection to server at "192.168.55.125", port 5532 failed: 치명적오류:  호스트 "192.168.55.184", 
+	사용자 "postgres", 데이터베이스 "postgres", 암호화 안함 연결에 대한 설정이 pg_hba.conf 파일에 없습니다. */
+	=====================================================================
