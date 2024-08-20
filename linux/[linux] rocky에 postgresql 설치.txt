@@ -2,3 +2,84 @@
 
 # 참고 링크 
 	https://blife.tistory.com/23 
+	https://ryans-note.tistory.com/16
+
+# dnf update
+	[root@localhost ~]# dnf update
+
+
+# 현재 dnf 로 받을 수 있는 postgresql 목록 확인
+
+	[root@localhost ~]# dnf module list postgresql
+
+	postgresql   9.6      client, server [d]   PostgreSQL server and client module
+	postgresql   10 [d]   client, server [d]   PostgreSQL server and client module
+	postgresql   12       client, server [d]   PostgreSQL server and client module
+	postgresql   13       client, server [d]   PostgreSQL server and client module
+	postgresql   15       client, server [d]   PostgreSQL server and client module
+	postgresql   16       client, server [d]   PostgreSQL server and client module
+
+
+# postgresql 설치
+	dnf install -y postgresql-server
+
+# PostgreSQL 16 모듈 스트림 활성화 
+	먼저 PostgreSQL 16 버전 모듈을 활성화해야 합니다. 이렇게 하면 dnf가 PostgreSQL 16 버전을 설치하도록 설정됩니다.
+	
+	dnf module enable postgresql:16
+	
+	==========================================================================
+	[root@localhost ~]# dnf module enable postgresql:16
+	마지막 메타자료 만료확인(0:00:46 이전): 2024년 08월 20일 (화) 오후 09시 43분 29초.
+	종속성이 해결되었습니다.
+	================================================================================
+	 꾸러미            구조             버전                저장소             크기
+	================================================================================
+	모듈 스트림 활성화:
+	 postgresql                         16
+
+	연결 요약
+	================================================================================
+
+	진행할까요? [y/N]: y
+	완료되었습니다!
+	==========================================================================
+
+# PostgreSQL 16 설치
+	dnf install -y postgresql-server
+
+# PostgreSQL 초기화
+	postgresql-setup --initdb
+
+	[root@localhost ~]# postgresql-setup --initdb
+	 * Initializing database in '/var/lib/pgsql/data'
+	 * Initialized, logs are in /var/lib/pgsql/initdb_postgresql.log
+
+# PostgreSQL 서비스 등록 및 자동 시작 설정
+	systemctl enable --now postgresql
+	==========================================================================
+	[root@localhost ~]# systemctl enable --now postgresql
+	Created symlink /etc/systemd/system/multi-user.target.wants/postgresql.service → /usr/lib/systemd/system/postgresql.service.
+	==========================================================================
+
+# PostgreSQL 버전 확인
+	psql --version
+	==========================================================================
+	[root@localhost ~]# psql --version
+	psql (PostgreSQL) 16.1
+	==========================================================================
+
+---2024-08-20,22시 여기까지 진행 완료
+
+# postgres 계정 생성
+
+# postgres 계정 전환
+
+
+sudo -i -u postgres
+
+
+
+
+
+
