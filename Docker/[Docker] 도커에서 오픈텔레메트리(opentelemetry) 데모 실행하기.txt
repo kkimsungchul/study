@@ -1,0 +1,38 @@
+# Docker - 도커에서 오픈텔레메트리(opentelemetry) 데모 실행하기
+	※약 30GB의 용량을 차지하므로 실행 시 주의
+
+# 공식 문서
+	https://opentelemetry.io/docs/demo/docker-deployment/
+
+# 오픈텔레메트리데모 클론
+	git clone https://github.com/open-telemetry/opentelemetry-demo.git
+
+# 도커 실행
+	윈도우에서 도커 데스크탑 실행
+
+# 도커 가상환경 저장 경로 설정
+	1. 우측 상단의 Settings 클릭 (톱니바퀴모양)
+	2. 좌측의 Resources 메뉴 진입
+	3. Disk image location 경로 설정
+
+# terminal 진입
+	도커 데스크탑 우측 하단의 terminal 클릭
+
+# 아래의 명령어 입력
+	클론받은 경로로 이동 후 아래의 명령어 입력
+	docker compose up --force-recreate --remove-orphans --detach
+	※ 이미지 빌드 및 실행에 시간 소요됨
+
+# 빌드 확인
+	도커 데스크탑의 좌측 메뉴에서 Images 클릭
+	-> 오텔 데모 이미지들이 보이면 정상적으로 실행된거임
+	
+
+
+# 접속 테스트
+	Web store: http://localhost:8080/
+	Grafana: http://localhost:8080/grafana/
+	Load Generator UI: http://localhost:8080/loadgen/
+	Jaeger UI: http://localhost:8080/jaeger/ui/
+	Tracetest UI: http://localhost:11633/
+	※ only when using make start-odd
