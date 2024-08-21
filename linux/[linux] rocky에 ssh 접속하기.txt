@@ -49,7 +49,7 @@
 	$ ssh_port_t		tcp		22
 
 # SElinux 정책 추가
-	semange port -a -t ssh_port_t -p tcp 2222
+	semanage port -a -t ssh_port_t -p tcp 2222
 
 # SElinux 정책 추가 확인
 	semanage port -l |grep ssh
