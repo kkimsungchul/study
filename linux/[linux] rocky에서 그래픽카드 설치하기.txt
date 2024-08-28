@@ -1,0 +1,111 @@
+# rocky linux에서 그래픽카드 설치하기
+
+# 참고링크
+	https://yongeekd01.tistory.com/19
+	https://yongeekd01.tistory.com/20
+	https://yongeekd01.tistory.com/21
+	https://westeastcircle.tistory.com/83
+
+
+# 사전 준비 사항
+	- BIOS 에서 Secure boot를 비활성화
+	※ 비활성화 하지 않으면 드라이버 설치가 제대로되지 않음
+
+# 드라이버 다운로드
+	- 아래의 링크에서 버전에 맞는 드라이버 다운로드
+	https://www.nvidia.com/ko-kr/drivers/
+
+# Cuda 버전 확인
+	https://docs.nvidia.com/deploy/cuda-compatibility/
+
+# GUI 비활성화
+	- 현재 설정 확인
+	=====================================================================
+	[root@localhost ~]# systemctl get-default
+	graphical.target
+	=====================================================================
+
+	- GUI를 사용하지 않는 일반 멀티유저 모드로 변경
+	=====================================================================
+	[root@localhost ~]# systemctl set-default multi-user.target
+	=====================================================================
+	
+	- 서버 재부팅
+	=====================================================================
+	[root@localhost ~]# reboot
+	=====================================================================
+
+# Nouveau 드라이버 비활성화
+	- Nouveau 드라이버 사용 확인
+	=====================================================================
+	[root@localhost ~]# lsmod | grep nouveau
+	=====================================================================
+
+	- grub 파일 수정
+	아래의 내용을 추가
+	GRUB_CMDLINE_LINUX의 제일 끝에 module_blacklist=nouveau 추가
+	=====================================================================
+	[root@localhost ~]# vi /etc/default/grub
+	
+	...중략
+	GRUB_CMDLINE_LINUX="crashkernel=auto resume=/dev/mapper/rl-swap rd.lvm.lv=rl/root rd.lvm.lv=rl/swap rhgb quiet module_blacklist=nouveau"
+	...중략
+	=====================================================================
+
+	- nouveau.conf 파일 생성
+	아래의 내용 추가
+	=====================================================================
+	[root@localhost ~]# vi /etc/modprobe.d/nouveau.conf
+	
+	blacklist nouveau
+
+	=====================================================================
+
+	- modules 리빌드
+	=====================================================================
+	[root@localhost ~]# depmod -a
+	=====================================================================
+
+	- grub config 리빌드
+	=====================================================================
+	[root@localhost ~]# grub2-mkconfig --output=/boot/efi/EFI/rocky/grub.cfg
+	=====================================================================
+
+	- 서버 재부팅
+	=====================================================================
+	[root@localhost ~]# reboot
+	=====================================================================
+
+	- nouvea 비활성화 확인
+	=====================================================================
+	[root@localhost ~]# lsmod |grep nouveau
+	=====================================================================
+
+# 드라이버 설치
+	=====================================================================
+	[root@localhost ~]# ./NVIDIA-Linux-x86_64-550.107.02.run
+	=====================================================================
+
+# 드라이버 설치가 안되는 경우 패키지들 설치 확인
+	dnf install vulkan-loader
+	dnf install pkgconfig
+	dnf install libglvnd-devel
+
+# 오류 발생 대처
+	- 아래의 파일에 오류로그가 남아있음
+	=====================================================================
+	[root@localhost ~]# vi /var/log/nvidia-installer.log
+	=====================================================================
+
+
+[root@localhost ~]# 
+---
+
+# 아래의 방법으로도 설치 가능
+	=====================================================================
+	dnf config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/rhel8/x86_64/cuda-rhel8.repo
+	dnf install kernel-devel-$(uname -r) kernel-headers-$(uname -r)
+	dnf install nvidia-driver nvidia-settings
+	dnf install cuda-driver
+	dnf remove nvidia-driver nvidia-settings cuda-driver kernel-devel-$(uname -r) kernel-headers-$(uname -r)
+	=====================================================================
