@@ -20,7 +20,7 @@
 	firewall-cmd --permanent --remove-port=9999/tcp
  
 # 리눅스 방화벽 리로드
-	firewall-cmd --reload
+	firewall-cmd --reload
  
 # 리눅스 방화벽 상태
 	firewall-cmd --state

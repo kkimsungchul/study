@@ -5,6 +5,7 @@
 
 # 침입 시도 기록
 	- 너무 많아서 일부만 작성함
+	journalctl |grep Failed
 	=====================================================================
 	8월 10 12:50:29 localhost.localdomain sshd[37543]: Failed password for root from 116.212.111.186 port 40448 ssh2
 	8월 10 12:50:37 localhost.localdomain sshd[37546]: Failed password for root from 116.212.111.186 port 40454 ssh2
