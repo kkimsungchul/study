@@ -1,0 +1,22 @@
+
+# 레디스 사용
+	https://ittrue.tistory.com/318
+	https://inpa.tistory.com/entry/REDIS-%F0%9F%93%9A-Window10-%ED%99%98%EA%B2%BD%EC%97%90-Redis-%EC%84%A4%EC%B9%98%ED%95%98%EA%B8%B0
+	https://firstws.tistory.com/52
+
+# 레디스 CRUD
+	https://m.blog.naver.com/sqlmvp/221522073848
+	https://computerlove.tistory.com/entry/REDIS-SETNX-SETEX-MEST-MSETNX
+
+# 레디스 JSON 모듈 사용
+	https://wiki.yowu.dev/ko/Knowledge-base/NoSQL/redis-json-data-structures-storing-and-querying-json-data-in-redis
+	https://velog.io/@os_js/Redis-JSON-%EB%AA%A8%EB%93%88-%EC%A0%81%EC%9A%A9
+	https://redis.io/docs/latest/develop/data-types/json/#redis-cli-examples
+
+# (error) MISCONF Redis is configured to save RDB snapshots, but is currently not able to persist on disk. Commands that may modify the data set are disabled. Please check Redis logs for details about the error.
+	https://charsyam.wordpress.com/2013/01/28/%EC%9E%85-%EA%B0%9C%EB%B0%9C-redis-%EC%84%9C%EB%B2%84%EA%B0%80-misconf-redis-is-configured-to-save-rdb-snapshots-%EC%97%90%EB%9F%AC%EB%A5%BC-%EB%82%B4%EB%A9%B0-%EB%8F%99%EC%9E%91%ED%95%98%EC%A7%80/
+	윈도우에서 실행후 set 명령어를 실행하니 위와같이 오류가 발생함
+
+	확인해보니 권한 부족으로 발생하였음
+	관리자권한으로 실행하니 정상작동함
+
