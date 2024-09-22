@@ -1,0 +1,191 @@
+# Redis - Python에서 Redis 사용하기
+
+# 파이썬 redis 패키지 링크
+	https://pypi.org/project/redis/
+
+# redis 패키지 
+	pip install redis
+	pip install redis[hiredis]
+
+# redis import 
+	import redis
+
+# redis 연결
+	r = redis.Redis(host='서버아이피', port=6379, decode_responses=True, password='비밀번호')
+
+	decode_responses=True
+		Redis 클라이언트가 Redis로부터 데이터를 받을 때 바이트 대신 문자열로 자동 변환해주는 옵션
+		기본적으로 Redis는 데이터를 바이트로 저장하고 반환하기 때문에, 문자열 데이터를 다루고 싶다면 이 옵션을 True로 설정
+		해당 옵션을 true로 설정하면 UTF-8로 디코딩된 데이터가 넘어옴
+
+# 데이터 추가
+	r.set(key , value)
+	=====================================================================
+	r.set("trace_id", "trace_data")
+	=====================================================================
+
+# 데이터 조회
+	r.get(key)
+	=====================================================================
+	r.get("trace_id")
+	=====================================================================
+
+# 데이터 삭제
+	r.delete(key)
+	=====================================================================
+	r.delete("trace_id")
+	=====================================================================
+# 데이터 만료 시간 설정
+	r.expire(key, second)
+	
+
+# 인코딩/디코딩 문제
+	- Redis에 ASCII 문자열이 아닌 UTF-8 타입의 문자열을 저장하고 조회하면, decoding이 되지 않는 문제 발생
+	- 따라서 json의 dumps(), loads()를 사용해서, 데이터를 저장하고 읽어야함
+	=====================================================================
+	# dict 데이터 선언
+	dataDict = {
+		"key1": "테스트값1",
+		"key2": "테스트값2",
+		"key3": "테스트값3"
+	}
+
+	# json dumps
+	jsonDataDict = json.dumps(dataDict, ensure_ascii=False).encode('utf-8')
+
+	# 데이터 set
+	r.set("dict", jsonDataDict)
+
+	# 데이터 get
+	resultData = r.get("dict")
+	resultData = resultData.decode('utf-8')
+
+	# json loads 
+	result = dict(json.loads(resultData))
+	=====================================================================
+
+# 번외 - json.dumps()
+	- json.dumps(dataDict, ensure_ascii=False).encode('utf-8')
+	json.dumps는 기본적으로 모든 문자열을 ASCII로 변환함
+	한글이 포함되어 있을 경우 콘솔에 출력해보면 ASCII로 표시되서 볼수가 없음.
+	위와같이 json.dumps를 사용할때 ensure_ascii=False 옵션을 주면 문자열 그대로 출력이 됨
+	=====================================================================
+	# ensure_ascii=True (기본값)
+	json.dumps({'message': '안녕하세요'})
+	# 출력: '{"message": "\\uC548\\uB155\\uD558\\uC138\\uC694"}'
+
+	# ensure_ascii=False
+	json.dumps({'message': '안녕하세요'}, ensure_ascii=False)
+	# 출력: '{"message": "안녕하세요"}'
+	=====================================================================
+
+#####################################################################
+# 코드 작성
+	=====================================================================
+	import redis
+	import json
+
+	# pip install redis
+	# pip install redis[hiredis]
+
+	# Redis 클라이언트 설정
+	r = redis.Redis(host='100.83.227.59', port=16379, db=0, password='redis1234!')
+
+	# 저장할 데이터
+	data = {
+		"status": "trace",
+		"parsing_data_log": [" 로그 파싱된 데이터"],
+		"parsing_data_trace": [" 트레이스 파싱된 데이터"],
+		"retry": 2,
+		"api": "N"
+	}
+	json_data = json.dumps(data, ensure_ascii=False).encode('utf-8')
+
+	# 데이터를 Redis에 저장 (key: 'trace_key')
+	r.set("trace_key", json_data)
+
+	# 데이터 조회
+	retrieved_data = json.loads(r.get("trace_key"))
+	print(retrieved_data)
+
+	# 데이터 삭제
+	r.delete("trace_key")
+
+	# 데이터 조회 - 이미 삭제된 키 가져오려고 해서 오류발생함
+	# retrieved_data = json.loads(r.get("trace_key"))
+	# print(retrieved_data)
+
+	r.set("test","test_data")
+
+	# 모든 키 가져오기
+	print(r.keys("*"))
+
+	print(r.get("test"))
+
+	# 모든 키 삭제
+	r.flushall()
+	# 모든 키 가져오기
+	print(r.keys("*"))
+
+
+
+	data_01 = {
+		"status": "trace",
+		"parsing_data_log": [" 로그 파싱된 데이터"],
+		"parsing_data_trace": [" 트레이스 파싱된 데이터"],
+		"retry": 2,
+		"api": "N"
+	}
+	data_02 = {
+		"status": "log",
+		"parsing_data_log": [" 로그 파싱된 데이터"],
+		"parsing_data_trace": [" 트레이스 파싱된 데이터"],
+		"retry": 2,
+		"api": "N"
+	}
+	data_03 = {
+		"status": "complete",
+		"parsing_data_log": [" 로그 파싱된 데이터"],
+		"parsing_data_trace": [" 트레이스 파싱된 데이터"],
+		"retry": 2,
+		"api": "N"
+	}
+	# 데이터 저장 및 "complete" 상태인 데이터의 키를 Set에 추가
+	r.set('data_01', json.dumps(data_01))
+	r.sadd('trace_set', 'data_01')
+
+	r.set('data_02', json.dumps(data_02))
+	r.sadd('log_set', 'data_02')
+
+	r.set('data_03', json.dumps(data_03))
+	r.sadd('complete_set', 'data_03')
+
+	# "trace" 상태인 데이터 조회
+	trace_keys = r.smembers('trace_set')
+	trace_data = []
+	for key in trace_keys:
+		trace_data.append(json.loads(r.get(key)))
+
+	print(trace_data)
+	print()
+
+	# "log" 상태인 데이터 조회
+	log_keys = r.smembers('log_set')
+	log_data = []
+	for key in log_keys:
+		log_data.append(json.loads(r.get(key)))
+
+	print(log_data)
+	print()
+
+	# "complete" 상태인 데이터 조회
+	complete_keys = r.smembers('complete_set')
+	complete_data = []
+	for key in complete_keys:
+		complete_data.append(json.loads(r.get(key)))
+
+	print(complete_data)
+	print()
+
+	r.flushall()
+	=====================================================================

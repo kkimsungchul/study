@@ -13,6 +13,10 @@
 	https://velog.io/@os_js/Redis-JSON-%EB%AA%A8%EB%93%88-%EC%A0%81%EC%9A%A9
 	https://redis.io/docs/latest/develop/data-types/json/#redis-cli-examples
 
+# 파이썬에서 Redis 사용
+	https://soyoung-new-challenge.tistory.com/117
+	https://suwani.tistory.com/172
+	https://blog.naver.com/makeflood/223162119316?trackingCode=rss
 # (error) MISCONF Redis is configured to save RDB snapshots, but is currently not able to persist on disk. Commands that may modify the data set are disabled. Please check Redis logs for details about the error.
 	https://charsyam.wordpress.com/2013/01/28/%EC%9E%85-%EA%B0%9C%EB%B0%9C-redis-%EC%84%9C%EB%B2%84%EA%B0%80-misconf-redis-is-configured-to-save-rdb-snapshots-%EC%97%90%EB%9F%AC%EB%A5%BC-%EB%82%B4%EB%A9%B0-%EB%8F%99%EC%9E%91%ED%95%98%EC%A7%80/
 	윈도우에서 실행후 set 명령어를 실행하니 위와같이 오류가 발생함
