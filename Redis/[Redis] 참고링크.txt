@@ -7,6 +7,7 @@
 # 레디스 CRUD
 	https://m.blog.naver.com/sqlmvp/221522073848
 	https://computerlove.tistory.com/entry/REDIS-SETNX-SETEX-MEST-MSETNX
+	https://velog.io/@zhyun/Redis-SET-%EC%9E%90%EB%A3%8C%EA%B5%AC%EC%A1%B0-SADD-SMEMBERS-%ED%95%B4%EC%95%BC%EB%90%A8
 
 # 레디스 JSON 모듈 사용
 	https://wiki.yowu.dev/ko/Knowledge-base/NoSQL/redis-json-data-structures-storing-and-querying-json-data-in-redis
