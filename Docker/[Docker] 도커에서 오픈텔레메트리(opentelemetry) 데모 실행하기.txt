@@ -36,3 +36,79 @@
 	Jaeger UI: http://localhost:8080/jaeger/ui/
 	Tracetest UI: http://localhost:11633/
 	※ only when using make start-odd
+
+# 외부에서도 같은 포트로 접속하기
+	데모의 docker-compose.yml 파일을 열어서 콜렉터 쪽설정을 보면 포트번호가 외부랑 매핑이 안되어 있음
+	"${OTEL_COLLECTOR_PORT_GRPC}" 이렇게 하나만 두면 내부에서는 해당 포트로 적용이 되고
+	외부에서는 랜덤하게 도커에서 할당하는 포트로 접속해야함
+
+	"${OTEL_COLLECTOR_PORT_GRPC}:${OTEL_COLLECTOR_PORT_GRPC}" 이렇게 외부와 내부 포트를 매핑시켜주면됨
+
+	- 기존
+	=====================================================================
+  otelcol:
+    image: ${COLLECTOR_CONTRIB_IMAGE}
+    container_name: otel-col
+    deploy:
+      resources:
+        limits:
+          memory: 200M
+    restart: unless-stopped
+    command: [ "--config=/etc/otelcol-config.yml", "--config=/etc/otelcol-config-extras.yml" ]
+    user: 0:0
+    volumes:
+      - ${HOST_FILESYSTEM}:/hostfs:ro
+      - ${DOCKER_SOCK}:/var/run/docker.sock:ro
+      - ${OTEL_COLLECTOR_CONFIG}:/etc/otelcol-config.yml
+      - ${OTEL_COLLECTOR_CONFIG_EXTRAS}:/etc/otelcol-config-extras.yml
+    ports:
+      - "${OTEL_COLLECTOR_PORT_GRPC}"
+      - "${OTEL_COLLECTOR_PORT_HTTP}"
+    depends_on:
+      - jaeger
+    logging: *logging
+    environment:
+      - ENVOY_PORT
+      - HOST_FILESYSTEM
+      - OTEL_COLLECTOR_HOST
+      - OTEL_COLLECTOR_PORT_GRPC
+      - OTEL_COLLECTOR_PORT_HTTP
+	=====================================================================
+
+	- 변경
+	=====================================================================
+  otelcol:
+    image: ${COLLECTOR_CONTRIB_IMAGE}
+    container_name: otel-col
+    deploy:
+      resources:
+        limits:
+          memory: 200M
+    restart: unless-stopped
+    command: [ "--config=/etc/otelcol-config.yml", "--config=/etc/otelcol-config-extras.yml" ]
+    user: 0:0
+    volumes:
+      - ${HOST_FILESYSTEM}:/hostfs:ro
+      - ${DOCKER_SOCK}:/var/run/docker.sock:ro
+      - ${OTEL_COLLECTOR_CONFIG}:/etc/otelcol-config.yml
+      - ${OTEL_COLLECTOR_CONFIG_EXTRAS}:/etc/otelcol-config-extras.yml
+    ports:
+      - "${OTEL_COLLECTOR_PORT_GRPC}:${OTEL_COLLECTOR_PORT_GRPC}"
+      - "${OTEL_COLLECTOR_PORT_HTTP}:${OTEL_COLLECTOR_PORT_HTTP}"
+    depends_on:
+      - jaeger
+    logging: *logging
+    environment:
+      - ENVOY_PORT
+      - HOST_FILESYSTEM
+      - OTEL_COLLECTOR_HOST
+      - OTEL_COLLECTOR_PORT_GRPC
+      - OTEL_COLLECTOR_PORT_HTTP
+	=====================================================================
+
+# 포트 변경 확인
+	 docker ps |grep otel
+	=====================================================================
+	 "/otelcol-contrib --…"   22 seconds ago   Up 21 seconds  
+	 0.0.0.0:4317-4318->4317-4318/tcp, :::4317-4318->4317-4318/tcp
+	=====================================================================

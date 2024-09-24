@@ -6,6 +6,22 @@
 	ex)
 		{"users": [{"userId": 1,"firstName": "AAAAA","lastName": "as23","phoneNumber": "123456","emailAddress": "AAAAA@test.com","homepage": "https://amogg.tistory.com/1"},{"userId": 2,"firstName": "BBBB","lastName": "h5jdd","phoneNumber": "123456","homepage": "https://amogg.tistory.com/2"},{"userId": 3,"firstName": "CCCCC","lastName": "2dhbs","phoneNumber": "33333333","homepage": "https://amogg.tistory.com/3"},{"userId": 4,"firstName": "DDDDD","lastName": "bacasd","phoneNumber": "222222222","homepage": "https://amogg.tistory.com/4"},{"userId": 5,"firstName": "EEEEE","lastName": "asdfasdf","phoneNumber": "111111111","homepage": "https://amogg.tistory.com/5"}]}
 
+
+# 번외 - json.dumps()
+	- json.dumps(dataDict, ensure_ascii=False).encode('utf-8')
+	json.dumps는 기본적으로 모든 문자열을 ASCII로 변환함
+	한글이 포함되어 있을 경우 콘솔에 출력해보면 ASCII로 표시되서 볼수가 없음.
+	위와같이 json.dumps를 사용할때 ensure_ascii=False 옵션을 주면 문자열 그대로 출력이 됨
+	=====================================================================
+	# ensure_ascii=True (기본값)
+	json.dumps({'message': '안녕하세요'})
+	# 출력: '{"message": "\\uC548\\uB155\\uD558\\uC138\\uC694"}'
+
+	# ensure_ascii=False
+	json.dumps({'message': '안녕하세요'}, ensure_ascii=False)
+	# 출력: '{"message": "안녕하세요"}'
+	=====================================================================
+
 #  코드
 	==========================================================================
 	import json

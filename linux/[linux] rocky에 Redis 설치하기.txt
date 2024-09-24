@@ -1,0 +1,53 @@
+# rocky linux에 Redis 설치하기
+
+
+# EPEL (Extra Packages for Enterprise Linux) 리포지토리 설치
+	dnf install epel-release
+
+# Redis 설치
+	dnf install redis
+
+# Redis 서비스 활성화 및 시작
+	systemctl enable redis
+	systemctl start redis
+
+# Redis 서비스 상태 확인
+	systemctl status redis
+
+# Redis 설정 변경
+	※ bind 가 여러개 있을수 있음, bind 0.0.0.0 만있으면되니 중복되는건 제거
+	vi /etc/redis.conf
+	=====================================================================
+	bind 0.0.0.0	# 모든 IP 접속 허용
+
+	port 16379		# 포트번호 변경
+
+	requirepass 사용할비번	# 비밀번호
+
+	protected-mode no		# 외부 접속 허용, 기본 yes
+	=====================================================================
+
+
+
+
+# Redis 재시작
+	systemctl restart redis
+
+# 방화벽 설정
+	firewall-cmd --permanent --zone=public --add-port=16379/tcp
+	firewall-cmd --reload
+
+# 방화벽 설정 확인
+	firewall-cmd --list-all
+
+# SELinux 에 포트 추가
+	semanage port -a -t redis_port_t -p tcp 16379
+
+# SELinux 에 포트 추가 확인
+	semanage port -l |grep redis_port_t
+
+# 접속 확인 (서버에서 확인)
+	redis-cli -h 127.0.0.1 -p 16379
+
+# 접속 확인 (클라이언트에서 확인)
+	redis-cli -h 192.168.55.125 -p 16379

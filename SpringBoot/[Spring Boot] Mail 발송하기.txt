@@ -1,0 +1,267 @@
+# SpringBoot - Mail 발송하기
+
+
+# 참고링크
+	https://tbmaster.tistory.com/126
+	https://baessi.tistory.com/111
+
+# 개발 방법
+	- 구글 검색을 하면 다들 applicaton.yml 파일에 메일주소와 토큰값을 넣어놓고, 메일발송하는 시점에 해당 메일주소와 토큰을사용함
+		근데 이렇게 하면 토큰이랑 메일주소가 노출된다는 단점이 있어서 DB에 값을 저장해 놓고 불러와서 사용하도록 했음
+	
+	- DB는 postgresql을 사용했고, JPA를 사용함
+
+	- @PostConstruct를 사용해서 의존성 주입이 완료된 후 바로 실행되도록 했음
+	
+	- lombok 을 사용하면 오류가발생함, 해당 내용은 코드 내 주석으로 달아놓았음
+
+
+# 작성코드 - txt 메일 발송
+	- txt내용을 메일로 보낼때 사용가능
+
+
+	=====================================================================
+
+	import jakarta.annotation.PostConstruct;
+	import lombok.AllArgsConstructor;
+	import lombok.NoArgsConstructor;
+	import org.slf4j.Logger;
+	import org.slf4j.LoggerFactory;
+	import org.springframework.beans.factory.annotation.Autowired;
+	import org.springframework.mail.SimpleMailMessage;
+	import org.springframework.mail.javamail.JavaMailSender;
+	import org.springframework.mail.javamail.JavaMailSenderImpl;
+	import org.springframework.stereotype.Service;
+
+	import java.util.Optional;
+	import java.util.Properties;
+
+
+	// 해당 클래스는 lombok으로 사용하면 안됨
+	// JavaMailSender는 기본적으로 application-local.yml 파일을 읽어서 세팅을하는데
+	// 그러면 토큰값이 노출되서 DB로 바꿨음
+	// @AllArgsConstructor 를 사용하면 모든 필드에 자동으로 생성해줄려고 해서 오류발생함
+	// init 메서드를 별도로 만들어서 사용하려고 하다보니 아래와같이 @Autowired 을 사용해서 주입해서 써야함
+
+	@Service
+	public class MailService {
+
+		private final Logger logger = LoggerFactory.getLogger(getClass());
+
+		@Autowired
+		private ApiAuthTokenRepository apiAuthTokenRepository;
+
+
+		private String gmailUserName;
+		private String gmailAppToken;
+		private JavaMailSender mailSender;
+
+		@PostConstruct
+		public void init() {
+			// DB에서 Gmail 토큰을 불러옴
+			Optional<ApiAuthToken> tokenOpt = apiAuthTokenRepository.findByApiServiceName("gmail");
+			if (tokenOpt.isPresent()) {
+				ApiAuthToken token = tokenOpt.get();
+				this.gmailUserName = token.getApiServiceId();
+				this.gmailAppToken = token.getApiServiceToken();
+				this.mailSender = createJavaMailSender(gmailUserName, gmailAppToken);
+			} else {
+				throw new IllegalStateException("Gmail token not found in the database");
+			}
+		}
+
+		private JavaMailSender createJavaMailSender(String gmailUserName, String gmailAppToken) {
+			JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+			mailSender.setHost("smtp.gmail.com");
+			mailSender.setPort(587);
+			mailSender.setUsername(gmailUserName);
+			mailSender.setPassword(gmailAppToken);
+
+			Properties props = mailSender.getJavaMailProperties();
+			props.put("mail.transport.protocol", "smtp");
+			props.put("mail.smtp.auth", "true");
+			props.put("mail.smtp.starttls.enable", "true");
+			props.put("mail.debug", "false"); //SMTP 발송 로그
+
+			return mailSender;
+		}
+
+		public void sendEmail(String to, String subject, String text) {
+			logger.info("### mail send start");
+			SimpleMailMessage message = new SimpleMailMessage();
+			message.setFrom(gmailUserName);
+			message.setTo(to);
+			message.setSubject(subject);
+			message.setText(text);
+			mailSender.send(message);
+			logger.info("### mail send end, to : {} , subject : {} , text : {} ", to, subject, text);
+		}
+	}
+
+
+
+
+	=====================================================================
+
+
+# 작성코드 - HTML 템플릿 발송
+	=====================================================================
+
+
+	import jakarta.annotation.PostConstruct;
+	import jakarta.mail.MessagingException;
+	import jakarta.mail.internet.MimeMessage;
+	import lombok.AllArgsConstructor;
+	import lombok.NoArgsConstructor;
+	import org.slf4j.Logger;
+	import org.slf4j.LoggerFactory;
+	import org.springframework.beans.factory.annotation.Autowired;
+	import org.springframework.mail.SimpleMailMessage;
+	import org.springframework.mail.javamail.JavaMailSender;
+	import org.springframework.mail.javamail.JavaMailSenderImpl;
+	import org.springframework.mail.javamail.MimeMessageHelper;
+	import org.springframework.stereotype.Service;
+
+	import java.util.HashMap;
+	import java.util.Map;
+	import java.util.Optional;
+	import java.util.Properties;
+
+
+	// 해당 클래스는 lombok으로 사용하면 안됨
+	// JavaMailSender는 기본적으로 application-local.yml 파일을 읽어서 세팅을하는데
+	// 그러면 토큰값이 노출되서 DB로 바꿨음
+	// @AllArgsConstructor 를 사용하면 모든 필드에 자동으로 생성해줄려고 해서 오류발생함
+	// init 메서드를 별도로 만들어서 사용하려고 하다보니 아래와같이 @Autowired 을 사용해서 주입해서 써야함
+
+	@Service
+	public class MailService {
+
+		private final Logger logger = LoggerFactory.getLogger(getClass());
+
+		@Autowired
+		private ApiAuthTokenRepository apiAuthTokenRepository;
+
+
+
+		private String gmailUserName;
+		private String gmailAppToken;
+		private JavaMailSender mailSender;
+
+		@PostConstruct
+		public void init() {
+			// DB에서 Gmail 토큰을 불러옴
+			Optional<ApiAuthToken> tokenOpt = apiAuthTokenRepository.findByApiServiceName("gmail");
+			if (tokenOpt.isPresent()) {
+				ApiAuthToken token = tokenOpt.get();
+				this.gmailUserName = token.getApiServiceId();
+				this.gmailAppToken = token.getApiServiceToken();
+				this.mailSender = createJavaMailSender(gmailUserName, gmailAppToken);
+			} else {
+				throw new IllegalStateException("Gmail token not found in the database");
+			}
+		}
+
+		private JavaMailSender createJavaMailSender(String gmailUserName, String gmailAppToken) {
+			JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+			mailSender.setHost("smtp.gmail.com");
+			mailSender.setPort(587);
+			mailSender.setUsername(gmailUserName);
+			mailSender.setPassword(gmailAppToken);
+
+			Properties props = mailSender.getJavaMailProperties();
+			props.put("mail.transport.protocol", "smtp");
+			props.put("mail.smtp.auth", "true");
+			props.put("mail.smtp.starttls.enable", "true");
+			props.put("mail.debug", "false"); //SMTP 발송 로그
+
+			return mailSender;
+		}
+
+		public void sendEmail(String to, String subject, String text) {
+
+			MimeMessage message = mailSender.createMimeMessage();
+			MimeMessageHelper helper=null;
+			try{
+				helper = new MimeMessageHelper(message, true, "UTF-8");
+			}catch (Exception e){
+				e.printStackTrace();
+			}
+			try{
+				helper.setFrom(gmailUserName); //발신자 설정
+				helper.setTo(to); // 수신자 설정
+				helper.setSubject(subject); // 이메일 제목 설정
+				helper.setText(text, true); // 본문 설정 (true: HTML 형식 사용)
+			}catch (Exception e){
+				e.printStackTrace();
+			}
+
+
+			mailSender.send(message); // 이메일 전송
+
+			logger.info("### mail send end, to : {} , subject : {} , text : {} ", to, subject, text);
+		}
+
+
+
+		public Map<String,String> createMailForm(ErrorReport errorReport){
+
+			/*
+			오류명 : error_name
+			오류 내용 :  error_content
+			오류 발생 시간 : created_time
+			오류 발생 위치 : error_location
+			오류 근본 원인 : error_cause
+			오류 해결 방법 : error_solution
+			*/
+			Map<String,String> mailForm = new HashMap<>();
+			String mailContent = "";
+			String mailTitle ="오류 리포트";
+
+
+	//        mailContent += "오류명 : " + errorReport.getErrorName() +"\n\n";
+	//        mailContent += "오류 내용 : " + errorReport.getErrorContent() +"\n\n";
+	//        mailContent += "오류 발생 시간 : " + errorReport.getCreatedTime() +"\n\n";
+	//        mailContent += "오류 발생 위치 : " + errorReport.getErrorLocation() +"\n\n";
+	//        mailContent += "오류 근본 원인 : " + errorReport.getErrorCause() +"\n\n";
+	//        mailContent += "오류 해결 방법 : " + errorReport.getErrorSolution() +"\n\n";
+
+			mailContent = "<html>";
+			mailContent += "<head>";
+			mailContent += "<style>";
+			mailContent += "body { font-family: Arial, sans-serif; }";
+			mailContent += "h2 { color: #2C3E50; }";
+			mailContent += "p { font-size: 14px; }";
+			mailContent += "pre { background-color: #F4F4F4; padding: 10px; border-radius: 5px; }";
+			mailContent += "</style>";
+			mailContent += "</head>";
+			mailContent += "<body>";
+
+			mailContent += "<h2>오류명</h2>";
+			mailContent += "<p>" + errorReport.getErrorName() + "</p>";
+
+			mailContent += "<h2>오류 내용</h2>";
+			mailContent += "<pre>" + errorReport.getErrorContent() + "</pre>";
+
+			mailContent += "<h2>오류 발생 시간</h2>";
+			mailContent += "<p>" + errorReport.getCreatedTime() + "</p>";
+
+			mailContent += "<h2>오류 발생 위치</h2>";
+			mailContent += "<pre>" + errorReport.getErrorLocation() + "</pre>";
+
+			mailContent += "<h2>오류 근본 원인</h2>";
+			mailContent += "<pre>" + errorReport.getErrorCause() + "</pre>";
+
+			mailContent += "<h2>오류 해결 방법</h2>";
+			mailContent += "<pre>" + errorReport.getErrorSolution() + "</pre>";
+
+			mailContent += "</body>";
+			mailContent += "</html>";
+
+			mailForm.put("mailTitle" , mailTitle);
+			mailForm.put("mailContent" , mailContent);
+			return mailForm;
+		}
+	}
+
+	=====================================================================
