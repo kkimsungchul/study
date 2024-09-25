@@ -23,7 +23,8 @@
 	https://devocean.sk.com/blog/techBoardDetail.do?ID=166040&boardType=techBlog
 	redis-benchmark -t hset,hget -n 1000000 -q
 
-
+# 레디스 GUI
+	https://github.com/patrikx3/redis-ui/releases
 
 # (error) MISCONF Redis is configured to save RDB snapshots, but is currently not able to persist on disk. Commands that may modify the data set are disabled. Please check Redis logs for details about the error.
 	https://charsyam.wordpress.com/2013/01/28/%EC%9E%85-%EA%B0%9C%EB%B0%9C-redis-%EC%84%9C%EB%B2%84%EA%B0%80-misconf-redis-is-configured-to-save-rdb-snapshots-%EC%97%90%EB%9F%AC%EB%A5%BC-%EB%82%B4%EB%A9%B0-%EB%8F%99%EC%9E%91%ED%95%98%EC%A7%80/
