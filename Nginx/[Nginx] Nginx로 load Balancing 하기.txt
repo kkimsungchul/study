@@ -1,0 +1,135 @@
+# Nginx - Nginx로 load Balancing 하기
+
+# 사용 이유
+	- 하나의 Springboot 애플리케이션에서 데이터를 처리하기에는 처리해야 할 데이터가 너무 많다고 생각됨
+	- 그리고 하나의 Springboot로 구성하기엔 가용성이 너무 낮음
+
+# 구성 
+	Nginx 1개
+	Springboot 2개
+
+# Nginx load balancer
+	- 기본적으로 Nginx 의 load balancer는 RR(Round Robin) 방식
+	- 나는 사용자의 세션에 따른 값 처리 부분이이나 리턴값을 확인할 용도가 아니고, 단순 데이터 수신 처리만 할거라서 기본 RR 사용
+	- Nginx 에서 제공하는 load balancing 기술은 아래와 같음
+		Round Robin, Hash, IP Hash, Least Connections
+
+# Nginx 설정파일 수정
+	- upstream 블록 추가
+		NGINX가 라운드 로빈 방식으로 요청을 두 개의 Spring Boot 서버(127.0.0.1:13031과 127.0.0.1:13032)에 분배
+		server 지시어는 각 Spring Boot 인스턴스의 IP 주소와 포트를 지정
+
+	- server 블록 부분 수정
+		listen 13030
+		nginx의 port번호를 13030으로 지정
+
+	- location 부분 수정
+		location에서 / 이부분은 모든 요청에 대한 처리를 proxy pass 에 정의한 서버로 보냄
+		proxy pass http://spring_backend; 이부분은 들어오는 요청을 upstream에서 정의한 서버로 보냄
+		proxy_set_header 를 사용해서 클라이언트의 헤더 정보를 그대로 추가하여서 proxy pass 서버에 보냄
+
+	- 수정된 nginx.conf
+	=====================================================================
+	http {
+		include       mime.types;
+		default_type  application/octet-stream;
+
+		#log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+		#                  '$status $body_bytes_sent "$http_referer" '
+		#                  '"$http_user_agent" "$http_x_forwarded_for"';
+
+		#access_log  logs/access.log  main;
+
+		sendfile        on;
+		#tcp_nopush     on;
+
+		#keepalive_timeout  0;
+		keepalive_timeout  65;
+
+		#gzip  on;
+
+		upstream spring_backend {
+			# Spring Boot 애플리케이션 서버 두 개를 RR 방식으로 로드 밸런싱
+			# nginx의 load balancing의 기본방식은 RR임
+			server 127.0.0.1:13031;
+			server 127.0.0.1:13032;
+			
+			# Optionally, you can adjust settings such as max_fails, fail_timeout, etc.
+			# Example:
+			# server 127.0.0.1:13030 max_fails=3 fail_timeout=30s;
+			# server 127.0.0.1:13031 max_fails=3 fail_timeout=30s;
+		}
+
+		server {
+			listen       13030;
+			server_name  localhost;
+
+			#charset koi8-r;
+
+			#access_log  logs/host.access.log  main;
+
+			location / {
+				proxy_pass http://spring_backend;  # Spring Boot 애플리케이션으로 요청을 전달
+				proxy_set_header Host $host;
+				proxy_set_header X-Real-IP $remote_addr;
+				proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+				proxy_set_header X-Forwarded-Proto $scheme;
+
+				# Timeout 설정 (필요에 따라 수정)
+				proxy_connect_timeout 60s;
+				proxy_send_timeout 60s;
+				proxy_read_timeout 60s;
+				send_timeout 60s;
+			}
+	... 중략 ...
+	=====================================================================
+
+	- 기존 Nginx.conf
+	=====================================================================
+	http {
+		include       mime.types;
+		default_type  application/octet-stream;
+
+		#log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+		#                  '$status $body_bytes_sent "$http_referer" '
+		#                  '"$http_user_agent" "$http_x_forwarded_for"';
+
+		#access_log  logs/access.log  main;
+
+		sendfile        on;
+		#tcp_nopush     on;
+
+		#keepalive_timeout  0;
+		keepalive_timeout  65;
+
+		#gzip  on;
+
+		server {
+			listen       80;
+			server_name  localhost;
+
+			#charset koi8-r;
+
+			#access_log  logs/host.access.log  main;
+
+			location / {
+				root   html;
+				index  index.html index.htm;
+			}
+
+	... 중략 ...
+	=====================================================================
+
+
+# 테스트
+	※ 테스트 시작 전 요청이 한번 씩 번갈아 들어오는것을 확인하기 위해 System.out.println("### in")을 Springboot의 컨트롤러에 작성함
+	1. nginx 실행
+	2. SpringBoot 애플리케이션 두개를 실행
+		java -jar spring-otel-listener-0.0.1-SNAPSHOT.jar --server.port=13031
+		java -jar spring-otel-listener-0.0.1-SNAPSHOT.jar --server.port=13032
+	
+	3. nginx port로 접속 시도
+		http://localhost:13030
+
+	4. Springboot 애플리케이션 콘솔에 ### in 메시지가 번갈아 찍히는 것을 확인
+

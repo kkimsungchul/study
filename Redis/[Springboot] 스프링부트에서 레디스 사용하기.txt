@@ -1,0 +1,5 @@
+# Springboot - redis 사용하기
+
+# 참고링크
+	https://oingdaddy.tistory.com/239
+	https://programmingiraffe.tistory.com/171
