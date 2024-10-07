@@ -39,5 +39,78 @@
 
 
 
+# Jenkins 설치 (이전 버전 설치)
+	※ 윈도우에서 먼저 테스트 함
+	※ 13번부터는 낮은 버전때매 발생하는 오류로 보임
+
+	1. 기존 버전 제거
+		제어판 - 프로그램 추가제거에서 젠킨스 제거
+
+	2. ProgramData 에서 jenkins삭제
+		경로 : C:\ProgramData\Jenkins
+		위 디렉토리 자체를 삭제
+
+	3. 설치 파일 다운로드
+		https://get.jenkins.io/windows-stable/2.289.1/jenkins.msi 
+	
+	4. 설치 파일 실행
+
+	5. 서비스 구동 계정은 Run service as LocalSystem (not recommended) 선택
+	
+	6. localhost:7070 접속
+
+	7. Unlock Jenkins 이라는 메시지가 뜨면 아래의 파일에 적혀있는 암호를 입력
+		C:\ProgramData\Jenkins\.jenkins\secrets\initialAdminPassword
+	
+	8. 아래의 메시지 출력됨
+		=====================================================================
+		Offline
+		This Jenkins instance appears to be offline.
+		=====================================================================
+		참고링크 : https://stackoverflow.com/questions/42408703/why-does-jenkins-say-this-jenkins-instance-appears-to-be-offline
+		
+		SSL인증 오류라고 하니 아래의 파일 수정
+		경로 : C:\ProgramData\Jenkins\.jenkins
+		파일명 : hudson.model.UpdateCenter.xml
+		수정내용 :  https 를 http 로 변경
+		=====================================================================
+		<?xml version='1.1' encoding='UTF-8'?>
+		<sites>
+		  <site>
+			<id>default</id>
+			<url>http://updates.jenkins.io/update-center.json</url>
+		  </site>
+		</sites>
+		=====================================================================
+	
+	9. Jenkins 재시작
+	
+	10. Jenkins 접속
+		localhost:7070
+		7번항목이 다시뜨면 비번 똑같이 입력
+	
+	11. Customize Jenkins
+		Install suggested plugins 선택
+		※ 플러그인 전부다 설치 안됨, 그냥 넘어갈것
+	
+	12. 계정명 , 암호, 암호확인, 이름 은 알아서 입력
+
+
+	13. 플러그인 설치 오류 해결
+		참고링크 : https://sweet0828.tistory.com/16
+		참고링크 : https://nevido.tistory.com/580
+
+		아래의 링크에서 skip-certificate-check.hpi 다운로드
+		※ 1.1버전은 2.346.3 버전이상이므로 1.0 버전 다운로드
+		https://updates.jenkins-ci.org/download/plugins/skip-certificate-check/
+		https://updates.jenkins-ci.org/download/plugins/skip-certificate-check/1.0/skip-certificate-check.hpi
+	
+	13-1. 플러그인 복사
+		경로 : C:\ProgramData\Jenkins\.jenkins\plugins
+		위 경로로 플러그인 복사
+
+	13-2. 젠킨스 재시작
+		그럼 이제 모든 플러그인이 설치되어 있음
+
 
 	
