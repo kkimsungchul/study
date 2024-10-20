@@ -10,11 +10,42 @@ https://brunch.co.kr/@topasvga/790
 # 합격 후기
 https://mwkinfra.tistory.com/8
 
-#  덤프
+# 시험 진행 방법
+https://daddyrang.tistory.com/83
+
+# 기억나는 문제
+- Microsoft Entra 관련문제가 나옴, 덤프에는 없음
+
+
+- Azure 웹앱이 있습니다.
+iPhone에서 웹 앱의 설정을 관리해야 합니다.
+사용할 수 있는 두 가지 Azure 관리 도구는 무엇인가요? 각 정답은 완전한 해결책을 제시합니다.
+참고 : 각 올바른 선택은 1 점의 가치가 있습니다.
+A. Azure CLI
+B. Azure 포털
+C. Azure Cloud Shell
+D. Windows PowerShell
+E. Azure 저장소 탐색기
+
+정답 : ABC
+-> 덤프에는 아래와같이 답을 말하는데, 실제 문제에서는 세개 고르라고되어있음
+A, C라고 나와있지만 B, C가 맞는다고 판단됨
+
+# 덤프
+※ 아래 덤프자료는 오래됐지만 비슷한 유형으로 문제가 많이 출제됨
+
+
+
+
 https://itwise.tistory.com/111
 https://itwise.tistory.com/112
 https://itwise.tistory.com/113
 https://itwise.tistory.com/114
+
+
+https://m.blog.naver.com/PostList.naver?blogId=kroa&categoryName=MS%20Azure%20Cloud&categoryNo=47&logCode=0&tab=1
+
+https://m.blog.naver.com/kroa/222213117787
 
 
 https://blog.naver.com/ju3452/223505032308?
@@ -40,4 +71,6 @@ https://gogetem.tistory.com/entry/AZ-900-%EB%AC%B4%EB%A3%8C-%EB%8D%A4%ED%94%84-%
 https://daddyrang.tistory.com/83
 
 https://helpit.tistory.com/17
+
+
 
