@@ -1,0 +1,19 @@
+https://1mini2.tistory.com/175
+
+# 오텔 환경변수
+https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/
+
+# trace flags
+https://opentelemetry.io/docs/specs/otel/trace/api/#spancontext
+
+# sample flag
+https://www.w3.org/TR/trace-context/#sampled-flag
+
+# 스팬 종류
+https://opentelemetry.io/docs/specs/otel/trace/api/#spankind
+
+# 콜렉터 다운로드 페이지
+https://github.com/open-telemetry/opentelemetry-collector-releases/releases/
+
+# 콜렉터 추가 기능 
+https://github.com/open-telemetry/opentelemetry-collector-contrib/

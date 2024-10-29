@@ -5,6 +5,9 @@
 	https://gksdudrb922.tistory.com/147
 	https://derveljunit.tistory.com/339
 
+# 암복호화 해주는 링크
+	https://www.devglan.com/online-tools/jasypt-online-encryption-decryption
+
 # 암호화 의존성 추가
 	- Gradle 
 	==========================================================================

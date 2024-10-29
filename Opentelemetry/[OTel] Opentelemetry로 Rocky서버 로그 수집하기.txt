@@ -1,0 +1,168 @@
+#OTel - Opentelemetry로 Rocky서버 로그 수집하기
+
+# 콜렉터 디렉토리 생성
+	mkdir /opt/otel_collector
+
+# 콜렉터 다운로드
+	- 다운로드 페이지 : https://github.com/open-telemetry/opentelemetry-collector-releases/releases/
+	※ 파일로그를 읽을려면 contrib 로 다운받아야 함
+
+	cd /opt/otel_collector
+	wget https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.112.0/otelcol-contrib_0.112.0_linux_386.tar.gz
+
+# 압축 해제
+	tar -zxvf otelcol-contrib_0.112.0_linux_386.tar.gz
+
+# 콜렉터 설정파일 생성
+	- 파일로그 설명 : https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/filelogreceiver
+	※ 콜렉터 버전이 올라가면서  exporters에서 logging이 사라짐.
+	아래처럼 사용해야함
+	exporters:
+	  debug:
+		verbosity: detailed	
+
+vi customconfig.yaml
+=====================================================================
+```yaml
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 127.0.0.1:9999
+      http:
+        endpoint: 127.0.0.1:4318
+  filelog:
+    include: [ '/var/log/messages' ]
+    start_at: beginning
+    encoding: utf-8
+
+exporters:
+  debug :
+    verbosity: detailed
+  file:
+    path: example.log
+    rotation:
+
+processors:
+  batch:
+
+service:
+  pipelines:
+    logs/dev:
+      receivers: [filelog]
+      exporters: [file]
+      processors: [batch]
+    traces:
+      receivers: [otlp]
+      exporters: [file]
+      processors: [batch]
+    metrics:
+      receivers: [otlp]
+      exporters: [file]
+      processors: [batch]
+```
+
+=====================================================================
+
+
+#  콜렉터 실행파일 생성
+	vi start_otel_collector.sh
+	=====================================================================
+	#!/bin/bash
+
+	nohup ./otelcol-contrib --config customconfig.yaml  > collector.log 2>&1 &
+	=====================================================================
+
+# 콜렉터 종료 파일 생성
+	vi stop_otel_collector.sh
+	=====================================================================
+	#!/bin/bash
+
+	PID=$(ps -ef |grep '[o]tel' | awk '{print $2}')
+	#echo $PID
+
+	if [ -n "$PID" ]; then
+		echo "otel process stop....PID : $PID"
+		kill -9 $PID
+	else
+		echo "not working otel collector!"
+	fi
+	=====================================================================
+
+# 권한 변경
+	chmod 755 start_otel_collector.sh
+	chmod 755 stop_otel_collector.sh
+# 실행
+	./start_otel_collector.sh
+
+# 종료
+	./stop_otel_collector.sh
+
+# 프로세스 확인
+	ps -ef |grep otelcol
+
+# journald 로그 저장
+	※ 기본적으로 저장하지 않고 있음
+	- 경로 이동 
+		/etc/systemd
+	- 파일수정 : 
+		vi journald.conf
+	
+	- 기존
+	=====================================================================
+	[Journal]
+	Storage=auto
+	#SystemMaxUse=
+	#SystemKeepFree=
+	#SystemMaxFileSize=
+	#SystemMaxFiles=100
+
+	=====================================================================
+	- 변경
+	=====================================================================
+	[Journal]
+	Storage=persistent
+	SystemMaxUse=100M
+	#SystemKeepFree=
+	#SystemMaxFileSize=
+	SystemMaxFiles=25M
+	=====================================================================
+	Storage=persistent: 디스크에 영구적으로 저장하도록 설정
+	SystemMaxUse=100M : 최대 사용할 크기
+	SystemMaxFiles=25M : 파일별 최대 사용 크기
+
+
+	- journald 서비스 재시작
+	systemctl restart systemd-journald
+
+	- 파일 저장 확인
+		cd /var/log/journal
+	
+	※ 바이너리임 vi로 못봄..
+	※ rsyslog를 설치하면 된다고 하는데 이거는 서버마다 다를꺼같아서 위에 설정내용 원복함
+		
+# 수집할 서버 로그
+	
+	- 기본 로그
+		/var/log/messages
+			부팅 시스템, 시스템 및 오류의 전반적인 정보를 출력
+		/var/log/secure
+			SSH 로그인 및 인증 메시지 등을 출력
+		/var/log/cron
+			시스템에서 예약된 작업 관련 로그 (크론탭)
+		/var/log/boot.log
+			부팅 시스템의 로그
+		/var/log/dmesg
+			부팅 시스템의 하드웨어 관련 정보 로그
+			※ 없을수도 있음
+
+	- 애플리케이션 & 서비스 로그
+		/var/log/httpd/access_log
+			Apache 웹서버 엑세스 로그
+		/var/log_httpd/error_log
+			Apache 웹서버 에러 로그
+		/var/log/maillog
+			메일 서버의 이벤트와 오류 로그
+
+
+
