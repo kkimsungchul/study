@@ -1,0 +1,22 @@
+# OTel - Opentelemetry로 Rocky서버 장애&보안 탐지하기
+
+# 탐지 조건
+
+1. 보안 위협 탐지용 키워드
+	로그인 시도 관련: failed, authentication failure, invalid user, denied, unauthorized, brute force, blocked, drop, timeout
+	권한 및 액세스 관련: permission denied, access denied, unauthorized access, sudo, root, elevated, privilege, access
+	네트워크 관련: firewall, iptables, connection refused, port scan, attack, intrusion, malware, virus, trojan
+	감사 및 변경 기록: audit, modified, changed, policy violation, policy change
+
+2. 시스템 오류 및 문제 탐지용 키워드
+	일반적인 오류 관련: error, failed, unable, critical, alert, warn, emergency, fault, exception
+	메모리 및 리소스 관련: out of memory, memory allocation failed, cpu overload, disk full, high load, swap
+	프로세스 및 서비스 관련: killed, terminated, stopped, service unavailable, crash, restart, panic
+	성능 저하 관련: slow, latency, timeout, unresponsive, dropped
+
+3. 특정 로그 파일별 키워드
+	/var/log/secure: authentication failure, invalid user, root, access denied
+	/var/log/audit/audit.log: AVC, denied, changed, policy violation
+	/var/log/cron: failed, not found, permission denied
+	/var/log/firewalld, /var/log/firewalld-droppd.log: drop, blocked, unauthorized, attack
+	/var/log/fail2ban.log: banned, unban, reject, attempt

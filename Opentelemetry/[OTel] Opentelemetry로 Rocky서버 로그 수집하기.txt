@@ -1,4 +1,4 @@
-#OTel - Opentelemetry로 Rocky서버 로그 수집하기
+# OTel - Opentelemetry로 Rocky서버 로그 수집하기
 
 # 콜렉터 디렉토리 생성
 	mkdir /opt/otel_collector
@@ -21,48 +21,48 @@
 	  debug:
 		verbosity: detailed	
 
-vi customconfig.yaml
-=====================================================================
-```yaml
-receivers:
-  otlp:
-    protocols:
-      grpc:
-        endpoint: 127.0.0.1:9999
-      http:
-        endpoint: 127.0.0.1:4318
-  filelog:
-    include: [ '/var/log/messages' ]
-    start_at: beginning
-    encoding: utf-8
+	vi customconfig.yaml
+	=====================================================================
+	```yaml
+	receivers:
+	  otlp:
+		protocols:
+		  grpc:
+			endpoint: 127.0.0.1:9999
+		  http:
+			endpoint: 127.0.0.1:4318
+	  filelog:
+		include: [ '/var/log/messages' ]
+		start_at: beginning
+		encoding: utf-8
 
-exporters:
-  debug :
-    verbosity: detailed
-  file:
-    path: example.log
-    rotation:
+	exporters:
+	  debug :
+		verbosity: detailed
+	  file:
+		path: example.log
+		rotation:
 
-processors:
-  batch:
+	processors:
+	  batch:
 
-service:
-  pipelines:
-    logs/dev:
-      receivers: [filelog]
-      exporters: [file]
-      processors: [batch]
-    traces:
-      receivers: [otlp]
-      exporters: [file]
-      processors: [batch]
-    metrics:
-      receivers: [otlp]
-      exporters: [file]
-      processors: [batch]
-```
+	service:
+	  pipelines:
+		logs/dev:
+		  receivers: [filelog]
+		  exporters: [file]
+		  processors: [batch]
+		traces:
+		  receivers: [otlp]
+		  exporters: [file]
+		  processors: [batch]
+		metrics:
+		  receivers: [otlp]
+		  exporters: [file]
+		  processors: [batch]
+	```
 
-=====================================================================
+	=====================================================================
 
 
 #  콜렉터 실행파일 생성
@@ -142,19 +142,51 @@ service:
 	※ rsyslog를 설치하면 된다고 하는데 이거는 서버마다 다를꺼같아서 위에 설정내용 원복함
 		
 # 수집할 서버 로그
-	
+	참고 URL : https://github.com/kkimsungchul/study/blob/master/linux/%5Blinux%5D%20rocky%EC%97%90%20log%ED%8C%8C%EC%9D%BC%20%EC%9A%A9%EB%8F%84.txt
+
 	- 기본 로그
-		/var/log/messages
+		/var/log/messages 또는 syslog
 			부팅 시스템, 시스템 및 오류의 전반적인 정보를 출력
-		/var/log/secure
+			※ Rocky에서는 messages 로 통합됨
+
+		/var/log/secure 또는 auth.log
 			SSH 로그인 및 인증 메시지 등을 출력
+
 		/var/log/cron
 			시스템에서 예약된 작업 관련 로그 (크론탭)
+
 		/var/log/boot.log
 			부팅 시스템의 로그
+
+		/var/log/yum.log 또는 dnf.log
+			패키지 관리자인 yum을 통해 설치, 업데이트, 삭제된 패키지에 대한 정보
+
+		/var/log/audit/audit.log
+			시스템의 보안 관련 이벤트
+			SELinux와 같은 보안 이벤트 및 시스템 콜 추적
+		/var/log/firewalld
+			Firewalld(방화벽 데몬)와 관련된 다양한 이벤트와 설정 변경 이벤트
+		
+		/var/log/firewalld-droppd.log
+			화벽에서 차단(dropped)된 패킷에 대한 로그
+		
+		/var/log/hawkey.log
+			hawkey와 관련된 로그 파일
+			dnf 또는 yum 등의 패키지 관리자가 패키지 설치, 업데이트, 삭제와 같은 작업에서 hawkey를 호출할 때 생성
+			패키지 관리 오류, 설치 또는 업데이트 내역을 추적
+		
+		/var/log/spooler
+			풀러(spooler) 서비스에 대한 로그로, 프린트 작업과 같은 스풀링이 필요한 작업과 관련된 정보
+		
+		/var/log/tuned/tuned.log
+			tuned 서비스에 의해 작성되는 로그로, tuned는 시스템 성능과 전력 소비를 최적화하기 위해 다양한 프로파일을 관리하는 데몬
+			tuned가 적용한 시스템 최적화 프로파일, 에러 로그, 적용된 설정 변경 사항 등을 확인
+
 		/var/log/dmesg
 			부팅 시스템의 하드웨어 관련 정보 로그
-			※ 없을수도 있음
+			※ 기본적으로 메모리에 남아있음 journald 처럼 rsyslog 로 남기도록 설정해야함
+		
+
 
 	- 애플리케이션 & 서비스 로그
 		/var/log/httpd/access_log
@@ -164,5 +196,72 @@ service:
 		/var/log/maillog
 			메일 서버의 이벤트와 오류 로그
 
+
+# 여러개의 파일 읽어오기
+	- 하나의 경로에서 .log로 읽어오는거는 아래에서 *.log로 하면됨
+		include: [ '/var/log/*.log' ]
+	- 다만 확장자가 다르거나, 경로가 다를경우 아래의 방법처럼 사용 가능
+	=====================================================================
+	  filelog:
+		include: 
+		  - '/var/log/messages'
+		  - '/var/log/secure'
+		  - '/var/log/fail2ban.log'
+	=====================================================================
+
+	- 적용을 한 config 파일
+	vi customconfig.yaml
+	=====================================================================
+	```yaml
+	receivers:
+	  otlp:
+		protocols:
+		  grpc:
+			endpoint: 127.0.0.1:9999
+		  http:
+			endpoint: 127.0.0.1:4318
+	  filelog:
+		include:
+		  - '/var/log/messages'
+		  - '/var/log/secure'
+		  - '/var/log/cron'
+		  - '/var/log/fail2ban.log'
+		  - '/var/log/audit/audit.log'
+		  - '/var/log/dnf.log'
+		  - '/var/log/firewalld'
+		  - '/var/log/firewalld-droppd.log'
+		  - '/var/log/tuned/tuned.log'
+
+		start_at: beginning
+		encoding: utf-8
+
+	exporters:
+	  debug :
+		verbosity: detailed
+	  file:
+		path: example.log
+		rotation:
+
+	processors:
+	  batch:
+
+	service:
+	  pipelines:
+		logs/dev:
+		  receivers: [filelog]
+		  exporters: [file]
+		  processors: [batch]
+		traces:
+		  receivers: [otlp]
+		  exporters: [file]
+		  processors: [batch]
+		metrics:
+		  receivers: [otlp]
+		  exporters: [file]
+		  processors: [batch]
+
+	```
+
+	=====================================================================
 
 
