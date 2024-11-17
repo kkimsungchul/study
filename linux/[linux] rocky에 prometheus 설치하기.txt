@@ -1,0 +1,200 @@
+# rocky linux 에 prometheus 설치하기
+
+
+# 다운로드할 폴더 생성
+	cd /opt
+	mkdir prometheus
+
+# 프로메테우스 다운로드
+	wget https://github.com/prometheus/prometheus/releases/download/v2.55.1/prometheus-2.55.1.linux-386.tar.gz
+
+# 압축 해제
+	
+	tar -xvzf prometheus-2.55.1.linux-386.tar.gz
+
+# 방화벽에 포트 추가
+	- 포트 추가
+		firewall-cmd --permanent --add-port=9090/tcp
+
+	- 방화벽 리로드
+		firewall-cmd --reload
+	
+	- 확인
+		firewall-cmd --list-all
+
+# 실행
+	./prometheus
+	※ 혹시나 안될 경우 권한부여 및 소유자:그룹 변경
+	- 권한 변경
+	chmod 755 prometheus
+
+	- 소유자:그룹 변경
+	chown -R 소유자:그룹 prometheus
+
+# 접속
+	http://ip:9090
+	http://ip:9090/metrics
+
+# 실행 스크립트 생성
+	vi start_prometheus.sh
+	=====================================================================
+	#!/bin/bash
+
+	nohup ./prometheus 1> /dev/null 2>&1 &
+	=====================================================================
+
+	※ 로그파일을 남기고 싶을 경우 아래와 같이 수정
+	=====================================================================
+	#!/bin/bash
+
+	nohup ./prometheus 1> prometheus.log 2>&1 &
+	=====================================================================
+
+# 권한 변경 
+	chmod 755 start_prometheus.sh
+
+# 실행
+	./start_prometheus.sh
+
+# 중지 스크립트 생성
+	vi stop_prometheus.sh
+	=====================================================================
+	#!/bin/bash
+
+	PID=$(ps -ef |grep '[p]rometheus' | awk '{print $2}')
+	#echo $PID
+
+	if [ -n "$PID" ]; then
+		echo "prometheus process stop....PID : $PID"
+		kill -9 $PID
+	else
+		echo "not working prometheus!"
+	fi
+	=====================================================================
+
+# 중지 
+	./stop_prometheus.sh
+
+# 애플리케이션 로그 수집 변경
+	vi prometheus.yml
+
+	- 기존
+	=====================================================================
+	# my global config
+	global:
+	  scrape_interval: 15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+	  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+	  # scrape_timeout is set to the global default (10s).
+
+	# Alertmanager configuration
+	alerting:
+	  alertmanagers:
+		- static_configs:
+			- targets:
+			  # - alertmanager:9093
+
+	# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+	rule_files:
+	  # - "first_rules.yml"
+	  # - "second_rules.yml"
+
+	# A scrape configuration containing exactly one endpoint to scrape:
+	# Here it's Prometheus itself.
+	scrape_configs:
+	  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+	  - job_name: "prometheus"
+
+		# metrics_path defaults to '/metrics'
+		# scheme defaults to 'http'.
+
+		static_configs:
+		  - targets: ["localhost:9090"]
+
+	=====================================================================
+
+	- 변경
+	=====================================================================
+	# my global config
+	global:
+	  scrape_interval: 15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+	  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+	  # scrape_timeout is set to the global default (10s).
+
+	# Alertmanager configuration
+	alerting:
+	  alertmanagers:
+		- static_configs:
+			- targets:
+			  # - alertmanager:9093
+
+	# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+	rule_files:
+	  # - "first_rules.yml"
+	  # - "second_rules.yml"
+
+	# A scrape configuration containing exactly one endpoint to scrape:
+	# Here it's Prometheus itself.
+	scrape_configs:
+	  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+	  - job_name: "otel_collector"
+
+		# metrics_path defaults to '/metrics'
+		# scheme defaults to 'http'.
+
+		static_configs:
+		  - targets: ["localhost:9464"]
+
+	=====================================================================
+
+# 설정 파일 설명
+	job_name : 수집하려는 서비스의 이름
+	- targets: ["localhost:9464"] : 수집하려는 서비스에서 메트릭 데이터가 있는 위치
+		오픈텔레메트리 콜렉터에서 9464 포트로 metric 데이터를 출력하면
+		프로메테우슨 해당 포트로 접근해서 데이터를 읽어옴
+	=====================================================================
+	scrape_configs:
+	  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+	  - job_name: "otel_collector"
+
+		# metrics_path defaults to '/metrics'
+		# scheme defaults to 'http'.
+		scrape_interval: 1s
+		static_configs:
+		  - targets: ["localhost:9464"]
+	=====================================================================
+
+# 프로메테우스 메트릭 데이터 수집 방식 설명
+	※ 오픈텔레메트리를 예시로 작성함
+	- Polling(스크레이핑) 방식 (pull)
+		1. 오픈텔레메트리 콜렉터에서 localhost:9464 로 지속해서 메트릭 데이터를 출력함
+		2. 프로메테우스에서는 localhost:9464 접근하여 접근한 당시의 메트릭 데이터를 수집함
+			※ 누적된 메트릭 데이터 수집이 아님
+			※ 접근했을 당시의 데이터만 수집함
+		
+		위 순서대로 데이터를 가져오며 Polling 방식으로 설정된 주기마다 데이터를 가져옴
+		설정에는 1초마다 가져오도록 설정해놨음
+
+	- prometheus_remote_write 방식 (push)
+		1. 오픈텔레메트리 콜렉터에서 주기적 또는 실시간으로 prometheus의 endpoint로 데이터를 보냄
+		※ 위 방식을 사용하게되면 prometheus에 prometheus_remote_write 설정을 해줘야함
+		- prometheus의 설정파일
+		=====================================================================
+		remote_write : 
+		  - url : "http://prometheusURL:PORT/api/v1/write"
+		    name : "service_name"
+		remote_read : 
+		  - url : "http://prometheusURL:PORT/api/v1/read"
+		=====================================================================
+		
+		- collector의 설정파일
+		=====================================================================
+		exporters : 
+		  prometheus_remote_write : 
+		    endpoint : "http://prometheusURL:PORT/api/v1/write"
+		=====================================================================
+
+	
+	- 차이점
+		push(prometheus_remote_write) : 데이터가 오픈텔레메트리 콜렉터 주도적으로 push
+		pull(Prometheus scrape_configs) : prometheus가 주기적으로 타깃 URL에서 데이터를 가져옴
+

@@ -1,0 +1,93 @@
+# OTel - Opentelemetry config 설정
+
+
+# 127.0.0.1과 0.0.0.0의 차이점
+
+	- 127.0.0.1 (Loopback Address):
+		127.0.0.1은 로컬 컴퓨터 내에서만 접근할 수 있는 루프백(Loopback) 주소입니다.
+		서버가 이 주소에 바인딩되면, 같은 서버 내에서만 접근이 가능합니다. 외부에서 요청이 와도 접속이 차단됩니다.
+		예를 들어 localhost:9464로 설정된 서비스를 외부에서 접근할 수 없는 이유가 여기에 있습니다.
+
+	- 0.0.0.0 (Wildcard Address):
+		0.0.0.0은 와일드카드 주소로, 서버의 모든 네트워크 인터페이스에서 접근할 수 있게 합니다.
+		서버가 이 주소에 바인딩되면, 로컬 네트워크뿐 아니라 외부 네트워크에서도 접근이 가능합니다.
+		예를 들어 0.0.0.0:9464로 설정하면, 같은 서버뿐 아니라 다른 네트워크의 클라이언트도 서버 IP:9464로 접근할 수 있습니다.
+		따라서, 외부에서 접속하려면 127.0.0.1 대신 0.0.0.0으로 설정해야 합니다.
+
+	※ 외부에서도 접근 또는 수집을 가능하도록 하게 하려면 0.0.0.0을 사용
+	※ 외부에서 접근할 필요가 없는 경우 127.0.0.1 또는 localhost 사용
+
+# 기본적으로 적용한 설정
+	=====================================================================
+	receivers:
+	  otlp:
+		protocols:
+		  grpc:
+			endpoint: 0.0.0.0:4317
+		  http:
+			endpoint: 0.0.0.0:4318
+
+	exporters:
+	  logging:
+		verbosity: detailed
+
+	  otlphttp/metrics:
+		encoding: json
+		endpoint: http://127.0.0.1:13030/otlp/original/json
+
+	  otlphttp/filtered_traces:
+		encoding: json
+		endpoint: http://127.0.0.1:13030/otlp/filtered/json
+
+	  otlphttp/filtered_logs:
+		encoding: json
+		endpoint: http://127.0.0.1:13030/otlp/filtered/json
+
+	  otlphttp/original_traces:
+		encoding: json
+		endpoint: http://127.0.0.1:13030/otlp/original/json
+
+	  otlphttp/original_logs:
+		encoding: json
+		endpoint: http://127.0.0.1:13030/otlp/original/json
+	  prometheus:
+		endpoint: 0.0.0.0:9464
+	  otlp/jaeger:
+		endpoint: 127.0.0.1:14317
+		tls :
+		  insecure : true
+
+
+	processors:
+	  batch:
+	  filter/logs:
+		logs:
+		  log_record:
+			- 'severity_number < 10'
+
+	  filter/error_spans:
+		traces:
+		  span:
+			- 'status.code != 2'
+
+	service:
+	  pipelines:
+		logs:
+		  receivers: [otlp]
+		  processors: [batch]
+		  exporters: [logging, otlphttp/original_logs]
+		traces:
+		  receivers: [otlp]
+		  processors: [batch]
+		  exporters: [otlphttp/original_traces,otlp/jaeger]
+		metrics:
+		  receivers: [otlp]
+		  processors: [batch]
+		  exporters: [otlphttp/metrics, prometheus]
+
+		traces/error:
+		  receivers: [otlp]
+		  processors: [filter/error_spans]
+		  exporters: [otlphttp/filtered_traces]
+
+	=====================================================================

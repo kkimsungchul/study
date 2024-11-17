@@ -1,0 +1,89 @@
+# rocky linux 에 jaeger 설치하기
+
+# 다운로드할 폴더 생성
+	cd /opt
+	mkdir jaeger
+# 다운로드
+	wget https://github.com/jaegertracing/jaeger/releases/download/v1.63.0/jaeger-1.63.0-linux-amd64.tar.gz
+
+# 압축 해제
+	tar -xvzf jaeger-1.63.0-linux-amd64.tar.gz
+
+# 방화벽에 포트 추가
+	- 포트 추가
+		firewall-cmd --permanent --add-port=16686/tcp
+
+	- 방화벽 리로드
+		firewall-cmd --reload
+	
+	- 확인
+		firewall-cmd --list-all
+
+# 소유자 변경
+	chown -R root:root jaeger-1.63.0-linux-amd64
+
+# 실행 명령어
+	./jaeger-all-in-one --collector.otlp.grpc.host-port 127.0.0.1:14317 --collector.otlp.http.host-port 127.0.0.1:14318
+
+	※ grpc 수집포트와 http수집포트를 변경하였음, 해당 포트는 otel collector에서 사용중임
+	기본 : 
+		grpc : 4317
+		http : 4318
+
+	※ otel collector에서도 설정을 변경하여 수집한 trace 데이터를 jaeger 로 export 하도록 해야함
+	  otlp/jaeger:
+		endpoint: 127.0.0.1:14317
+		tls :
+		  insecure : true
+		
+
+
+# 프로세스 확인
+	ps -ef |grep jaeger
+	root     2064576       1  0 23:32 pts/4    00:00:00 ./jaeger-all-in-one --collector.otlp.grpc.host-port 127.0.0.1:14317 --collector.otlp.http.host-port 127.0.0.1:14318
+	root     2065044 2012515  0 23:33 pts/4    00:00:00 grep --color=auto jaeger
+	
+
+# 실행 스크립트 생성
+	vi start_jaeger-all-in-one.sh
+	=====================================================================
+	#!/bin/bash
+	nohup ./jaeger-all-in-one --collector.otlp.grpc.host-port 127.0.0.1:14317 --collector.otlp.http.host-port 127.0.0.1:14318 1> /dev/null 2>&1 &
+	=====================================================================
+
+	※ 로그파일을 남기고 싶을 경우 아래와 같이 수정
+	=====================================================================
+	#!/bin/bash
+
+	nohup ./jaeger-all-in-one --collector.otlp.grpc.host-port 127.0.0.1:14317 --collector.otlp.http.host-port 127.0.0.1:14318 1> jaeger-all-in-one.log 2>&1 &
+	=====================================================================
+
+
+# 중지 스크립트 생성
+	vi stop_jaeger-all-in-one.sh
+	=====================================================================
+	#!/bin/bash
+
+	PID=$(ps -ef |grep '[j]aeger-all-in-one' | awk '{print $2}')
+	#echo $PID
+
+	if [ -n "$PID" ]; then
+		echo "jaeger-all-in-one process stop....PID : $PID"
+		kill -9 $PID
+	else
+		echo "not working jaeger-all-in-one!"
+	fi
+	=====================================================================
+
+# 실행 권한 부여
+	chmod 755 start_jaeger-all-in-one.sh
+	chmod 755 stop_jaeger-all-in-one.sh
+
+# 서비스 실행
+	./start_jaeger-all-in-one.sh
+
+# 서비스 중지 
+	./stop_jaeger-all-in-one.sh
+
+# 접속
+	http://serverip:16686/search

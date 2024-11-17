@@ -1,0 +1,111 @@
+# OTel - Opentelemetry custom metric 설정 주의사항
+
+
+# 커스텀 매트릭 생성
+	- 아래는 샘플코드
+	=====================================================================
+	@RestController
+	@RequiredArgsConstructor
+	public class LoginController {
+
+		private final Logger logger = LoggerFactory.getLogger(getClass());
+
+		@Autowired
+		private final RestTemplate restTemplate;
+
+		@Autowired
+		private SpanUtils spanUtils;
+
+		@Autowired
+		Meter meter;
+
+		private LongCounter requestCounter;
+
+		@PostConstruct
+		public void initMeter() {
+			this.requestCounter = meter.counterBuilder("LAMP_LOGIN_requests_")
+					.setDescription("Total number of LAMP login requests")
+					.setUnit("requests")
+					.build();
+		}
+		@PostMapping("/lamp/login")
+		public String login(HttpServletRequest req, @RequestBody LoginRequest loginRequest) {
+			// 로그인 시도에 대한 메트릭 기록
+			recordLoginAttempt(req, "total");
+
+			String result;
+			if ("password".equalsIgnoreCase(loginRequest.getPw())) {
+				result = "success";
+				logger.info("### login success");
+			} else {
+				result = "fail";
+				logger.info("### login fail");
+			}
+
+			// 성공/실패에 대한 메트릭 기록
+			recordLoginAttempt(req, result, loginRequest.getId());
+			return result;
+		}
+
+		// 메트릭 기록을 위한 공통 메서드
+		private void recordLoginAttempt(HttpServletRequest req, String status) {
+			recordLoginAttempt(req, status, null);
+		}
+
+		private void recordLoginAttempt(HttpServletRequest req, String status, String loginId) {
+			AttributesBuilder attributesBuilder = Attributes.builder()
+					.put("hostname", "LAMP")
+					.put("region", "korea")
+					.put("ip.address", req.getRemoteAddr())
+					.put("http.method", req.getMethod())
+					.put("http.url", req.getRequestURL().toString())
+					.put("http.uri", req.getRequestURI())
+					//문제 부분 시작
+					.put("custom.matric.x-forwarded-for", req.getHeader("x-forwarded-for"))
+					//문제 부분 종료
+					.put("login", status);
+
+			if (loginId != null) {
+				attributesBuilder.put("loginId", loginId);
+			}
+			requestCounter.add(1, attributesBuilder.build());
+		}
+
+	=====================================================================
+
+# 유의해야 할 부분
+
+
+	=====================================================================
+		private void recordLoginAttempt(HttpServletRequest req, String status, String loginId) {
+			AttributesBuilder attributesBuilder = Attributes.builder()
+					.put("hostname", "LAMP")
+					.put("region", "korea")
+					.put("ip.address", req.getRemoteAddr())
+					.put("http.method", req.getMethod())
+					.put("http.url", req.getRequestURL().toString())
+					.put("http.uri", req.getRequestURI())
+					//문제 부분 시작
+					.put("custom.matric.x-forwarded-for", req.getHeader("x-forwarded-for"))
+					//문제 부분 종료
+					.put("login", status);
+
+			if (loginId != null) {
+				attributesBuilder.put("loginId", loginId);
+			}
+			requestCounter.add(1, attributesBuilder.build());
+		}
+
+
+	=====================================================================
+
+	//문제 부분 시작
+	.put("custom.matric.x-forwarded-for", req.getHeader("x-forwarded-for"))
+	//문제 부분 종료
+	
+	위와같이 작성했었음.
+	앞단에 nginx가 없고, header에 x-forwarded-for 값이 없기때문에 req.getHeader("x-forwarded-for") 를 출력해보면 null이 나옴
+	null 값을 커스텀 매트릭에 넣은 후 조회해보면
+	해당 key값 자체가 표시가 안됨.
+	value 값에 null을 넣을경우 해당 데이터는 매트릭 속성에 추가가 안되는 부분을 확인했으며,
+	추후 이부분은 유의해서 개발

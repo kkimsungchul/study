@@ -1,0 +1,119 @@
+# SpringBoot - JPA 순환참조 해결
+
+# 참고 링크
+	- https://dev-coco.tistory.com/133
+
+# 순환참조 발생 이유
+	- MailSendInfo 도메인 클래스와 ErrorReport 도메인 클래스 두개가 있음
+	- 아래와 같이 서로 연관관계가 매핑이 되어 있는 상태
+	- 이 상태에서 DTO 클래스를 사용하지 않고, 바로 컨트롤러에서 Entity 객체를 리턴할 경우 순환참조가 발생함
+	ex) MailSendInfo에서 ErrorReport 호출 
+		-> ErrorReport 에서 MailSendInfo호출
+		-> 무한반복...
+
+	MailSendInfo.java
+	=====================================================================
+
+	@Table(name = "mail_send_info")
+	public class MailSendInfo {
+		...중략...
+		@ManyToOne
+		@JoinColumn(name = "error_report_seq", nullable = false)
+		private ErrorReport errorReport;	
+		...중략...
+
+	=====================================================================
+
+	ErrorReport.java
+	=====================================================================
+	@Table(name = "error_report")
+	public class ErrorReport {
+		...중략...
+		@OneToMany(mappedBy = "errorReport", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	    private List<MailSendInfo> mailSendInfos;
+		...중략...
+	=====================================================================
+
+# 해결방안
+	- 출처 : https://dev-coco.tistory.com/133
+	
+	- @JsonIgnore 
+	이 어노테이션을 붙이면 JSON 데이터에 해당 프로퍼티는 null로 들어가게 된다. 
+	즉, 데이터에 아예 포함시키지 않는다.
+	 
+	- @JsonManagedReference 와 @JsonBackReference
+	부모 클래스(Posts entity)의 Comment 필드에 @JsonManagedReference를, 자식 클래스(Comment entity)의 Posts 필드에 @JsonBackReference를 추가해주면 순환 참조를 막을 수 있다.
+	 
+	- @JsonIgnoreProperties
+	부모 클래스(Posts entity)의 Comment 필드에 @JsonIgnoreProperties({"posts"}) 를 붙여주면 순환 참조를 막을 수 있다.
+	 
+	- DTO 사용
+	위와 같은 상황이 발생하게된 주원인은 '양방향 매핑'이기도 하지만, 더 정확하게는 Entity 자체를 response로 리턴한데에 있다. 
+	entity 자체를 return 하지 말고, DTO 객체를 만들어 필요한 데이터만 옮겨담아 Client로 리턴하면 순환 참조 관련 문제는 애초에 방지 할 수 있다.
+	 
+	- 매핑 재설정
+	양방향 매핑이 꼭 필요한지 다시 한번 생각해볼 필요가 있다. 만약 양쪽에서 접근할 필요가 없다면 단방향 매핑을 해줘서 자연스레 순환 참조 문제를 해결하자.
+	
+# 해결방법
+	- DTO 사용했음
+	위에 해결방안에 써있듯이 나는 귀찮음이 너무 많아서 Entity 객체 자체를 리턴했었음.
+	DTO 클래스 생성 후 modelmapper 라이브러리 사용해서 DTO클래스로 변환 후 리턴하도록 했음
+
+# 라이브러리 추가
+	- Maven url : https://mvnrepository.com/artifact/org.modelmapper/modelmapper/3.2.1
+	- build.gradle
+	=====================================================================
+	// https://mvnrepository.com/artifact/org.modelmapper/modelmapper
+	implementation 'org.modelmapper:modelmapper:3.2.1'
+	=====================================================================
+
+# ModelMapperConfig 클래스 생성
+
+	=====================================================================
+	import org.modelmapper.ModelMapper;
+	import org.springframework.context.annotation.Bean;
+	import org.springframework.context.annotation.Configuration;
+
+	@Configuration
+	public class ModelMapperConfig {
+
+		@Bean
+		public ModelMapper modelMapper() {
+			return new ModelMapper();
+		}
+	}
+	=====================================================================	
+
+# DTO 클래스 생성
+	=====================================================================
+	@Getter
+	@Setter
+	public class MailSendInfosDto{
+		private Long seq;
+		private String serviceCode;
+		private String isMailSent;
+		private String receiverEmail;
+		private LocalDateTime createTime;
+	}
+	=====================================================================
+
+# Service 로직 수정
+	- convertToDTO 메서드 생성해서 DTO로 변환할수 있도록 했음
+	- modelMapper 쓰면 편하게 변환됨
+	=====================================================================
+    public List<MailSendInfosDto> getAll(){
+        List<MailSendInfo> mailSendInfos = mailSendInfoRepository.findAll();
+        return mailSendInfos.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public MailSendInfosDto convertToDTO(MailSendInfo mailSendInfo){
+        MailSendInfosDto mailSendInfosDto = modelMapper.map(mailSendInfo, MailSendInfosDto.class);
+        return mailSendInfosDto;
+    }
+
+	=====================================================================	
+
+
+
