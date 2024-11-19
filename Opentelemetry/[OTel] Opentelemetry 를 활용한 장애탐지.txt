@@ -1,0 +1,76 @@
+아키텍처 설계와 개발을 진행할 수 있는 방향을 다음과 같이 제안합니다.
+
+### 아키텍처 검토
+1. **애플리케이션 계측**:
+   - OpenTelemetry SDK를 이용해 애플리케이션에서 데이터 계측을 설정합니다.
+   - 주요 API 호출, 응답 시간, 에러 정보를 포함한 데이터를 수집합니다.
+
+2. **OpenTelemetry Collector**:
+   - 애플리케이션으로부터 데이터를 수집합니다.
+   - Collector가 데이터를 다른 시스템(Data Prepper)으로 export할 수 있는지 확인해야 합니다.
+   - `OTLP (OpenTelemetry Protocol)`가 지원되므로, Data Prepper와의 통합도 가능합니다.
+
+3. **Data Prepper**:
+   - Data Prepper는 OpenTelemetry 데이터를 수신하여 필요한 통계 데이터를 생성할 수 있습니다.
+   - 적절한 파이프라인을 구성하여 API 호출 횟수, 평균 응답 시간 등을 계산합니다.
+
+4. **데이터베이스 저장**:
+   - Data Prepper의 결과 데이터를 저장할 데이터베이스(PostgreSQL, MySQL 등)를 설정합니다.
+   - 저장된 데이터는 시각화 도구와 분석 목적으로 사용할 수 있습니다.
+
+---
+
+### 개발 방법
+1. **OpenTelemetry Collector 설정**:
+   - Collector에서 OTLP Exporter를 사용하여 데이터를 Data Prepper로 전송합니다.
+   - `receiver`와 `exporter`를 적절히 설정하여 Data Prepper로 데이터를 전송할 수 있도록 합니다.
+
+2. **Data Prepper 설정**:
+   - OpenTelemetry 데이터 입력을 처리하기 위해 `otel-trace-source`를 활성화합니다.
+   - 통계 계산을 위한 파이프라인을 정의합니다.
+   - 결과 데이터를 저장하기 위해 데이터베이스로 내보낼 수 있도록 설정합니다.
+
+3. **통합 테스트**:
+   - OpenTelemetry Collector와 Data Prepper 간의 연결을 테스트합니다.
+   - Data Prepper에서 데이터를 수신하고 처리된 결과가 데이터베이스에 저장되는지 확인합니다.
+
+---
+
+### OpenTelemetry Collector → Data Prepper 통합
+- OpenTelemetry Collector에서 OTLP Exporter를 설정하면 Data Prepper가 데이터를 수신할 수 있습니다.  
+- Data Prepper는 기본적으로 OTLP 데이터를 받을 수 있는 `otel-trace-source` 플러그인을 제공합니다.
+  - Data Prepper 설정 파일에서 다음과 같이 구성합니다:
+    ```yaml
+    sources:
+      - otel-trace-source:
+          ssl: false
+          port: 21890
+    sinks:
+      - your-database-sink:
+          # 데이터베이스 연결 설정
+    ```
+  - OpenTelemetry Collector 설정:
+    ```yaml
+    exporters:
+      otlp:
+        endpoint: "http://dataprepper-host:21890"
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: []
+          exporters: [otlp]
+    ```
+
+### 검토 필요 사항
+- **Collector와 Data Prepper 간 연결**:
+  - 네트워크 통신이 원활한지 확인합니다.
+  - OTLP 프로토콜을 사용하는 경우 포트 설정(기본 21890)을 확인합니다.
+  
+- **Data Prepper 성능**:
+  - 대규모 트래픽 처리 시 성능 테스트를 통해 병목 현상을 확인합니다.
+
+- **통계 데이터 정의**:
+  - API 호출 횟수, 평균 응답 시간 등 필요한 통계가 무엇인지 명확히 정의해야 합니다.
+
+필요한 추가 설정이나 문제 발생 시 알려주시면 더 구체적으로 도움을 드릴 수 있습니다!
