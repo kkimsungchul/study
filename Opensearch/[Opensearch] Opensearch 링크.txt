@@ -1,0 +1,26 @@
+# Opensearch - Opensearch 링크
+
+# opensearch project github
+	https://github.com/opensearch-project
+
+# opensearch github
+	https://github.com/opensearch-project/OpenSearch
+
+# opensearch dashboards github
+	https://github.com/opensearch-project/OpenSearch-Dashboards
+
+# opensearch data prepper github
+	https://github.com/opensearch-project/data-prepper
+
+# opensearch download
+	https://opensearch.org/downloads.html
+
+# opensearch data prepper download
+	https://artifacts.opensearch.org/releases/bundle/opensearch/2.18.0/opensearch-2.18.0-linux-x64.tar.gz
+
+# opensearch dashboards download
+	https://artifacts.opensearch.org/releases/bundle/opensearch-dashboards/2.18.0/opensearch-dashboards-2.18.0-linux-x64.tar.gz
+
+
+# opensearch data prepper 설치
+

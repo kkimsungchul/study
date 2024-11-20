@@ -1,0 +1,18 @@
+# data prepper github
+	https://github.com/opensearch-project/data-prepper
+
+# data prepper download
+	https://artifacts.opensearch.org/releases/bundle/opensearch/2.18.0/opensearch-2.18.0-linux-x64.tar.gz
+
+# data prepper 공식 문서
+	https://opensearch.org/docs/latest/data-prepper/
+	https://github.com/opensearch-project/data-prepper/tree/main/docs
+
+# 성능
+	https://github.com/opensearch-project/data-prepper/blob/main/docs/latest_performance_test_results.md
+
+# data prepper 설치 전 준비사항
+	JAVA : 
+
+# data prepper 설치
+	
