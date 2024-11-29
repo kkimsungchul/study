@@ -1,0 +1,120 @@
+# rocky linux에서 포트 스캔 여부 확인하기
+
+# 
+
+
+# GPT한테 질문
+	나는 로키 리눅스를 사용하고 있어
+	누군가 내 서버에 포트스캔을 하는지 안하는지 어떻게 알수가 있을까?
+
+# 답변 
+	포트 스캔은 일반적으로 서버의 네트워크 로그에 흔적을 남깁니다. Rocky Linux에서 누군가 포트 스캔을 시도하는지 감지하려면 다음 방법을 사용할 수 있습니다:
+
+	---
+
+	### 1. **`firewalld` 또는 `iptables` 로깅 확인**
+	- **firewalld** 또는 **iptables**는 비정상적인 연결 시도를 기록할 수 있습니다.
+	- 비정상적인 다수의 포트 접근 로그는 포트 스캔의 징후일 수 있습니다.
+
+	#### 확인 방법:
+	```bash
+	sudo cat /var/log/messages | grep "firewalld"
+	sudo dmesg | grep "iptables"
+	```
+
+	---
+
+	### 2. **`fail2ban` 사용**
+	- `fail2ban`은 반복적인 연결 시도를 자동으로 차단하는 도구입니다.
+	- 비정상적인 접근을 탐지하고 로그를 확인할 수 있습니다.
+
+	#### 설치 및 설정:
+	```bash
+	sudo dnf install fail2ban
+	sudo systemctl enable --now fail2ban
+	```
+
+	- **로그 확인**:
+	  ```bash
+	  sudo cat /var/log/fail2ban.log
+	  ```
+
+	---
+
+	### 3. **`netstat` 또는 `ss` 명령으로 연결 시도 확인**
+	- 현재 서버에 연결 중인 IP 주소와 포트를 확인하여 의심스러운 패턴을 탐지합니다.
+
+	#### 실행 명령:
+	```bash
+	sudo netstat -anp | grep SYN
+	sudo ss -tuln
+	```
+
+	- 포트 스캔 시 다수의 `SYN` 연결이 감지될 수 있습니다.
+
+	---
+
+	### 4. **IDS/IPS 설치 (Snort 또는 Suricata)**
+	- **Snort** 또는 **Suricata**는 네트워크 침입 탐지 및 방지를 위해 사용됩니다.
+	- 포트 스캔 시도를 감지하는 서명을 포함할 수 있습니다.
+
+	#### Snort 설치:
+	```bash
+	sudo dnf install snort
+	```
+
+	#### Suricata 설치:
+	```bash
+	sudo dnf install suricata
+	```
+
+	---
+
+	### 5. **`tcpdump` 또는 `Wireshark`로 네트워크 트래픽 분석**
+	- `tcpdump`를 사용하여 네트워크 트래픽을 실시간으로 모니터링할 수 있습니다.
+	- 특정 IP에서 짧은 시간에 다수의 포트로 연결 시도가 있다면 포트 스캔의 징후일 수 있습니다.
+
+	#### 실행 명령:
+	```bash
+	sudo tcpdump -i eth0
+	```
+
+	---
+
+	### 6. **로그 분석**
+	Rocky Linux의 기본 로그 파일을 분석하여 포트 스캔 흔적을 찾습니다:
+	- `/var/log/messages`
+	- `/var/log/secure`
+
+	#### 예제:
+	```bash
+	sudo cat /var/log/messages | grep "Connection"
+	sudo cat /var/log/secure | grep "Failed"
+	```
+
+	---
+
+	### 7. **포트 스캔 감지 전용 도구 (`psad`)**
+	- `psad`는 `iptables`와 연동하여 포트 스캔을 탐지하고 경고를 보냅니다.
+
+	#### 설치:
+	```bash
+	sudo dnf install psad
+	sudo systemctl enable --now psad
+	```
+
+	#### 로그 확인:
+	```bash
+	sudo psad --Status
+	```
+
+	---
+
+### 결론
+1. 로그와 네트워크 트래픽을 모니터링하여 포트 스캔 시도를 감지합니다.
+2. 도구(`fail2ban`, `psad`, `tcpdump`)를 사용하여 탐지 및 방어를 자동화합니다.
+3. 의심스러운 활동이 발견되면 해당 IP를 차단합니다:
+   ```bash
+   sudo firewall-cmd --permanent --add-rich-rule="rule family='ipv4' source address='IP주소' reject"
+   sudo firewall-cmd --reload
+   ```

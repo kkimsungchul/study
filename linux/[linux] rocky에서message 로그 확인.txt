@@ -1,0 +1,47 @@
+# rocky linux의 message 로그 확인
+
+# 확인 로그
+	Nov 30 02:22:14 localhost rsyslogd[1224]: imjournal: 33 messages lost due to rate-limiting (20000 allowed within 600 seconds)
+
+# 로그 분석
+	로그에 기록된 메시지는 rsyslog에서 rate-limiting(속도 제한) 정책
+
+	imjournal: 
+		로그를 수집하는 imjournal 모듈에서 발생한 메시지입니다.
+	33 messages lost: 
+		33개의 로그 메시지가 기록되지 않고 손실되었습니다.
+	rate-limiting: 
+		초당 처리 가능한 로그 메시지의 수를 제한하는 설정 때문에 로그가 손실되었습니다.
+	20000 allowed within 600 seconds:
+		600초(10분) 동안 최대 20000개의 로그 메시지만 기록할 수 있도록 설정되어 있습니다.
+
+# 원인
+	로그 폭발:
+		특정 서비스나 애플리케이션에서 짧은 시간에 대량의 로그를 생성.
+		예: 오류 루프, 포트 스캔 감지 시 다량의 이벤트 발생 등.
+	
+	rsyslog의 기본 속도 제한 설정:
+		기본적으로 imjournal 모듈은 너무 많은 로그를 처리하지 않도록 보호하기 위해 속도 제한을 적용합니다.
+
+# 해결방법
+	1. 속도 제한 해제 또는 설정 변경
+
+		- 아래 두줄을 수정하거나 추가
+			vi /etc/systemd/journald.conf
+			=====================================================================
+			RateLimitInterval=1s   # 제한 간격(기본값: 30s)
+			RateLimitBurst=5000    # 초당 허용 로그 메시지 수(기본값: 1000)
+			=====================================================================
+		
+		- 변경사항 적용
+			systemctl restart systemd-journald
+
+	2. rsyslog 구성 변경
+		- 속도 제한 설정 추가
+			vi /etc/rsyslog.conf
+			=====================================================================
+			$SystemLogRateLimitInterval 0   # 비활성화
+			=====================================================================
+
+		- rsyslog 재시작
+			systemctl restart rsyslog

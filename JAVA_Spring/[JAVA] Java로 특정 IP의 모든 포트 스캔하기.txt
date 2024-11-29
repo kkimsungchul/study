@@ -1,0 +1,186 @@
+# Java - Java로 특정 IP의 모든 포트 스캔하기
+
+# 용도
+	특정 서버에 열려있는 포트를 확인하기 위해 사용
+
+# 주의점
+	아무 서버에다가 막 할 경우 차단당할 수 있음
+
+# 코드
+	- 스레드 10개를 생성해서 작업을 분산처리하였음
+	=====================================================================
+	import java.io.IOException;
+	import java.net.InetSocketAddress;
+	import java.net.Socket;
+	import java.util.concurrent.ExecutorService;
+	import java.util.concurrent.Executors;
+
+	public class PortScanner {
+		public static void main(String[] args) {
+			String host = "192.168.55.125"; // 스캔할 서버의 IP 또는 도메인
+			int startPort = 1; // 시작 포트
+			int endPort = 65535; // 끝 포트
+			int threadCount = 10; // 스레드 개수
+
+			System.out.println("Scanning ports on host: " + host);
+
+			// 스레드 풀 생성
+			ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+
+			// 포트 범위를 스캔하는 작업을 스레드 풀에 제출
+			for (int port = startPort; port <= endPort; port++) {
+				int currentPort = port; // 람다식에서 사용하려면 final 또는 effectively final이어야 함
+				executor.submit(() -> {
+					if (isPortOpen(host, currentPort, 100)) { // 타임아웃 100ms 설정
+						System.out.println("Port " + currentPort + " is open.");
+					}
+				});
+			}
+
+			// 작업 완료 후 스레드 풀 종료
+			executor.shutdown();
+		}
+
+		/**
+		 * 주어진 호스트와 포트가 열려 있는지 확인
+		 *
+		 * @param host       스캔할 호스트
+		 * @param port       스캔할 포트
+		 * @param timeout    연결 시도 제한 시간(ms)
+		 * @return 포트가 열려 있으면 true, 아니면 false
+		 */
+		private static boolean isPortOpen(String host, int port, int timeout) {
+			try (Socket socket = new Socket()) {
+				socket.connect(new InetSocketAddress(host, port), timeout);
+				return true;
+			} catch (IOException e) {
+				return false; // 연결 실패 -> 포트가 닫혀 있음
+			}
+		}
+	}
+
+	=====================================================================
+
+
+# 코드 설명
+	- 스레드 풀 생성
+		Executors.newFixedThreadPool(threadCount)를 사용하여 10개의 스레드로 작업을 병렬 처리
+
+	- 작업 제출
+		각 포트에 대해 작업을 생성하고 스레드 풀에 제출
+		스레드 풀은 각 작업을 분산 처리하여 병렬로 실행
+
+	- 스레드 안전성
+		각 작업에서 사용하는 currentPort는 람다식 내에서 안정성을 위해 final처럼 처리
+	
+	- isPortOpen 메서드
+		포트에 연결을 시도하여 열려 있는지 확인
+	
+	- 스레드 풀 종료
+		모든 작업이 완료되면 executor.shutdown()을 호출하여 스레드 풀을 종료
+
+
+# 지피티 한테 질문
+	
+	- 질문
+	=====================================================================
+	10개의 스레드를 생성해서 하고있는데 for문은 계속 돌고있어
+	근데 10개의 스레드가 전부 사용중일경우에는 어떻게 처리되는거야?
+
+	for (int port = startPort; port <= endPort; port++) {
+		int currentPort = port; // 람다식에서 사용하려면 final 또는 effectively final이어야 함
+		executor.submit(() -> {
+			if (isPortOpen(host, currentPort, 100)) { // 타임아웃 100ms 설정
+				System.out.println("Port " + currentPort + " is open.");
+			}
+		});
+	}
+	=====================================================================
+
+	- 답변
+	=====================================================================
+	당신의 코드에서 executor.submit()을 사용하는 방식은 스레드 풀의 큐를 활용합니다. 
+	즉, 10개의 스레드가 이미 실행 중인 경우, 새로운 작업은 큐에 대기하게 됩니다. 
+	스레드가 하나 작업을 완료하면 큐에서 다음 작업을 꺼내 실행합니다.
+
+	스레드 풀이 가득 찬 경우:
+		ExecutorService가 newFixedThreadPool(10)로 생성되었으므로 10개의 스레드가 동시에 실행됩니다.
+		추가 작업은 스레드 풀 내부의 작업 큐에 대기 상태로 들어갑니다.
+
+	작업 완료 후 큐에서 꺼내기:
+		이미 실행 중인 스레드가 작업을 완료하면 해당 스레드는 풀로 돌아갑니다.
+		큐에 대기 중인 작업 중 하나를 꺼내 실행합니다.
+
+	큐가 계속 처리됨:
+		이렇게 작업 큐는 스레드 풀이 처리할 수 있는 작업들을 순서대로 실행합니다.
+		for 루프는 모든 포트를 submit()하지만, 실행은 스레드 풀이 스케줄링을 통해 관리됩니다.
+
+	큐에 대해 조금 더 자세히
+		스레드 풀이 사용하는 큐는 기본적으로 **LinkedBlockingQueue**로 구현됩니다. 
+		이 큐는 대기 중인 작업을 무제한으로 저장할 수 있으며, 실행 중인 스레드가 작업을 완료하면 큐에서 새로운 작업을 가져옵니다.
+
+	간단한 설명으로 동작 흐름
+		1. executor.submit()은 작업을 스레드 풀에 추가합니다.
+		2. 현재 실행 가능한 스레드가 남아 있다면 즉시 실행합니다.
+		3. 실행 가능한 스레드가 없으면 작업 큐에 대기시킵니다.
+		4. 작업 중 하나가 끝나면 대기 중인 작업을 꺼내 실행합니다.
+	
+	작업 처리량과 큐 대기
+		작업량 많음: for 루프에서 많은 작업을 submit()하면 큐에 대기 중인 작업이 많아질 수 있습니다.
+		스레드 수 조정: 작업이 매우 많다면 스레드 수를 늘리거나 작업 큐에 오래 대기하지 않도록 최적화할 수 있습니다.
+
+	개선점: 큐 크기 제한하기
+		기본적으로 LinkedBlockingQueue는 무제한 크기를 가지므로, 과도한 작업 제출은 메모리를 소비할 수 있습니다. 
+		큐의 크기를 제한하려면 ThreadPoolExecutor를 직접 사용해 큐 크기를 지정하세요
+		=====================================================================
+		import java.util.concurrent.*;
+
+		public class LimitedQueuePortScanner {
+			public static void main(String[] args) {
+				String host = "127.0.0.1";
+				int startPort = 1;
+				int endPort = 65535;
+				int threadCount = 10;
+				int queueSize = 1000; // 큐 크기 제한
+
+				ThreadPoolExecutor executor = new ThreadPoolExecutor(
+						threadCount,
+						threadCount,
+						0L, TimeUnit.MILLISECONDS,
+						new ArrayBlockingQueue<>(queueSize) // 제한된 크기의 큐 사용
+				);
+
+				for (int port = startPort; port <= endPort; port++) {
+					int currentPort = port;
+					executor.submit(() -> {
+						if (isPortOpen(host, currentPort, 100)) {
+							System.out.println("Port " + currentPort + " is open.");
+						}
+					});
+				}
+
+				executor.shutdown();
+			}
+
+			private static boolean isPortOpen(String host, int port, int timeout) {
+				try (Socket socket = new Socket()) {
+					socket.connect(new InetSocketAddress(host, port), timeout);
+					return true;
+				} catch (IOException e) {
+					return false;
+				}
+			}
+		}
+		=====================================================================
+	위 코드의 특징
+		큐 크기 제한: 
+			작업 큐의 크기를 제한하여 너무 많은 작업이 큐에 쌓이는 것을 방지합니다.
+		대기 상태 발생 가능: 
+			큐가 꽉 차면 submit() 호출이 대기하게 됩니다.
+		메모리 관리 개선: 
+			무제한 큐로 인해 발생할 수 있는 메모리 과부하를 방지합니다.
+
+
+	=====================================================================
+
+	
