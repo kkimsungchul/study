@@ -1,5 +1,19 @@
 # Intellij - 인텔리J - 추천 플러그인
 
+# 2024.12.03추가
+
+
+# jpa-buddy
+	데이터베이스 테이블을 바로 Entity 객체로 만들어줌
+	https://plugins.jetbrains.com/plugin/15075-jpa-buddy
+	https://martial.tistory.com/9
+
+
+# translation
+	Intellij에서 변역기 바로 사용가능
+	https://plugins.jetbrains.com/plugin/8579-translation/
+	https://nahwasa.com/entry/%EA%B5%AC%EA%B8%80-%EB%B2%88%EC%97%AD%EA%B8%B0-%ED%8B%80%EC%96%B4%EB%91%90%EA%B3%A0-%EA%B0%9C%EB%B0%9C%ED%95%98%EB%8A%94-%EB%B6%84%EB%93%A4%EC%9D%84-%EC%9C%84%ED%95%9C-%EC%9D%B8%ED%85%94%EB%A6%AC%EC%A0%9C%EC%9D%B4-%ED%94%8C%EB%9F%AC%EA%B7%B8%EC%9D%B8
+
 
 # 참고링크 : 
 	https://code-boki.tistory.com/4
