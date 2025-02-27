@@ -1,0 +1,221 @@
+# Linux - IOPS 계산하기
+
+# 사용 이유
+	Linux에 Database 를 설치하여 사용하다보면 IOPS  를 산정해야 할 때 가 있음
+
+# IOPS (input/output Operations Per Second) 란
+	컴퓨터에서 저장장치에 초당 수행할 수 있는 입력 및 출력 작업의 수를 측정하는 성능 지표
+	
+	계산식은 읽기, 쓰기를 더한 후 평균을 내면 됨
+	IOPS = r/s + w/s
+
+# iostat 사용
+	iostat 는 linux에서 디스크 I/O통계 및 CPU사용량을 모니터링하고 분석하기 위한 도구임
+
+	- iostat 
+	기본적으로 CPU와 모든 디스크의 I/O 성능정보를 표시
+	=====================================================================
+	[sungchul@localhost ~]$ iostat
+	Linux 4.18.0-553.22.1.el8_10.x86_64 (localhost.localdomain)     2025년 02월 24일        _x86_64_        (4 CPU)
+
+	avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+			   0.09    0.00    0.17    0.00    0.00   99.73
+
+	Device             tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
+	sda               0.91         0.10         5.15     595838   29500020
+	dm-0              0.94         0.10         5.14     560861   29464081
+	dm-1              0.00         0.00         0.00       2220          0
+	dm-2              0.00         0.00         0.00       5322       2242
+	=====================================================================
+
+	- iostat -x 1 5
+	1초 간격으로 5회 실행하여 통계 출력
+	=====================================================================
+	[sungchul@localhost ~]$ iostat -x 1 5
+	Linux 4.18.0-553.22.1.el8_10.x86_64 (localhost.localdomain)     2025년 02월 24일        _x86_64_        (4 CPU)
+
+	avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+			   0.09    0.00    0.17    0.00    0.00   99.73
+
+	Device            r/s     w/s     rkB/s     wkB/s   rrqm/s   wrqm/s  %rrqm  %wrqm r_await w_await aqu-sz rareq-sz wareq-sz  svctm  %util
+	sda              0.00    0.91      0.10      5.15     0.00     0.03   0.23   2.73    0.44    0.54   0.00    41.23     5.65   0.19   0.02
+	dm-0             0.00    0.94      0.10      5.14     0.00     0.00   0.00   0.00    0.39    0.56   0.00    41.32     5.49   0.47   0.04
+	dm-1             0.00    0.00      0.00      0.00     0.00     0.00   0.00   0.00    0.20    0.00   0.00    21.35     0.00   0.14   0.00
+	dm-2             0.00    0.00      0.00      0.00     0.00     0.00   0.00   0.00    0.27    1.37   0.00    36.21    31.61   0.56   0.00
+
+	avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+			   0.00    0.00    0.00    0.00    0.00  100.00
+
+	Device            r/s     w/s     rkB/s     wkB/s   rrqm/s   wrqm/s  %rrqm  %wrqm r_await w_await aqu-sz rareq-sz wareq-sz  svctm  %util
+	sda              0.00    0.00      0.00      0.00     0.00     0.00   0.00   0.00    0.00    0.00   0.00     0.00     0.00   0.00   0.00
+	dm-0             0.00    0.00      0.00      0.00     0.00     0.00   0.00   0.00    0.00    0.00   0.00     0.00     0.00   0.00   0.00
+	dm-1             0.00    0.00      0.00      0.00     0.00     0.00   0.00   0.00    0.00    0.00   0.00     0.00     0.00   0.00   0.00
+	dm-2             0.00    0.00      0.00      0.00     0.00     0.00   0.00   0.00    0.00    0.00   0.00     0.00     0.00   0.00   0.00
+	=====================================================================
+
+	- iostat -c
+	CPU 통계만 출력
+	=====================================================================
+	[sungchul@localhost ~]$ iostat -c
+	Linux 4.18.0-553.22.1.el8_10.x86_64 (localhost.localdomain)     2025년 02월 24일        _x86_64_        (4 CPU)
+
+	avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+			   0.09    0.00    0.17    0.00    0.00   99.73
+	=====================================================================
+
+	- iostat -p sda
+	특정 장치에 대한 I/O 통계 표시
+	=====================================================================
+	[sungchul@localhost ~]$ iostat -p sda
+	Linux 4.18.0-553.22.1.el8_10.x86_64 (localhost.localdomain)     2025년 02월 24일        _x86_64_        (4 CPU)
+
+	avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+			   0.09    0.00    0.17    0.00    0.00   99.73
+
+	Device             tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
+	sda               0.91         0.10         5.15     595838   29500351
+	sda2              0.00         0.00         0.01      14044      33686
+	sda3              0.91         0.10         5.14     573980   29466655
+	sda1              0.00         0.00         0.00       5537         10
+	=====================================================================
+
+
+# 측정 방법
+	아래의 명령어를 실행하여 iostat_log 파일을 생성함
+	=====================================================================
+	iostat -xd 1 10 > iostat_log.txt
+	=====================================================================
+	-x (Extended statistics)
+		각 디스크의 확장된 통계를 표시함
+	-d (Device statistics)
+		시스템에서 사용 가능한 디스크에 대한 디스크 통계만 표시
+		CPU는 표시되지 않음
+
+	- iostat_log.txt 파일 내용
+	=====================================================================
+	Device            r/s     w/s     rkB/s     wkB/s   rrqm/s   wrqm/s  %rrqm  %wrqm r_await w_await aqu-sz rareq-sz wareq-sz  svctm  %util
+	sda              5.00    12.00      0.00      0.00     0.00     0.00   0.00   0.00    0.00    0.00   0.00     0.00     0.00   0.00   0.00
+	dm-0             0.00    0.00      0.00      0.00     0.00     0.00   0.00   0.00    0.00    0.00   0.00     0.00     0.00   0.00   0.00
+	dm-1             0.00    0.00      0.00      0.00     0.00     0.00   0.00   0.00    0.00    0.00   0.00     0.00     0.00   0.00   0.00
+	dm-2             0.00    0.00      0.00      0.00     0.00     0.00   0.00   0.00    0.00    0.00   0.00     0.00     0.00   0.00   0.00
+
+	Device            r/s     w/s     rkB/s     wkB/s   rrqm/s   wrqm/s  %rrqm  %wrqm r_await w_await aqu-sz rareq-sz wareq-sz  svctm  %util
+	sda              7.00    3.00      0.00      0.00     0.00     0.00   0.00   0.00    0.00    0.00   0.00     0.00     0.00   0.00   0.00
+	dm-0             0.00    0.00      0.00      0.00     0.00     0.00   0.00   0.00    0.00    0.00   0.00     0.00     0.00   0.00   0.00
+	dm-1             0.00    0.00      0.00      0.00     0.00     0.00   0.00   0.00    0.00    0.00   0.00     0.00     0.00   0.00   0.00
+	dm-2             0.00    0.00      0.00      0.00     0.00     0.00   0.00   0.00    0.00    0.00   0.00     0.00     0.00   0.00   0.00
+	=====================================================================
+
+
+# 분석
+	iostat_log.txt 파일의 내용을 그대로 사용기엔 불편함
+	IOPS는 r/s + w/s이므로 두개의 필드 외에는 사용하지 않음
+	
+	- 아래의 리눅스 스크립트로 r/s+w/s / 횟수로 계산함
+	=====================================================================
+	awk '/^[a-z]/ {
+		iops = $4 + $3; 
+		total += iops; 
+		count++; 
+		if (iops > max) max = iops; 
+		if (min == "" || iops < min) min = iops; 
+	} 
+	END {
+		printf "Total IOPS: %.2f\n", total;
+		printf "Average IOPS: %.2f\n", total/count;
+		printf "Min IOPS: %.2f\n", min;
+		printf "Max IOPS: %.2f\n", max;
+	}' iostat_log.txt
+	=====================================================================
+
+	- 실제 실행했을때의 결과, 하단의 네줄을 확인하면 합계 , 평균, 최소, 최대값이 나옴
+	=====================================================================
+	[sungchul@localhost ~]$ awk '/^[a-z]/ {
+	> iops = $4 + $3;
+	> total += iops;
+	> count++;
+	> if (iops > max) max = iops;
+	}
+	> if (min == "" || iops < min) min = iops;
+			printf "Total IOPS: %.2f\n", total;
+	> }
+			printf "Average IOPS: %.2f\n", total/count;
+	> END {
+	> printf "Total IOPS: %.2f\n", total;
+	}' iostat_log.txt
+	> printf "Average IOPS: %.2f\n", total/count;
+	> printf "Min IOPS: %.2f\n", min;
+	> printf "Max IOPS: %.2f\n", max;
+	> }' iostat_log.txt
+	Total IOPS: 21.05
+	Average IOPS: 0.53
+	Min IOPS: 0.00
+	Max IOPS: 9.50
+	=====================================================================
+
+	- 다만위와같이 명령어를 입력하면, 사용하지 않는 disk까지 포함하여 계산하기에 사용중인 disk만으로 계산하는 스크립트를 새로 작성함
+	=====================================================================
+	awk '/^[a-z]/ {
+		iops = $4 + $3; 
+		if (iops > 0) { # r/s 또는 w/s가 0이 아닐 경우만 처리
+			total += iops; 
+			count++; 
+			if (iops > max) max = iops; 
+			if (min == "" || iops < min) min = iops; 
+		}
+	} 
+	END {
+		printf "Total IOPS: %.2f\n", total;
+		if (count > 0) {
+			printf "Average IOPS: %.2f\n", total/count; # 0인 경우 식을 방지하기 위한 조건 추가
+		} else {
+			printf "Average IOPS: No valid data available.\n";
+		}
+		printf "Min IOPS: %.2f\n", (min == "" ? 0 : min); # min이 없을 경우 0 출력
+		printf "Max IOPS: %.2f\n", max; # max가 없을 경우 기본값이 0이므로 별다른 조치 필요 없음
+	}' iostat_log.txt
+	=====================================================================
+
+	- 실제 실행했을때의 결과, 위와 같은 파일을 사용하였지만, 0인 데이터를 제외하고 계산하였기에 평균값이 다르게 나옴
+	=====================================================================
+	Total IOPS: 21.05
+	Average IOPS: 5.26
+	Min IOPS: 1.01
+	Max IOPS: 9.50
+	=====================================================================
+
+
+	- 위와 똑같은 명령어 인데 tab이 두번 들어가서 중간에 폴더/파일들이 표시됨, tab을 space로 변경하여 다시 작성함
+	=====================================================================
+	[sungchul@localhost ~]$  awk '/^[a-z]/ {
+	  iops = $4 + $3;
+	  if (iops > 0) { # r/s 또는 w/s가 0이 아닐 경우만 처리
+	   total += iops;
+	   count++;
+	   if (iops > max) max = iops;
+	   if (min == "" || iops < min) min = iops;
+	  }
+	 }
+	>   iops = $4 + $3;
+	>   if (iops > 0) { # r/s 또는 w/s가 0이 아닐 경우만 처리
+	>    total += iops;
+	>    count++;
+	>    if (iops > max) max = iops;
+	>    if (min == "" || iops < min) min = iops;
+	>   }
+	>  }
+	>  END {
+	>   printf "Total IOPS: %.2f\n", total;
+	>   if (count > 0) {
+	>    printf "Average IOPS: %.2f\n", total/count; # 0인 경우 식을 방지하기 위한 조건 추가
+	>   } else {
+	>    printf "Average IOPS: No valid data available.\n";
+	>   }
+	>   printf "Min IOPS: %.2f\n", (min == "" ? 0 : min); # min이 없을 경우 0 출력
+	>   printf "Max IOPS: %.2f\n", max; # max가 없을 경우 기본값이 0이므로 별다른 조치 필요 없음
+	>  }' iostat_log.txt
+	Total IOPS: 21.05
+	Average IOPS: 5.26
+	Min IOPS: 1.01
+	Max IOPS: 9.50
+	=====================================================================
