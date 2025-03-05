@@ -254,7 +254,7 @@
 	DROP USER 사용할DB계정명;
 	
 	- 사용자 생성 및 슈퍼 관리자 권한 부여
-	CREATE ROLE 사용할DB계정명 WITH LOGIN PASSWORD 'rlatjdcjf!1' SUPERUSER;
+	CREATE ROLE 사용할DB계정명 WITH LOGIN PASSWORD 'qlalfqjsghdlafur' SUPERUSER;
 
 
 	- 권한 확인
