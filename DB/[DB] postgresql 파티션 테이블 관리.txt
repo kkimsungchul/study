@@ -151,3 +151,92 @@
 	crontab -e
 	0 1 * * * psql -U your_user -d your_db -c "SELECT manage_partitions();"
 	=====================================================================
+
+
+
+# 여러개의 파티션 테이블 관리
+	- 아래과 같이 세개의 파티션 테이블을 사용할 예정임
+	=====================================================================
+	CREATE TABLE user_log(
+		user_id character varying(20) NOT NULL,
+		user_log_date character varying(8) NOT NULL
+	)PARTITION BY RANGE (user_log_date);
+
+
+	CREATE TABLE board_log(
+		board_id character varying(20) NOT NULL,
+		board_log_date character varying(8) NOT NULL
+	)PARTITION BY RANGE (board_log_date);
+
+
+	CREATE TABLE access_log(
+		user_id character varying(20) NOT NULL,
+		access_log_date character varying(8) NOT NULL
+	)PARTITION BY RANGE (access_log_date);
+	=====================================================================
+
+	- 모두 6개월의 보관주기를 가지고 있으므로 아래의 함수로 관리
+	=====================================================================
+	CREATE OR REPLACE FUNCTION manage_all_partitions()
+	RETURNS VOID AS $$
+	DECLARE
+		base_tables TEXT[] := ARRAY['user_log', 'board_log', 'access_log'];  -- 대상 테이블 목록
+		base_column TEXT[] := ARRAY['user_log_date', 'board_log_date', 'access_log_date'];  -- 날짜 컬럼 목록
+		cur_date TEXT;
+		partition_date TEXT;
+		partition_name TEXT;
+		drop_partition_name TEXT;
+		start_date TEXT;
+		end_date TEXT;
+		drop_date TEXT;
+		exists_check BOOLEAN;
+		table_idx INT;
+	BEGIN
+		-- 현재 날짜 기준 (YYYYMM)
+		cur_date := to_char(now(), 'YYYYMM');
+
+		-- 각 테이블에 대해 6개월 치의 파티션 생성
+		FOR table_idx IN 1..array_length(base_tables, 1) LOOP
+			FOR i IN 0..5 LOOP
+				partition_date := to_char((now() + (i || ' months')::INTERVAL), 'YYYYMM');
+				partition_name := base_tables[table_idx] || '_' || partition_date;
+				start_date := partition_date || '01';
+				end_date := to_char((start_date::DATE + INTERVAL '1 month')::DATE, 'YYYYMMDD');
+
+				-- 기존 테이블 존재 여부 확인
+				SELECT EXISTS (
+					SELECT 1 FROM pg_class WHERE relname = partition_name
+				) INTO exists_check;
+
+				IF NOT exists_check THEN
+					-- 파티션 테이블 생성
+					EXECUTE format(
+						'CREATE TABLE %I PARTITION OF %I FOR VALUES FROM (%L) TO (%L);',
+						partition_name, base_tables[table_idx], start_date, end_date
+					);
+					RAISE NOTICE 'Created partition: %', partition_name;
+				ELSE
+					RAISE NOTICE 'Partition already exists: %', partition_name;
+				END IF;
+			END LOOP;
+
+			-- 6개월이 지난 파티션 삭제
+			drop_date := to_char((now() - INTERVAL '6 months'), 'YYYYMM');
+			drop_partition_name := base_tables[table_idx] || '_' || drop_date;
+
+			-- 기존 테이블 존재 여부 확인 후 삭제
+			SELECT EXISTS (
+				SELECT 1 FROM pg_class WHERE relname = drop_partition_name
+			) INTO exists_check;
+
+			IF exists_check THEN
+				EXECUTE format('DROP TABLE %I;', drop_partition_name);
+				RAISE NOTICE 'Dropped old partition: %', drop_partition_name;
+			ELSE
+				RAISE NOTICE 'No old partition to drop for %', base_tables[table_idx];
+			END IF;
+		END LOOP;
+	END;
+	$$ LANGUAGE plpgsql;
+
+	=====================================================================
