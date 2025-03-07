@@ -1,0 +1,153 @@
+[DB - Postgresql 파티션 테이블 관리]
+
+# 파티션 관리
+	- 보관주기가 잇는 데이터들을 파티션 테이블로 관리를 하려고 함
+	- 프로그래밍도 가능하지만, 파티션테이블을 사용하면 보다 간단하게 테이블 삭제만으로 관리가 가능함
+
+# 방법
+	- Function으로 미리 6개월치의 테이블을 생성하고, 6개월이 지난 테이블은 삭제하도록 함
+
+# Function 생성
+	=====================================================================
+	CREATE OR REPLACE FUNCTION manage_partitions()
+	RETURNS VOID AS $$
+	DECLARE
+		cur_date TEXT;                 -- 현재 날짜를 저장할 변수 (current_date 사용 금지)
+		partition_date TEXT;           -- 생성할 파티션의 기준 년월 (YYYYMM)
+		partition_name TEXT;           -- 생성할 파티션 테이블명 (예: user_log_202504)
+		drop_partition_name TEXT;      -- 삭제할 파티션 테이블명 (6개월 이전 데이터)
+		start_date TEXT;               -- 파티션 시작 날짜 (YYYYMMDD)
+		end_date TEXT;                 -- 파티션 종료 날짜 (YYYYMMDD)
+		drop_date TEXT;                -- 삭제할 파티션의 기준 년월 (YYYYMM)
+		exists_check BOOLEAN;          -- 테이블 존재 여부 확인용 변수
+	BEGIN
+		-- 현재 날짜 기준 (YYYYMM)
+		cur_date := to_char(now(), 'YYYYMM');
+
+		-- 6개월 후까지의 파티션을 생성
+		FOR i IN 0..5 LOOP
+			partition_date := to_char((now() + (i || ' months')::INTERVAL), 'YYYYMM');
+			partition_name := 'user_log_' || partition_date;
+			start_date := partition_date || '01';
+			end_date := to_char((start_date::DATE + INTERVAL '1 month')::DATE, 'YYYYMMDD');
+
+			-- 기존 테이블 존재 여부 확인
+			SELECT EXISTS (
+				SELECT 1 FROM pg_class WHERE relname = partition_name
+			) INTO exists_check;
+
+			IF NOT exists_check THEN
+				-- 파티션 테이블 생성
+				EXECUTE format(
+					'CREATE TABLE %I PARTITION OF user_log FOR VALUES FROM (%L) TO (%L);',
+					partition_name, start_date, end_date
+				);
+				RAISE NOTICE 'Partition % created', partition_name;
+			ELSE
+				RAISE NOTICE 'Partition % already exists', partition_name;
+			END IF;
+		END LOOP;
+
+		-- 6개월이 지난 파티션 삭제
+		drop_date := to_char((now() - INTERVAL '6 months'), 'YYYYMM');
+		drop_partition_name := 'user_log_' || drop_date;
+
+		-- 기존 테이블 존재 여부 확인 후 삭제
+		SELECT EXISTS (
+			SELECT 1 FROM pg_class WHERE relname = drop_partition_name
+		) INTO exists_check;
+
+		IF exists_check THEN
+			EXECUTE format('DROP TABLE %I;', drop_partition_name);
+			RAISE NOTICE 'Dropped old partition: %', drop_partition_name;
+		ELSE
+			RAISE NOTICE 'No old partition to drop';
+		END IF;
+	END;
+	$$ LANGUAGE plpgsql;
+	=====================================================================
+
+# Function내 쿼리 설명
+	
+	- 6개월 후까지의 파티션 테이블을 자동 생성
+		현재 월부터 6개월 후까지 반복문 (FOR i IN 0..5 LOOP)를 실행
+		user_log_YYYYMM 형식의 파티션 테이블이 존재하는지 확인 후 없으면 생성
+	- 6개월이 지난 파티션 테이블 삭제
+		pg_class 테이블을 조회하여 해당 파티션 테이블이 존재하는지 확인 후 삭제
+
+	- EXECUTE format(...) 사용
+		동적으로 SQL을 생성하여 안전하게 실행
+	
+	- start_date와 end_date
+	=====================================================================
+	start_date := partition_date || '01';  -- 예: '20250301'
+	end_date := to_char((start_date::DATE + INTERVAL '1 month')::DATE, 'YYYYMMDD');  -- 예: '20250401'
+	=====================================================================
+	이렇게 하면 FOR VALUES FROM ('20250301') TO ('20250401') 이 되어, 20250401 데이터가 포함되는 것처럼 보일 수 있음
+	PostgreSQL의 RANGE 파티셔닝은 TO 값 자체를 포함하지 않음
+	
+	- start_date와 end_date 확인 쿼리 
+	=====================================================================
+	--start date
+	select to_char(((to_char((now() + (1 || ' months')::INTERVAL), 'YYYYMM')|| '01')::DATE + INTERVAL '1 month')::DATE, 'YYYYMMDD');
+
+	--end date
+	select to_char(((to_char(((to_char((now() + (1 || ' months')::INTERVAL), 'YYYYMM')|| '01')::DATE + INTERVAL '1 month')::DATE, 'YYYYMMDD'))::DATE + INTERVAL '1 month')::DATE, 'YYYYMMDD');
+
+
+	--start date
+	select to_char(((to_char((now() - (2 || ' months')::INTERVAL), 'YYYYMM')|| '01')::DATE + INTERVAL '1 month')::DATE, 'YYYYMMDD');
+
+	--end date
+	select to_char(((to_char(((to_char((now() - (2 || ' months')::INTERVAL), 'YYYYMM')|| '01')::DATE + INTERVAL '1 month')::DATE, 'YYYYMMDD'))::DATE + INTERVAL '1 month')::DATE, 'YYYYMMDD');
+	=====================================================================
+
+# PostgreSQL의 RANGE 파티셔닝 규칙
+	- FROM 값은 포함됨
+	- TO 값은 포함되지 않음
+
+# start_date와 end_date 테스트
+	
+	- 테이블 생성
+	=====================================================================
+	CREATE TABLE user_log (
+		user_id VARCHAR(20) NOT NULL,
+		user_log_date VARCHAR(8) NOT NULL
+	) PARTITION BY RANGE (user_log_date);
+
+	CREATE TABLE user_log_202503 
+		PARTITION OF user_log 
+		FOR VALUES FROM ('20250301') TO ('20250401');
+
+	CREATE TABLE user_log_202504 
+		PARTITION OF user_log 
+		FOR VALUES FROM ('20250401') TO ('20250501');
+
+	=====================================================================
+	
+	- 데이터 추가
+	=====================================================================
+	INSERT INTO user_log VALUES ('user1', '20250331');  -- user_log_202503
+	INSERT INTO user_log VALUES ('user2', '20250401');  -- user_log_202504
+	INSERT INTO user_log VALUES('kimsungchul', '20250701'); -- user_log_202506
+	INSERT INTO user_log VALUES('kimsungchul', '20250601'); -- user_log_202506
+	=====================================================================
+	- 데이터 확인
+	=====================================================================
+	SELECT tableoid::regclass, * FROM user_log;
+	=====================================================================
+
+
+
+# PostgreSQL 스케줄러 (pg_cron) 사용
+	=====================================================================
+	-- 매일 새벽 1시에 실행하도록 설정
+	SELECT cron.schedule('0 1 * * *', 'SELECT manage_partitions();');
+	=====================================================================
+
+# cron을 활용한 자동 실행 (Linux)
+	매일 새벽 1시에 실행
+	=====================================================================
+	crontab -e
+	0 1 * * * psql -U your_user -d your_db -c "SELECT manage_partitions();"
+	=====================================================================
