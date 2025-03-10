@@ -15,7 +15,7 @@
 	- iostat 
 	기본적으로 CPU와 모든 디스크의 I/O 성능정보를 표시
 	=====================================================================
-	[sungchul@localhost ~]$ iostat
+	[root@localhost ~]$ iostat
 	Linux 4.18.0-553.22.1.el8_10.x86_64 (localhost.localdomain)     2025년 02월 24일        _x86_64_        (4 CPU)
 
 	avg-cpu:  %user   %nice %system %iowait  %steal   %idle
@@ -31,7 +31,7 @@
 	- iostat -x 1 5
 	1초 간격으로 5회 실행하여 통계 출력
 	=====================================================================
-	[sungchul@localhost ~]$ iostat -x 1 5
+	[root@localhost ~]$ iostat -x 1 5
 	Linux 4.18.0-553.22.1.el8_10.x86_64 (localhost.localdomain)     2025년 02월 24일        _x86_64_        (4 CPU)
 
 	avg-cpu:  %user   %nice %system %iowait  %steal   %idle
@@ -56,7 +56,7 @@
 	- iostat -c
 	CPU 통계만 출력
 	=====================================================================
-	[sungchul@localhost ~]$ iostat -c
+	[root@localhost ~]$ iostat -c
 	Linux 4.18.0-553.22.1.el8_10.x86_64 (localhost.localdomain)     2025년 02월 24일        _x86_64_        (4 CPU)
 
 	avg-cpu:  %user   %nice %system %iowait  %steal   %idle
@@ -66,7 +66,7 @@
 	- iostat -p sda
 	특정 장치에 대한 I/O 통계 표시
 	=====================================================================
-	[sungchul@localhost ~]$ iostat -p sda
+	[root@localhost ~]$ iostat -p sda
 	Linux 4.18.0-553.22.1.el8_10.x86_64 (localhost.localdomain)     2025년 02월 24일        _x86_64_        (4 CPU)
 
 	avg-cpu:  %user   %nice %system %iowait  %steal   %idle
@@ -130,7 +130,7 @@
 
 	- 실제 실행했을때의 결과, 하단의 네줄을 확인하면 합계 , 평균, 최소, 최대값이 나옴
 	=====================================================================
-	[sungchul@localhost ~]$ awk '/^[a-z]/ {
+	[root@localhost ~]$ awk '/^[a-z]/ {
 	> iops = $4 + $3;
 	> total += iops;
 	> count++;
@@ -187,7 +187,7 @@
 
 	- 위와 똑같은 명령어 인데 tab이 두번 들어가서 중간에 폴더/파일들이 표시됨, tab을 space로 변경하여 다시 작성함
 	=====================================================================
-	[sungchul@localhost ~]$  awk '/^[a-z]/ {
+	[root@localhost ~]$  awk '/^[a-z]/ {
 	  iops = $4 + $3;
 	  if (iops > 0) { # r/s 또는 w/s가 0이 아닐 경우만 처리
 	   total += iops;
