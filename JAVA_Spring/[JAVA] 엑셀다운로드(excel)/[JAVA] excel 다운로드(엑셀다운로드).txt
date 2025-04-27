@@ -2,7 +2,7 @@
 
 
 # Excel 파일 생성 코드
-	=================================================================================================================
+	================================================================================
 	import java.io.FileOutputStream;
 	import java.io.IOException;
 	import java.util.HashMap;
@@ -39,12 +39,12 @@
 	  }
 
 	}
-	=================================================================================================================
+	================================================================================
 
 
 
 # 오류 발생 - 1
-	=================================================================================================================
+	================================================================================
 	"C:\Program Files\Java\jdk1.8.0_192\bin\java.exe" "-javaagent:C:\Program Files\JetBrains\IntelliJ IDEA 2022.3.3\lib\idea_rt.jar=3081:C:\Program Files\JetBrains\IntelliJ IDEA 2022.3.3\bin" -Dfile.encoding=UTF-8 -classpath "C:\Program Files\Java\jdk1.8.0_192\jre\lib\charsets.jar;C:\Program Files\Java\jdk1.8.0_192\jre\lib\deploy.jar;C:\Program Files\Java\jdk1.8.0_192\jre\lib\ext\access-bridge-64.jar;C:\Program Files\Java\jdk1.8.0_192\jre\lib\ext\cldrdata.jar;C:\Program Files\Java\jdk1.8.0_192\jre\lib\ext\dnsns.jar;C:\Program Files\Java\jdk1.8.0_192\jre\lib\ext\jaccess.jar;C:\Program Files\Java\jdk1.8.0_192\jre\lib\ext\jfxrt.jar;C:\Program Files\Java\jdk1.8.0_192\jre\lib\ext\localedata.jar;C:\Program Files\Java\jdk1.8.0_192\jre\lib\ext\nashorn.jar;C:\Program Files\Java\jdk1.8.0_192\jre\lib\ext\sunec.jar;C:\Program Files\Java\jdk1.8.0_192\jre\lib\ext\sunjce_provider.jar;C:\Program Files\Java\jdk1.8.0_192\jre\lib\ext\sunmscapi.jar;C:\Program Files\Java\jdk1.8.0_192\jre\lib\ext\sunpkcs11.jar;C:\Program Files\Java\jdk1.8.0_192\jre\lib\ext\zipfs.jar;C:\Program Files\Java\jdk1.8.0_192\jre\lib\javaws.jar;C:\Program Files\Java\jdk1.8.0_192\jre\lib\jce.jar;C:\Program Files\Java\jdk1.8.0_192\jre\lib\jfr.jar;C:\Program Files\Java\jdk1.8.0_192\jre\lib\jfxswt.jar;C:\Program Files\Java\jdk1.8.0_192\jre\lib\jsse.jar;C:\Program Files\Java\jdk1.8.0_192\jre\lib\management-agent.jar;C:\Program Files\Java\jdk1.8.0_192\jre\lib\plugin.jar;C:\Program Files\Java\jdk1.8.0_192\jre\lib\resources.jar;C:\Program Files\Java\jdk1.8.0_192\jre\lib\rt.jar;C:\IntellijProject\CodeTest\out\production\CodeTest;C:\IntellijProject\CodeTest\lib\jackson-annotations-2.9.8.jar;C:\IntellijProject\CodeTest\lib\jackson-core-2.9.8.jar;C:\IntellijProject\CodeTest\lib\jackson-databind-2.9.8.jar;C:\IntellijProject\CodeTest\lib\poi-5.2.3.jar;C:\IntellijProject\CodeTest\lib\poi-ooxml-5.2.3.jar;C:\IntellijProject\CodeTest\lib\commons-collections4-4.4.jar;C:\IntellijProject\CodeTest\lib\xmlbeans-5.1.1.jar;C:\IntellijProject\CodeTest\lib\commons-lang3-3.12.0.jar;C:\IntellijProject\CodeTest\lib\commons-io-2.11.0.jar;C:\IntellijProject\CodeTest\lib\log4j-core-2.20.0.jar;C:\IntellijProject\CodeTest\lib\log4j-api-2.20.0.jar;C:\IntellijProject\CodeTest\lib\commons-compress-1.22.jar;C:\IntellijProject\CodeTest\lib\ooxml-schemas-1.4.jar;C:\IntellijProject\CodeTest\lib\json-simple-1.1.1.jar;C:\IntellijProject\CodeTest\lib\jsoup-1.13.1.jar" com.sungchul.ExcelMain
 	Exception in thread "main" java.lang.NoSuchFieldError: Factory
 		at org.apache.poi.xssf.usermodel.XSSFWorkbook.onWorkbookCreate(XSSFWorkbook.java:476)
@@ -52,7 +52,7 @@
 		at org.apache.poi.xssf.usermodel.XSSFWorkbook.<init>(XSSFWorkbook.java:227)
 		at org.apache.poi.xssf.usermodel.XSSFWorkbook.<init>(XSSFWorkbook.java:215)
 		at com.sungchul.ExcelMain.main(ExcelMain.java:23)
-	=================================================================================================================
+	================================================================================
 
 	poi-ooxml-schemas-4.1.2.jar 라이브러리가 없어서 발생한줄 알았음 그래서 추가함
 	https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml-schemas/4.1.2

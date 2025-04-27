@@ -8,7 +8,7 @@
 	build.gradle 파일에서 아래의 내용 수정
 	sourceCompatibility -> 사용하려는 java 버전
 	keycloakVersion -> 사용하려는 keycloak 버전, 10 11 12까지 지원된다고 하나 13버전도 되는거같음
-	=================================================================================================================
+	================================================================================
 	sourceCompatibility = '11.0'
 	tasks.withType(JavaCompile) {
 		options.encoding = 'UTF-8'
@@ -17,7 +17,7 @@
 	ext {
 		keycloakVersion = '12.0.3'
 	}
-	=================================================================================================================
+	================================================================================
 
 
 # JAVA 빌드
@@ -35,9 +35,9 @@
 
 # JS 파일 설정
 	"KEYCLOAK_HOME/themes/base/login/theme.properties" 파일에 아래의 내용 추가
-	=================================================================================================================
+	================================================================================
 	scripts=js/password-encryption-provider.js
-	=================================================================================================================
+	================================================================================
 
 
 [ AES 암호화 ]
@@ -178,7 +178,7 @@
 	CMD 창에서 아래의 명령어를 통해 토큰이 발급되는지 테스트
 
 	1. 암호화 미적용 
-		=================================================================================================================
+		================================================================================
 curl -X POST "http://localhost:8080/auth/realms/demo/protocol/openid-connect/token" ^
 --header "Content-Type:application/x-www-form-urlencoded" ^
 --data-urlencode "grant_type=password" ^
@@ -186,13 +186,13 @@ curl -X POST "http://localhost:8080/auth/realms/demo/protocol/openid-connect/tok
 --data-urlencode "client_secret=JBFLaz1mgZKPwYNqE9Tfyf0c3b2mnkOl" ^
 --data-urlencode "username=sungchul" ^
 --data-urlencode "password=1"
-		=================================================================================================================
+		================================================================================
 
 		결과 : {"error":"invalid_request","error_description":"User Not Found"}
 
 	2. 암호화 적용
 
-		=================================================================================================================
+		================================================================================
 curl -X POST "http://localhost:8080/auth/realms/demo/protocol/openid-connect/token" ^
 --header "Content-Type:application/x-www-form-urlencoded" ^
 --data-urlencode "grant_type=password" ^
@@ -200,7 +200,7 @@ curl -X POST "http://localhost:8080/auth/realms/demo/protocol/openid-connect/tok
 --data-urlencode "client_secret=JBFLaz1mgZKPwYNqE9Tfyf0c3b2mnkOl" ^
 --data-urlencode "username=sungchul" ^
 --data-urlencode "password=MQ=="
-		=================================================================================================================
+		================================================================================
 
 		결과 : 
 		{"access_token":"eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPdGViQldzSmdhRWozeXVaMGZlbTVWclFmbkZpcDlLczE5aVN6anBybGw0In0.eyJleHAiOjE2NDQ1MjIzMDksImlhdCI6MTY0NDQ4NjMwOSwianRpIjoiYmM4ZGI5ZTAtYjZmYy00OWJlLWI0MjItZjBiZDcxNGQ2YzJiIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL2F1dGgvcmVhbG1zL2RlbW8iLCJhdWQiOiJhY2NvdW50Iiwic3ViIjoiNzNkNWYwOWUtZTY2Ny00YjA2LTgwZDctMTk3ZDM1NzQyNmQ0IiwidHlwIjoiQmVhcmVyIiwiYXpwIjoibXlfY2xpZW50Iiwic2Vzc2lvbl9zdGF0ZSI6ImIwNTVhMTRlLWY3N2QtNGVkYS04MTE1LWE2Y2NmZDFkNzRhMiIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwIl0sInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJvZmZsaW5lX2FjY2VzcyIsInVtYV9hdXRob3JpemF0aW9uIiwiZGVmYXVsdC1yb2xlcy1kZW1vIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsibXlfY2xpZW50Ijp7InJvbGVzIjpbIlJPTEVfVVNFUiJdfSwiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJwcm9maWxlIGVtYWlsIiwic2lkIjoiYjA1NWExNGUtZjc3ZC00ZWRhLTgxMTUtYTZjY2ZkMWQ3NGEyIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJuYW1lIjoia2ltIHN1bmdjaHVsIiwicHJlZmVycmVkX3VzZXJuYW1lIjoic3VuZ2NodWwiLCJnaXZlbl9uYW1lIjoia2ltIiwiZmFtaWx5X25hbWUiOiJzdW5nY2h1bCIsImVtYWlsIjoia2ltc2MxMjE4QGdtYWlsLmNvbSJ9.QacHvhWS7myXfOgXhwtxLiyf7k4s7C_UowNgSxAipUxUBPa-2V5PHOatV68jqi1V9Np-Gbmj8iTlo4-PqTK3hImZRGx19YBM1hQ3uSGOQOg3QUVS9VMHIV8DBUl_bKfN92uQfg8b_Bqf4q9AT4ZNnvAk2yx5RlahDWi_qaH76qbECj04R6qrBJe9EgDJyxZB8xcMdT494TCMlCCyAV3rJ4KALDdBp7kSuQFlQHSLGY_Ti4K8y6TjWAE5jXpYRPUyq-27gymhhdrl9yktvb2LJluKgSjvDJ4tixMPYGOYTJWhqUTfWDfQncraGLd0vzJEev0GHb_aZ4mx67W_Ypz9pQ","expires_in":36000,"refresh_expires_in":1800,"refresh_token":"eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJhZDM2NmVmOS1kMTNmLTQyM2YtOTRhMS04OTI4M2YxN2JmNGUifQ.eyJleHAiOjE2NDQ0ODgxMDksImlhdCI6MTY0NDQ4NjMwOSwianRpIjoiMzdlNzM4OWUtMGYyNC00NTBkLTg2ZTUtYzYwZjNmOTlkN2E2IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL2F1dGgvcmVhbG1zL2RlbW8iLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvYXV0aC9yZWFsbXMvZGVtbyIsInN1YiI6IjczZDVmMDllLWU2NjctNGIwNi04MGQ3LTE5N2QzNTc0MjZkNCIsInR5cCI6IlJlZnJlc2giLCJhenAiOiJteV9jbGllbnQiLCJzZXNzaW9uX3N0YXRlIjoiYjA1NWExNGUtZjc3ZC00ZWRhLTgxMTUtYTZjY2ZkMWQ3NGEyIiwic2NvcGUiOiJwcm9maWxlIGVtYWlsIiwic2lkIjoiYjA1NWExNGUtZjc3ZC00ZWRhLTgxMTUtYTZjY2ZkMWQ3NGEyIn0.RLVYh5a4yUpYtRmpfF-TTMUkJMQK2wK28MFU1gsaYLU","token_type":"Bearer","not-before-policy":0,"session_state":"b055a14e-f77d-4eda-8115-a6ccfd1d74a2","scope":"profile email"}
@@ -209,7 +209,7 @@ curl -X POST "http://localhost:8080/auth/realms/demo/protocol/openid-connect/tok
 			1. https://jwt.io/ 사이트 접속
 			2. access_token 의 내용을 붙여넣기
 			-결과값
-			=================================================================================================================
+			================================================================================
 			{
 				  "exp": 1644522309,
 				  "iat": 1644486309,
@@ -256,7 +256,7 @@ curl -X POST "http://localhost:8080/auth/realms/demo/protocol/openid-connect/tok
 				}
 
 
-			=================================================================================================================
+			================================================================================
 
 
 

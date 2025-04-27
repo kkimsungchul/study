@@ -2,7 +2,7 @@
 
 https://hyun-sun.github.io/2021-05-02-swagger/
 https://github.com/springfox/springfox/issues/1450
-=================================================================================================================
+================================================================================
 package com.sungchul.stock.config.security;
 
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -25,10 +25,10 @@ public class CsrfRequireMatcher implements RequestMatcher {
         return true;
     }
 }
-=================================================================================================================
+================================================================================
 
 
-=================================================================================================================
+================================================================================
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -50,4 +50,4 @@ public class CsrfRequireMatcher implements RequestMatcher {
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
     }
 
-=================================================================================================================
+================================================================================
