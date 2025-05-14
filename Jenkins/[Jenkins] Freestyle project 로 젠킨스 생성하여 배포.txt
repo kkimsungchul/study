@@ -1,15 +1,9 @@
 # Jenkins - Freestyle project 로 배포하기
-
-
-
-
 	참고 URL : https://hwannny.tistory.com/89
-
 
 # 젠킨스 빌드
 	이전에 생성한 프로젝트에서 그대로 하였음
 	https://github.com/kkimsungchul/study/blob/master/Jenkins/%5BJenkins%5D%20Freestyld%20Project%20%EB%A1%9C%20%EC%A0%A0%ED%82%A8%EC%8A%A4%20%EC%83%9D%EC%84%B1.txt
-
 
 # 사전 작업
 	Tomcat 에서의 사전 작업이 필요함

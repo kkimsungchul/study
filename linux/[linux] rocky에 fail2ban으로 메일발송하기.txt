@@ -1,0 +1,195 @@
+# rokcy linux 에서 fail2ban으로 차단된 IP 메일 발송하기
+
+# 메일 전송 도구 설치
+
+	- 설치 
+	=====================================================================
+	dnf install msmtp -y
+	=====================================================================
+	
+	- 확인
+	=====================================================================
+	[root@localhost ~]# msmtp --version
+	msmtp version 1.8.10
+	Platform: x86_64-redhat-linux-gnu
+	TLS/SSL library: GnuTLS
+	Authentication library: GNU SASL; oauthbearer: built-in
+	Supported authentication methods:
+	plain scram-sha-1 external gssapi cram-md5 digest-md5 login ntlm oauthbearer
+	IDN support: enabled
+	NLS: enabled, LOCALEDIR is /usr/share/locale
+	Keyring support: Gnome
+	System configuration file name: /etc/msmtprc
+	User configuration file name: /root/.msmtprc
+
+	Copyright (C) 2020 Martin Lambers and others.
+	This is free software.  You may redistribute copies of it under the terms of
+	the GNU General Public License <http://www.gnu.org/licenses/gpl.html>.
+	There is NO WARRANTY, to the extent permitted by law.
+
+	=====================================================================
+
+# sendmail 명령어를 msmtp로 연결
+	Fail2ban과 mail 명령어가 내부적으로 sendmail을 쓰므로, 이를 msmtp로 연결
+	=====================================================================
+	ln -sf /usr/bin/msmtp /usr/sbin/sendmail
+	=====================================================================
+
+	가리키는 경로가 /usr/bin/msmtp여야 함
+	=====================================================================
+	[root@localhost ~]# which sendmail
+	/usr/sbin/sendmail
+	=====================================================================
+
+# Gmail SMTP 설정
+
+	1. Gmail 계정 로그인
+
+	2. 보안 설정 > 2단계 인증 설정
+
+	3. “앱 비밀번호” 생성 > 메일 / Linux 컴퓨터 선택
+
+	4. 생성된 비밀번호 저장해두기 (예: abcd efgh ijkl mnop)
+
+	
+# 설정 파일 작성
+	vi /etc/msmtprc
+	=====================================================================
+	defaults
+	auth           on
+	tls            on
+	tls_trust_file /etc/ssl/certs/ca-bundle.crt
+	logfile        /var/log/msmtp.log
+
+	account        gmail
+	host           smtp.gmail.com
+	port           587
+	from           kimsc1218@gmail.com
+	user           kimsc1218@gmail.com
+	password       앱_비밀번호_여기에_입력
+
+	account default : gmail
+	=====================================================================
+
+# 권한 설정
+
+	=====================================================================
+	chown root:mail /etc/msmtprc
+	chmod 640 /etc/msmtprc
+	=====================================================================
+
+
+# 메일 발송 테스트
+	
+	your_email@gmail.com < 본인메일로 변경
+	=====================================================================
+	echo "Fail2ban 메일 테스트입니다." | mail -s "Fail2ban 테스트" kimsc1218@gmail.com
+	=====================================================================
+
+# 로그 확인
+	=====================================================================
+	tail -f /var/log/msmtp.log
+	=====================================================================
+
+# Fail2ban 알림 설정
+
+	vi /etc/fail2ban/jail.local
+	=====================================================================
+	[sshd]
+	enabled  = true
+	port     = ssh
+	filter   = sshd
+	logpath  = /var/log/secure
+	maxretry = 5
+	bantime  = 600
+	action   = %(action_mwl)s
+	destemail = kimsc1218@gmail.com
+	sender = kimsc1218@gmail.com
+	mta = msmtp
+	=====================================================================
+
+	%(action_mwl)s는 로그 포함 , whois 결과 포함 , 메일 전송
+
+
+
+
+# Fail2ban 재시작
+	=====================================================================
+	systemctl restart fail2ban
+	=====================================================================
+
+# 오류 발생
+	=====================================================================
+	● fail2ban.service - Fail2Ban Service
+	   Loaded: loaded (/usr/lib/systemd/system/fail2ban.service; enabled; vendor preset: disabled)
+	   Active: failed (Result: exit-code) since Wed 2025-04-09 01:46:16 KST; 27s ago
+		 Docs: man:fail2ban(1)
+	  Process: 342115 ExecStop=/usr/bin/fail2ban-client stop (code=exited, status=0/SUCCESS)
+	  Process: 342127 ExecStart=/usr/bin/fail2ban-server -xf start (code=exited, status=255)
+	  Process: 342125 ExecStartPre=/bin/mkdir -p /run/fail2ban (code=exited, status=0/SUCCESS)
+	 Main PID: 342127 (code=exited, status=255)
+
+	 4월 09 01:46:16 localhost.localdomain systemd[1]: Starting Fail2Ban Service...
+	 4월 09 01:46:16 localhost.localdomain systemd[1]: Started Fail2Ban Service.
+	 4월 09 01:46:16 localhost.localdomain fail2ban-server[342127]: 2025-04-09 01:46:16,589 fail2ban.configreader   [342127]: ERROR   Found no accessible config files for 'action.d/msmtp-whois-lines' under /etc/fail2ban
+	 4월 09 01:46:16 localhost.localdomain fail2ban-server[342127]: 2025-04-09 01:46:16,589 fail2ban.jailreader     [342127]: ERROR   Unable to read action 'msmtp-whois-lines'
+	 4월 09 01:46:16 localhost.localdomain fail2ban-server[342127]: 2025-04-09 01:46:16,589 fail2ban.jailsreader    [342127]: ERROR   Errors in jail 'sshd'. Skipping...
+	 4월 09 01:46:16 localhost.localdomain fail2ban-server[342127]: 2025-04-09 01:46:16,593 fail2ban                [342127]: ERROR   Async configuration of server failed
+	 4월 09 01:46:16 localhost.localdomain systemd[1]: fail2ban.service: Main process exited, code=exited, status=255/n/a
+	 4월 09 01:46:16 localhost.localdomain systemd[1]: fail2ban.service: Failed with result 'exit-code'.
+	=====================================================================
+
+# 오류 해결
+	현재 문제는 fail2ban이 시작하지 못하는 이유는 
+	설정한 action = %(action_mwl)s 내부에서 사용하는 msmtp-whois-lines 액션 파일이 존재하지 않기 때문
+	=====================================================================
+	ERROR   Found no accessible config files for 'action.d/msmtp-whois-lines'
+	ERROR   Unable to read action 'msmtp-whois-lines'
+	=====================================================================
+	
+
+	- msmtp용 커스텀 액션 생성
+	vi /etc/fail2ban/action.d/msmtp.conf
+	dest에 보내고 싶은 이메일 주소를 작성
+	=====================================================================
+	[Definition]
+	actionstart =
+	actionstop =
+	actioncheck =
+	actionban = printf "To: <dest>\nFrom: <sender>\nSubject: [Fail2Ban] <name> banned <ip>\nContent-Type: text/plain; charset=UTF-8\n\n🚫 Fail2Ban 경고\n\n차단된 IP: <ip>\n차단 시간: `date '+%%Y-%%m-%%d %%H:%%M:%%S'`\n시도된 계정: <matches>\n\n>로그파일: <logpath>\nJail: <name>\n\n자세한 내용은 서버 로그를 참조하세요.\n" | /usr/bin/msmtp -t
+	actionunban =
+
+	[Init]
+	name = Fail2Ban
+	sender = kimsc1218@gmail.com
+	dest = kimsc1218@gmail.com
+	=====================================================================
+
+	- 옵션 설명
+	Subject: [Fail2Ban] <name> banned <ip>: 제목 포함
+	\n\nFail2Ban has banned IP: <ip>...: 본문 포함
+	msmtp -t: 헤더와 본문을 직접 구성할 때 필요
+	--debug: 메일 전송 확인용 로그 (문제 있으면 제거해도 됨)
+	
+	- 설정 변경
+	vi /etc/fail2ban/jail.local
+	=====================================================================
+	enabled = true
+	port = ssh
+	filter = sshd
+	logpath = /var/log/secure
+	maxretry = 5
+	bantime = 600
+	action = msmtp[name=sshd, dest=kimsc1218@gmail.com]
+	destemail = kimsc1218@gmail.com
+	sender = kimsc1218@gmail.com
+	mta = msmtp
+	=====================================================================
+
+
+
+# 테스트
+	- 아래 명령어를 치면 메일이 와있음	
+	=====================================================================
+	fail2ban-client set sshd banip 1.2.3.55
+	=====================================================================

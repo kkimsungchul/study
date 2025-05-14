@@ -1,0 +1,70 @@
+# Nginx - Nginx 와 SpringBoot 연결하기
+
+# nginx.conf 수정
+	경로 : /etc/nginx
+	파일명 : nginx.conf
+	=====================================================================
+	http {
+		log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+						  '$status $body_bytes_sent "$http_referer" '
+						  '"$http_user_agent" "$http_x_forwarded_for"';
+
+		access_log  /var/log/nginx/access.log  main;
+
+		sendfile            on;
+		tcp_nopush          on;
+		tcp_nodelay         on;
+		keepalive_timeout   65;
+		types_hash_max_size 2048;
+
+		include             /etc/nginx/mime.types;
+		default_type        application/octet-stream;
+
+		# Load modular configuration files from the /etc/nginx/conf.d directory.
+		# See http://nginx.org/en/docs/ngx_core_module.html#include
+		# for more information.
+		include /etc/nginx/conf.d/*.conf;
+
+		server {
+			listen       80 default_server;
+			listen       [::]:80 default_server;
+			server_name  _;
+			root         /usr/share/nginx/html;
+
+			# Load configuration files for the default server block.
+			include /etc/nginx/default.d/*.conf;
+
+			location / {
+					proxy_pass http://localhost:8080; # Spring Boot가 동작 중인 포트
+					proxy_http_version 1.1;
+					proxy_set_header Host $host;
+					proxy_set_header X-Real-IP $remote_addr; # 클라이언트 IP 전달
+					proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+					proxy_set_header X-Forwarded-Proto $scheme;
+			}
+
+			error_page 404 /404.html;
+				location = /40x.html {
+			}
+
+			error_page 500 502 503 504 /50x.html;
+				location = /50x.html {
+			}
+		}
+
+
+	=====================================================================
+
+# SELinux 정책 수정 
+	그냥 하면 아래와 같이 오류가 나옴
+	=====================================================================
+	2025/04/27 21:08:25 [crit] 441319#0: *5 connect() to [::1]:8080 failed (13: Permission denied) while connecting to upstream, 
+	client: 192.168.55.184, server: _, request: "GET / HTTP/1.1", upstream: "http://[::1]:8080/", host: "192.168.55.125"
+	=====================================================================
+	
+	아래의 명령어로 SELinux 설정
+	=====================================================================
+	[root@localhost nginx]# setsebool -P httpd_can_network_connect 1
+	=====================================================================
+
+

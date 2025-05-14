@@ -133,8 +133,6 @@ add를 하게되면 본인 하위에 본인이 또 추가되서 두개씩 출력
 		NewJenkinsParamVO , 젠킨스에서 전달해준 값을을 화면으로 보내는데 사용하는 VO
 		Jenkins 에서 보내준 값을 파싱하여서 저장하도록 작성함
 		====================================================================================================
-		package com.kt.dspace.portal.project.jenkins.test;
-
 		import java.util.ArrayList;
 
 		import org.json.JSONArray;

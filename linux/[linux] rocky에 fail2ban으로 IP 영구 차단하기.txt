@@ -1,0 +1,133 @@
+# rokcy linux에서 fail2ban으로 IP 영구 차단하기
+
+
+
+# 사유
+	개인 서버 만들었더니 공격이 너무 많이들어옴
+	fail2ban으로 10분간 차단정책 만들고 했지만 계속들어옴
+	그래서 영구적으로 차단할 생각임
+
+# 목표
+	일반적인 공격은 Fail2Ban으로 처리 (maxretry=5, bantime=600)
+	100회 이상 실패한 IP는 firewalld로 완전 차단 (--permanent)
+
+# 커스텀 액션 파일 작성 
+	vi /etc/fail2ban/action.d/firewalld-ban.conf
+	=====================================================================
+	[Definition]
+	actionstart =
+	actionstop =
+	actioncheck =
+	actionban = firewall-cmd --permanent --add-rich-rule='rule family="ipv4" source address="<ip>" reject' && firewall-cmd --reload
+	actionunban = firewall-cmd --permanent --remove-rich-rule='rule family="ipv4" source address="<ip>" reject' && firewall-cmd --reload
+
+	[Init]
+	=====================================================================
+
+# 적용 확인
+
+	=====================================================================
+	[root@localhost ~]# fail2ban-client status sshd-strong
+	Status for the jail: sshd-strong
+	|- Filter
+	|  |- Currently failed: 0
+	|  |- Total failed:     0
+	|  `- File list:        /var/log/secure
+	`- Actions
+	   |- Currently banned: 0
+	   |- Total banned:     0
+	   `- Banned IP list:
+	=====================================================================
+
+# 이메일 발송 설정
+	vi /etc/fail2ban/action.d/firewalld-ban-mail.conf
+	=====================================================================
+	[Definition]
+	actionstart =
+	actionstop =
+	actioncheck =
+
+	# IP 차단 + 예쁜 메일 발송
+	actionban = printf "To: <dest>\nFrom: <sender>\nSubject: [Fail2Ban] <name> banned <ip>\nContent-Type: text/plain; charset=UTF-8\n\n🚫 Fail2Ban 경고\n\n차단된 IP: <ip>\n차단 시간: `date '+%%Y-%%m-%%d %%H:%%M:%%S'`\n\n> 로그파일: <logpath>\nJail: <name>\n\n자세한 내용은 서버 로그를 참조하세요.\n" | /usr/bin/msmtp -t && firewall-cmd --permanent --add-rich-rule='rule family="ipv4" source address="<ip>" reject' && firewall-cmd --reload
+
+	actionunban = firewall-cmd --permanent --remove-rich-rule='rule family="ipv4" source address="<ip>" reject' && firewall-cmd --reload
+
+	[Init]
+	name = Fail2Ban
+	sender = kimsc1218@gmail.com
+	dest = kimsc1218@gmail.com
+
+	=====================================================================
+
+
+# 메일 발송을 위한 jail 설정 추가
+	vi /etc/fail2ban/jail.d/sshd-strong.conf
+	=====================================================================
+	[sshd-strong]
+	enabled = true
+	filter = sshd
+	logpath = /var/log/secure
+	maxretry = 100
+	findtime = 3600
+	bantime = -1
+	action = firewalld-ban-mail[name=sshd-strong, sender=kimsc1218@gmail.com, destemail=kimsc1218@gmail.com]
+	=====================================================================
+
+# fail2ban 재시작
+	=====================================================================
+	systemctl restart fail2ban
+	=====================================================================
+
+# 100회 테스트 해보기
+	=====================================================================
+	for i in {1..110}; do
+	  echo "Apr  9 02:53:5$i localhost sshd[12345]: Failed password for root from 123.253.91.15 port 55556 ssh2" >> /var/log/secure
+	done
+	=====================================================================
+
+# 차단 확인
+	=====================================================================
+	[root@localhost ~]# fail2ban-client status sshd-strong
+	Status for the jail: sshd-strong
+	|- Filter
+	|  |- Currently failed: 2
+	|  |- Total failed:     18
+	|  `- File list:        /var/log/secure
+	`- Actions
+	   |- Currently banned: 0
+	   |- Total banned:     0
+	   `- Banned IP list:
+	=====================================================================
+
+	=====================================================================
+	firewall-cmd --list-all
+	=====================================================================
+
+
+
+# fail2ban에서 여러개의 ssh등록하면 안됨
+	다했는데, 안되서 그냥 비활성화함
+	vi /etc/fail2ban/jail.d/sshd-strong.conf
+	=====================================================================
+	enabled = false
+	=====================================================================
+
+
+---
+# sshd jail 설정에서 조건 추가
+
+	- 기본적으로 jail.conf 파일내에 sshd-strong 이라는 jail은 없음
+	- 커스텀 jail이며, 해당 내용으로 차단할것임
+
+	vi /etc/fail2ban/jail.conf
+	=====================================================================
+	[sshd-strong]
+	enabled = true
+	filter = sshd
+	logpath = /var/log/secure
+	maxretry = 100
+	bantime = -1         ; 영구 차단
+	findtime = 3600      ; 1시간 이내
+	action = firewalld-ban[name=sshd-strong]
+	=====================================================================
+
