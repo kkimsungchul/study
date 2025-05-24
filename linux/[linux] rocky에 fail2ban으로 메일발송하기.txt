@@ -193,3 +193,75 @@
 	=====================================================================
 	fail2ban-client set sshd banip 1.2.3.55
 	=====================================================================
+
+
+# 메일 발송 오류
+	- 아래처럼 접속 실패한 로그들이 쭉 있는데 어느날 갑자기 메일발송이 안오고 있었음
+	=====================================================================
+	[root@localhost image]# last -f /var/log/btmp |tac
+	btmp begins Tue May 13 19:04:39 2025
+	a        ssh:notty    211.212.209.205  Tue May 13 19:04 - 19:04  (00:00)
+	a        ssh:notty    211.212.209.205  Tue May 13 19:04 - 19:04  (00:00)
+	ubnt     ssh:notty    211.212.209.205  Tue May 13 19:04 - 19:04  (00:00)
+	ubnt     ssh:notty    211.212.209.205  Tue May 13 19:04 - 19:04  (00:00)
+	root     ssh:notty    211.212.209.205  Tue May 13 19:04 - 19:04  (00:00)
+	=====================================================================
+
+	
+	- fail2ban.log 로그를 확인해보니 메일발송에서 오류가 나고있었음
+	=====================================================================
+	vi /var/log/fail2ban.log
+	2025-05-15 01:51:28,247 fail2ban.actions        [342752]: NOTICE  [sshd] Ban 1.2.3.55
+	2025-05-15 01:51:30,054 fail2ban.utils          [342752]: ERROR   558700378660 -- exec: printf "To: kimsc1218@gmail.com\nFrom: kimsc1218@gmail.com\nSubject: [Fail2Ban] sshd banned 1.2.3.55\nContent-Type: text/plain; charset=UTF-8\n\n🚫 Fail2Ban 경고\n\n차단된 IP: 1.2.3.55\n차단 시간: `date '+%Y-%m-%d %H:%M:%S'`\n시도된 계정: \n\n로그파일: /var/log/secure\nJail: sshd\n\n자세한 내용은 서버 로그를 참조하세요.\n" | /usr/bin/msmtp -t
+	2025-05-15 01:51:30,054 fail2ban.utils          [342752]: ERROR   558700378660 -- stderr: 'msmtp: authentication failed (method PLAIN)'
+	2025-05-15 01:51:30,054 fail2ban.utils          [342752]: ERROR   558700378660 -- stderr: 'msmtp: server message: 535-5.7.8 Username and Password not accepted. For more information, go to'
+	2025-05-15 01:51:30,054 fail2ban.utils          [342752]: ERROR   558700378660 -- stderr: 'msmtp: server message: 535 5.7.8  https://support.google.com/mail/?p=BadCredentials d9443c01a7336-22fc7540056sm102488325ad.23 - gsmtp'
+	2025-05-15 01:51:30,055 fail2ban.utils          [342752]: ERROR   558700378660 -- stderr: 'msmtp: could not send mail (account default from /etc/msmtprc)'
+	2025-05-15 01:51:30,055 fail2ban.utils          [342752]: ERROR   558700378660 -- returned 77
+	2025-05-15 01:51:31,473 fail2ban.utils          [342752]: ERROR   55870037bb30 -- exec: printf "To: kimsc1218@gmail.com\nFrom: kimsc1218@gmail.com\nSubject: [Fail2Ban] sshd banned 1.2.3.55\nContent-Type: text/plain; charset=UTF-8\n\n🚫 Fail2Ban 경고\n\n차단된 IP: 1.2.3.55\n차단 시간: `date '+%Y-%m-%d %H:%M:%S'`\n시도된 계정: \n\n로그파일: /var/log/secure\nJail: sshd\n\n자세한 내용은 서버 로그를 참조하세요.\n" | /usr/bin/msmtp -t
+	2025-05-15 01:51:31,473 fail2ban.utils          [342752]: ERROR   55870037bb30 -- stderr: 'msmtp: authentication failed (method PLAIN)'
+	2025-05-15 01:51:31,473 fail2ban.utils          [342752]: ERROR   55870037bb30 -- stderr: 'msmtp: server message: 535-5.7.8 Username and Password not accepted. For more information, go to'
+	2025-05-15 01:51:31,473 fail2ban.utils          [342752]: ERROR   55870037bb30 -- stderr: 'msmtp: server message: 535 5.7.8  https://support.google.com/mail/?p=BadCredentials d9443c01a7336-22fc7b29cf4sm101779435ad.104 - gsmtp'
+	2025-05-15 01:51:31,473 fail2ban.utils          [342752]: ERROR   55870037bb30 -- stderr: 'msmtp: could not send mail (account default from /etc/msmtprc)'
+	2025-05-15 01:51:31,473 fail2ban.utils          [342752]: ERROR   55870037bb30 -- returned 77
+	2025-05-15 01:51:31,473 fail2ban.actions        [342752]: ERROR   Failed to execute ban jail 'sshd' action 'msmtp' info 'ActionInfo({'ip': '1.2.3.55', 'family': 'inet4', 'fid': <function Actions.ActionInfo.<lambda> at 0x7f70686b8e18>, 'matches': '', 'raw-ticket': <function Actions.ActionInfo.<lambda> at 0x7f70686b9510>})': Error banning 1.2.3.55
+	[root@localhost image]#
+	[root@localhost image]# vi /var/log/fail2ban.log
+	[root@localhost image]# tail -f  /var/log/fail2ban.log
+	2025-05-15 01:51:30,054 fail2ban.utils          [342752]: ERROR   558700378660 -- stderr: 'msmtp: server message: 535 5.7.8  https://support.google.com/mail/?p=BadCredentials d9443c01a7336-22fc7540056sm102488325ad.23 - gsmtp'
+	2025-05-15 01:51:30,055 fail2ban.utils          [342752]: ERROR   558700378660 -- stderr: 'msmtp: could not send mail (account default from /etc/msmtprc)'
+	2025-05-15 01:51:30,055 fail2ban.utils          [342752]: ERROR   558700378660 -- returned 77
+	2025-05-15 01:51:31,473 fail2ban.utils          [342752]: ERROR   55870037bb30 -- exec: printf "To: kimsc1218@gmail.com\nFrom: kimsc1218@gmail.com\nSubject: [Fail2Ban] sshd banned 1.2.3.55\nContent-Type: text/plain; charset=UTF-8\n\n🚫 Fail2Ban 경고\n\n차단된 IP: 1.2.3.55\n차단 시간: `date '+%Y-%m-%d %H:%M:%S'`\n시도된 계정: \n\n로그파일: /var/log/secure\nJail: sshd\n\n자세한 내용은 서버 로그를 참조하세요.\n" | /usr/bin/msmtp -t
+	2025-05-15 01:51:31,473 fail2ban.utils          [342752]: ERROR   55870037bb30 -- stderr: 'msmtp: authentication failed (method PLAIN)'
+	2025-05-15 01:51:31,473 fail2ban.utils          [342752]: ERROR   55870037bb30 -- stderr: 'msmtp: server message: 535-5.7.8 Username and Password not accepted. For more information, go to'
+	2025-05-15 01:51:31,473 fail2ban.utils          [342752]: ERROR   55870037bb30 -- stderr: 'msmtp: server message: 535 5.7.8  https://support.google.com/mail/?p=BadCredentials d9443c01a7336-22fc7b29cf4sm101779435ad.104 - gsmtp'
+	2025-05-15 01:51:31,473 fail2ban.utils          [342752]: ERROR   55870037bb30 -- stderr: 'msmtp: could not send mail (account default from /etc/msmtprc)'
+	2025-05-15 01:51:31,473 fail2ban.utils          [342752]: ERROR   55870037bb30 -- returned 77
+	2025-05-15 01:51:31,473 fail2ban.actions        [342752]: ERROR   Failed to execute ban jail 'sshd' action 'msmtp' info 'ActionInfo({'ip': '1.2.3.55', 'family': 'inet4', 'fid': <function Actions.ActionInfo.<lambda> at 0x7f70686b8e18>, 'matches': '', 'raw-ticket': <function Actions.ActionInfo.<lambda> at 0x7f70686b9510>})': Error banning 1.2.3.55
+	=====================================================================
+
+
+	- 오류가 발생했던 이유는 내가 google 2차인증을 껏다가, 다시키면서 앱 비밀번호가 날라갔음
+	그래서 재발급 한뒤에 아래 경로에 다시 password 를 넣어줌
+	=====================================================================
+	[root@localhost fail2ban]# vi /etc/msmtprc
+	defaults
+	auth           on
+	tls            on
+	tls_trust_file /etc/ssl/certs/ca-bundle.crt
+	logfile        /var/log/msmtp.log
+
+	account        gmail
+	host           smtp.gmail.com
+	port           587
+	from           kimsc1218@gmail.com
+	user           kimsc1218@gmail.com
+	password       abcd eeee ffff zzzz
+
+	account default : gmail
+	=====================================================================
+
+	- 그리고 서비스 재시작
+	=====================================================================
+	systemctl restart fail2ban
+	=====================================================================
