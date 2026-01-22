@@ -99,6 +99,15 @@
 	./bin/data-prepper config/pipelines.yaml config/data-prepper-config.yaml
 	=====================================================================
 
+# 실행 파일 생성
+	
+	=====================================================================
+	vi 
+	
+	#!/bin/bash
+	nohup ./bin/data-prepper config/pipelines.yaml config/data-prepper-config.yaml
+	=====================================================================
+
 # 방화벽 오픈
 	=====================================================================
 	firewall-cmd --add-port=21890/tcp --permanent
@@ -112,3 +121,76 @@
 	=====================================================================
 
 
+
+# 데이터 전처리 로직 추가
+	필요없는 필드들을 삭제해서, 데이터를 경량화 할 목적으로 함
+	delete_entries 에서 삭제할 키들을 정의해서 사용하면되는데
+	@ 가 들어간 키값들은 삭제가 안되고 있음
+
+	- pipelines.yaml 경로
+	=====================================================================
+	cd /home/dataprepper/opensearch-data-prepper-jdk-2.13.0-linux-x64/config
+	vi pipelines.yaml
+	=====================================================================
+
+	- pipelines.yaml 수정
+	=====================================================================
+	body-only-pipeline:
+	  source:
+		otel_logs_source:
+		  ssl: false
+		  port: 21890
+
+	  processor:
+		# body → message
+		- rename_keys:
+			entries:
+			  - from_key: body
+				to_key: message
+
+		# message에 traceId 추가 (문자열 결합)
+		- add_entries:
+			entries:
+			  - key: message
+				value: "[traceId=${traceId}] ${message}"
+
+		# ❗ 남길 것 제외하고 전부 명시적으로 삭제
+		- delete_entries:
+			with_keys:
+			  - spanId
+			  - severityText
+			  - severityNumber
+			  - flags
+			  - time
+			  - observedTimestamp
+			  - schemaUrl
+			  - droppedAttributesCount
+			  - serviceName
+			  - instrumentationScope.name
+			  - resource.attributes.telemetry@sdk@language
+			  - resource.attributes.host@name
+			  - resource.attributes.process@pid
+			  - resource.attributes.host@arch
+			  - resource.attributes.process@runtime@description
+			  - resource.attributes.process@executable@path
+			  - resource.attributes.service@instance@id
+			  - resource.attributes.telemetry@sdk@version
+			  - resource.attributes.service@name
+			  - resource.attributes.process@command_line
+			  - resource.attributes.process@runtime@version
+			  - resource.attributes.service@code
+			  - resource.attributes.service@version
+			  - resource.attributes.telemetry@sdk@name
+			  - resource.attributes.process@runtime@name
+			  - resource.attributes.telemetry@distro@name
+			  - resource.attributes.os@type
+			  - resource.attributes.os@description
+			  - resource.attributes.telemetry@distro@version
+
+	  sink:
+		- file:
+			path: /home/dataprepper/log/lamp-logs.json
+			append: true
+
+
+	=====================================================================
