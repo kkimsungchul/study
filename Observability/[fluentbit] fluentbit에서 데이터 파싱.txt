@@ -1,0 +1,319 @@
+# Fluent Bit에서 데이터 변환/파싱하기
+
+
+# 데이터 파싱
+	파싱 가이드 문서 : https://docs.fluentbit.io/manual/data-pipeline/filters/parser
+	태그 가이드 문서 : https://docs.fluentbit.io/manual/data-pipeline/filters/rewrite-tag
+
+	내가 보내는 데이터는 body안에 문자열 타입으로 묶여 있는 json 데이터임
+	=====================================================================
+	"body": "{"stringValue": { "key" : "value"}}"
+	=====================================================================
+	
+	- 아래 설정파일 제일 마지막에 추가
+		name : 정의한 파서의 이름
+		Format : 파서에서 사용할 포맷
+		decode_field_as : utf8 로변경 -> 이 옵션은 없어도 잘됨
+
+	vi /etc/fluent-bit/parsers.conf
+	=====================================================================
+	[PARSER]
+		Name        json_log
+		Format      json
+		decode_field_as: escaped_utf8 log
+	=====================================================================
+
+
+
+	- 위에 작성한 파서를 필터에 추가
+		name : Fluent Bit에 들어온 record의 특정 필드 값을 정해진 파서(JSON, regex 등)로 다시 해석하는 필터
+		Match : 모든 데이터에 대해 이 필터 적용
+		Key_Name : 각 로그 레코드에서 여기에 정의한 필드를 찾아서 안에 들어있는 값을 대상으로 파싱함
+			내가 보낸 데이터에서는 모든 데이터의 key는 log임
+		Parser : parsers.conf 에 정의한 이름을 넣음
+		Reserve_Data : 
+			On일 때
+				파싱 성공 시:
+					JSON으로 풀린 필드들이 최상위로 추가
+					기존 log 필드는 유지
+				파싱 실패 시:
+					아무 변화 없음
+			Off일 때
+				파싱 성공 시:
+					log 필드는 제거
+					파싱된 필드만 남음
+			Reserve_Data Off는 “파싱이 성공한 경우에만” 원본을 버림
+
+	/etc/fluent-bit/fluent-bit.conf
+	=====================================================================
+	[FILTER]
+		Name              parser
+		Match             *
+		Key_Name          log
+		Parser            json_log
+		Reserve_Data      On
+	=====================================================================
+
+	- Reserve_Data 에 대해서
+		이게 진짜 헷갈렸음 off 하면 나는 파싱이 안된 데이터를 버린다고 생각했는데 그게 아님
+			- 파싱 실패 로그는 버려진다	X 아님 안버려짐
+			- Reserve_Data Off = drop	X 아님 
+			- 데이터 유실 가능 X 없음		
+			- 필드 유지/제거 정책만 바뀜
+
+	- 작동 순서
+	=====================================================================
+		입력 레코드
+		└─ log 필드 존재?
+			├─ JSON 형식인가?
+			│    ├─ YES → json_log 파서 적용
+			│    │         ├─ 필드 구조화
+			│    │         └─ log 유지 (Reserve_Data On)
+			│    └─ NO  → 아무 것도 안 함 (원본 유지)
+	=====================================================================
+
+	- 예시
+	=====================================================================
+	아래 두개 데이터가 fluent-bit로 들어옴
+		{"log":"{\"timestamp\":\"2026-01-25\",\"msg\":\"ok\"}"}
+		{"log":"### LampController start"}
+	파싱 하게되면 아래처럼 남게됨
+		{"timestamp":"2026-01-25","msg":"ok"}
+		{"log":"### LampController start"}
+	=====================================================================
+
+
+# 로그 데이터 파싱 설정 후 수집 데이터
+	=====================================================================
+	v1_logs: [1769275011.1090294645, {"log":"### LampController start"}]
+	v1_logs: [1769275011.1095956545, {"timestamp":"2026-01-25 02:16:51.232","service":"OG077201","operation":"LampController Logic","bizTransactionId":null,"transactionId":"a4a9960a-e8df-46e1-8426-934ff2c4063b","logType":"IN_RES","payload":null,"caller":null,"host":{"name":"sung-PC","ip":"169.254.83.107"},"response":{"type":"I","code":"SUCCESS","duration":"303"},"user":{"id":"82284884","ip":"169.254.83.107","type":"LAMP_MANAGER"},"device":null,"security":{"type":"ACCESS","event":"LOGIN","target":"82284884","reason":"\uc798\ub418\ub098 \ud14c\uc2a4\ud2b8 \ud574\ubcf4\uc790","detail":"{\"id\":\"82284884\",\"ip\":\"10.225.164.84\",\"type\":\"LAMP_MANAGER\"}"},"destination":null}]
+	v1_logs: [1769275011.1101638345, {"log":"### LampController end"}]
+	v1_logs: [1769275011.1099672445, {"timestamp":"2026-01-25 02:16:51.239","service":"OG077201","operation":"LampBusinessService Logic","bizTransactionId":null,"transactionId":"7ba9627b-bd89-4f62-9048-76e501107681","logType":"IN_RES","payload":null,"caller":null,"host":{"name":"sung-PC","ip":"169.254.83.107"},"response":{"type":"I","code":"SUCCESS","duration":"303"},"user":{"id":"82284884","ip":"169.254.83.107","type":"LAMP_MANAGER"},"device":null,"security":{"type":"ACCESS","event":"LOGIN","target":"82284884","reason":"\uc798\ub418\ub098 \ud14c\uc2a4\ud2b8 \ud574\ubcf4\uc790","detail":"{\"id\":\"82284884\",\"ip\":\"10.225.164.84\",\"type\":\"LAMP_MANAGER\"}"},"destination":null}]
+	=====================================================================
+
+# 규격에 맞는 로그만 분리하기
+	규격에 맞지 않는 로그를 버릴려면 parser가 아니라 grep / lua / rewrite_tag 같은 필터를 써야함
+	시원하게 다 버리면 좋지만 운영환경에서는 규격에 맞지 않는 로그도 확인해야 할 필요가 있으니
+	분리하는 작업을 진행 하려고함
+	다만 아래처럼 이렇게 두개로 분리는 안되고
+		- 규격 맞는 로그
+		- 규격 안맞는 로그
+	하나만 분리가 됨
+		- 규격 맞는 로그
+		- 모든 로그
+	
+	내가 잘 몰라서 그런건지 암만해도 안됨
+
+# 파서 / 필터 수정
+	필터 가이드 : https://docs.fluentbit.io/manual/data-pipeline/filters
+
+	vi /etc/fluent-bit/parsers.conf
+	- 애는 일단 기존 꺼 그대로 씀
+	=====================================================================
+	[PARSER]
+		Name        json_log
+		Format      json
+		decode_field_as: escaped_utf8 log
+	=====================================================================
+
+	vi /etc/fluent-bit/fluent-bit.conf
+	- input에 Tag를 추가(안해도 상관없음), 다만 태그를 추가해주면 Match에서 사용할 수 있음
+	- OUTPUT 추가
+	- FILTER에 rewrite_tag 추가
+	=====================================================================
+	[SERVICE]
+		Flush         1
+		Log_Level     info
+		Daemon        off
+		Parsers_File  parsers.conf
+
+	[INPUT]
+		Name          opentelemetry
+		Listen        0.0.0.0
+		Port          4318
+		Tag    otel.log
+
+	[OUTPUT]
+		Name          file
+		Match         *
+		Path          /home/sungchul/fluent-bit-log
+		File          otel-logs.log
+
+	[OUTPUT]
+		Name  file
+		Match parsed.log
+		Path  /home/sungchul/fluent-bit-log/
+		File  parsing.log
+
+
+	#[FILTER]
+	#    Name              parser
+	#    Match             *
+	#    Key_Name          log
+	#    Parser            json_log
+	#    Reserve_Data      Off
+	[FILTER]
+		Name          parser
+		Match         *
+		Key_Name      log
+		Parser        json_log
+		Reserve_Data  On
+
+	[FILTER]
+		Name   rewrite_tag
+		Match  *
+		Rule   $timestamp ^.+$ parsed.log true
+	=====================================================================
+
+	- 결과
+	=====================================================================
+	[sungchul@localhost fluent-bit-log]$ ll
+	합계 64
+	-rw-r--r--. 1 root root 41879  1월 25 04:47 otel-logs.log
+	-rw-r--r--. 1 root root 17946  1월 25 04:47 parsing.log
+	=====================================================================
+
+
+# non-ASCII 데이터 문제
+	한글데이터의 경우에는 아래와 같이 이스케이프되서 처리가 됨
+	이거는 뭐 옵션 줘도 안되는데, 카프카로 보내면 정상적으로 보인다고 하니 이것도 테스트를 해봐야함
+	=====================================================================
+	"operation":"\ub85c\uadf8\uc778"
+	"reason\":\"\uc798\ub418\ub098 \ud14c\uc2a4\ud2b8 .....
+	=====================================================================
+
+# 카프카로 내보내기 -> 아직 안해봄
+	가이드 문서 : https://docs.fluentbit.io/manual/data-pipeline/outputs/kafka
+	
+
+	- fluent bit 에서 출력한 데이터
+	=====================================================================
+	v1_logs: [1769275011.1095956545, {"timestamp":"2026-01-25 02:16:51.232","service":"OG077201","operation":"LampController Logic","bizTransactionId":null,"transactionId":"a4a9960a-e8df-46e1-8426-934ff2c4063b","logType":"IN_RES","payload":null,"caller":null,"host":{"name":"sung-PC","ip":"169.254.83.107"},"response":{"type":"I","code":"SUCCESS","duration":"303"},"user":{"id":"82284884","ip":"169.254.83.107","type":"LAMP_MANAGER"},"device":null,"security":{"type":"ACCESS","event":"LOGIN","target":"82284884","reason":"\uc798\ub418\ub098 \ud14c\uc2a4\ud2b8 \ud574\ubcf4\uc790","detail":"{\"id\":\"82284884\",\"ip\":\"10.225.164.84\",\"type\":\"LAMP_MANAGER\"}"},"destination":null}]
+	=====================================================================
+	
+	위 데이터에는 태그와 시간이 붙어있음
+	=====================================================================
+	v1_logs: [1769275011.1095956545, 
+	=====================================================================
+
+	이건 Fluent Bit 내부 레코드 포맷이라서 카프카로 보낼떄는 안에 있는 데이터만 보냄
+	=====================================================================
+	{"timestamp":"2026-01-25 0...} 
+	=====================================================================
+
+	실제로 카프카에선 아래처럼 찍힌다고 함
+	=====================================================================
+	{
+	  "timestamp":"2026-01-25 04:47:21.924",
+	  "service":"OG077201",
+	  "operation":"로그인",
+	  "security":{
+		"reason":"잘되나 테스트 해보자"
+	  }
+	}
+	=====================================================================
+
+
+# traceId , spanId 추가하기
+	traceId ,spanId 이 두개를 사용해야 옵저버빌리티가 가능함
+	오픈텔레메트리를 사용하니 당연히 로그에 기록되어 있고 이 데이터를 기존 json에 추가하려고함
+	근데 이거는 처음부터 안됌
+	=====================================================================
+	traceId / spanId는 이미 OTLP 로그에 존재하지만,
+	Fluent Bit opentelemetry input이 기본 설정으로는 그걸 record로 풀어주지 않는다.	
+	=====================================================================
+	
+	아무옵션도 안주고 그냥 오픈텔레메트리 콜렉터에서 받는 데이터를 풀어보면 아래처럼 되어 있음
+	이미 트레이스,스팬 아이디는 존재하지도 않음
+	=====================================================================
+	v1_logs: [1769285802.18446744073245948222, {"log":"{\"timestamp\":\"2026-01-25 05:16:42.929\",\"service\":
+	=====================================================================
+
+	이거는 콜렉터쪽에서 log attribute 로 추가해야한다함
+
+
+
+#  로그 여러개로 분리 - 이거 안됌
+	될거같은데 안됌 내가 뭘 잘못하고 있는거 같음
+	공식문서에는 되는거처럼 써있는데.. 파일로 분리하는건 안됌
+	=====================================================================
+	[INPUT]
+	  └─ 로그 수신
+
+	[FILTER parser]
+	  └─ log 필드 JSON 파싱 시도
+
+	[FILTER rewrite_tag]
+	  ├─ 파싱 성공 → tag: parsed.log
+	  └─ 파싱 실패 → tag: unparsed.log
+
+	[OUTPUT]
+	  ├─ parsed.log   → parsing.log
+	  └─ unparsed.log → no-parsing.log
+
+	=====================================================================
+
+
+
+# 최종 설정 파일
+	
+	- fluent-bit.conf
+	=====================================================================
+	[SERVICE]
+		Flush         1
+		Log_Level     info
+		Daemon        off
+		Parsers_File  parsers.conf
+
+	[INPUT]
+		Name          opentelemetry
+		Listen        0.0.0.0
+		Port          4318
+		Tag    otel.log
+
+	[OUTPUT]
+		Name          file
+		Match         *
+		Path          /home/sungchul/fluent-bit-log
+		File          otel-logs.log
+
+	[OUTPUT]
+		Name  file
+		Match parsed.log
+		Path  /home/sungchul/fluent-bit-log/
+		File  parsing.log
+
+	#[FILTER]
+	#    Name              parser
+	#    Match             *
+	#    Key_Name          log
+	#    Parser            json_log
+	#    Reserve_Data      Off
+	[FILTER]
+		Name          parser
+		Match         *
+		Key_Name      log
+		Parser        json_log
+		Reserve_Data  On
+
+	[FILTER]
+		Name   rewrite_tag
+		Match  *
+		Rule   $timestamp ^.+$ parsed.log true
+
+
+	=====================================================================
+
+	- parsers.conf
+	=====================================================================
+	[PARSER]
+		Name        json_log
+		Format      json
+		#decode_field_as: escaped_utf8 log
+
+	=====================================================================
+
+
+systemctl status fluent-bit
+systemctl start fluent-bit
+systemctl stop fluent-bit

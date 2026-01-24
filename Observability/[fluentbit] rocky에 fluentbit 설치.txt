@@ -1,0 +1,306 @@
+# rocky linux에 Fluent Bit 설치
+
+# 사용 이유
+	오픈텔레메트리 수집로그 -> 미정 -> 카프카 -> 아파치 스톰
+	위 순서대로 데이터를 보내서 처리하려고함
+	다만 오픈텔레메트리 로그규격에서 원하는 데이터를 찾으려면 4뎁스까지 내려가야함
+	이걸 아파치 스톰에서 처리하기에는 너무 부하가 커서 전처리 단계를 추가하기 위함
+	dataprepper 은 테스트 완료하였으나, 속도측면에서 Fluent Bit가 더 좋다고 하여 테스트 하기위해 설치함
+
+# 공식 가이드
+	https://docs.fluentbit.io/manual
+
+# 설치 가이드
+	https://docs.fluentbit.io/manual/installation/downloads/linux/alma-rocky
+
+
+
+
+
+# 저장소 추가
+	※ root로 실행
+
+	- 저장소 추가
+	=====================================================================
+	cd /etc/yum.repos.d
+	vi fluent-bit.repo
+	=====================================================================
+
+	- 추가 할 내용
+	=====================================================================
+	[fluent-bit]
+	name=Fluent Bit
+	baseurl=https://packages.fluentbit.io/almalinux/$releasever/
+	gpgcheck=1
+	gpgkey=https://packages.fluentbit.io/fluentbit.key
+	repo_gpgcheck=1
+	enabled=1
+	=====================================================================
+
+
+# 설치
+	yum install fluent-bit
+	※ 어떤 종속성이 설치되나 보려고 전체 전문을 넣어놨음
+	※ 명령어로도 볼 수 있지만 일단은 하단 내용만 기재함
+	=====================================================================
+	[root@localhost yum.repos.d]# yum install fluent-bit
+	Fluent Bit                                      435  B/s | 866  B     00:01
+	Fluent Bit                                      3.6 kB/s | 3.1 kB     00:00
+	GPG키 0x3888C1CD 가져오는 중:
+	사용자 ID : "Fluentbit releases (Releases signing key) <releases@fluentbit.io>"
+	지문: C3C0 A285 34B9 293E AF51 FABD 9F9D DC08 3888 C1CD
+	출처 : https://packages.fluentbit.io/fluentbit.key
+	진행할까요? [y/N]: y
+	Fluent Bit                                      8.9 kB/s |  26 kB     00:02
+	마지막 메타자료 만료확인(0:00:01 이전): 2026년 01월 25일 (일) 오전 01시 34분 00초.
+	종속성이 해결되었습니다.
+	================================================================================
+	 꾸러미            구조          버전                   저장소             크기
+	================================================================================
+	설치 중:
+	 fluent-bit        x86_64        4.2.2-1                fluent-bit        8.9 M
+	종속 꾸러미 설치 중:
+	 libpq             x86_64        13.23-1.el8_10         appstream         199 k
+
+	연결 요약
+	================================================================================
+	설치  2 꾸러미
+
+	전체 내려받기 크기: 9.1 M
+	설치된 크기 : 27 M
+	진행할까요? [y/N]: y
+	꾸러미 내려받기 중:
+	(1/2): libpq-13.23-1.el8_10.x86_64.rpm          1.0 MB/s | 199 kB     00:00
+	(2/2): fluent-bit-4.2.2-1.x86_64.rpm            1.9 MB/s | 8.9 MB     00:04
+	--------------------------------------------------------------------------------
+	합계                                            1.7 MB/s | 9.1 MB     00:05
+	Fluent Bit                                      3.8 kB/s | 3.1 kB     00:00
+	GPG키 0x3888C1CD 가져오는 중:
+	사용자 ID : "Fluentbit releases (Releases signing key) <releases@fluentbit.io>"
+	지문: C3C0 A285 34B9 293E AF51 FABD 9F9D DC08 3888 C1CD
+	출처 : https://packages.fluentbit.io/fluentbit.key
+	진행할까요? [y/N]: y
+	키 가져오기에 성공했습니다
+	연결 확인 실행 중
+	연결 확인에 성공했습니다.
+	연결 시험 실행 중
+	연결 시험에 성공했습니다.
+	연결 실행 중
+	  준비 중     :                                                             1/1
+	  설치 중     : libpq-13.23-1.el8_10.x86_64                                 1/2
+	  설치 중     : fluent-bit-4.2.2-1.x86_64                                   2/2
+	  구현 중     : fluent-bit-4.2.2-1.x86_64                                   2/2
+	  확인 중     : libpq-13.23-1.el8_10.x86_64                                 1/2
+	  확인 중     : fluent-bit-4.2.2-1.x86_64                                   2/2
+
+	설치되었습니다:
+	  fluent-bit-4.2.2-1.x86_64             libpq-13.23-1.el8_10.x86_64
+
+	완료되었습니다!
+	[root@localhost yum.repos.d]#
+
+	=====================================================================
+
+# 설치 확인
+	
+	- 설치 확인
+	=====================================================================
+	[root@localhost yum.repos.d]# systemctl status fluent-bit
+	● fluent-bit.service - Fluent Bit
+	   Loaded: loaded (/usr/lib/systemd/system/fluent-bit.service; disabled; vendor preset: disable>
+	   Active: inactive (dead)
+		 Docs: https://docs.fluentbit.io/manual/
+
+	=====================================================================
+	- 설치 경로 
+	=====================================================================
+	[root@localhost yum.repos.d]# rpm -ql fluent-bit | grep bin
+	/opt/fluent-bit/bin
+	/opt/fluent-bit/bin/fluent-bit
+
+	=====================================================================
+
+# 로그 적재 디렉토리 생성
+
+	=====================================================================
+	mkdir /home/sungchul/fluent-bit-log
+	=====================================================================
+
+# 설정파일 수정
+	위치 : /etc/fluent-bit/fluent-bit.conf
+	
+	- 기존
+	=====================================================================
+	[INPUT]
+		name cpu
+		tag  cpu.local
+
+		# Read interval (sec) Default: 1
+		interval_sec 1
+
+	[OUTPUT]
+		name  stdout
+		match *
+
+	=====================================================================
+	
+	- 변경
+	※ 탭들어가면 안되고 스페이스 4칸임
+	=====================================================================
+	[SERVICE]
+		Flush         1
+		Log_Level     info
+		Daemon        off
+		Parsers_File  parsers.conf
+
+	[INPUT]
+		Name          opentelemetry
+		Listen        0.0.0.0
+		Port          4318
+
+	[OUTPUT]
+		Name          file
+		Match         *
+		Path          /home/sungchul/fluent-bit-log
+		File          otel-logs.log
+	=====================================================================
+
+
+# 실행
+	- 실행
+	=====================================================================
+	systemctl start fluent-bit
+	=====================================================================
+	
+	- 상태 확인
+		오류 발생함
+		잘 보면 저거 프로세스 경로에 //가 두개들어가있음 
+		//etc/fluent-bit/
+	=====================================================================
+	[root@localhost fluent-bit]# systemctl status fluent-bit
+	● fluent-bit.service - Fluent Bit
+	   Loaded: loaded (/usr/lib/systemd/system/fluent-bit.service; disabled; vendor preset: disabled)
+	   Active: failed (Result: exit-code) since Sun 2026-01-25 01:47:24 KST; 2min 48s ago
+		 Docs: https://docs.fluentbit.io/manual/
+	  Process: 21496 ExecStart=/opt/fluent-bit/bin/fluent-bit -c //etc/fluent-bit/fluent-bit.conf (code=exited, status=1/FAILURE)
+	 Main PID: 21496 (code=exited, status=1/FAILURE)
+
+	 1월 25 01:47:24 localhost.localdomain systemd[1]: fluent-bit.service: Service RestartSec=100ms expired, scheduling restart.
+	 1월 25 01:47:24 localhost.localdomain systemd[1]: fluent-bit.service: Scheduled restart job, restart counter is at 5.
+	 1월 25 01:47:24 localhost.localdomain systemd[1]: Stopped Fluent Bit.
+	 1월 25 01:47:24 localhost.localdomain systemd[1]: fluent-bit.service: Start request repeated too quickly.
+	 1월 25 01:47:24 localhost.localdomain systemd[1]: fluent-bit.service: Failed with result 'exit-code'.
+	 1월 25 01:47:24 localhost.localdomain systemd[1]: Failed to start Fluent Bit.
+	=====================================================================
+	
+	- 오류 수정
+		아래파일에서 //etc 이부분을 /etc로 수정
+		왜 이렇게 됐는지 모르겠음. 나는 yum 으로 설치만 한게 다임
+	=====================================================================
+	 vi /usr/lib/systemd/system/fluent-bit.service
+
+	[Unit]
+	Description=Fluent Bit
+	Documentation=https://docs.fluentbit.io/manual/
+	Requires=network.target
+	After=network.target
+
+	[Service]
+	Type=simple
+	EnvironmentFile=-/etc/sysconfig/fluent-bit
+	EnvironmentFile=-/etc/default/fluent-bit
+	ExecStart=/opt/fluent-bit/bin/fluent-bit -c //etc/fluent-bit/fluent-bit.conf
+	Restart=always
+
+	[Install]
+	WantedBy=multi-user.target
+	=====================================================================
+
+	- systemed 리로드 
+	=====================================================================
+	systemctl daemon-reload
+	=====================================================================
+	
+
+
+# 방화벽 오픈
+	=====================================================================
+	firewall-cmd --add-port=4318/tcp --permanent
+	firewall-cmd --reload
+	=====================================================================
+
+# 방화벽 오픈 확인
+	다른서버에서 접속
+	=====================================================================
+	telnet 아이피 4318
+	=====================================================================
+
+# 데이터 전송 테스트
+	- 로그 원문
+	=====================================================================
+	{
+	  "resourceLogs": [
+		{
+		  "resource": {...},
+		  "scopeLogs": [
+			{
+			  "scope": {...},
+			  "logRecords": [
+					{
+					  "body": "{
+						"stringValue": {
+						  "timestamp": "2026-01-25 02: 05: 53.376",
+						  "service": "OG077201",
+						  "operation": "LampController Logic",
+						  "bizTransactionId": null,
+						  "transactionId": "28189847-4ae5-4f95-8a30-662b28ca4744",
+						  "logType": "IN_RES",
+						  "payload": null,
+						  "caller": null,
+						  "host": {
+							"name": "sung-PC",
+							"ip": "169.254.83.107"
+						  },
+						  "response": {
+							"type": "I",
+							"code": "SUCCESS",
+							"duration": "303"
+						  },
+						  "user": {
+							"id": "82284884",
+							"ip": "169.254.83.107",
+							"type": "LAMP_MANAGER"
+						  },
+						  "device": null,
+						  "security": {
+							"type": "ACCESS",
+							"event": "LOGIN",
+							"target": "82284884",
+							"reason": "잘되나 테스트 해보자",
+							"detail": "{\"id\":\"82284884\",\"ip\":\"10.225.164.84\",\"type\":\"LAMP_MANAGER\"}"
+						  },
+						  "destination": null
+						}"
+					  }
+					},
+				{ /* log 2 */ },
+				{ /* log 3 */ }
+			  ]
+			}
+		  ]
+		}
+	  ]
+	}
+	=====================================================================
+
+	- Fluent bit 에서 확인한 로그 데이터
+	=====================================================================
+	v1_logs: [1769274353.364127891, {"log":"### LampController start"}]
+	v1_logs: [1769274353.369790491, {"log":"{\"timestamp\":\"2026-01-25 02:05:53.376\",\"service\":\"OG077201\",\"operation\":\"LampController Logic\",\"bizTransactionId\":null,\"transactionId\":\"28189847-4ae5-4f95-8a30-662b28ca4744\",\"logType\":\"IN_RES\",\"payload\":null,\"caller\":null,\"host\":{\"name\":\"sung-PC\",\"ip\":\"169.254.83.107\"},\"response\":{\"type\":\"I\",\"code\":\"SUCCESS\",\"duration\":\"303\"},\"user\":{\"id\":\"82284884\",\"ip\":\"169.254.83.107\",\"type\":\"LAMP_MANAGER\"},\"device\":null,\"security\":{\"type\":\"ACCESS\",\"event\":\"LOGIN\",\"target\":\"82284884\",\"reason\":\"\uc798\ub418\ub098 \ud14c\uc2a4\ud2b8 \ud574\ubcf4\uc790\",\"detail\":\"{\\\"id\\\":\\\"82284884\\\",\\\"ip\\\":\\\"10.225.164.84\\\",\\\"type\\\":\\\"LAMP_MANAGER\\\"}\"},\"destination\":null}"}]
+	v1_logs: [1769274353.375786491, {"log":"### LampController end"}]
+	v1_logs: [1769274353.373787591, {"log":"{\"timestamp\":\"2026-01-25 02:05:53.383\",\"service\":\"OG077201\",\"operation\":\"LampBusinessService Logic\",\"bizTransactionId\":null,\"transactionId\":\"555482e2-8f89-4cb8-ba6a-708333ab3070\",\"logType\":\"IN_RES\",\"payload\":null,\"caller\":null,\"host\":{\"name\":\"sung-PC\",\"ip\":\"169.254.83.107\"},\"response\":{\"type\":\"I\",\"code\":\"SUCCESS\",\"duration\":\"303\"},\"user\":{\"id\":\"82284884\",\"ip\":\"169.254.83.107\",\"type\":\"LAMP_MANAGER\"},\"device\":null,\"security\":{\"type\":\"ACCESS\",\"event\":\"LOGIN\",\"target\":\"82284884\",\"reason\":\"\uc798\ub418\ub098 \ud14c\uc2a4\ud2b8 \ud574\ubcf4\uc790\",\"detail\":\"{\\\"id\\\":\\\"82284884\\\",\\\"ip\\\":\\\"10.225.164.84\\\",\\\"type\\\":\\\"LAMP_MANAGER\\\"}\"},\"destination\":null}"}]
+	v1_logs: [1769274427.1192863485, {"log":"### LampController start"}]
+	v1_logs: [1769274427.1197912385, {"log":"{\"timestamp\":\"2026-01-25 02:07:07.220\",\"service\":\"OG077201\",\"operation\":\"LampController Logic\",\"bizTransactionId\":null,\"transactionId\":\"22d5025f-e451-49af-8583-a2e3eb2f69c1\",\"logType\":\"IN_RES\",\"payload\":null,\"caller\":null,\"host\":{\"name\":\"sung-PC\",\"ip\":\"169.254.83.107\"},\"response\":{\"type\":\"I\",\"code\":\"SUCCESS\",\"duration\":\"303\"},\"user\":{\"id\":\"82284884\",\"ip\":\"169.254.83.107\",\"type\":\"LAMP_MANAGER\"},\"device\":null,\"security\":{\"type\":\"ACCESS\",\"event\":\"LOGIN\",\"target\":\"82284884\",\"reason\":\"\uc798\ub418\ub098 \ud14c\uc2a4\ud2b8 \ud574\ubcf4\uc790\",\"detail\":\"{\\\"id\\\":\\\"82284884\\\",\\\"ip\\\":\\\"10.225.164.84\\\",\\\"type\\\":\\\"LAMP_MANAGER\\\"}\"},\"destination\":null}"}]
+	v1_logs: [1769274427.1202071585, {"log":"### LampController end"}]
+	v1_logs: [1769274427.1201148485, {"log":"{\"timestamp\":\"2026-01-25 02:07:07.225\",\"service\":\"OG077201\",\"operation\":\"LampBusinessService Logic\",\"bizTransactionId\":null,\"transactionId\":\"acdec1b0-dd43-4e02-9de9-f9ca7c71d774\",\"logType\":\"IN_RES\",\"payload\":null,\"caller\":null,\"host\":{\"name\":\"sung-PC\",\"ip\":\"169.254.83.107\"},\"response\":{\"type\":\"I\",\"code\":\"SUCCESS\",\"duration\":\"303\"},\"user\":{\"id\":\"82284884\",\"ip\":\"169.254.83.107\",\"type\":\"LAMP_MANAGER\"},\"device\":null,\"security\":{\"type\":\"ACCESS\",\"event\":\"LOGIN\",\"target\":\"82284884\",\"reason\":\"\uc798\ub418\ub098 \ud14c\uc2a4\ud2b8 \ud574\ubcf4\uc790\",\"detail\":\"{\\\"id\\\":\\\"82284884\\\",\\\"ip\\\":\\\"10.225.164.84\\\",\\\"type\\\":\\\"LAMP_MANAGER\\\"}\"},\"destination\":null}"}]
+	=====================================================================
