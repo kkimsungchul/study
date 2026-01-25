@@ -1,0 +1,127 @@
+# fluentbit에서 traceId , spanId 사용하기
+
+# 하게 된 이유
+
+	- 아래처럼 나는 오픈텔레메트리에서 수집한 로그 데이터를 보내려고 함
+	=====================================================================
+	애플리케이션
+	-> 오플텔레메트리 에이전트
+	-> 오픈텔레메트리 콜렉터
+	-> 플루언트비트
+	-> 카프카
+	-> 아파치스톰
+	=====================================================================
+	
+	- 근데 플루언트비트에서는 로그레코드 안의 바디 데이터(로그원문) 만 파싱해서 보내도록 설계 되어있음
+	이건 뭐 플러운트비트의 철학이라고함
+	=====================================================================
+	“로그 파이프라인은 가볍게,트레이스 상관관계는 OpenTelemetry Collector나 Backend에서”
+	=====================================================================
+
+	- 그래서 내용 정리하면 아래와 같음
+	=====================================================================
+	Fluent Bit opentelemetry input은 OTLP LogRecord 전체 구조를 그대로 유지하지 않는다
+	body.stringValue → log message
+	severityText → level
+	traceId / spanId → 내부 메타데이터로만 처리되거나 아예 드롭
+	공식 구현 기준으로 보면
+		trace/span은 Fluent Bit의 record field로 자동 매핑되지 않음
+		특히 JSON output / filter 단계에서는 접근 불가
+	=====================================================================
+
+	트레이스와 스팬은 추적용이고
+	로그는 메시지용이다보니 뭐 다르다고 함
+
+
+# OpenTelemetry Collector에서 traceId/spanId를 로그 attribute로 승격
+	- 오픈텔레메트리 컨피그 파일에 아래 설정 추가
+	=====================================================================
+	processors:
+	  batch:
+		timeout: 1ms
+		send_batch_size: 1
+
+	  transform:
+		log_statements:
+		  - context: log
+			statements:
+			  - set(attributes["trace_id"], trace_id.string)
+			  - set(attributes["span_id"], span_id.string)
+
+
+	service:
+	  pipelines:
+		logs:
+		  receivers: [otlp]
+		  processors: [transform]
+		  exporters: [file/logs, otlphttp/fluentbit]
+	=====================================================================
+	
+	- 추가 후 로그
+	보면 attributes에 trace_id 랑 span_id가 추가됨
+	=====================================================================
+	{
+	  "timeUnixNano": "1769342076386344400",
+	  "observedTimeUnixNano": "1769342076386344400",
+	  "severityNumber": 9,
+	  "severityText": "INFO",
+	  "body": {
+		"stringValue": "{"timestamp":"2026-0..중략"
+	  },
+	  "attributes": [
+		{
+		  "key": "trace_id",
+		  "value": {
+			"stringValue": "76da4b2a151f9b7eb2765f9b27cfaf98"
+		  }
+		},
+		{
+		  "key": "span_id",
+		  "value": {
+			"stringValue": "ab889891b901a570"
+		  }
+		}
+	  ],
+	  "flags": 1,
+	  "traceId": "76da4b2a151f9b7eb2765f9b27cfaf98",
+	  "spanId": "ab889891b901a570"
+	}
+
+	=====================================================================
+
+
+# 루아 스크립트 작성
+	경로 : /etc/fluent-bit
+	파일명 : otel_attrs.lua
+	=====================================================================
+	function extract_otel_attrs(tag, ts, record)
+		local attrs = record["attributes"]
+		if attrs == nil then
+			return 1, ts, record
+		end
+
+		for _, item in ipairs(attrs) do
+			if item["key"] == "trace_id" then
+				record["trace_id"] = item["value"]["stringValue"]
+			elseif item["key"] == "span_id" then
+				record["span_id"] = item["value"]["stringValue"]
+			end
+		end
+
+		return 1, ts, record
+	end
+	=====================================================================
+
+# 스트립트 적용
+
+	=====================================================================
+	[FILTER]
+		Name   lua
+		Match  otel.log
+		Script /etc/fluent-bit/otel_attrs.lua
+		Call   extract_otel_attrs
+
+	=====================================================================
+
+# 결과
+	안됌
