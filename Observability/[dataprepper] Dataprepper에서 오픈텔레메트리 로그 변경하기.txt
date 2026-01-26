@@ -1,0 +1,125 @@
+# Dataprepper에서 오픈텔레메트리 로그 변경하기
+
+# 사용 이유
+	오픈텔레메트리에서 보내는 로그규격은 계층구조라서
+	내가 원하는 데이터는 4뎁스 밑에 있음 (리스트->맵->리스트->맵->리스트->맵...)
+	소스코드에서 반복문을 돌며 꺼내기에는 성능부하가 너무 심함
+	그리서 처리를 한 뒤에 보내려고함
+
+# Dataprepper 원본 데이터
+	
+	=====================================================================
+	{
+	  "traceId": "2877962896f6408f368de5922c53d601",
+	  "spanId": "6523fa3c346bb9a6",
+	  "severityText": "INFO",
+	  "flags": 1,
+	  "time": "2026-01-26T13:57:55.271028200Z",
+	  "severityNumber": 9,
+	  "droppedAttributesCount": 0,
+	  "serviceName": "otel-agent-springboot-01",
+	  "body": "{\"timestamp\":\"2026-01-26 22:57:55.269\",\"service\":\"OG077201\",\"operation\":\"LampBusinessService Logic\",\"bizTransactionId\":null,\"transactionId\":\"6d98f64b-c8e9-45c5-8466-115dd2e73aab\",\"logType\":\"IN_RES\",\"payload\":null,\"caller\":null,\"host\":{\"name\":\"sung-PC\",\"ip\":\"169.254.83.107\"},\"response\":{\"type\":\"I\",\"code\":\"SUCCESS\",\"duration\":\"303\"},\"user\":{\"id\":\"82284884\",\"ip\":\"169.254.83.107\",\"type\":\"LAMP_MANAGER\"},\"device\":null,\"security\":{\"type\":\"ACCESS\",\"event\":\"LOGIN\",\"target\":\"82284884\",\"reason\":\"잘되나 테스트 해보자\",\"detail\":\"{\\\"id\\\":\\\"82284884\\\",\\\"ip\\\":\\\"10.225.164.84\\\",\\\"type\\\":\\\"LAMP_MANAGER\\\"}\"},\"destination\":null}",
+	  "observedTimestamp": "2026-01-26T13:57:55.271028200Z",
+	  "schemaUrl": "https://opentelemetry.io/schemas/1.24.0",
+	  "log.attributes.trace_id": "2877962896f6408f368de5922c53d601",
+	  "resource.attributes.telemetry@sdk@language": "java",
+	  "resource.attributes.host@name": "sung-PC",
+	  "resource.attributes.process@pid": 24636,
+	  "resource.attributes.host@arch": "amd64",
+	  "resource.attributes.process@runtime@description": "Oracle Corporation OpenJDK 64-Bit Server VM 17.0.2+8-86",
+	  "resource.attributes.process@executable@path": "C:\\Program Files\\Java\\jdk-17.0.2\\bin\\java.exe",
+	  "resource.attributes.service@instance@id": "cbf5dd2e-321a-4e38-90c0-558a337eea9b",
+	  "resource.attributes.telemetry@sdk@version": "1.37.0",
+	  "resource.attributes.service@name": "otel-agent-springboot-01",
+	  "resource.attributes.process@command_line": "C:\\Program Files\\Java\\jdk-17.0.2\\bin\\java.exe -javaagent:..\\..\\opentelemetry-javaagent.jar -jar otel-agent-springboot-01-0.0.1-SNAPSHOT.jar",
+	  "instrumentationScope.name": "com.kt.otelagentspringboot01.lamp.LampBusinessService",
+	  "resource.attributes.process@runtime@version": "17.0.2+8-86",
+	  "resource.attributes.service@version": "0.0.1-SNAPSHOT",
+	  "resource.attributes.telemetry@sdk@name": "opentelemetry",
+	  "resource.attributes.process@runtime@name": "OpenJDK Runtime Environment",
+	  "resource.attributes.telemetry@distro@name": "opentelemetry-java-instrumentation",
+	  "log.attributes.span_id": "6523fa3c346bb9a6",
+	  "resource.attributes.os@type": "windows",
+	  "resource.attributes.TOPIC_LAMP": "OG077201",
+	  "resource.attributes.os@description": "Windows 10 10.0",
+	  "resource.attributes.telemetry@distro@version": "2.3.0"
+	}
+
+	=====================================================================
+
+# Dataprepper 설정 파일
+	- pipelines.yaml
+	=====================================================================
+	body-only-pipeline:
+	  source:
+		otel_logs_source:
+		  ssl: false
+		  port: 21890
+
+	  processor:
+		# 1.  body →> message로 변환
+		- rename_keys:
+			entries:
+			  - from_key: body
+				to_key: message
+
+		# 2. message를 JSON으로 파싱
+		- parse_json:
+			source: message
+			destination: message
+
+		- add_entries:
+			entries:
+			  - key: message/trace_id
+				format: "${traceId}"
+			  - key: message/span_id
+				format: "${spanId}"
+
+	  sink:
+		- file:
+			path: /home/dataprepper/log/lamp-logs.json
+			append: true
+
+	=====================================================================
+
+# Dataprepper 커스터마이징 데이터 
+	- message는 원래 body이지만 설정을 추가해서 키 명을 message로 바꿨음
+	- message안의 데이터는 제이슨 타입의 문자열이지만 Dataprepper에 파싱을 추가해서 Json타입으로 출력됨
+	- message안의 traceId,spanId는 dataprepper에서 키값을 추가해서 넣어놓은 것임
+	=====================================================================
+	{
+	  "traceId": "ac21153b7a5579fd1a63ef7e0659379b",
+	  "spanId": "264630ec38feb394",
+	  "message": {
+		"logType": "IN_RES",
+		"destination": null,
+		"transactionId": "af0c76a2-77fc-4d36-b570-11448bab7f3d",
+			....중략...
+		"timestamp": "2026-01-26 22:32:21.533",
+		"trace_id": "ac21153b7a5579fd1a63ef7e0659379b",
+		"span_id": "264630ec38feb394"
+	  },
+	  "log.attributes.trace_id": "ac21153b7a5579fd1a63ef7e0659379b",
+	  "resource.attributes.telemetry@sdk@language": "java",
+	  "resource.attributes.host@name": "sung-PC",
+	  "resource.attributes.process@pid": 24636,
+	  "resource.attributes.host@arch": "amd64",
+	  "resource.attributes.process@runtime@description": "Oracle Corporation OpenJDK 64-Bit Server VM 17.0.2+8-86",
+	  "resource.attributes.process@executable@path": "C:\\Program Files\\Java\\jdk-17.0.2\\bin\\java.exe",
+	  "resource.attributes.service@instance@id": "cbf5dd2e-321a-4e38-90c0-558a337eea9b",
+	  "resource.attributes.telemetry@sdk@version": "1.37.0",
+	  "resource.attributes.service@name": "otel-agent-springboot-01",
+	  "resource.attributes.process@command_line": "C:\\Program Files\\Java\\jdk-17.0.2\\bin\\java.exe -javaagent:..\\..\\opentelemetry-javaagent.jar -jar otel-agent-springboot-01-0.0.1-SNAPSHOT.jar",
+	  "instrumentationScope.name": "com.kt.otelagentspringboot01.lamp.LampBusinessService",
+	  "resource.attributes.process@runtime@version": "17.0.2+8-86",
+	  "resource.attributes.service@version": "0.0.1-SNAPSHOT",
+	  "resource.attributes.telemetry@sdk@name": "opentelemetry",
+	  "resource.attributes.process@runtime@name": "OpenJDK Runtime Environment",
+	  "resource.attributes.telemetry@distro@name": "opentelemetry-java-instrumentation",
+	  "log.attributes.span_id": "264630ec38feb394",
+	  "resource.attributes.os@type": "windows",
+	  "resource.attributes.TOPIC_LAMP": "OG077201",
+	  "resource.attributes.os@description": "Windows 10 10.0",
+	  "resource.attributes.telemetry@distro@version": "2.3.0"
+	}	
+	=====================================================================

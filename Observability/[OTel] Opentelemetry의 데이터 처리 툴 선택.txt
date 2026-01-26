@@ -1,0 +1,154 @@
+# Opentelemetry의 데이터 처리 툴 선택
+
+# 목적
+	- 오픈텔레메트리 콜렉터에서 보내는 로그를 EndPoint로 보낼 때 데이터를 가공해서 보내야함
+		오픈텔레메트리 콜렉터 -> 데이터가공 -> 카프카 -> 아파치 스톰
+	- 특정 필드의 데이터만 필요함
+
+# 오픈텔레메트리 로그 규격 및 필요 필드
+	- 필요한 데이터는 logRecords 배열에 들어있는 로그 데이터
+	- 로그데이터 중에서도 body의 stringValue 와 traceId , spanId
+	=====================================================================
+	{
+	  "resourceLogs": [
+		{
+		  "resource": {...},
+		  "scopeLogs": [
+			{
+			  "scope": {...},
+			  "logRecords": [
+				{ 	
+					"body": {
+						"stringValue": "### LampController start"
+						} 
+					"traceId" : "ac21153b7a5579fd1a63ef7e0659379b",
+					"spanId" : "ac21153b7a5579fd1a63ef7e0659379b"
+					},
+				{ /* log 2 */ },
+				{ /* log 3 */ }
+			  ]
+			}
+		  ]
+		}
+	  ]
+	}
+	=====================================================================
+
+# fluent-bit
+
+	- 플루언트 비트의 철학
+		=====================================================================
+		"로그 파이프라인은 가볍게,트레이스 상관관계는 OpenTelemetry Collector나 Backend에서"
+		=====================================================================
+		그래서 로그레코드 안의 바디 데이터(로그원문) 만 파싱해서 보내도록 설계 되어있음
+	- 로그 데이터만 수집함
+	- attribute 데이터 수집 불가
+	- traceId , spanId 데이터 수집 불가
+	- 경량화
+	- 처리 속도 빠름
+	- 로그 데이터만 활용한다면 간단하게 사용가능
+	- lua 기반
+	- 수집된 데이터는 아래와 같이 저장됨
+	=====================================================================
+	v1_logs: [1769275011.1090294645, {"log":"### LampController start"}]
+	v1_logs: [1769275011.1095956545, {"timestamp":"2026-01-25 02:16:51.232","service":"OG077201"}
+	=====================================================================
+
+
+
+# Dataprepper
+	- java기반
+	- 수집된 데이터를 Json기반으로 파싱해서 보여줌
+	- attribute 데이터 수집 가능
+	- 수집한 데이터 변환/추가 가능
+	- Opensearch 생태계에 포함되어 있지만 kafka로의 호환성 좋음
+	- 수집된 데이터는 아래와 같이 저장됨
+	=====================================================================
+	{
+	  "traceId": "2877962896f6408f368de5922c53d601",
+	  "spanId": "6523fa3c346bb9a6",
+	  "severityText": "INFO",
+	  "flags": 1,
+	  "time": "2026-01-26T13:57:55.271028200Z",
+	  "severityNumber": 9,
+	  "droppedAttributesCount": 0,
+	  "serviceName": "otel-agent-springboot-01",
+	  "body": "{\"timestamp\":\"2026-01-26 22:57:55.269\",\"service\":\"OG077201\",\"operation\":\"LampBusinessService Logic\",\"bizTransactionId\":null,\"transactionId\":\"6d98f64b-c8e9-45c5-8466-115dd2e73aab\",\"logType\":\"IN_RES\",\"payload\":null,\"caller\":null,\"host\":{\"name\":\"sung-PC\",\"ip\":\"169.254.83.107\"},\"response\":{\"type\":\"I\",\"code\":\"SUCCESS\",\"duration\":\"303\"},\"user\":{\"id\":\"82284884\",\"ip\":\"169.254.83.107\",\"type\":\"LAMP_MANAGER\"},\"device\":null,\"security\":{\"type\":\"ACCESS\",\"event\":\"LOGIN\",\"target\":\"82284884\",\"reason\":\"잘되나 테스트 해보자\",\"detail\":\"{\\\"id\\\":\\\"82284884\\\",\\\"ip\\\":\\\"10.225.164.84\\\",\\\"type\\\":\\\"LAMP_MANAGER\\\"}\"},\"destination\":null}",
+	  "observedTimestamp": "2026-01-26T13:57:55.271028200Z",
+	  "schemaUrl": "https://opentelemetry.io/schemas/1.24.0",
+	  "log.attributes.trace_id": "2877962896f6408f368de5922c53d601",
+	  "resource.attributes.telemetry@sdk@language": "java",
+	  "resource.attributes.host@name": "sung-PC",
+	  "resource.attributes.process@pid": 24636,
+	  "resource.attributes.host@arch": "amd64",
+	  "resource.attributes.process@runtime@description": "Oracle Corporation OpenJDK 64-Bit Server VM 17.0.2+8-86",
+	  "resource.attributes.process@executable@path": "C:\\Program Files\\Java\\jdk-17.0.2\\bin\\java.exe",
+	  "resource.attributes.service@instance@id": "cbf5dd2e-321a-4e38-90c0-558a337eea9b",
+	  "resource.attributes.telemetry@sdk@version": "1.37.0",
+	  "resource.attributes.service@name": "otel-agent-springboot-01",
+	  "resource.attributes.process@command_line": "C:\\Program Files\\Java\\jdk-17.0.2\\bin\\java.exe -javaagent:..\\..\\opentelemetry-javaagent.jar -jar otel-agent-springboot-01-0.0.1-SNAPSHOT.jar",
+	  "instrumentationScope.name": "com.kt.otelagentspringboot01.lamp.LampBusinessService",
+	  "resource.attributes.process@runtime@version": "17.0.2+8-86",
+	  "resource.attributes.service@version": "0.0.1-SNAPSHOT",
+	  "resource.attributes.telemetry@sdk@name": "opentelemetry",
+	  "resource.attributes.process@runtime@name": "OpenJDK Runtime Environment",
+	  "resource.attributes.telemetry@distro@name": "opentelemetry-java-instrumentation",
+	  "log.attributes.span_id": "6523fa3c346bb9a6",
+	  "resource.attributes.os@type": "windows",
+	  "resource.attributes.TOPIC_LAMP": "OG077201",
+	  "resource.attributes.os@description": "Windows 10 10.0",
+	  "resource.attributes.telemetry@distro@version": "2.3.0"
+	}
+
+	=====================================================================
+
+
+# 선택
+	- 로그데이터만 사용 할꺼다 -> fluent-bit
+	- 데이터 처리와 trace id, span id 가 필요하다 -> dataprepper
+	
+
+# Dataprepper 커스터마이징 데이터 
+	- message는 원래 body이지만 설정을 추가해서 키 명을 message로 바꿨음
+	- message안의 데이터는 문자열이지만 Dataprepper에 파싱을 추가해서 Json타입으로 출력됨
+	- message안의 traceId,spanId는 dataprepper에서 키값을 추가해서 넣어놓은 것임
+	=====================================================================
+	{
+	  "traceId": "ac21153b7a5579fd1a63ef7e0659379b",
+	  "spanId": "264630ec38feb394",
+	  "message": {
+		"logType": "IN_RES",
+		"destination": null,
+		"transactionId": "af0c76a2-77fc-4d36-b570-11448bab7f3d",
+			....중략...
+		"timestamp": "2026-01-26 22:32:21.533",
+		"trace_id": "ac21153b7a5579fd1a63ef7e0659379b",
+		"span_id": "264630ec38feb394"
+	  },
+	  "log.attributes.trace_id": "ac21153b7a5579fd1a63ef7e0659379b",
+	  "resource.attributes.telemetry@sdk@language": "java",
+	  "resource.attributes.host@name": "sung-PC",
+	  "resource.attributes.process@pid": 24636,
+	  "resource.attributes.host@arch": "amd64",
+	  "resource.attributes.process@runtime@description": "Oracle Corporation OpenJDK 64-Bit Server VM 17.0.2+8-86",
+	  "resource.attributes.process@executable@path": "C:\\Program Files\\Java\\jdk-17.0.2\\bin\\java.exe",
+	  "resource.attributes.service@instance@id": "cbf5dd2e-321a-4e38-90c0-558a337eea9b",
+	  "resource.attributes.telemetry@sdk@version": "1.37.0",
+	  "resource.attributes.service@name": "otel-agent-springboot-01",
+	  "resource.attributes.process@command_line": "C:\\Program Files\\Java\\jdk-17.0.2\\bin\\java.exe -javaagent:..\\..\\opentelemetry-javaagent.jar -jar otel-agent-springboot-01-0.0.1-SNAPSHOT.jar",
+	  "instrumentationScope.name": "com.kt.otelagentspringboot01.lamp.LampBusinessService",
+	  "resource.attributes.process@runtime@version": "17.0.2+8-86",
+	  "resource.attributes.service@version": "0.0.1-SNAPSHOT",
+	  "resource.attributes.telemetry@sdk@name": "opentelemetry",
+	  "resource.attributes.process@runtime@name": "OpenJDK Runtime Environment",
+	  "resource.attributes.telemetry@distro@name": "opentelemetry-java-instrumentation",
+	  "log.attributes.span_id": "264630ec38feb394",
+	  "resource.attributes.os@type": "windows",
+	  "resource.attributes.TOPIC_LAMP": "OG077201",
+	  "resource.attributes.os@description": "Windows 10 10.0",
+	  "resource.attributes.telemetry@distro@version": "2.3.0"
+	}	
+	=====================================================================
+
+
+

@@ -1,0 +1,193 @@
+# fluentbit에서 traceId , spanId 사용하기
+
+
+# 선결론 - 불가능함
+	resourceLogs 구조 자체를 레코드로 전달하지 않음
+	scopeLogs에 접근 불가
+	logRecords 배열에 접근 불가
+	오직 개별 로그의 body만 추출해서 전달
+	
+	=====================================================================
+	OTLP Input → Fluent Bit 내부에서 파싱 
+		→ body만 record로 변환
+		→ attributes, trace_id, span_id 등은 버림
+
+	=====================================================================
+
+# 안되는거 확인 방법
+	- lua 스크립트 작성
+	=====================================================================
+	function flatten_otlp(tag, timestamp, record)
+		-- 디버깅: 실제로 뭐가 들어오는지 확인
+		for k, v in pairs(record) do
+			print(k, v)
+		end
+	end
+	=====================================================================
+
+
+	- 설정 적용
+	=====================================================================
+	[FILTER]
+		Name    lua
+		Match   *
+		script  flatten.lua
+		call    flatten_otlp
+
+	[OUTPUT]
+		Name   file
+		Match  *
+		Path   /home/sungchul/fluent-bit-log/
+		File flatten.log
+	=====================================================================
+
+	- 로그 확인
+	journalctl -u fluent-bit -f
+	=====================================================================
+	 1월 26 21:24:37 localhost.localdomain fluent-bit[36609]: log        ### LampController start
+	 1월 26 21:24:37 localhost.localdomain fluent-bit[36609]: log        {"timestamp":"2026-01-26 21:24:12.333","service":"OG077201","operation":"LampController Logic","bizTransactionId":null,"transactionId":"1b45cd85-7b5e-437f-a589-e4247ca3c1f9","logType":"IN_RES","payload":null,"caller":null,"host":{"name":"sung-PC","ip":"169.254.83.107"},"response":{"type":"I","code":"SUCCESS","duration":"303"},"user":{"id":"82284884","ip":"169.254.83.107","type":"LAMP_MANAGER"},"device":null,"security":{"type":"ACCESS","event":"LOGIN","target":"82284884","reason":"잘되나 테스트 해보자","detail":"{\"id\":\"82284884\",\"ip\":\"10.225.164.84\",\"type\":\"LAMP_MANAGER\"}"},"destination":null}
+	 1월 26 21:24:37 localhost.localdomain fluent-bit[36609]: log        ### LampController end
+	 1월 26 21:24:37 localhost.localdomain fluent-bit[36609]: log        ### LampController start
+	 1월 26 21:24:37 localhost.localdomain fluent-bit[36609]: log        {"timestamp":"2026-01-26 21:24:12.862","service":"OG077201","operation":"LampController Logic","bizTransactionId":null,"transactionId":"39700b88-0c03-436e-9750-9afc2e295508","logType":"IN_RES","payload":null,"caller":null,"host":{"name":"sung-PC","ip":"169.254.83.107"},"response":{"type":"I","code":"SUCCESS","duration":"303"},"user":{"id":"82284884","ip":"169.254.83.107","type":"LAMP_MANAGER"},"device":null,"security":{"type":"ACCESS","event":"LOGIN","target":"82284884","reason":"잘되나 테스트 해보자","detail":"{\"id\":\"82284884\",\"ip\":\"10.225.164.84\",\"type\":\"LAMP_MANAGER\"}"},"destination":null}
+	 1월 26 21:24:37 localhost.localdomain fluent-bit[36609]: log        ### LampController end
+	 1월 26 21:24:37 localhost.localdomain fluent-bit[36609]: log        ### LampController start
+	 1월 26 21:24:37 localhost.localdomain fluent-bit[36609]: log        {"timestamp":"2026-01-26 21:24:13.209","service":"OG077201","operation":"LampController Logic","bizTransactionId":null,"transactionId":"9b8bc14e-0045-4c16-b62b-31be4428fc2c","logType":"IN_RES","payload":null,"caller":null,"host":{"name":"sung-PC","ip":"169.254.83.107"},"response":{"type":"I","code":"SUCCESS","duration":"303"},"user":{"id":"82284884","ip":"169.254.83.107","type":"LAMP_MANAGER"},"device":null,"security":{"type":"ACCESS","event":"LOGIN","target":"82284884","reason":"잘되나 테스트 해보자","detail":"{\"id\":\"82284884\",\"ip\":\"10.225.164.84\",\"type\":\"LAMP_MANAGER\"}"},"destination":null}
+	 1월 26 21:24:37 localhost.localdomain fluent-bit[36609]: log        ### LampController end
+	 1월 26 21:24:37 localhost.localdomain fluent-bit[36609]: log        {"timestamp":"2026-01-26 21:24:12.339","service":"OG077201","operation":"LampBusinessService Logic","bizTransactionId":null,"transactionId":"102b4d0e-8319-41ec-aee1-639096717a5c","logType":"IN_RES","payload":null,"caller":null,"host":{"name":"sung-PC","ip":"169.254.83.107"},"response":{"type":"I","code":"SUCCESS","duration":"303"},"user":{"id":"82284884","ip":"169.254.83.107","type":"LAMP_MANAGER"},"device":null,"security":{"type":"ACCESS","event":"LOGIN","target":"82284884","reason":"잘되나 테스트 해보자","detail":"{\"id\":\"82284884\",\"ip\":\"10.225.164.84\",\"type\":\"LAMP_MANAGER\"}"},"destination":null}
+	 1월 26 21:24:37 localhost.localdomain fluent-bit[36609]: log        {"timestamp":"2026-01-26 21:24:12.866","service":"OG077201","operation":"LampBusinessService Logic","bizTransactionId":null,"transactionId":"de0b3655-4b30-4771-b3c0-f794573198a8","logType":"IN_RES","payload":null,"caller":null,"host":{"name":"sung-PC","ip":"169.254.83.107"},"response":{"type":"I","code":"SUCCESS","duration":"303"},"user":{"id":"82284884","ip":"169.254.83.107","type":"LAMP_MANAGER"},"device":null,"security":{"type":"ACCESS","event":"LOGIN","target":"82284884","reason":"잘되나 테스트 해보자","detail":"{\"id\":\"82284884\",\"ip\":\"10.225.164.84\",\"type\":\"LAMP_MANAGER\"}"},"destination":null}
+	 1월 26 21:24:37 localhost.localdomain fluent-bit[36609]: log        {"timestamp":"2026-01-26 21:24:13.213","service":"OG077201","operation":"LampBusinessService Logic","bizTransactionId":null,"transactionId":"128cf211-1849-4bc8-a7bf-9dc1a94ad39a","logType":"IN_RES","payload":null,"caller":null,"host":{"name":"sung-PC","ip":"169.254.83.107"},"response":{"type":"I","code":"SUCCESS","duration":"303"},"user":{"id":"82284884","ip":"169.254.83.107","type":"LAMP_MANAGER"},"device":null,"security":{"type":"ACCESS","event":"LOGIN","target":"82284884","reason":"잘되나 테스트 해보자","detail":"{\"id\":\"82284884\",\"ip\":\"10.225.164.84\",\"type\":\"LAMP_MANAGER\"}"},"destination":null}
+	 1월 26 21:24:37 localhost.localdomain fluent-bit[36609]: log        ### LampController start
+	=====================================================================
+
+
+	
+
+
+
+# 하게 된 이유
+	- 아래처럼 나는 오픈텔레메트리에서 수집한 로그 데이터를 보내려고 함
+	=====================================================================
+	애플리케이션
+	-> 오플텔레메트리 에이전트
+	-> 오픈텔레메트리 콜렉터
+	-> 플루언트비트
+	-> 카프카
+	-> 아파치스톰
+	=====================================================================
+	
+	- 근데 플루언트비트에서는 로그레코드 안의 바디 데이터(로그원문) 만 파싱해서 보내도록 설계 되어있음
+	이건 뭐 플러운트비트의 철학이라고함
+	=====================================================================
+	“로그 파이프라인은 가볍게,트레이스 상관관계는 OpenTelemetry Collector나 Backend에서”
+	경량화 우선: OTLP 전체 구조를 메모리에 유지하지 않음
+	로그 중심: Trace context는 내부 메타데이터로만 사용
+	변환 불가: 플러그인이 OTLP → Fluent Bit 내부 포맷으로 변환 시 정보 손실
+	=====================================================================
+
+	- 그래서 내용 정리하면 아래와 같음
+	=====================================================================
+	Fluent Bit opentelemetry input은 OTLP LogRecord 전체 구조를 그대로 유지하지 않는다
+	body.stringValue → log message
+	severityText → level
+	traceId / spanId → 내부 메타데이터로만 처리되거나 아예 드롭
+	공식 구현 기준으로 보면
+		trace/span은 Fluent Bit의 record field로 자동 매핑되지 않음
+		특히 JSON output / filter 단계에서는 접근 불가
+	=====================================================================
+
+	트레이스와 스팬은 추적용이고
+	로그는 메시지용이다보니 뭐 다르다고 함
+
+
+# OpenTelemetry Collector에서 traceId/spanId를 로그 attribute로 승격
+	- 오픈텔레메트리 컨피그 파일에 아래 설정 추가
+	=====================================================================
+	processors:
+	  batch:
+		timeout: 1ms
+		send_batch_size: 1
+
+	  transform:
+		log_statements:
+		  - context: log
+			statements:
+			  - set(attributes["trace_id"], trace_id.string)
+			  - set(attributes["span_id"], span_id.string)
+
+
+	service:
+	  pipelines:
+		logs:
+		  receivers: [otlp]
+		  processors: [transform]
+		  exporters: [file/logs, otlphttp/fluentbit]
+	=====================================================================
+	
+	- 추가 후 로그
+	보면 attributes에 trace_id 랑 span_id가 추가됨
+	=====================================================================
+	{
+	  "timeUnixNano": "1769342076386344400",
+	  "observedTimeUnixNano": "1769342076386344400",
+	  "severityNumber": 9,
+	  "severityText": "INFO",
+	  "body": {
+		"stringValue": "{"timestamp":"2026-0..중략"
+	  },
+	  "attributes": [
+		{
+		  "key": "trace_id",
+		  "value": {
+			"stringValue": "76da4b2a151f9b7eb2765f9b27cfaf98"
+		  }
+		},
+		{
+		  "key": "span_id",
+		  "value": {
+			"stringValue": "ab889891b901a570"
+		  }
+		}
+	  ],
+	  "flags": 1,
+	  "traceId": "76da4b2a151f9b7eb2765f9b27cfaf98",
+	  "spanId": "ab889891b901a570"
+	}
+
+	=====================================================================
+
+
+# 루아 스크립트 작성
+	경로 : /etc/fluent-bit
+	파일명 : otel_attrs.lua
+	=====================================================================
+	function extract_otel_attrs(tag, ts, record)
+		local attrs = record["attributes"]
+		if attrs == nil then
+			return 1, ts, record
+		end
+
+		for _, item in ipairs(attrs) do
+			if item["key"] == "trace_id" then
+				record["trace_id"] = item["value"]["stringValue"]
+			elseif item["key"] == "span_id" then
+				record["span_id"] = item["value"]["stringValue"]
+			end
+		end
+
+		return 1, ts, record
+	end
+	=====================================================================
+
+# 스트립트 적용
+
+	=====================================================================
+	[FILTER]
+		Name   lua
+		Match  otel.log
+		Script /etc/fluent-bit/otel_attrs.lua
+		Call   extract_otel_attrs
+
+	=====================================================================
+
+# 결과
+	안됌
