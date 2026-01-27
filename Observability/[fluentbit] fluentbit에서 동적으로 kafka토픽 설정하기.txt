@@ -1,0 +1,35 @@
+# Fluent Bit에서 동적으로 kafka 토픽 설정하기
+
+# 공식 문서
+	https://docs.fluentbit.io/manual/data-pipeline/outputs/kafka
+
+# 사용 이유
+	- 카프카로 데이터를 보낼때 동적으로 데이터마다 다른 토픽으로 보내려고함
+	- 데이터프래퍼, 오픈텔레메트리 콜렉터에서는 해당 기능을 제공해주지 않음
+
+# 사용방법
+	- 파일명 : fluent-bit.conf
+	- 수정내용
+	=====================================================================
+	[OUTPUT]
+		Name        kafka
+		Match       parsed.log
+		Brokers     119.206.235.233:9092
+		Topics      TOPIC_LAMP02, TOPIC_LAMP05
+		Topic_Key   topic
+		Dynamic_Topic On
+		Format      json
+	=====================================================================
+
+# 설명
+	Topics : 플루언트 비트에서 보낼 토픽들을 정의
+	Topic_Key : 
+		- 수신한 데이터 내에 어느 토픽으로 보낼지 저장된 데이터의 키값
+		- 데이터를 보낼 토픽명이 들어가면 됨
+		- dynamic_topic 옵션과 같이 사용할 경우 On이면 Topics 에 정의 안된 토픽이여도 데이터를 보냄
+	dynamic_topic : On / Off 설정
+		- 동적으로 토픽을 보낼수 있도록 해줌
+		- 기본은 off 임
+			이 옵션이 없으면 Topic_Key 값이 topics에 없으면 → drop/fallback
+			이 옵션이 있으면 record 안의 topic 값을 실제 Kafka 토픽으로 생성해서 전송
+
