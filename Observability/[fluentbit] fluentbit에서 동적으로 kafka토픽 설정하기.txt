@@ -33,3 +33,22 @@
 			이 옵션이 없으면 Topic_Key 값이 topics에 없으면 → drop/fallback
 			이 옵션이 있으면 record 안의 topic 값을 실제 Kafka 토픽으로 생성해서 전송
 
+# 데이터 예시
+	- 아래 두개의 데이터로 예시를 듬
+	=====================================================================
+	parsed.log: [1769532285.710050821, {"message":{"topic":"TOPIC_LAMP02","host":{"name":"sung-PC","ip":"169.254.83.107"},"security":{"event":"LOGIN","target":"82284884","reason":"\uc798\ub418\ub098 \ud14c\uc2a4\ud2b8 \ud574\ubcf4\uc790","type":"ACCESS","detail":"{\"id\":\"8228        4884\",\"ip\":\"10.225.164.84\",\"type\":\"LAMP_MANAGER\"}"},"operation":"LampBusinessService Logic","user":{"type":"LAMP_MANAGER","id":"82284884","ip":"169.254.83.107"},"response":{"type":"I","duration":"303","code":"SUCCESS"},"timestamp":"2026-01-28 01:44:44.686","service        ":"OG077201","transactionId":"d1f85101-2811-443f-a3ae-004bf58d30fb","service_name":"otel-agent-springboot-01","logType":"IN_RES","trace_id":"2cdb3441b322ed8a52560fd8bf6fd150","span_id":"235ca48f8d8bd34b"}}]
+	parsed.log: [1769532285.706056594, {"message":{"topic":"TOPIC_LAMP02","host":{"name":"sung-PC","ip":"169.254.83.107"},"security":{"event":"LOGIN","target":"82284884","reason":"\uc798\ub418\ub098 \ud14c\uc2a4\ud2b8 \ud574\ubcf4\uc790","type":"ACCESS","detail":"{\"id\":\"8228        4884\",\"ip\":\"10.225.164.84\",\"type\":\"LAMP_MANAGER\"}"},"operation":"LampController Logic","user":{"type":"LAMP_MANAGER","id":"82284884","ip":"169.254.83.107"},"response":{"type":"I","duration":"303","code":"SUCCESS"},"timestamp":"2026-01-28 01:44:44.682","service":"OG        077201","transactionId":"4d0008e1-b36d-4389-8dcf-d1ad5abc1b9d","service_name":"otel-agent-springboot-01","logType":"IN_RES","trace_id":"2cdb3441b322ed8a52560fd8bf6fd150","span_id":"235ca48f8d8bd34b"}}]
+	=====================================================================
+
+	- 해당 데이터를 보면 message 밑에 topic에 TOPIC_LAMP02가 있음 해당 값이 보낼 토픽명이 되는거임
+	=====================================================================
+	{"message":{"topic":"TOPIC_LAMP02"
+	=====================================================================
+
+	- 원본 데이터는 아래처럼 message 로 감싸져 있지 않고 바로 json 타입으로 들어가 있음
+	- 서비스측에서 원하는데이터는 message 로 감싸져 있어야 하기때문에 message 로 감싼거지만
+	  원래는 감싸져 있지 않은 데이터라서 topic 키값에 접근해서 데이터를 가져 올 수 있음
+	=====================================================================
+	parsed.log: [1769532285.706056594, {"topic":"TOPIC_LAMP02","host":{"name":"sung-PC","ip":"169.254.83.107"},"security":{"event":"LOGIN","target":"82284884","reason":"\uc798\ub418\ub098 \ud14c\uc2a4\ud2b8 \ud574\ubcf4\uc790","type":"ACCESS","detail":"{\"id\":\"8228        4884\",\"ip\":\"10.225.164.84\",\"type\":\"LAMP_MANAGER\"}"},"operation":"LampController Logic","user":{"type":"LAMP_MANAGER","id":"82284884","ip":"169.254.83.107"},"response":{"type":"I","duration":"303","code":"SUCCESS"},"timestamp":"2026-01-28 01:44:44.682","service":"OG        077201","transactionId":"4d0008e1-b36d-4389-8dcf-d1ad5abc1b9d","service_name":"otel-agent-springboot-01","logType":"IN_RES","trace_id":"2cdb3441b322ed8a52560fd8bf6fd150","span_id":"235ca48f8d8bd34b"}]
+	=====================================================================
+
