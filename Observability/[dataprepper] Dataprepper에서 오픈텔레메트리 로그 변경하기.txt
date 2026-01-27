@@ -118,7 +118,7 @@
 	  "resource.attributes.telemetry@distro@name": "opentelemetry-java-instrumentation",
 	  "log.attributes.span_id": "264630ec38feb394",
 	  "resource.attributes.os@type": "windows",
-	  "resource.attributes.TOPIC_LAMP": "OG077201",
+	  "resource.attributes.TOPIC_LAMP": "TOPIC_LAMP05",
 	  "resource.attributes.os@description": "Windows 10 10.0",
 	  "resource.attributes.telemetry@distro@version": "2.3.0"
 	}	
