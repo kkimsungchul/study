@@ -1,0 +1,179 @@
+# 윈도우에 kafka 설치하기
+
+# 다운로드
+
+	다운로드 페이지 : https://kafka.apache.org/community/downloads/
+	다운로드 링크 : https://dlcdn.apache.org/kafka/3.9.1/kafka_2.13-3.9.1.tgz
+	다운로드 버전 : Scala 2.13 - kafka_2.13-3.9.1
+	※ Scala 2.12랑 2.13있음, 나는 2.13다운로드함
+
+# 설치
+	다운받은 kafka_2.13-3.9.1.tgz 파일을 압축 품
+
+# properties 수정
+	※ 윈도우에서 \ 로 경로 표시하는데 , 설정파일에서는 /로 할것
+	※ 이거때매 삽질함
+
+	- zookeeper
+	경로 : kafka_2.13-3.9.1\config
+	파일명 : zookeeper.properties
+	=====================================================================
+	dataDir=/tmp/zookeeper
+	-> 위 내용을 아래처럼 수정
+	dataDir=C:/kafka_2.13-3.9.1/zookeeper-data
+	=====================================================================
+	
+	- kafka
+	경로 : kafka_2.13-3.9.1\config
+	파일명 : server.properties
+	내 아이피를 넣어줘야 외부에서 접속이 가능함
+	=====================================================================
+	log.dirs=C:/kafka_2.13-3.9.1/log
+
+	listeners=PLAINTEXT://0.0.0.0:9092
+
+	advertised.listeners=PLAINTEXT://119.206.235.233:9092
+	=====================================================================
+
+
+
+# 실행
+
+	- zookeeper 실행
+		bin\windows\zookeeper-server-start.bat config\zookeeper.properties
+	
+	- zookeeper 실행 확인
+		netstat -na | findstr "2181"
+		=====================================================================
+		C:\Users\sung>netstat -na | findstr "2181"
+		  TCP    0.0.0.0:2181           0.0.0.0:0              LISTENING
+		  TCP    127.0.0.1:2181         127.0.0.1:54751        ESTABLISHED
+		  TCP    127.0.0.1:54751        127.0.0.1:2181         ESTABLISHED
+		  TCP    [::]:2181              [::]:0                 LISTENING
+		=====================================================================
+
+	- kafka 실행
+		bin\windows\kafka-server-start.bat config\server.properties
+
+	- kafka 실행 확인
+		netstat -na | findstr "9092"
+		=====================================================================
+		C:\Users\sung>netstat -na | findstr "9092"
+		  TCP    0.0.0.0:9092           0.0.0.0:0              LISTENING
+		  TCP    169.254.83.107:9092    169.254.83.107:54753   ESTABLISHED
+		  TCP    169.254.83.107:54753   169.254.83.107:9092    ESTABLISHED
+		  TCP    [::]:9092              [::]:0                 LISTENING
+		=====================================================================
+
+	- 오류 
+	아래 오류가 뜨는건 경로가 너무 길어서 이니, C드라이브 바로 밑으로 옮기고 실행
+	=====================================================================
+	C:\IntelliJProject\Opentelemetry-lamp-test\kafka_2.13-3.9.1>bin\windows\zookeeper-server-start.bat config\zookeeper.properties 
+	입력 줄이 너무 깁니다. 
+	명령 구문이 올바르지 않습니다.
+	=====================================================================
+
+
+# 토픽 생성하기
+	bin\windows\kafka-topics.bat --create --bootstrap-server localhost:9092 --topic TOPIC_LAMP
+	bin\windows\kafka-topics.bat --create --bootstrap-server localhost:9092 --topic TOPIC_LAMP02
+	bin\windows\kafka-topics.bat --create --bootstrap-server localhost:9092 --topic TOPIC_LAMP05
+	=====================================================================
+	C:\kafka_2.13-3.9.1>bin\windows\kafka-topics.bat --create --bootstrap-server localhost:9092 --topic TOPIC_LAMP
+	WARNING: Due to limitations in metric names, topics with a period ('.') or underscore ('_') could collide. To avoid issues it is best to use either, but not both.
+	Created topic TOPIC_LAMP.
+
+	C:\kafka_2.13-3.9.1>bin\windows\kafka-topics.bat --create --bootstrap-server localhost:9092 --topic TOPIC_LAMP02
+	WARNING: Due to limitations in metric names, topics with a period ('.') or underscore ('_') could collide. To avoid issues it is best to use either, but not both.
+	Created topic TOPIC_LAMP02.
+	=====================================================================
+
+# 토픽 생성확인
+	bin\windows\kafka-topics.bat --list --bootstrap-server localhost:9092
+	=====================================================================
+	C:\kafka_2.13-3.9.1>bin\windows\kafka-topics.bat --list --bootstrap-server localhost:9092
+	TOPIC_LAMP
+	TOPIC_LAMP02
+	=====================================================================
+
+
+#  토픽 삭제
+	=====================================================================
+	bin\windows\kafka-topics.bat ^
+	 --bootstrap-server localhost:9092 ^
+	 --delete ^
+	 --topic TOPIC_LAMP05
+	=====================================================================
+# 토픽 메시지 테스트
+	※ 이건 진짜 테스트 용도라서 위에랑 별개로 하나 더 생성해서 진행함
+
+	- test-topic 토픽 생성 
+	=====================================================================
+	bin\windows\kafka-topics.bat ^
+	 --create ^
+	 --topic test-topic ^
+	 --bootstrap-server localhost:9092 ^
+	 --replication-factor 1 ^
+	 --partitions 1
+	=====================================================================
+
+	- 생성 확인
+	=====================================================================
+	bin\windows\kafka-topics.bat --list --bootstrap-server localhost:9092
+	=====================================================================
+
+	- producer
+	=====================================================================
+	bin\windows\kafka-console-producer.bat ^
+	 --topic test-topic ^
+	 --bootstrap-server localhost:9092
+
+	hello kafka
+	=====================================================================
+
+	- 메시지 입력
+	=====================================================================
+	hello kafka
+	=====================================================================
+
+	- 확인
+	=====================================================================
+	bin\windows\kafka-console-consumer.bat ^
+	 --topic test-topic ^
+	 --from-beginning ^
+	 --bootstrap-server localhost:9092
+	=====================================================================
+
+	- 확인 시 출력
+	=====================================================================
+	C:\kafka_2.13-3.9.1>bin\windows\kafka-console-consumer.bat ^
+	More?  --topic test-topic ^
+	More?  --from-beginning ^
+	More?  --bootstrap-server localhost:9092
+	hello kafka
+	=====================================================================
+
+
+# 카프카 데이터 읽기
+	- 데이터가 있는지 확인
+	=====================================================================
+	bin\windows\kafka-topics.bat ^
+	--bootstrap-server localhost:9092 ^
+	--describe ^
+	--topic TOPIC_LAMP05
+	=====================================================================
+
+	- 데이터 읽기
+	=====================================================================
+bin\windows\kafka-console-consumer.bat ^
+--bootstrap-server localhost:9092 ^
+--topic TOPIC_LAMP05 ^
+--from-beginning ^
+--formatter kafka.tools.DefaultMessageFormatter
+	=====================================================================
+
+bin\windows\kafka-console-consumer.bat ^
+--bootstrap-server localhost:9092 ^
+--topic TOPIC_LAMP02 ^
+--from-beginning ^
+--formatter kafka.tools.DefaultMessageFormatter

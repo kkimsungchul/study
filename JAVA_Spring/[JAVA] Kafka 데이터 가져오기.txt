@@ -1,0 +1,55 @@
+package com.ktds;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.serialization.StringDeserializer;
+
+import java.time.Duration;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Properties;
+
+//TIP 코드를 <b>실행</b>하려면 <shortcut actionId="Run"/>을(를) 누르거나
+// 에디터 여백에 있는 <icon src="AllIcons.Actions.Execute"/> 아이콘을 클릭하세요.
+public class Main {
+    public static void main(String[] args) throws Exception {
+
+        Properties props = new Properties();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "lamp-log-consumer-java-debug");
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
+                "org.apache.kafka.common.serialization.StringDeserializer");
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+                "org.apache.kafka.common.serialization.StringDeserializer");
+
+// ⭐ 핵심
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+
+        KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
+        consumer.subscribe(Collections.singletonList("TOPIC_LAMP02"));
+
+        while (true) {
+            ConsumerRecords<String, String> records =
+                    consumer.poll(Duration.ofSeconds(1));
+
+            for (ConsumerRecord<String, String> record : records) {
+
+
+                System.out.println(record.value());
+                ObjectMapper mapper = new ObjectMapper();
+
+                JsonNode root = mapper.readTree(record.value());
+                JsonNode message = root.path("message");
+                JsonNode security = message.path("security");
+
+                //String reason = security.path("reason");
+                System.out.println(security.path("reason").toString());
+
+            }
+        }
+    }
+}
