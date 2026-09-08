@@ -86,9 +86,9 @@
 # 로그 데이터 파싱 설정 후 수집 데이터
 	=====================================================================
 	v1_logs: [1769275011.1090294645, {"log":"### LampController start"}]
-	v1_logs: [1769275011.1095956545, {"timestamp":"2026-01-25 02:16:51.232","service":"OG077201","operation":"LampController Logic","bizTransactionId":null,"transactionId":"a4a9960a-e8df-46e1-8426-934ff2c4063b","logType":"IN_RES","payload":null,"caller":null,"host":{"name":"sung-PC","ip":"169.254.83.107"},"response":{"type":"I","code":"SUCCESS","duration":"303"},"user":{"id":"82284884","ip":"169.254.83.107","type":"LAMP_MANAGER"},"device":null,"security":{"type":"ACCESS","event":"LOGIN","target":"82284884","reason":"\uc798\ub418\ub098 \ud14c\uc2a4\ud2b8 \ud574\ubcf4\uc790","detail":"{\"id\":\"82284884\",\"ip\":\"10.225.164.84\",\"type\":\"LAMP_MANAGER\"}"},"destination":null}]
+	v1_logs: [1769275011.1095956545, {"timestamp":"2026-01-25 02:16:51.232","service":"AB070707","operation":"LampController Logic","bizTransactionId":null,"transactionId":"a4a9960a-e8df-46e1-8426-934ff2c4063b","logType":"IN_RES","payload":null,"caller":null,"host":{"name":"sung-PC","ip":"169.254.83.107"},"response":{"type":"I","code":"SUCCESS","duration":"303"},"user":{"id":"87987987","ip":"169.254.83.107","type":"LAMP_MANAGER"},"device":null,"security":{"type":"ACCESS","event":"LOGIN","target":"87987987","reason":"\uc798\ub418\ub098 \ud14c\uc2a4\ud2b8 \ud574\ubcf4\uc790","detail":"{\"id\":\"87987987\",\"ip\":\"10.225.164.84\",\"type\":\"LAMP_MANAGER\"}"},"destination":null}]
 	v1_logs: [1769275011.1101638345, {"log":"### LampController end"}]
-	v1_logs: [1769275011.1099672445, {"timestamp":"2026-01-25 02:16:51.239","service":"OG077201","operation":"LampBusinessService Logic","bizTransactionId":null,"transactionId":"7ba9627b-bd89-4f62-9048-76e501107681","logType":"IN_RES","payload":null,"caller":null,"host":{"name":"sung-PC","ip":"169.254.83.107"},"response":{"type":"I","code":"SUCCESS","duration":"303"},"user":{"id":"82284884","ip":"169.254.83.107","type":"LAMP_MANAGER"},"device":null,"security":{"type":"ACCESS","event":"LOGIN","target":"82284884","reason":"\uc798\ub418\ub098 \ud14c\uc2a4\ud2b8 \ud574\ubcf4\uc790","detail":"{\"id\":\"82284884\",\"ip\":\"10.225.164.84\",\"type\":\"LAMP_MANAGER\"}"},"destination":null}]
+	v1_logs: [1769275011.1099672445, {"timestamp":"2026-01-25 02:16:51.239","service":"AB070707","operation":"LampBusinessService Logic","bizTransactionId":null,"transactionId":"7ba9627b-bd89-4f62-9048-76e501107681","logType":"IN_RES","payload":null,"caller":null,"host":{"name":"sung-PC","ip":"169.254.83.107"},"response":{"type":"I","code":"SUCCESS","duration":"303"},"user":{"id":"87987987","ip":"169.254.83.107","type":"LAMP_MANAGER"},"device":null,"security":{"type":"ACCESS","event":"LOGIN","target":"87987987","reason":"\uc798\ub418\ub098 \ud14c\uc2a4\ud2b8 \ud574\ubcf4\uc790","detail":"{\"id\":\"87987987\",\"ip\":\"10.225.164.84\",\"type\":\"LAMP_MANAGER\"}"},"destination":null}]
 	=====================================================================
 
 # 규격에 맞는 로그만 분리하기
@@ -188,7 +188,7 @@
 
 	- fluent bit 에서 출력한 데이터
 	=====================================================================
-	v1_logs: [1769275011.1095956545, {"timestamp":"2026-01-25 02:16:51.232","service":"OG077201","operation":"LampController Logic","bizTransactionId":null,"transactionId":"a4a9960a-e8df-46e1-8426-934ff2c4063b","logType":"IN_RES","payload":null,"caller":null,"host":{"name":"sung-PC","ip":"169.254.83.107"},"response":{"type":"I","code":"SUCCESS","duration":"303"},"user":{"id":"82284884","ip":"169.254.83.107","type":"LAMP_MANAGER"},"device":null,"security":{"type":"ACCESS","event":"LOGIN","target":"82284884","reason":"\uc798\ub418\ub098 \ud14c\uc2a4\ud2b8 \ud574\ubcf4\uc790","detail":"{\"id\":\"82284884\",\"ip\":\"10.225.164.84\",\"type\":\"LAMP_MANAGER\"}"},"destination":null}]
+	v1_logs: [1769275011.1095956545, {"timestamp":"2026-01-25 02:16:51.232","service":"AB070707","operation":"LampController Logic","bizTransactionId":null,"transactionId":"a4a9960a-e8df-46e1-8426-934ff2c4063b","logType":"IN_RES","payload":null,"caller":null,"host":{"name":"sung-PC","ip":"169.254.83.107"},"response":{"type":"I","code":"SUCCESS","duration":"303"},"user":{"id":"87987987","ip":"169.254.83.107","type":"LAMP_MANAGER"},"device":null,"security":{"type":"ACCESS","event":"LOGIN","target":"87987987","reason":"\uc798\ub418\ub098 \ud14c\uc2a4\ud2b8 \ud574\ubcf4\uc790","detail":"{\"id\":\"87987987\",\"ip\":\"10.225.164.84\",\"type\":\"LAMP_MANAGER\"}"},"destination":null}]
 	=====================================================================
 	
 	위 데이터에는 태그와 시간이 붙어있음
@@ -205,7 +205,7 @@
 	=====================================================================
 	{
 	  "timestamp":"2026-01-25 04:47:21.924",
-	  "service":"OG077201",
+	  "service":"AB070707",
 	  "operation":"로그인",
 	  "security":{
 		"reason":"잘되나 테스트 해보자"

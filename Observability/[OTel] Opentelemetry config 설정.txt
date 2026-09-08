@@ -91,3 +91,185 @@
 		  exporters: [otlphttp/filtered_traces]
 
 	=====================================================================
+
+# 여러곳으로 내보내야 할 경우
+	이렇게 파이프라인을 여러개 만들어서 할 수 있음
+	=====================================================================
+	service:
+	  pipelines:
+		logs/kafka:
+		  receivers: [otlp]
+		  processors: [transform/logs]
+		  exporters: [kafka/logs]
+
+		logs/file:
+		  receivers: [otlp]
+		  processors: []
+		  exporters: [file/logs]
+
+	=====================================================================
+
+# contrib 사용하여 여러 기능 사용하기
+	- 아래처럼 사용
+	- log_statements 에서 로그에 들어있는 데이터 파싱 가능
+	- 속성들의 위치를 추가할수 있음
+	=====================================================================
+	receivers:
+	  otlp:
+		protocols:
+		  grpc:
+			endpoint: 127.0.0.1:9999
+
+
+
+
+	#묶어서 보내지 않도록 설정
+	#다만 해도 묶어서 보냄..
+	processors:
+	  batch:
+		timeout: 1ms
+		send_batch_size: 1
+
+	# traceid와 spanid 를 속성에 매핑
+	  # logRecords flatten
+	  transform:
+		log_statements:
+		  - context: log
+			statements:
+			  # 1body.stringValue → body 로 단순화
+			  - set(body, body.string) where body.string != nil
+
+			  # 2trace / span 승격
+			  - set(attributes["trace_id"], trace_id.string)
+			  - set(attributes["span_id"], span_id.string)
+
+			  # 3TOPIC_LAMP → attributes (Kafka routing용)
+			  - set(attributes["topic"], resource.attributes["TOPIC_LAMP"])
+
+			  # 4OTEL 메타 제거
+			  - delete_key(resource.attributes, "*")
+			  - delete_key(attributes, "otel.*")
+
+
+	  transform/logs:
+		log_statements:
+		  - context: log
+			statements:
+			  # 1️ JSON 문자열만 파싱 (첫 글자가 '{')
+			  - set(body, ParseJSON(body.string))
+				where IsString(body)
+				  and Substring(body.string, 0, 1) == "{"
+
+			  # 2️ trace / span 주입 (JSON 로그만)
+			  - set(body["trace_id"], trace_id.string)
+				where IsMap(body)
+
+			  - set(body["span_id"], span_id.string)
+				where IsMap(body)
+
+			  # 3️ topic 주입
+			  - set(body["topic"], resource.attributes["TOPIC_LAMP"])
+				where IsMap(body)
+			  # 4 service_name 주입
+			  - set(body["service_name"], resource.attributes["service.name"])
+				where IsMap(body)
+
+			  # 5 response 파싱(json)
+			  - set(body["response"], ParseJSON(body["response"]))
+				where IsMap(body)
+				  and IsString(body["response"])
+				  and Substring(body["response"], 0, 1) == "{"
+
+			  # 6 security 파싱
+			  - set(body["security"], ParseJSON(body["security"]))
+				where IsMap(body)
+				  and IsString(body["security"])
+				  and Substring(body["security"], 0, 1) == "{"
+
+			  # 7 security.detail 파싱
+			  - set(body["security"]["detail"], ParseJSON(body["security"]["detail"]))
+				where IsMap(body)
+				  and IsString(body["security"]["detail"])
+				  and Substring(body["security"]["detail"], 0, 1) == "{"
+	 
+			  # 8 host 파싱
+			  - set(body["host"], ParseJSON(body["host"]))
+				where IsMap(body)
+				  and IsString(body["host"])
+				  and Substring(body["host"], 0, 1) == "{"
+
+	exporters:
+	  # =====================
+	  # FILE EXPORTERS (분리)
+	  # =====================
+	  file/logs:
+		path: logs.json
+
+	  file/traces:
+		path: traces.json
+
+	  file/metrics:
+		path: metrics.json
+
+	  # =====================
+	  # OTHER EXPORTERS
+	  # =====================
+	  debug:
+		verbosity: detailed
+
+	  prometheus:
+		endpoint: 127.0.0.1:9464
+
+	  otlp/jaeger:
+		endpoint: 127.0.0.1:4317
+		tls:
+		  insecure: true
+
+	  otlphttp:
+		endpoint: http://127.0.0.1:3100/otlp
+
+	  otlphttp/fluentbit:
+		endpoint: http://221.153.107.124:4318
+
+	  otlp/dataprepper:
+		endpoint: 221.153.107.124:21890
+		tls:
+		  insecure: true
+	  
+	  kafka/logs:
+		brokers:
+		  - localhost:9092
+		topic: TOPIC_LAMP05
+
+
+	service:
+	  pipelines:
+		logs:
+		  receivers: [otlp]
+		  processors: [transform/logs]
+		  exporters: [file/logs, debug, otlphttp/fluentbit]
+		  #exporters: [file/logs, otlp/dataprepper, debug, kafka/logs]
+		  #exporters: [file/logs, otlphttp]
+
+		traces:
+		  receivers: [otlp]
+		  processors: [batch]
+		  exporters: [file/traces]
+		  #exporters: [file/traces, otlp/jaeger]
+
+		metrics:
+		  receivers: [otlp]
+		  processors: [batch]
+		  exporters: [file/metrics]
+		  #exporters: [file/metrics, prometheus]
+
+	  telemetry:
+		metrics:
+		  readers:
+			- pull:
+				exporter:
+				  prometheus:
+					host: '0.0.0.0'
+					port: 8888
+
+	=====================================================================

@@ -64,7 +64,7 @@
 	- 수집된 데이터는 아래와 같이 저장됨
 	=====================================================================
 	v1_logs: [1769275011.1090294645, {"log":"### LampController start"}]
-	v1_logs: [1769275011.1095956545, {"timestamp":"2026-01-25 02:16:51.232","service":"OG077201"}
+	v1_logs: [1769275011.1095956545, {"timestamp":"2026-01-25 02:16:51.232","service":"AB070707"}
 	=====================================================================
 
 
@@ -87,7 +87,7 @@
 	  "severityNumber": 9,
 	  "droppedAttributesCount": 0,
 	  "serviceName": "otel-agent-springboot-01",
-	  "body": "{\"timestamp\":\"2026-01-26 22:57:55.269\",\"service\":\"OG077201\",\"operation\":\"LampBusinessService Logic\",\"bizTransactionId\":null,\"transactionId\":\"6d98f64b-c8e9-45c5-8466-115dd2e73aab\",\"logType\":\"IN_RES\",\"payload\":null,\"caller\":null,\"host\":{\"name\":\"sung-PC\",\"ip\":\"169.254.83.107\"},\"response\":{\"type\":\"I\",\"code\":\"SUCCESS\",\"duration\":\"303\"},\"user\":{\"id\":\"82284884\",\"ip\":\"169.254.83.107\",\"type\":\"LAMP_MANAGER\"},\"device\":null,\"security\":{\"type\":\"ACCESS\",\"event\":\"LOGIN\",\"target\":\"82284884\",\"reason\":\"잘되나 테스트 해보자\",\"detail\":\"{\\\"id\\\":\\\"82284884\\\",\\\"ip\\\":\\\"10.225.164.84\\\",\\\"type\\\":\\\"LAMP_MANAGER\\\"}\"},\"destination\":null}",
+	  "body": "{\"timestamp\":\"2026-01-26 22:57:55.269\",\"service\":\"AB070707\",\"operation\":\"LampBusinessService Logic\",\"bizTransactionId\":null,\"transactionId\":\"6d98f64b-c8e9-45c5-8466-115dd2e73aab\",\"logType\":\"IN_RES\",\"payload\":null,\"caller\":null,\"host\":{\"name\":\"sung-PC\",\"ip\":\"169.254.83.107\"},\"response\":{\"type\":\"I\",\"code\":\"SUCCESS\",\"duration\":\"303\"},\"user\":{\"id\":\"87987987\",\"ip\":\"169.254.83.107\",\"type\":\"LAMP_MANAGER\"},\"device\":null,\"security\":{\"type\":\"ACCESS\",\"event\":\"LOGIN\",\"target\":\"87987987\",\"reason\":\"잘되나 테스트 해보자\",\"detail\":\"{\\\"id\\\":\\\"87987987\\\",\\\"ip\\\":\\\"10.225.164.84\\\",\\\"type\\\":\\\"LAMP_MANAGER\\\"}\"},\"destination\":null}",
 	  "observedTimestamp": "2026-01-26T13:57:55.271028200Z",
 	  "schemaUrl": "https://opentelemetry.io/schemas/1.24.0",
 	  "log.attributes.trace_id": "2877962896f6408f368de5922c53d601",
@@ -109,7 +109,7 @@
 	  "resource.attributes.telemetry@distro@name": "opentelemetry-java-instrumentation",
 	  "log.attributes.span_id": "6523fa3c346bb9a6",
 	  "resource.attributes.os@type": "windows",
-	  "resource.attributes.TOPIC_LAMP": "OG077201",
+	  "resource.attributes.TOPIC_LAMP": "AB070707",
 	  "resource.attributes.os@description": "Windows 10 10.0",
 	  "resource.attributes.telemetry@distro@version": "2.3.0"
 	}
@@ -158,7 +158,7 @@
 	  "resource.attributes.telemetry@distro@name": "opentelemetry-java-instrumentation",
 	  "log.attributes.span_id": "264630ec38feb394",
 	  "resource.attributes.os@type": "windows",
-	  "resource.attributes.TOPIC_LAMP": "OG077201",
+	  "resource.attributes.TOPIC_LAMP": "AB070707",
 	  "resource.attributes.os@description": "Windows 10 10.0",
 	  "resource.attributes.telemetry@distro@version": "2.3.0"
 	}	
@@ -275,15 +275,15 @@
 			},
 			"security": {
 			  "event": "LOGIN",
-			  "target": "82284884",
+			  "target": "87987987",
 			  "reason": "\uc798\ub418\ub098 \ud14c\uc2a4\ud2b8 \ud574\ubcf4\uc790",
 			  "type": "ACCESS",
-			  "detail": "{\"id\":\"82284884\",\"ip\":\"10.225.164.84\",\"type\":\"LAMP_MANAGER\"}"
+			  "detail": "{\"id\":\"87987987\",\"ip\":\"10.225.164.84\",\"type\":\"LAMP_MANAGER\"}"
 			},
 			"operation": "LampController Logic",
 			"user": {
 			  "type": "LAMP_MANAGER",
-			  "id": "82284884",
+			  "id": "87987987",
 			  "ip": "169.254.83.107"
 			},
 			"response": {
@@ -292,7 +292,7 @@
 			  "code": "SUCCESS"
 			},
 			"timestamp": "2026-01-28 01:44:44.682",
-			"service": "OG077201",
+			"service": "AB070707",
 			"transactionId": "4d0008e1-b36d-4389-8dcf-d1ad5abc1b9d",
 			"service_name": "otel-agent-springboot-01",
 			"logType": "IN_RES",
